@@ -1,6 +1,9 @@
+import time
+
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
+from ..utils.api.model import DailyData
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.hint import BIND_UID_HINT
 from ..utils.waves_api import waves_api
@@ -28,8 +31,17 @@ async def send_daily_info_pic(bot: Bot, ev: Event):
     if not uid:
         return await bot.send(BIND_UID_HINT)
 
-    flag, game_info = await waves_api.get_game_info(ck)
-    if not flag:
-        return await bot.send(game_info)
+    succ, daily_info = await waves_api.get_daily_info(ck)
+    if not succ:
+        return await bot.send(daily_info)
 
-    await bot.send('Waves每日信息功能正在开发中，敬请期待！')
+    daily_info = DailyData(**daily_info)
+
+    res = f'''角色名: {daily_info.roleName}
+特征码: {daily_info.roleId}
+结晶碎片: {daily_info.energyData.cur} / {daily_info.energyData.total}
+体力上限: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(daily_info.energyData.refreshTimeStamp))}
+签到: {daily_info.signInTxt}
+活跃度: {daily_info.livenessData.cur} / {daily_info.livenessData.total}'''
+
+    await bot.send(res)
