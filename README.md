@@ -1,7 +1,7 @@
 # WutheringWavesUID
 
 <p align="center">
-  <a href="https://github.com/tyql688/WutheringWavesUID"><img src="https://s2.loli.net/2024/08/02/qaAu5DS9e8t7loQ.jpg" width="800" height="750" alt="StarRailUID"></a>
+  <a href="https://github.com/tyql688/WutheringWavesUID"><img src="https://s2.loli.net/2024/08/05/lFN6J5sirhC42by.jpg" width="480" height="270" alt="WutheringWavesUID"></a>
 </p>
 <h1 align = "center">WutheringWavesUID 1.0</h1>
 <h4 align = "center">🚧支持OneBot(QQ)、QQ频道、微信、开黑啦、Telegram的全功能鸣潮Bot插件🚧</h4>
@@ -32,3 +32,9 @@
 
 + 本项目仅供学习使用，请勿用于商业用途
 + [GPL-3.0 License](https://github.com/tyql688/WutheringWavesUID/blob/master/LICENSE)
+
+### 致谢
+
+- [waves-plugin](https://github.com/erzaozi/waves-plugin) Yunzai 鸣潮游戏数据查询插件
+- [Yunzai-Kuro-Plugin](https://github.com/TomyJan/Yunzai-Kuro-Plugin) Yunzai 库洛插件
+- [Kuro-API-Collection](https://github.com/TomyJan/Kuro-API-Collection) 库街区 API 文档
