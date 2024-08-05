@@ -11,6 +11,7 @@ class WavesBind(Bind, table=True):
 
 
 class WavesUser(User, table=True):
+    cookie: str = Field(default='', title='Cookie')
     uid: Optional[str] = Field(default=None, title='鸣潮UID')
     tap_uid: Optional[str] = Field(default=None, title='TapTapUID')
 

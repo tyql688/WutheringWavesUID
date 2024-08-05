@@ -3,6 +3,7 @@ from ..utils.waves_prefix import PREFIX
 WAVES_CODE_100 = -100
 WAVES_CODE_101 = -101
 WAVES_CODE_102 = -102
+WAVES_CODE_103 = -103
 WAVES_CODE_200 = -200
 WAVES_CODE_201 = -201
 WAVES_CODE_202 = -202
@@ -15,6 +16,7 @@ ERROR_CODE = {
     WAVES_CODE_100: "库街区未查询到你的游戏角色，请检查是否对外访问",
     WAVES_CODE_101: "请检查ck有效性",
     WAVES_CODE_102: f"当前角色未绑定鸣潮ck, 请使用 {PREFIX}添加CK 完成绑定！",
+    WAVES_CODE_103: f"当前角色未绑定鸣潮id, 请使用 {PREFIX}绑定UID 完成绑定！",
 
     WAVES_CODE_200: "当前TapTap账号未绑定鸣潮角色",
     WAVES_CODE_201: "未获取到TapTap账号绑定的鸣潮角色信息",

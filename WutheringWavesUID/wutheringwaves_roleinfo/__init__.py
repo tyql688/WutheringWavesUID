@@ -15,10 +15,10 @@ waves_role_info = SV('waves查询信息')
 
 @waves_role_info.on_fullmatch(f'{PREFIX}查询', block=True)
 async def send_role_info(bot: Bot, ev: Event):
-    logger.info('开始执行[Waves查询]')
+    logger.info('[鸣潮]开始执行[查询信息]')
     user_id = ev.at if ev.at else ev.user_id
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
-    logger.info(f'[Waves查询] user_id: {user_id} UID: {uid}')
+    logger.info(f'[鸣潮][查询信息] user_id: {user_id} UID: {uid}')
     if not uid:
         return await bot.send(BIND_UID_HINT)
 

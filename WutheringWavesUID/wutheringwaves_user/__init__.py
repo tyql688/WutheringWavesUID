@@ -1,9 +1,12 @@
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from .add_ck import add_cookie, add_tap
+from gsuid_core.utils.message import send_diff_msg
+from .add import add_cookie, add_tap
+from ..utils.database.models import WavesBind
 from ..utils.waves_prefix import PREFIX
 
+waves_bind_uid = SV('waves绑定uid')
 waves_add_ck = SV('waves添加ck')
 waves_bind_tap = SV('绑定tap')
 
@@ -26,3 +29,62 @@ async def send_waves_add_ck_msg(bot: Bot, ev: Event):
 async def send_waves_add_ck_msg(bot: Bot, ev: Event):
     tap_uid = ev.text.strip()
     await bot.send(await add_tap(ev, tap_uid))
+
+
+@waves_bind_uid.on_command(
+    (
+            f'{PREFIX}绑定uid',
+            f'{PREFIX}绑定UID',
+            f'{PREFIX}切换uid',
+            f'{PREFIX}切换UID',
+            f'{PREFIX}删除uid',
+            f'{PREFIX}删除UID',
+            f'{PREFIX}查看uid',
+            f'{PREFIX}查看UID',
+    ),
+    block=True,
+)
+async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
+    uid = ev.text.strip()
+
+    await bot.logger.info('[鸣潮] 开始执行[绑定/解绑用户信息]')
+    qid = ev.user_id
+    await bot.logger.info('[鸣潮] [绑定/解绑]UserID: {}'.format(qid))
+
+    if '绑定' in ev.command:
+        if not uid:
+            return await bot.send('该命令需要带上正确的uid!\n')
+        data = await WavesBind.insert_uid(qid, ev.bot_id, uid, ev.group_id, lenth_limit=9)
+        return await send_diff_msg(
+            bot,
+            data,
+            {
+                0: f'[鸣潮] 绑定UID{uid}成功！',
+                -1: f'[鸣潮] UID{uid}的位数不正确！',
+                -2: f'[鸣潮] UID{uid}已经绑定过了！',
+                -3: '[鸣潮] 你输入了错误的格式!',
+            },
+        )
+    elif '切换' in ev.command:
+        retcode = await WavesBind.switch_uid_by_game(qid, ev.bot_id, uid)
+        if retcode == 0:
+            return await bot.send(f'[鸣潮] 切换UID{uid}成功！')
+        else:
+            return await bot.send(f'[鸣潮] 尚未绑定该UID{uid}')
+    elif '查看' in ev.command:
+        uid_list = await WavesBind.get_uid_list_by_game(qid, ev.bot_id, uid)
+        if uid_list:
+            uids = '\n'.join(uid_list)
+            return await bot.send(f'[鸣潮] 绑定的UID列表为：\n{uids}')
+        else:
+            return await bot.send(f'[鸣潮] 尚未绑定任何UID')
+    else:
+        data = await WavesBind.delete_uid(qid, ev.bot_id, uid)
+        return await send_diff_msg(
+            bot,
+            data,
+            {
+                0: f'[鸣潮] 删除UID{uid}成功！',
+                -1: f'[鸣潮] 该UID{uid}不在已绑定列表中！',
+            },
+        )
