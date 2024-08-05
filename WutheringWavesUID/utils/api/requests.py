@@ -1,11 +1,11 @@
 import copy
-from typing import Any, Dict, Union, Literal, Optional
+from typing import Any, Dict, Union, Literal, Optional, List
 
 from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 
 from gsuid_core.logger import logger
 from .api import *
-from ..error_reply import ERROR_CODE
+from ..error_reply import ERROR_CODE, WAVES_CODE_100, WAVES_CODE_200, WAVES_CODE_998, WAVES_CODE_999
 
 
 async def _check_response(res: Dict) -> (bool, Union[Dict, str]):
@@ -45,7 +45,7 @@ class WavesApi:
         for role in data['defaultRoleList']:
             if role['gameId'] == gameId:
                 return True, role
-        return False, ERROR_CODE[-100]
+        return False, WAVES_CODE_100
 
     async def get_daily_info(self, token: str) -> (bool, Union[Dict, str]):
         """每日"""
@@ -92,11 +92,11 @@ class WavesApi:
         return await _check_response(raw_data)
 
     async def get_explore_data(
-        self,
-        serverId: str,
-        roleId: str,
-        token: str,
-        countryCode: str = "1"
+            self,
+            serverId: str,
+            roleId: str,
+            token: str,
+            countryCode: str = "1"
     ) -> (bool, Union[Dict, str]):
         """探索度"""
         header = copy.deepcopy(self._HEADER)
@@ -124,34 +124,107 @@ class WavesApi:
         return await _check_response(raw_data)
 
     async def _waves_request(
-        self,
-        url: str,
-        method: Literal["GET", "POST"] = "GET",
-        header=None,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        data: Optional[FormData] = None,
+            self,
+            url: str,
+            method: Literal["GET", "POST"] = "GET",
+            header=None,
+            params: Optional[Dict[str, Any]] = None,
+            json: Optional[Dict[str, Any]] = None,
+            data: Optional[FormData] = None,
     ) -> Union[Dict, int]:
 
         if header is None:
             header = self._HEADER
 
         async with ClientSession(
-            connector=TCPConnector(verify_ssl=self.ssl_verify)
+                connector=TCPConnector(verify_ssl=self.ssl_verify)
         ) as client:
             async with client.request(
-                method,
-                url=url,
-                headers=header,
-                params=params,
-                json=json,
-                data=data,
-                timeout=300,
+                    method,
+                    url=url,
+                    headers=header,
+                    params=params,
+                    json=json,
+                    data=data,
+                    timeout=300,
             ) as resp:
                 try:
                     raw_data = await resp.json()
                 except ContentTypeError:
                     _raw_data = await resp.text()
-                    raw_data = {"code": -999, "data": _raw_data}
+                    raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
+                logger.debug(raw_data)
+                return raw_data
+
+
+class TapApi:
+    ssl_verify = True
+    _DEFAULT_DATA = {
+        'app_id': TAP_WAVES_APP_ID,
+        'X-UA': TAP_UA
+    }
+    _HEADER = {
+        "Content-Type": "application/json; charset=utf-8",
+        "User-Agent": TAP_USER_AGENT
+    }
+
+    async def get_waves_id_by_tap(self, tapUserId: int) -> int:
+        data = copy.deepcopy(self._DEFAULT_DATA)
+        data.update({'user_id': tapUserId})
+        raw_data = await self._tap_request(USER_DETAIL, "GET", None, params=data)
+        valid_data = raw_data.get('data', {})
+        if not isinstance(valid_data, dict):
+            return WAVES_CODE_998
+
+        # 检查是否绑定
+        bind = valid_data.get('is_bind', False)
+        if not bind:
+            return WAVES_CODE_200
+
+        # 获取角色 ID
+        role_info = next((item for item in valid_data.get('list', []) if 'basic_module' in item), None)
+        subtitle = role_info['basic_module']['subtitle'] if role_info else None
+        role_id = subtitle.split("ID:")[1]
+        logger.debug(f"TapTap : {tapUserId}, 获取到鸣潮角色ID: {role_id}")
+        return int(role_id)
+
+    async def get_all_role_info(self, tapUserId: int, roleNum: int = 100) -> Union[List, None]:
+        data = copy.deepcopy(self._DEFAULT_DATA)
+        data.update({'user_id': tapUserId, 'form': 0, 'limit': roleNum, })
+        raw_data = await self._tap_request(CHAR_DETAIL, "GET", None, params=data)
+        if not raw_data:
+            return
+        return raw_data.get('data', {}).get('list', None)
+
+    async def _tap_request(
+            self,
+            url: str,
+            method: Literal["GET", "POST"] = "GET",
+            header=None,
+            params: Optional[Dict[str, Any]] = None,
+            json: Optional[Dict[str, Any]] = None,
+            data: Optional[FormData] = None,
+    ) -> Union[Dict, int]:
+
+        if header is None:
+            header = self._HEADER
+
+        async with ClientSession(
+                connector=TCPConnector(verify_ssl=self.ssl_verify)
+        ) as client:
+            async with client.request(
+                    method,
+                    url=url,
+                    headers=header,
+                    params=params,
+                    json=json,
+                    data=data,
+                    timeout=300,
+            ) as resp:
+                try:
+                    raw_data = await resp.json()
+                except ContentTypeError:
+                    _raw_data = await resp.text()
+                    raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
                 logger.debug(raw_data)
                 return raw_data

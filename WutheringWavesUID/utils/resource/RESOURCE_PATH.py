@@ -8,6 +8,8 @@ sys.path.append(str(MAIN_PATH))
 # 配置文件
 CONFIG_PATH = MAIN_PATH / 'config.json'
 
+PLAYER_PATH = MAIN_PATH / 'players'
+
 
 def init_dir():
     for i in [

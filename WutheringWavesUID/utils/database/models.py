@@ -7,11 +7,12 @@ from gsuid_core.webconsole.mount_app import PageSchema, GsAdminModel, site
 
 
 class WavesBind(Bind, table=True):
-    uid: Optional[str] = Field(default=None, title='WavesUID')
+    uid: Optional[str] = Field(default=None, title='鸣潮UID')
 
 
 class WavesUser(User, table=True):
-    uid: Optional[str] = Field(default=None, title='WavesUID')
+    uid: Optional[str] = Field(default=None, title='鸣潮UID')
+    tap_uid: Optional[str] = Field(default=None, title='TapTapUID')
 
 
 @site.register_admin
