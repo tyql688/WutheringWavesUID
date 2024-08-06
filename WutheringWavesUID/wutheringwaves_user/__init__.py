@@ -2,12 +2,13 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.message import send_diff_msg
-from .add import add_cookie, add_tap
+from .deal import add_cookie, add_tap, delete_cookie
 from ..utils.database.models import WavesBind
 from ..utils.waves_prefix import PREFIX
 
 waves_bind_uid = SV('waves绑定uid')
 waves_add_ck = SV('waves添加ck')
+waves_del_ck = SV('waves删除ck')
 waves_bind_tap = SV('绑定tap')
 
 
@@ -15,6 +16,14 @@ waves_bind_tap = SV('绑定tap')
 async def send_waves_add_ck_msg(bot: Bot, ev: Event):
     ck = ev.text.strip()
     await bot.send(await add_cookie(ev, ck))
+
+
+@waves_del_ck.on_prefix((f'{PREFIX}删除ck', f'{PREFIX}王者删除CK'))
+async def send_waves_del_ck_msg(bot: Bot, ev: Event):
+    uid = ev.text.strip()
+    if not uid or len(uid) != 9:
+        return await bot.send(f'末尾需要跟正确的UID, 例如 {PREFIX}删除CK1234567')
+    await bot.send(await delete_cookie(uid))
 
 
 @waves_bind_tap.on_prefix(

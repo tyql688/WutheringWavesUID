@@ -28,22 +28,15 @@ async def send_card_info(bot: Bot, ev: Event):
     if not user_list:
         return await bot.send(hint.error_reply(code=WAVES_CODE_102))
 
-    tap_uid = None
-    str_waves_uid = str(waves_uid)
-    for user in user_list:
-        if user.uid != str_waves_uid:
-            continue
-        tap_uid = user.tap_uid
-        break
-
-    if not tap_uid:
+    user = await WavesUser.get_user_by_attr(user_id, ev.bot_id, 'uid', str(waves_uid))
+    if not user or not user.tap_uid:
         return await bot.send(hint.error_reply(code=WAVES_CODE_203))
 
-    await bot.logger.info(f'[{PREFIX}强制刷新]uid: {waves_uid} tap_uid: {tap_uid}')
-    waves_datas = await tap_api.get_all_role_info(tap_uid)
+    await bot.logger.info(f'[{PREFIX}强制刷新]uid: {waves_uid} tap_uid: {user.tap_uid}')
+    waves_datas = await tap_api.get_all_role_info(user.tap_uid)
     if not waves_datas:
         return await bot.send(hint.error_reply(code=WAVES_CODE_204))
-    await save_card_info(user_id, waves_uid, tap_uid, waves_datas)
+    await save_card_info(user_id, waves_uid, user.tap_uid, waves_datas)
 
     return await bot.send('强制刷新成功')
 

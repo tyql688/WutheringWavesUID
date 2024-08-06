@@ -16,7 +16,7 @@ async def _check_response(res: Dict) -> (bool, Union[Dict, str]):
 
         if res.get('msg'):
             return False, res['msg']
-    return False, ERROR_CODE[-999]
+    return False, ERROR_CODE[WAVES_CODE_999]
 
 
 class WavesApi:
