@@ -21,8 +21,8 @@ ERROR_CODE = {
     WAVES_CODE_200: "当前TapTap账号未绑定鸣潮角色",
     WAVES_CODE_201: "未获取到TapTap账号绑定的鸣潮角色信息",
     WAVES_CODE_202: "请绑定自己的TapTap账号",
-    WAVES_CODE_203: f"当前角色已绑定鸣潮ck, 但未绑定TapTap账号, 请使用 {PREFIX}绑定tap 完成绑定！",
-    WAVES_CODE_204: "TapTap强制刷新面板失败，请稍后再试",
+    WAVES_CODE_203: f"当前角色未绑定TapTap账号, 请使用 {PREFIX}绑定tap 完成绑定！",
+    WAVES_CODE_204: "TapTap强制刷新面板失败，请检查TapTap账号是否已经解绑鸣潮",
 
     WAVES_CODE_998: "请求TapTap错误，先看看日志吧",
     WAVES_CODE_999: "不知道的错误，先看看日志吧"

@@ -39,7 +39,7 @@ async def send_card_info(bot: Bot, ev: Event):
     if not tap_uid:
         return await bot.send(hint.error_reply(code=WAVES_CODE_203))
 
-    await bot.logger.info(f'[ww强制刷新]uid: {waves_uid} tap_uid: {tap_uid}')
+    await bot.logger.info(f'[{PREFIX}强制刷新]uid: {waves_uid} tap_uid: {tap_uid}')
     waves_datas = await tap_api.get_all_role_info(tap_uid)
     if not waves_datas:
         return await bot.send(hint.error_reply(code=WAVES_CODE_204))

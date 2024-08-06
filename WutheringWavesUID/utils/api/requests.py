@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime
 from typing import Any, Dict, Union, Literal, Optional, List
 
 from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
@@ -122,6 +123,14 @@ class WavesApi:
                 'roleId': roleId}
         raw_data = await self._waves_request(CHALLENGE_INDEX_URL, "POST", header, data=data)
         return await _check_response(raw_data)
+
+    async def sign_in(self, serverId: str, roleId: str, token: str) -> (bool, Union[Dict, str]):
+        """签到"""
+        header = copy.deepcopy(self._HEADER)
+        header.update({'token': token, 'devcode': ''})
+        data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId, 'reqMonth': f"{datetime.now().month:02}"}
+        return await self._waves_request(SIGNIN_URL, "POST", header, data=data)
+        # return await _check_response(raw_data)
 
     async def _waves_request(
             self,
