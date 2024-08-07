@@ -47,6 +47,7 @@ async def recheck(bot: Bot, ev: Event):
 @scheduler.scheduled_job('cron', hour=SIGN_TIME[0], minute=SIGN_TIME[1])
 async def waves_sign_at_night():
     if WutheringWavesConfig.get_config('SchedSignin').data:
+        logger.info('[鸣潮] [定时签到] 开始执行!')
         result = await daily_sign()
         if not IS_REPORT:
             result['private_msg_dict'] = {}

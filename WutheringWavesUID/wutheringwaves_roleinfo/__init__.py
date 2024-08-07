@@ -33,12 +33,12 @@ async def send_role_info(bot: Bot, ev: Event):
     game_info = KuroRoleInfo(**game_info)
 
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(game_info.serverId, uid, ck)
+    succ, role_info = await waves_api.get_role_info(uid, ck, game_info.serverId)
     if not succ:
         return await bot.send(role_info)
 
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(game_info.serverId, uid, ck)
+    succ, account_info = await waves_api.get_base_info(uid, ck, game_info.serverId)
     if not succ:
         return await bot.send(account_info)
 

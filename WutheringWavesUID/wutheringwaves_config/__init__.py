@@ -15,7 +15,7 @@ PREFIX = WutheringWavesConfig.get_config('WavesPrefix').data
 async def open_switch_func(bot: Bot, ev: Event):
     uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
     if uid is None:
-        return await bot.send('[鸣潮配置] 你还没有绑定UID哦!')
+        return await bot.send(f"您还未绑定鸣潮id, 请使用 {PREFIX}绑定UID 完成绑定！")
 
     logger.info(f"[{ev.user_id}]尝试[{ev.command[2:]}]了[{ev.text}]功能")
 

@@ -165,3 +165,16 @@ class KuroRoleInfo(BaseModel):
     gameHeadUrl: str
     roleNum: int
     achievementCount: int
+
+
+class GachaLog(BaseModel):
+    cardPoolType: str
+    resourceId: int
+    qualityLevel: int
+    resourceType: str
+    name: str
+    count: int
+    time: str
+
+    def __hash__(self):
+        return hash((self.resourceId, self.time))

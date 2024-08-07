@@ -55,7 +55,7 @@ class WavesApi:
         raw_data = await self._waves_request(GAME_DATA_URL, "POST", header)
         return await _check_response(raw_data)
 
-    async def refresh_data(self, serverId: str, roleId: str, token: str) -> (bool, Union[Dict, str]):
+    async def refresh_data(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         """刷新数据"""
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
@@ -63,28 +63,29 @@ class WavesApi:
         raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
-    async def get_base_info(self, serverId: str, roleId: str, token: str) -> (bool, Union[Dict, str]):
+    async def get_base_info(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
         raw_data = await self._waves_request(BASE_DATA_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
-    async def get_role_info(self, serverId: str, roleId: str, token: str) -> (bool, Union[Dict, str]):
+    async def get_role_info(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
         raw_data = await self._waves_request(ROLE_DATA_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
-    async def get_role_detail_info(self, serverId: str, roleId: str, token: str, id: str) -> (bool, Union[Dict, str]):
+    async def get_role_detail_info(self, charId: str, roleId: str, token: str, serverId: str = SERVER_ID) -> (
+            bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
-        data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId, 'id': id}
+        data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId, 'id': charId}
         raw_data = await self._waves_request(ROLE_DETAIL_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
-    async def get_calabash_data(self, serverId: str, roleId: str, token: str) -> (bool, Union[Dict, str]):
+    async def get_calabash_data(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         """数据坞"""
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
@@ -94,9 +95,9 @@ class WavesApi:
 
     async def get_explore_data(
             self,
-            serverId: str,
             roleId: str,
             token: str,
+            serverId: str = SERVER_ID,
             countryCode: str = "1"
     ) -> (bool, Union[Dict, str]):
         """探索度"""
@@ -106,7 +107,7 @@ class WavesApi:
         raw_data = await self._waves_request(EXPLORE_DATA_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
-    async def get_challenge_data(self, serverId: str, roleId: str, token: str) -> (bool, Union[Dict, str]):
+    async def get_challenge_data(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         """全息"""
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
@@ -114,7 +115,7 @@ class WavesApi:
         raw_data = await self._waves_request(CHALLENGE_DATA_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
-    async def get_challenge_index(self, serverId: str, roleId: str, token: str) -> (bool, Union[Dict, str]):
+    async def get_challenge_index(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         """全息"""
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
@@ -124,13 +125,25 @@ class WavesApi:
         raw_data = await self._waves_request(CHALLENGE_INDEX_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
-    async def sign_in(self, serverId: str, roleId: str, token: str) -> (bool, Union[Dict, str]):
+    async def sign_in(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         """签到"""
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token, 'devcode': ''})
         data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId, 'reqMonth': f"{datetime.now().month:02}"}
         return await self._waves_request(SIGNIN_URL, "POST", header, data=data)
         # return await _check_response(raw_data)
+
+    async def get_gacha_log(self, cardPoolType: str, recordId: str, roleId: str, serverId: str = SERVER_ID):
+        """抽卡记录"""
+        header = {"Content-Type": "application/json;charset=UTF-8"}
+        data = {
+            "playerId": roleId,
+            "cardPoolType": cardPoolType,
+            "serverId": serverId,
+            "languageCode": "zh-Hans",
+            "recordId": recordId
+        }
+        return await self._waves_request(GACHA_LOG_URL, "POST", header, json=data)
 
     async def _waves_request(
             self,
@@ -199,7 +212,7 @@ class TapApi:
 
     async def get_all_role_info(self, tapUserId: int, roleNum: int = 100) -> Union[List, None]:
         data = copy.deepcopy(self._DEFAULT_DATA)
-        data.update({'user_id': tapUserId, 'form': 0, 'limit': roleNum, })
+        data.update({'user_id': tapUserId, 'form': 0, 'limit': roleNum})
         raw_data = await self._tap_request(CHAR_DETAIL, "GET", None, params=data)
         if not raw_data:
             return

@@ -25,7 +25,7 @@ async def sign_in(uid: str, ck: str) -> str:
         logger.info(f'{sign_title} UID{uid} 该用户今日已签到,跳过...')
         return f'{sign_title} UID{uid} 今日已签到！'
 
-    sign_in_res = await waves_api.sign_in(daily_info.serverId, daily_info.roleId, ck)
+    sign_in_res = await waves_api.sign_in(daily_info.roleId, ck, daily_info.serverId)
     if isinstance(sign_in_res, dict):
         if sign_in_res.get('code') == 200 and sign_in_res.get('data'):
             # 签到成功
@@ -105,9 +105,9 @@ async def daily_sign():
         )
         if len(tasks) >= 1:
             await asyncio.gather(*tasks)
-            delay = 30 + random.randint(3, 35)
+            delay = 5 + random.randint(1, 5)
             logger.info(
-                f'[{game_name}] [签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
+                f'[鸣潮] [签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
             )
             tasks.clear()
             await asyncio.sleep(delay)

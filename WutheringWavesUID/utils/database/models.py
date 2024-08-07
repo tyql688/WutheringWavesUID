@@ -14,6 +14,7 @@ class WavesUser(User, table=True):
     cookie: str = Field(default='', title='Cookie')
     uid: Optional[str] = Field(default=None, title='鸣潮UID')
     tap_uid: Optional[str] = Field(default=None, title='TapTapUID')
+    record_id: Optional[str] = Field(default=None, title='鸣潮记录ID')
 
     @classmethod
     async def get_user_by_attr(
