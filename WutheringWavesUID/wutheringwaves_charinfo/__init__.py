@@ -16,7 +16,12 @@ from ..utils.waves_prefix import PREFIX
 waves_get_char_info = SV('waves获取面板')
 
 
-@waves_get_char_info.on_command(f'{PREFIX}强制刷新')
+@waves_get_char_info.on_fullmatch(
+    (
+            f'{PREFIX}刷新面板',
+            f'{PREFIX}强制刷新',
+    )
+)
 async def send_card_info(bot: Bot, ev: Event):
     user_id = ev.at if ev.at else ev.user_id
 
@@ -38,7 +43,9 @@ async def send_card_info(bot: Bot, ev: Event):
         return await bot.send(hint.error_reply(code=WAVES_CODE_204))
     await save_card_info(user_id, waves_uid, user.tap_uid, waves_datas)
 
-    return await bot.send('强制刷新成功')
+    msg = f'[鸣潮] 刷新完成！本次刷新{len(waves_datas)}个角色!'
+    msg += f'\n刷新角色列表:{",".join([i["name"] for i in waves_datas])}'
+    return await bot.send(msg)
 
 
 async def save_card_info(user_id: str, uid: str, tap_uid: str, waves_datas: dict):
