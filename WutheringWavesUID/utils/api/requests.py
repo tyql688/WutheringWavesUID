@@ -1,4 +1,5 @@
 import copy
+import uuid
 from datetime import datetime
 from typing import Any, Dict, Union, Literal, Optional, List
 
@@ -78,7 +79,7 @@ class WavesApi:
         return await _check_response(raw_data)
 
     async def get_role_detail_info(self, charId: str, roleId: str, token: str, serverId: str = SERVER_ID) -> (
-            bool, Union[Dict, str]):
+        bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId, 'id': charId}
@@ -94,11 +95,11 @@ class WavesApi:
         return await _check_response(raw_data)
 
     async def get_explore_data(
-            self,
-            roleId: str,
-            token: str,
-            serverId: str = SERVER_ID,
-            countryCode: str = "1"
+        self,
+        roleId: str,
+        token: str,
+        serverId: str = SERVER_ID,
+        countryCode: str = "1"
     ) -> (bool, Union[Dict, str]):
         """探索度"""
         header = copy.deepcopy(self._HEADER)
@@ -146,29 +147,29 @@ class WavesApi:
         return await self._waves_request(GACHA_LOG_URL, "POST", header, json=data)
 
     async def _waves_request(
-            self,
-            url: str,
-            method: Literal["GET", "POST"] = "GET",
-            header=None,
-            params: Optional[Dict[str, Any]] = None,
-            json: Optional[Dict[str, Any]] = None,
-            data: Optional[FormData] = None,
+        self,
+        url: str,
+        method: Literal["GET", "POST"] = "GET",
+        header=None,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        data: Optional[FormData] = None,
     ) -> Union[Dict, int]:
 
         if header is None:
             header = self._HEADER
 
         async with ClientSession(
-                connector=TCPConnector(verify_ssl=self.ssl_verify)
+            connector=TCPConnector(verify_ssl=self.ssl_verify)
         ) as client:
             async with client.request(
-                    method,
-                    url=url,
-                    headers=header,
-                    params=params,
-                    json=json,
-                    data=data,
-                    timeout=300,
+                method,
+                url=url,
+                headers=header,
+                params=params,
+                json=json,
+                data=data,
+                timeout=300,
             ) as resp:
                 try:
                     raw_data = await resp.json()
@@ -219,29 +220,95 @@ class TapApi:
         return raw_data.get('data', {}).get('list', None)
 
     async def _tap_request(
-            self,
-            url: str,
-            method: Literal["GET", "POST"] = "GET",
-            header=None,
-            params: Optional[Dict[str, Any]] = None,
-            json: Optional[Dict[str, Any]] = None,
-            data: Optional[FormData] = None,
+        self,
+        url: str,
+        method: Literal["GET", "POST"] = "GET",
+        header=None,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        data: Optional[FormData] = None,
     ) -> Union[Dict, int]:
 
         if header is None:
             header = self._HEADER
 
         async with ClientSession(
-                connector=TCPConnector(verify_ssl=self.ssl_verify)
+            connector=TCPConnector(verify_ssl=self.ssl_verify)
         ) as client:
             async with client.request(
-                    method,
-                    url=url,
-                    headers=header,
-                    params=params,
-                    json=json,
-                    data=data,
-                    timeout=300,
+                method,
+                url=url,
+                headers=header,
+                params=params,
+                json=json,
+                data=data,
+                timeout=300,
+            ) as resp:
+                try:
+                    raw_data = await resp.json()
+                except ContentTypeError:
+                    _raw_data = await resp.text()
+                    raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
+                logger.debug(raw_data)
+                return raw_data
+
+
+class KuroLogin:
+    ssl_verify = True
+    _HEADER = {
+        "source": "android",
+        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+    }
+
+    async def login(self, mobile: int, code: str):
+        header = copy.deepcopy(self._HEADER)
+        data = {"mobile": mobile, "code": code, "devCode": str(uuid.uuid4()).upper()}
+        return await self._kuro_request(LOGIN_URL, "POST", header, data=data)
+
+    async def send_phone_code(
+        self,
+        mobile: int,
+        override_geetest: Dict = None,
+    ):
+        header = copy.deepcopy(self._HEADER)
+        header.update({"devCode": str(uuid.uuid4()).upper()})
+
+        data = {
+            "mobile": mobile,
+            "geeTestData": ""
+        }
+        if override_geetest:
+            data['geeTestData'] = override_geetest
+
+        response = await self._kuro_request(KURO_GET_CODE_URL, "POST", header, data=data)
+        if response.get('code') == 200 & response.get('data'):
+            geeTest = response.get('data', {}).get("geeTest", False)
+            pass
+
+    async def _kuro_request(
+        self,
+        url: str,
+        method: Literal["GET", "POST"] = "GET",
+        header=None,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        data: Optional[FormData] = None,
+    ) -> Union[Dict, int]:
+
+        if header is None:
+            header = self._HEADER
+
+        async with ClientSession(
+            connector=TCPConnector(verify_ssl=self.ssl_verify)
+        ) as client:
+            async with client.request(
+                method,
+                url=url,
+                headers=header,
+                params=params,
+                json=json,
+                data=data,
+                timeout=300,
             ) as resp:
                 try:
                     raw_data = await resp.json()

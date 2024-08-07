@@ -1,6 +1,19 @@
-from typing import List
+from typing import List, Union
 
+from msgspec import UNSET, Struct, UnsetType, field
 from pydantic import BaseModel
+
+
+class GeneralGeetestData(Struct):
+    geetest_challenge: str
+    geetest_seccode: str
+    geetest_validate: str
+
+
+class GeneralV1SendPhoneCodeRequest(Struct):
+    phone: str
+    type: int
+    captcha: Union[GeneralGeetestData, UnsetType] = field(default=UNSET)
 
 
 class EnergyData(BaseModel):

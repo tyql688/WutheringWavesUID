@@ -3,6 +3,7 @@ GAME_ID = 3
 
 MAIN_URL = 'https://api.kurobbs.com'
 
+KURO_GET_CODE_URL = 'https://api.kurobbs.com/user/getSmsCode'
 LOGIN_URL = f'{MAIN_URL}/user/sdkLogin'
 KURO_ROLE_URL = f'{MAIN_URL}/gamer/role/default'
 REFRESH_URL = f'{MAIN_URL}/gamer/roleBox/aki/refreshData'
