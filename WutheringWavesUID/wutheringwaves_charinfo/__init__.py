@@ -10,7 +10,7 @@ from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_203, WAVES_CODE_204
 from ..utils.hint import BIND_UID_HINT
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
-from ..utils.waves_api import tap_api
+from ..utils.tap_api import tap_api
 from ..utils.waves_prefix import PREFIX
 
 waves_get_char_info = SV('waves获取面板')

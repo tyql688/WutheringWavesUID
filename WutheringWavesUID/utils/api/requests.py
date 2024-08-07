@@ -190,9 +190,9 @@ class TapApi:
         "User-Agent": TAP_USER_AGENT
     }
 
-    async def get_waves_id_by_tap(self, tapUserId: int) -> int:
+    async def get_waves_id_by_tap(self, tap_id: int) -> int:
         data = copy.deepcopy(self._DEFAULT_DATA)
-        data.update({'user_id': tapUserId})
+        data.update({'user_id': tap_id})
         raw_data = await self._tap_request(USER_DETAIL, "GET", None, params=data)
         valid_data = raw_data.get('data', {})
         if not isinstance(valid_data, dict):
@@ -207,7 +207,7 @@ class TapApi:
         role_info = next((item for item in valid_data.get('list', []) if 'basic_module' in item), None)
         subtitle = role_info['basic_module']['subtitle'] if role_info else None
         role_id = subtitle.split("ID:")[1]
-        logger.debug(f"TapTap : {tapUserId}, 获取到鸣潮角色ID: {role_id}")
+        logger.debug(f"TapTap : {tap_id}, 获取到鸣潮角色ID: {role_id}")
         return int(role_id)
 
     async def get_all_role_info(self, tapUserId: int, roleNum: int = 100) -> Union[List, None]:

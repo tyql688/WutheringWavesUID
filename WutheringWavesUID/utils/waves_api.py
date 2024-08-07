@@ -1,5 +1,3 @@
-from ..utils.api.requests import WavesApi, TapApi
+from ..utils.api.requests import WavesApi
 
 waves_api = WavesApi()
-
-tap_api = TapApi()

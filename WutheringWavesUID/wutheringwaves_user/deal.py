@@ -3,7 +3,8 @@ from ..utils import hint
 from ..utils.api.model import KuroRoleInfo
 from ..utils.database.models import WavesUser, WavesBind
 from ..utils.error_reply import WAVES_CODE_101, WAVES_CODE_103
-from ..utils.waves_api import waves_api, tap_api
+from ..utils.tap_api import tap_api
+from ..utils.waves_api import waves_api
 
 
 async def add_cookie(ev: Event, ck: str):
@@ -58,7 +59,6 @@ async def add_tap(ev: Event, tap_uid: str):
             update_data={
                 'tap_uid': tap_uid
             })
-        return 'TapTap绑定成功！'
     else:
         await WavesUser.insert_data(ev.user_id, ev.bot_id, uid=waves_id, tap_uid=tap_uid)
 
