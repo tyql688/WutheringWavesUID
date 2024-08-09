@@ -1,12 +1,9 @@
-import time
-
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from ..utils.api.model import DailyData
-from ..utils.database.models import WavesBind, WavesUser
-from ..utils.hint import BIND_UID_HINT
-from ..utils.waves_api import waves_api
+from .draw_waves_stamina import draw_stamina_img
+from ..utils.database.models import WavesBind
+from ..utils.error_reply import ERROR_CODE, WAVES_CODE_103
 from ..utils.waves_prefix import PREFIX
 
 waves_daily_info = SV('waves查询体力')
@@ -14,35 +11,17 @@ waves_daily_info = SV('waves查询体力')
 
 @waves_daily_info.on_fullmatch(
     (
-            f'{PREFIX}每日',
-            f'{PREFIX}mr',
-            f'{PREFIX}实时便笺',
-            f'{PREFIX}便笺',
-            f'{PREFIX}便签',
-            f'{PREFIX}体力',
+        f'{PREFIX}每日',
+        f'{PREFIX}mr',
+        f'{PREFIX}实时便笺',
+        f'{PREFIX}便笺',
+        f'{PREFIX}便签',
+        f'{PREFIX}体力',
     )
 )
 async def send_daily_info_pic(bot: Bot, ev: Event):
-    await bot.logger.info('[鸣潮]开始执行[每日信息]')
-    user_id = ev.at if ev.at else ev.user_id
-    uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
-    await bot.logger.info(f'[鸣潮][每日信息]QQ号: {user_id} UID: {uid}')
-
-    ck = await WavesUser.get_user_cookie_by_uid(uid)
-    if not ck:
-        return await bot.send(BIND_UID_HINT)
-
-    succ, daily_info = await waves_api.get_daily_info(ck)
-    if not succ:
-        return await bot.send(daily_info)
-
-    daily_info = DailyData(**daily_info)
-
-    res = f'''角色名: {daily_info.roleName}
-特征码: {daily_info.roleId}
-结晶碎片: {daily_info.energyData.cur} / {daily_info.energyData.total}
-体力上限: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(daily_info.energyData.refreshTimeStamp))}
-签到: {daily_info.signInTxt}
-活跃度: {daily_info.livenessData.cur} / {daily_info.livenessData.total}'''
-
-    await bot.send(res)
+    await bot.logger.info(f'[鸣潮]开始执行[每日信息]: {ev.user_id}')
+    uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
+    if not uid:
+        return await bot.send(ERROR_CODE[WAVES_CODE_103])
+    return await bot.send(await draw_stamina_img(bot, ev))

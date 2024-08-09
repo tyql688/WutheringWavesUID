@@ -42,6 +42,7 @@ class BattlePassData(BaseModel):
 
 class DailyData(BaseModel):
     """每日数据"""
+    token: str
     gameId: int
     userId: int
     serverId: str
