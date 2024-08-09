@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 from msgspec import json as msgjson
 
@@ -7,10 +8,9 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from ..utils import hint
 from ..utils.database.models import WavesBind, WavesUser
-from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_203, WAVES_CODE_204
+from ..utils.error_reply import WAVES_CODE_102
 from ..utils.hint import BIND_UID_HINT
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
-from ..utils.tap_api import tap_api
 from ..utils.waves_prefix import PREFIX
 
 waves_get_char_info = SV('waves获取面板')
@@ -18,8 +18,8 @@ waves_get_char_info = SV('waves获取面板')
 
 @waves_get_char_info.on_fullmatch(
     (
-            f'{PREFIX}刷新面板',
-            f'{PREFIX}强制刷新',
+        f'{PREFIX}刷新面板',
+        f'{PREFIX}强制刷新',
     )
 )
 async def send_card_info(bot: Bot, ev: Event):
@@ -34,21 +34,18 @@ async def send_card_info(bot: Bot, ev: Event):
         return await bot.send(hint.error_reply(code=WAVES_CODE_102))
 
     user = await WavesUser.get_user_by_attr(user_id, ev.bot_id, 'uid', str(waves_uid))
-    if not user or not user.tap_uid:
-        return await bot.send(hint.error_reply(code=WAVES_CODE_203))
+    if not user:
+        return await bot.send(hint.error_reply(code=WAVES_CODE_102))
 
-    await bot.logger.info(f'[{PREFIX}强制刷新]uid: {waves_uid} tap_uid: {user.tap_uid}')
-    waves_datas = await tap_api.get_all_role_info(user.tap_uid)
-    if not waves_datas:
-        return await bot.send(hint.error_reply(code=WAVES_CODE_204))
-    await save_card_info(user_id, waves_uid, user.tap_uid, waves_datas)
+    waves_datas = []
+    await save_card_info(user_id, waves_uid, waves_datas)
 
     msg = f'[鸣潮] 刷新完成！本次刷新{len(waves_datas)}个角色!'
     msg += f'\n刷新角色列表:{",".join([i["name"] for i in waves_datas])}'
     return await bot.send(msg)
 
 
-async def save_card_info(user_id: str, uid: str, tap_uid: str, waves_datas: dict):
+async def save_card_info(user_id: str, uid: str, waves_datas: List):
     save_path = PLAYER_PATH
     path = save_path / uid
     path.mkdir(parents=True, exist_ok=True)

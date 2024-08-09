@@ -2,14 +2,13 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.message import send_diff_msg
-from .deal import add_cookie, add_tap, delete_cookie
+from .deal import add_cookie, delete_cookie
 from ..utils.database.models import WavesBind
 from ..utils.waves_prefix import PREFIX
 
 waves_bind_uid = SV('waves绑定uid')
 waves_add_ck = SV('waves添加ck')
 waves_del_ck = SV('waves删除ck')
-waves_bind_tap = SV('绑定tap')
 
 
 @waves_add_ck.on_prefix((f'{PREFIX}添加CK', f'{PREFIX}添加ck'))
@@ -26,30 +25,16 @@ async def send_waves_del_ck_msg(bot: Bot, ev: Event):
     await bot.send(await delete_cookie(uid))
 
 
-@waves_bind_tap.on_prefix(
-    (
-            f'{PREFIX}绑定tap',
-            f'{PREFIX}绑定taptap',
-            f'{PREFIX}绑定TapTap',
-            f'{PREFIX}绑定Tap',
-            f'{PREFIX}绑定TAPTAP'
-    )
-)
-async def send_waves_add_ck_msg(bot: Bot, ev: Event):
-    tap_uid = ev.text.strip()
-    await bot.send(await add_tap(ev, tap_uid))
-
-
 @waves_bind_uid.on_command(
     (
-            f'{PREFIX}绑定uid',
-            f'{PREFIX}绑定UID',
-            f'{PREFIX}切换uid',
-            f'{PREFIX}切换UID',
-            f'{PREFIX}删除uid',
-            f'{PREFIX}删除UID',
-            f'{PREFIX}查看uid',
-            f'{PREFIX}查看UID',
+        f'{PREFIX}绑定uid',
+        f'{PREFIX}绑定UID',
+        f'{PREFIX}切换uid',
+        f'{PREFIX}切换UID',
+        f'{PREFIX}删除uid',
+        f'{PREFIX}删除UID',
+        f'{PREFIX}查看uid',
+        f'{PREFIX}查看UID',
     ),
     block=True,
 )

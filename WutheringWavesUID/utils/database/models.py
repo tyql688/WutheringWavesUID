@@ -13,16 +13,15 @@ class WavesBind(Bind, table=True):
 class WavesUser(User, table=True):
     cookie: str = Field(default='', title='Cookie')
     uid: Optional[str] = Field(default=None, title='鸣潮UID')
-    tap_uid: Optional[str] = Field(default=None, title='TapTapUID')
     record_id: Optional[str] = Field(default=None, title='鸣潮记录ID')
 
     @classmethod
     async def get_user_by_attr(
-            cls: Type[T_User],
-            user_id: str,
-            bot_id: str,
-            attr_key: str,
-            attr_value: str,
+        cls: Type[T_User],
+        user_id: str,
+        bot_id: str,
+        attr_key: str,
+        attr_value: str,
     ) -> Optional[Any]:
         user_list = await cls.select_data_list(user_id=user_id, bot_id=bot_id)
         if not user_list:
