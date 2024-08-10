@@ -5,6 +5,8 @@ from typing import Literal
 
 from PIL import Image, ImageOps
 
+from gsuid_core.utils.image.image_tools import crop_center_img
+
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 GREY = (216, 216, 216)
 BLACK_G = (40, 40, 40)
@@ -20,6 +22,19 @@ async def get_random_waves_role_pile():
     else:
         path = 'role_pile_anke.png'
     return Image.open(TEXT_PATH / f'role_pile/{path}').convert('RGBA')
+
+
+async def get_role_head(name: str):
+    return Image.open(TEXT_PATH / f'role_head/role_head_{name}.png').convert('RGBA')
+
+
+async def get_weapon(name: str):
+    return Image.open(TEXT_PATH / f'weapon/weapon_{name}.png').convert('RGBA')
+
+
+def get_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
+    img = Image.open(TEXT_PATH / f'{bg}.jpg').convert('RGBA')
+    return crop_center_img(img, w, h)
 
 
 def add_footer(

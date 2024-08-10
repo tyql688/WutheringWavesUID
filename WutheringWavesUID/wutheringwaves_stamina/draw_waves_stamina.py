@@ -43,7 +43,6 @@ async def draw_stamina_img(bot: Bot, ev: Event):
             succ, daily_info = await waves_api.get_daily_info(ck)
             if not succ:
                 continue
-            daily_info.update({'token': ck})
             daily_info = DailyData(**daily_info)
             valid_daily_list.append(daily_info)
 

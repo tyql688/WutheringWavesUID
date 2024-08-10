@@ -21,15 +21,19 @@ IS_REPORT = WutheringWavesConfig.get_config('PrivateSignReport').data
 @sv_waves_sign.on_fullmatch(f'{PREFIX}签到')
 async def get_sign_func(bot: Bot, ev: Event):
     logger.info(f'[鸣潮] [签到] 用户: {ev.user_id}')
-    uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
-    if uid is None:
+    uid_list = await WavesBind.get_uid_list_by_game(ev.user_id, ev.bot_id)
+    if not uid_list:
         return await bot.send(ERROR_CODE[WAVES_CODE_103])
-
-    ck = await WavesUser.get_user_cookie_by_uid(uid)
-    if not ck:
+    res = []
+    for uid in uid_list:
+        ck = await WavesUser.get_user_cookie_by_uid(uid)
+        if not ck:
+            continue
+        logger.info(f'[鸣潮] [签到] UID: {uid}')
+        res.append(await sign_in(uid, ck))
+    if not res:
         return await bot.send(ERROR_CODE[WAVES_CODE_102])
-    logger.info(f'[鸣潮] [签到] UID: {uid}')
-    await bot.send(await sign_in(uid, ck))
+    await bot.send('\n'.join(res))
 
 
 @sv_waves_sign_config.on_fullmatch(f'{PREFIX}全部重签')
