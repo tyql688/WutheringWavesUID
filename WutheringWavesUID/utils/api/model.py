@@ -57,6 +57,7 @@ class DailyData(BaseModel):
 class Role(BaseModel):
     roleId: int
     level: int
+    breach: int
     roleName: str
     roleIconUrl: str
     rolePicUrl: str
@@ -79,25 +80,19 @@ class Box(BaseModel):
 
 
 class AccountBaseInfo(BaseModel):
-    name: str
-    id: int
-    creatTime: int
-    activeDays: int
-    level: int
-    worldLevel: int
-    roleNum: int
-    soundBox: int
-    energy: int
-    maxEnergy: int
-    liveness: int
-    livenessMaxCount: int
-    livenessUnlock: bool
-    chapterId: int
-    bigCount: int
-    smallCount: int
-    achievementCount: int
-    boxList: list[Box]
-    showToGuest: bool
+    """账户基本信息"""
+    name: str  # 名字
+    id: int  # 特征码
+    creatTime: int  # 创建时间 ms
+    activeDays: int  # 活跃天数
+    level: int  # 等级
+    worldLevel: int  # 世界等级
+    roleNum: int  # 角色数量
+    bigCount: int  # 大型信标解锁数
+    smallCount: int  # 小型信标解锁数
+    achievementCount: int  # 成就数量
+    achievementStar: int  # 成就星数
+    boxList: list[Box]  # 宝箱
 
 
 class Chain(BaseModel):
@@ -116,6 +111,13 @@ class Weapon(BaseModel):
     weaponIcon: str
     weaponEffectName: str
     effectDescription: str
+
+
+class WeaponData(BaseModel):
+    weapon: Weapon
+    level: int
+    breach: int
+    # resonLevel: int
 
 
 class PhantomProp(BaseModel):
@@ -137,12 +139,25 @@ class FetterDetail(BaseModel):
     secondDescription: str
 
 
+class Props(BaseModel):
+    attributeName: str
+    iconUrl: Union[str, None] = None
+    attributeValue: str
+
+
 class EquipPhantom(BaseModel):
     phantomProp: PhantomProp
     cost: int
     quality: int
     level: int
     fetterDetail: FetterDetail
+    mainProps: List[Props]
+    subProps: Union[List[Props], None] = None
+
+
+class EquipPhantomData(BaseModel):
+    cost: int
+    equipPhantomList: Union[List[EquipPhantom], None, List[None]] = None
 
 
 class Skill(BaseModel):
@@ -153,21 +168,53 @@ class Skill(BaseModel):
     iconUrl: str
 
 
-class PhantomData(BaseModel):
-    cost: int
-    equipPhantomList: List[EquipPhantom]
+class SkillData(BaseModel):
+    skill: Skill
+    level: int
 
 
 class RoleDetailData(BaseModel):
     role: Role
     level: int
     chainList: List[Chain]
-    weaponData: Weapon
-    phantomData: PhantomData
-    skillList: List[Skill]
+    weaponData: WeaponData
+    phantomData: Union[EquipPhantomData, None] = None
+    skillList: List[SkillData]
+
+    def get_chain_num(self):
+        """获取命座数量"""
+        num = 0
+        for index, chain in enumerate(self.chainList):
+            if chain.unlocked:
+                num += 1
+        return num
+
+    def get_chain_name(self):
+        n = self.get_chain_num()
+        return f'{["零", "一", "二", "三", "四", "五", "六"][n]}命'
+
+
+class CalabashData(BaseModel):
+    """数据坞"""
+    level: int  # 数据坞等级
+    baseCatch: str  # 基础吸收概率
+    strengthenCatch: str  # 强化吸收概率
+    catchQuality: int  # 最高可吸收品质
+    cost: int  # cost上限
+    maxCount: int  # 声骸收集进度-max
+    unlockCount: int  # 声骸收集进度-curr
+    isUnlock: bool  # 解锁
+
+
+class ExploreData(BaseModel):
+    """探索度"""
+    countryCode: int  # 城市code: 1
+    countryName: str  # 城市名字: 瑝珑
+    countryProgress: str  # 进度: 75.81
 
 
 class KuroRoleInfo(BaseModel):
+    """库洛角色信息"""
     id: int
     userId: int
     gameId: int
@@ -181,6 +228,7 @@ class KuroRoleInfo(BaseModel):
 
 
 class GachaLog(BaseModel):
+    """抽卡记录"""
     cardPoolType: str
     resourceId: int
     qualityLevel: int

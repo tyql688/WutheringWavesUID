@@ -90,6 +90,7 @@ async def _draw_stamina_img(ev: Event, daily_info: DailyData) -> Union[str, Imag
 
     # 随机获得pile
     pile = await get_random_waves_role_pile()
+    pile = pile.crop((0, 0, pile.size[0], pile.size[1] - 155))
 
     base_info_draw = ImageDraw.Draw(base_info_bg)
     base_info_draw.text((275, 120), f'{daily_info.roleName[:7]}', GREY, waves_font_30, 'lm')

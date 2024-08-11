@@ -13,6 +13,8 @@ PLAYER_PATH = MAIN_PATH / 'players'
 
 # 游戏素材
 RESOURCE_PATH = MAIN_PATH / 'resource'
+AVATAR_PATH = RESOURCE_PATH / 'avatar'
+WEAPON_PATH = RESOURCE_PATH / 'weapon'
 
 
 def init_dir():
@@ -20,6 +22,8 @@ def init_dir():
         MAIN_PATH,
         PLAYER_PATH,
         RESOURCE_PATH,
+        AVATAR_PATH,
+        WEAPON_PATH,
     ]:
         i.mkdir(parents=True, exist_ok=True)
 

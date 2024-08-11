@@ -78,6 +78,13 @@ class WavesApi:
         raw_data = await self._waves_request(ROLE_DATA_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
+    async def get_wiki(self, catalogueId: str) -> (bool, Union[Dict, str]):
+        header = copy.deepcopy(self._HEADER)
+        header.update({'wiki_type': '9'})
+        data = {'catalogueId': catalogueId, 'limit': 1000}
+        raw_data = await self._waves_request(WIKI_URL, "POST", header, data=data)
+        return await _check_response(raw_data)
+
     async def get_role_detail_info(self, charId: str, roleId: str, token: str, serverId: str = SERVER_ID) -> (
         bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)
@@ -120,10 +127,24 @@ class WavesApi:
         """全息"""
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
-        data = {'gameId': GAME_ID,
-                'serverId': serverId,
-                'roleId': roleId}
+        data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
         raw_data = await self._waves_request(CHALLENGE_INDEX_URL, "POST", header, data=data)
+        return await _check_response(raw_data)
+
+    async def get_tower_data(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
+        """深渊"""
+        header = copy.deepcopy(self._HEADER)
+        header.update({'token': token})
+        data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
+        raw_data = await self._waves_request(TOWER_DETAIL_URL, "POST", header, data=data)
+        return await _check_response(raw_data)
+
+    async def get_tower_index(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
+        """深渊"""
+        header = copy.deepcopy(self._HEADER)
+        header.update({'token': token})
+        data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
+        raw_data = await self._waves_request(TOWER_INDEX_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
     async def sign_in(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):

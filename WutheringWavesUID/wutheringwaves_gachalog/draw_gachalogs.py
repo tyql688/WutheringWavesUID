@@ -10,28 +10,18 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
+from ..utils.api.api import SERVER_ID
 from ..utils.database.models import WavesUser
 from ..utils.fonts.waves_fonts import waves_font_25, waves_font_18, waves_font_32, waves_font_20, waves_font_40, \
     waves_font_23, waves_font_24
-from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_head, get_weapon
+from ..utils.image import get_waves_bg, add_footer, GOLD, cropped_square_avatar
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
+from ..utils.resource.constant import NORMAL_LIST
+from ..utils.resource.download_file import get_square_avatar, get_square_weapon
 from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 HOMO_TAG = ['非到极致', '运气不好', '平稳保底', '小欧一把', '欧狗在此']
-NORMAL_LIST = [
-    '凌阳',
-    '安可',
-    '卡卡罗',
-    '鉴心',
-    '维里奈',
-
-    '千古洑流',
-    '停驻之烟',
-    '擎渊怒涛',
-    '漪澜浮录',
-    '浩境粼光',
-]
 
 gacha_type_meta_rename = {
     '角色精准调谐': '角色精准调谐',
@@ -217,12 +207,12 @@ async def draw_card(user: WavesUser, ev: Event):
 
             item_temp = Image.new('RGBA', (167, 170))
             if item['resourceType'] == '武器':
-                item_icon = await get_weapon(item['name'])
+                item_icon = await get_square_weapon(item['name'])
                 item_icon = item_icon.resize((130, 130)).convert('RGBA')
                 item_temp.paste(item_icon, (22, 28), item_icon)
             else:
-                item_icon = await get_role_head(item['name'])
-                item_icon = item_icon.resize((130, 130)).convert('RGBA')
+                item_icon = await get_square_avatar(item['name'], user.uid, user.cookie, SERVER_ID)
+                item_icon = await cropped_square_avatar(item_icon, 130)
                 item_temp.paste(item_icon, (22, 28), item_icon)
 
             item_bg.paste(item_temp, (-2, -2), item_temp)
