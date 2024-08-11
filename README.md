@@ -75,13 +75,25 @@
 请自行查阅文档, 可控制签到时间等
 </p></details>
 
+## 后续
+
+- [ ] 手机号登录
+- [ ] 体力恢复提醒
+- [ ] 公告推送
+- [ ] 深渊
+- [ ] 全息战略
+- [ ] 角色面板
+- [ ] 练度查询
+- [ ] 帮助图
+
 ## 丨其他
 
 + 本项目仅供学习使用，请勿用于商业用途
 + [GPL-3.0 License](https://github.com/tyql688/WutheringWavesUID/blob/master/LICENSE)
 
-### 致谢
+## 致谢
 
+- 特别鸣谢 [Wuyi无疑]() 为 WutheringWavesUID 作出的巨大贡献！本插件的设计图均出自 Wuyi无疑 之手！！！
 - [waves-plugin](https://github.com/erzaozi/waves-plugin) Yunzai 鸣潮游戏数据查询插件
 - [Yunzai-Kuro-Plugin](https://github.com/TomyJan/Yunzai-Kuro-Plugin) Yunzai 库洛插件
 - [Kuro-API-Collection](https://github.com/TomyJan/Kuro-API-Collection) 库街区 API 文档
