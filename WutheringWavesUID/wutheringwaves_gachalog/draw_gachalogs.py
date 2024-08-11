@@ -159,7 +159,6 @@ async def draw_card(user: WavesUser, ev: Event):
     y = 0
     item_fg = Image.open(TEXT_PATH / 'char_bg.png')
     up_icon = Image.open(TEXT_PATH / 'up_tag.png')
-    info_block = Image.open(TEXT_PATH / 'info_block.png').resize((110, 70))
     for gindex, gacha_name in enumerate(total_data):
         gacha_data = total_data[gacha_name]
         title = Image.open(TEXT_PATH / 'bar.png')
@@ -217,16 +216,11 @@ async def draw_card(user: WavesUser, ev: Event):
 
             item_bg.paste(item_temp, (-2, -2), item_temp)
 
-            item_draw = ImageDraw.Draw(item_bg)
-            gnum = item['gacha_num']
-            if gnum >= 80:
-                gcolor = (255, 20, 20)
-            elif gnum <= 60:
-                gcolor = (63, 255, 0)
-            else:
-                gcolor = 'white'
-            item_draw.text((85, 143), f'{gnum}抽', gcolor, waves_font_20, 'mm')
-            item_bg.paste(info_block, (30, 120), info_block)
+            info_block = Image.new("RGBA", (50, 25), "white")
+            info_block_draw = ImageDraw.Draw(info_block)
+            info_block_draw.rectangle([0, 0, 110, 70], fill=(0, 0, 0, int(0.5 * 255)))
+            info_block_draw.text((25, 14), f'{item["gacha_num"]}抽', 'white', waves_font_20, 'mm')
+            item_bg.paste(info_block, (61, 131), info_block)
 
             _x = 95 + 162 * (index % 5)
             _y = 670 + bset * (index // 5) + y + gindex * oset

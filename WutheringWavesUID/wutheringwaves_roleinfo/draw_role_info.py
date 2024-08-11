@@ -114,8 +114,7 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
 
         if role_detail_info_map and roleInfo.roleName in role_detail_info_map:
             temp: RoleDetailData = role_detail_info_map[roleInfo.roleName]
-            char_bg_draw.text((20, 173), f'{temp.get_chain_name()}', 'white',
-                              waves_font_26, 'lm')
+            # char_bg_draw.text((20, 173), f'{temp.get_chain_name()}', 'white', waves_font_26, 'lm')
 
             weapon_bg = Image.open(TEXT_PATH / 'weapon_bg.png')
             weapon_name = temp.weaponData.weapon.weaponName
@@ -123,6 +122,12 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
             weapon_icon = weapon_icon.resize((75, 75)).convert('RGBA')
             weapon_bg.paste(weapon_icon, (123, 73), weapon_icon)
             char_bg.paste(weapon_bg, (0, 5), weapon_bg)
+
+            info_block = Image.new("RGBA", (60, 30), color=(255, 255, 255, 0))
+            info_block_draw = ImageDraw.Draw(info_block)
+            info_block_draw.rounded_rectangle([0, 0, 60, 30], radius=7, fill=(96, 12, 120, int(0.8 * 255)))
+            info_block_draw.text((5, 15), f'{temp.get_chain_name()}', 'white', waves_font_26, 'lm')
+            char_bg.paste(info_block, (18, 158), info_block)
 
         card_img.paste(char_bg, (_x, _y), char_bg)
 
