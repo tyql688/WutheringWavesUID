@@ -45,7 +45,7 @@
 </p></details>
 
 <details><summary>基本信息汇总 - 命令: ww查询</summary><p>
-<a><img src="https://s2.loli.net/2024/08/11/N5t3GFhCgcajE4u.jpg"></a>
+<a><img src="https://s2.loli.net/2024/08/11/IpZ7GliB5HMY9CA.jpg"></a>
 </p></details>
 
 <details><summary>导入抽卡链接 - 命令: ww导入抽卡链接</summary><p>
