@@ -1,4 +1,3 @@
-import json
 import re
 
 from gsuid_core.bot import Bot
@@ -42,15 +41,16 @@ async def get_resp_msg(bot: Bot, ev: Event):
                 await WavesBind.insert_uid(ev.user_id, ev.bot_id, user.uid, ev.group_id, lenth_limit=9)
             return await bot.send(f"{game_title} 登录成功!")
     else:
+        return await bot.send(f"{game_title} 账号登录失败\n\n请参照以下格式:\n{PREFIX}登录 手机号,验证码")
         # 手机登录
-        phone_number = text
-        if not phone_number.isdigit():
-            return await bot.send("你输入了错误的格式!")
-        resp = await bot.receive_resp(
-            f"请确认你的手机号码: {phone_number}." "如果正确请回复'确认', 其他任何回复将取消本次操作."
-        )
-        if resp is not None and resp.text == "确认":
-            result = await kuro_api.send_phone_code(phone_number)
-            return await bot.send(json.dumps(result))
+        # phone_number = text
+        # if not phone_number.isdigit():
+        #     return await bot.send("你输入了错误的格式!")
+        # resp = await bot.receive_resp(
+        #     f"请确认你的手机号码: {phone_number}." "如果正确请回复'确认', 其他任何回复将取消本次操作."
+        # )
+        # if resp is not None and resp.text == "确认":
+        #     result = await kuro_api.send_phone_code(phone_number)
+        #     return await bot.send(json.dumps(result))
 
     return await bot.send("登录成功!")

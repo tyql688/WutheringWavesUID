@@ -17,7 +17,7 @@ async def send_waves_add_ck_msg(bot: Bot, ev: Event):
     await bot.send(await add_cookie(ev, ck))
 
 
-@waves_del_ck.on_prefix((f'{PREFIX}删除ck', f'{PREFIX}王者删除CK'))
+@waves_del_ck.on_prefix((f'{PREFIX}删除ck', f'{PREFIX}删除CK'))
 async def send_waves_del_ck_msg(bot: Bot, ev: Event):
     uid = ev.text.strip()
     if not uid or len(uid) != 9:

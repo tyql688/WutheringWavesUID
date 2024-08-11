@@ -28,6 +28,53 @@
 
 ## 丨功能
 
+<details><summary>绑定切换删除查看UID - 命令: ww绑定UID123456、ww删除UID123456、ww切换UID、ww查看UID</summary><p>
+还没有图
+</p></details>
+
+<details><summary>添加库街区ck - 命令: ww添加CK xxxxxxy、ww删除CK</summary><p>
+还没有图
+</p></details>
+
+<details><summary>库街区登录手机+验证码方式 - 命令: ww登录 13333333333,114114</summary><p>
+还没有图
+</p></details>
+
+<details><summary>便签 - 命令: wwmr、ww便签、ww每日、ww体力</summary><p>
+<a><img src="https://s2.loli.net/2024/08/11/uVR3F6AWZvMXSkD.jpg"></a>
+</p></details>
+
+<details><summary>基本信息汇总 - 命令: ww查询</summary><p>
+<a><img src="https://s2.loli.net/2024/08/11/N5t3GFhCgcajE4u.jpg"></a>
+</p></details>
+
+<details><summary>导入抽卡链接 - 命令: ww导入抽卡链接</summary><p>
+<p>1. http格式: ww导入抽卡链接 https://......record_id=5e4d436ea1</p>
+<p>2. json格式: ww导入抽卡链接 {"recordId":"5e4d436ea1"}</p>
+<p>3. 手动格式: ww导入抽卡链接 recordId=5e4d436ea1</p>
+<p>4. 直接格式: ww导入抽卡链接 5e4d436ea1</p>
+</p></details>
+
+<details><summary>刷新抽卡记录（导入抽卡链接的recordId，后续可直接命令刷新） - 命令: ww刷新抽卡记录</summary><p>
+还没有图
+</p></details>
+
+<details><summary>抽卡记录 - 命令: ww抽卡记录</summary><p>
+<a><img src="https://s2.loli.net/2024/08/11/MD87eW3sUFwQqm2.jpg"></a>
+</p></details>
+
+<details><summary>面板更新 - 命令: ww刷新面板</summary><p>
+还没有图
+</p></details>
+
+<details><summary>签到相关 - 命令: ww签到 / ww开启自动签到 / ww全部重签 (需要管理员)</summary><p>
+还没有图
+</p></details>
+
+<details><summary>其他 - 网页控制台相关功能</summary><p>
+请自行查阅文档, 可控制签到时间等
+</p></details>
+
 ## 丨其他
 
 + 本项目仅供学习使用，请勿用于商业用途

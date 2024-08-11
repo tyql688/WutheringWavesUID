@@ -32,9 +32,12 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
     elif "{" in text:
         match_record_id = re.search(r'recordId:([a-zA-Z0-9]+)', text)
         match_player_id = re.search(r'playerId:(\d+)', text)
-    else:
+    elif "recordId=" in text:
         match_record_id = re.search(r'recordId=([a-zA-Z0-9]+)', text)
         match_player_id = re.search(r'playerId=(\d+)', text)
+    else:
+        match_record_id = re.search(r'recordId=([a-zA-Z0-9]+)', 'recordId=' + text)
+        match_player_id = ''
 
     # 提取参数值
     record_id = match_record_id.group(1) if match_record_id else None

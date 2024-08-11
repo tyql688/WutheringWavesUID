@@ -11,7 +11,7 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img, get_event_avatar
 from ..utils.api.model import DailyData
 from ..utils.database.models import WavesBind, WavesUser
-from ..utils.error_reply import WAVES_CODE_103, ERROR_CODE
+from ..utils.error_reply import WAVES_CODE_103, ERROR_CODE, WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25
 from ..utils.image import add_footer, GREY, GOLD, get_random_waves_role_pile, YELLOW
 from ..utils.waves_api import waves_api
@@ -26,8 +26,7 @@ based_h = 650
 
 async def draw_stamina_img(bot: Bot, ev: Event):
     try:
-        user_id = ev.at if ev.at else ev.user_id
-        uid_list = await WavesBind.get_uid_list_by_game(user_id, ev.bot_id)
+        uid_list = await WavesBind.get_uid_list_by_game(ev.user_id, ev.bot_id)
         logger.info(f'[鸣潮][每日信息]UID: {uid_list}')
         if uid_list is None:
             return ERROR_CODE[WAVES_CODE_103]
@@ -47,7 +46,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
             valid_daily_list.append(daily_info)
 
         if len(valid_daily_list) == 0:
-            return ERROR_CODE[WAVES_CODE_103]
+            return ERROR_CODE[WAVES_CODE_102]
 
         # 开始绘图任务
         task = []
