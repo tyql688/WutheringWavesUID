@@ -7,7 +7,8 @@ from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 
 from gsuid_core.logger import logger
 from .api import *
-from ..error_reply import ERROR_CODE, WAVES_CODE_100, WAVES_CODE_999
+from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_106
+from ..hint import error_reply
 
 
 async def _check_response(res: Dict) -> (bool, Union[Dict, str]):
@@ -17,7 +18,7 @@ async def _check_response(res: Dict) -> (bool, Union[Dict, str]):
 
         if res.get('msg'):
             return False, res['msg']
-    return False, ERROR_CODE[WAVES_CODE_999]
+    return False, error_reply(WAVES_CODE_999)
 
 
 class WavesApi:
@@ -34,14 +35,21 @@ class WavesApi:
         raw_data = await self._waves_request(EVENT_LIST_URL, "POST", header)
         return await _check_response(raw_data)
 
-    async def get_kuro_role_info(self, token: str) -> (bool, Union[Dict, str]):
+    async def get_kuro_role_info(self, token: str, kuro_uid: str = '') -> (bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
-        raw_data = await self._waves_request(KURO_ROLE_URL, "POST", header)
+        data = {}
+        if kuro_uid:
+            data.update({'queryUserId': kuro_uid})
+        raw_data = await self._waves_request(KURO_ROLE_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
-    async def get_game_role_info(self, token: str, gameId: str = 3) -> (bool, Union[Dict, str]):
-        succ, data = await self.get_kuro_role_info(token)
+    async def get_game_role_info(
+        self,
+        token: str,
+        gameId: str = GAME_ID,
+        kuro_uid: str = '') -> (bool, Union[Dict, str]):
+        succ, data = await self.get_kuro_role_info(token, kuro_uid)
         if not succ:
             return succ, data
         for role in data['defaultRoleList']:
@@ -69,14 +77,20 @@ class WavesApi:
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
         raw_data = await self._waves_request(BASE_DATA_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        flag, res = await _check_response(raw_data)
+        if flag and res.get('creatTime') is None:
+            return False, error_reply(WAVES_CODE_106)
+        return flag, res
 
     async def get_role_info(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
         raw_data = await self._waves_request(ROLE_DATA_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        flag, res = await _check_response(raw_data)
+        if flag and res.get('roleList') is None:
+            return False, error_reply(WAVES_CODE_107)
+        return flag, res
 
     async def get_wiki(self, catalogueId: str) -> (bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)

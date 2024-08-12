@@ -18,7 +18,7 @@ async def get_square_avatar(charName: str, roleId: str, token: str,
 
     succ, role_info = await waves_api.get_role_info(roleId, token, serverId)
     if not succ:
-        raise ValueError("角色信息获取失败")
+        raise ValueError(f"角色信息获取失败 :{role_info}")
 
     role_info = RoleList(**role_info)
     for r in role_info.roleList:
@@ -41,7 +41,7 @@ async def get_square_weapon(weaponName: str) -> Union[Image.Image, str, None]:
 
     succ, weapon_info = await waves_api.get_wiki(WIKI_CATALOGUE_MAP["武器"])
     if not succ:
-        raise ValueError("武器信息获取失败")
+        raise ValueError(f"武器信息获取失败 :{weapon_info}")
 
     for w in weapon_info['results']['records']:
         name = w['name']

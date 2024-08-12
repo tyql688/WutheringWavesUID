@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 
 from msgspec import UNSET, Struct, UnsetType, field
 from pydantic import BaseModel
@@ -83,16 +83,16 @@ class AccountBaseInfo(BaseModel):
     """账户基本信息"""
     name: str  # 名字
     id: int  # 特征码
-    creatTime: int  # 创建时间 ms
-    activeDays: int  # 活跃天数
-    level: int  # 等级
-    worldLevel: int  # 世界等级
-    roleNum: int  # 角色数量
-    bigCount: int  # 大型信标解锁数
-    smallCount: int  # 小型信标解锁数
-    achievementCount: int  # 成就数量
-    achievementStar: int  # 成就星数
-    boxList: list[Box]  # 宝箱
+    creatTime: Optional[int]  # 创建时间 ms
+    activeDays: Optional[int]  # 活跃天数
+    level: Optional[int]  # 等级
+    worldLevel: Optional[int]  # 世界等级
+    roleNum: Optional[int]  # 角色数量
+    bigCount: Optional[int]  # 大型信标解锁数
+    smallCount: Optional[int]  # 小型信标解锁数
+    achievementCount: Optional[int]  # 成就数量
+    achievementStar: Optional[int]  # 成就星数
+    boxList: Optional[list[Optional[Box]]]  # 宝箱
 
 
 class Chain(BaseModel):
@@ -157,7 +157,7 @@ class EquipPhantom(BaseModel):
 
 class EquipPhantomData(BaseModel):
     cost: int
-    equipPhantomList: Union[List[EquipPhantom], None, List[None]] = None
+    equipPhantomList: Union[List[Optional[EquipPhantom]], None, List[None]] = None
 
 
 class Skill(BaseModel):

@@ -19,7 +19,7 @@ async def send_role_info(bot: Bot, ev: Event):
     if not uid:
         return await bot.send(BIND_UID_HINT)
 
-    ck = await WavesUser.get_user_cookie_by_uid(uid)
+    ck = await WavesUser.get_ck(uid)
     if not ck:
         return await bot.send(BIND_UID_HINT)
 

@@ -60,11 +60,12 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
         base_info_value_list.append({"key": b.boxName, "value": f"{b.num}", "info_block": ""})
 
     # 角色信息
+
     xset = 50
     yset = 870
 
     w = 1000
-    h = 100 + yset + 200 * int(len(role_info.roleList) / 4)
+    h = 100 + yset + 200 * int(account_info.roleNum / 4 + (1 if account_info.roleNum % 4 else 0))
     card_img = get_waves_bg(w, h)
     char = Image.open(TEXT_PATH / 'char.png')
     base_info_bg = Image.open(TEXT_PATH / 'base_info_bg.png')

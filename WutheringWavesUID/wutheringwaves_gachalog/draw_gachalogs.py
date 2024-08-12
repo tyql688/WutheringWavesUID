@@ -210,7 +210,8 @@ async def draw_card(user: WavesUser, ev: Event):
                 item_icon = item_icon.resize((130, 130)).convert('RGBA')
                 item_temp.paste(item_icon, (22, 28), item_icon)
             else:
-                item_icon = await get_square_avatar(item['name'], user.uid, user.cookie, SERVER_ID)
+                cookie = await WavesUser.get_ck(user.uid)
+                item_icon = await get_square_avatar(item['name'], user.uid, cookie, SERVER_ID)
                 item_icon = await cropped_square_avatar(item_icon, 130)
                 item_temp.paste(item_icon, (22, 28), item_icon)
 

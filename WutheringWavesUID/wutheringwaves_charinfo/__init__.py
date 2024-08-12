@@ -6,11 +6,9 @@ from msgspec import json as msgjson
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from ..utils import hint
 from ..utils.api.api import SERVER_ID
 from ..utils.api.model import RoleList
 from ..utils.database.models import WavesBind, WavesUser
-from ..utils.error_reply import WAVES_CODE_102
 from ..utils.hint import BIND_UID_HINT
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
@@ -32,20 +30,22 @@ async def send_card_info(bot: Bot, ev: Event):
     if not waves_uid:
         return await bot.send(BIND_UID_HINT)
 
-    user = await WavesUser.get_user_by_attr(user_id, ev.bot_id, 'uid', str(waves_uid))
-    if not user:
-        return await bot.send(hint.error_reply(code=WAVES_CODE_102))
+    # user = await WavesUser.get_user_by_attr(user_id, ev.bot_id, 'uid', str(waves_uid))
+    # if not user:
+    #     return await bot.send(hint.error_reply(code=WAVES_CODE_102))
+
+    ck = await WavesUser.get_ck(waves_uid)
 
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(user.uid, user.cookie, SERVER_ID)
+    succ, role_info = await waves_api.get_role_info(waves_uid, ck, SERVER_ID)
     if not succ:
-        return role_info
+        return await bot.send(role_info)
 
     waves_datas = []
     role_info = RoleList(**role_info)
     for r in role_info.roleList:
-        succ, role_detail_info = await waves_api.get_role_detail_info(r.roleId, user.uid, user.cookie, SERVER_ID)
-        if not succ:
+        succ, role_detail_info = await waves_api.get_role_detail_info(r.roleId, waves_uid, ck, SERVER_ID)
+        if not succ or role_detail_info['role'] is None or role_detail_info['level'] is None:
             continue
         if role_detail_info['phantomData']['cost'] == 0:
             role_detail_info['phantomData']['equipPhantomList'] = None

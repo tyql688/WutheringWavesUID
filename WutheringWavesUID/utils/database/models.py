@@ -1,4 +1,5 @@
-from typing import Optional, Any, Type
+import random
+from typing import Optional, Any, Type, Literal
 
 from sqlmodel import Field
 
@@ -30,6 +31,26 @@ class WavesUser(User, table=True):
             if getattr(user, attr_key) != attr_value:
                 continue
             return user
+
+    @classmethod
+    async def get_waves_random_cookie(cls: Type[T_User], uid: str) -> Optional[str]:
+        # 有绑定自己CK 并且该CK有效的前提下，优先使用自己CK
+        ck = await WavesUser.get_user_cookie_by_uid(uid)
+        if ck:
+            return ck
+
+        # 公共ck 随机一个
+        user_list = await cls.get_all_user()
+        ck_list = [user.cookie for user in user_list if user.cookie]
+        if len(ck_list) > 0:
+            return random.choices(ck_list, k=1)[0]
+
+    @classmethod
+    async def get_ck(cls: Type[T_User], uid: str, mode: Literal['OWNER', 'RANDOM'] = 'RANDOM') -> Optional[str]:
+        if mode == 'RANDOM':
+            return await cls.get_waves_random_cookie(uid)
+        else:
+            return await cls.get_user_cookie_by_uid(uid)
 
 
 @site.register_admin
