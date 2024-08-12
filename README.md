@@ -34,7 +34,7 @@
 
 <details><summary>添加库街区ck - 命令: ww添加CK xxxxxxy、ww删除CK</summary><p>
 还没有图
-</p></details>
+</details>
 
 <details><summary>库街区登录手机+验证码方式 - 命令: ww登录 13333333333,114114</summary><p>
 还没有图
@@ -53,7 +53,7 @@
 <p>2. json格式: ww导入抽卡链接 {"recordId":"5e4d436ea1"}</p>
 <p>3. 手动格式: ww导入抽卡链接 recordId=5e4d436ea1</p>
 <p>4. 直接格式: ww导入抽卡链接 5e4d436ea1</p>
-</p></details>
+</details>
 
 <details><summary>刷新抽卡记录（导入抽卡链接的recordId，后续可直接命令刷新） - 命令: ww刷新抽卡记录</summary><p>
 还没有图
@@ -74,6 +74,10 @@
 <details><summary>其他 - 网页控制台相关功能</summary><p>
 请自行查阅文档, 可控制签到时间等
 </p></details>
+
+<details><summary>ck获取方法</summary><p>
+https://github.com/tyql688/WutheringWavesUID/wiki
+</details>
 
 ## 后续
 
