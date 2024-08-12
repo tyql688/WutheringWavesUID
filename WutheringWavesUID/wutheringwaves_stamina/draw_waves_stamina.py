@@ -108,7 +108,7 @@ async def _draw_stamina_img(ev: Event, daily_info: DailyData) -> Union[str, Imag
     # 活跃度
     active_draw.text((400, 300), f'/{daily_info.livenessData.total}', GREY, waves_font_30, 'lm')
     active_draw.text((398, 300), f'{daily_info.livenessData.cur}', GREY, waves_font_30, 'rm')
-    radio = daily_info.livenessData.cur / daily_info.livenessData.total
+    radio = daily_info.livenessData.cur / daily_info.livenessData.total if daily_info.livenessData.total != 0 else 0
     active_draw.rounded_rectangle((173, 325, int(173 + radio * max_len), 333), 30, YELLOW)
 
     # 签到
