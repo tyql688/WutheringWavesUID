@@ -93,7 +93,8 @@
 
 ## 致谢
 
-- 特别鸣谢 [Wuyi无疑]() 为 WutheringWavesUID 作出的巨大贡献！本插件的设计图均出自 Wuyi无疑 之手！！！
+- 特别鸣谢 [Wuyi无疑](https://github.com/KimigaiiWuyi) 为 WutheringWavesUID 作出的巨大贡献！本插件的设计图均出自 Wuyi无疑
+  之手！！！
 - [waves-plugin](https://github.com/erzaozi/waves-plugin) Yunzai 鸣潮游戏数据查询插件
 - [Yunzai-Kuro-Plugin](https://github.com/TomyJan/Yunzai-Kuro-Plugin) Yunzai 库洛插件
 - [Kuro-API-Collection](https://github.com/TomyJan/Kuro-API-Collection) 库街区 API 文档
