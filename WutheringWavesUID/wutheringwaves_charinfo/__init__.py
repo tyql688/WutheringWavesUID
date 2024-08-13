@@ -8,7 +8,7 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from ..utils.api.api import SERVER_ID
 from ..utils.api.model import RoleList
-from ..utils.database.models import WavesBind, WavesUser
+from ..utils.database.models import WavesBind
 from ..utils.hint import BIND_UID_HINT
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
@@ -34,7 +34,7 @@ async def send_card_info(bot: Bot, ev: Event):
     # if not user:
     #     return await bot.send(hint.error_reply(code=WAVES_CODE_102))
 
-    ck = await WavesUser.get_ck(waves_uid)
+    ck = await waves_api.get_ck(waves_uid)
 
     # 共鸣者信息
     succ, role_info = await waves_api.get_role_info(waves_uid, ck, SERVER_ID)

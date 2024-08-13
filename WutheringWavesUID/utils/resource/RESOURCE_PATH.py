@@ -13,8 +13,8 @@ PLAYER_PATH = MAIN_PATH / 'players'
 
 # 游戏素材
 RESOURCE_PATH = MAIN_PATH / 'resource'
-AVATAR_PATH = RESOURCE_PATH / 'avatar'
-WEAPON_PATH = RESOURCE_PATH / 'weapon'
+AVATAR_PATH = RESOURCE_PATH / 'waves_avatar'
+WEAPON_PATH = RESOURCE_PATH / 'waves_weapon'
 
 
 def init_dir():

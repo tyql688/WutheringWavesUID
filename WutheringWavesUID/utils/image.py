@@ -1,7 +1,7 @@
 import os
 import random
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Union
 
 from PIL import Image, ImageOps
 
@@ -25,8 +25,8 @@ async def get_random_waves_role_pile():
     return Image.open(TEXT_PATH / f'role_pile/{path}').convert('RGBA')
 
 
-async def get_square_avatar(char_name: str = "") -> Image.Image:
-    name = f"role_head_{char_name}.png"
+async def get_square_avatar(resource_id: Union[int, str]) -> Image.Image:
+    name = f"role_head_{resource_id}.png"
     path = AVATAR_PATH / name
     if path.exists():
         return Image.open(path).convert("RGBA")
@@ -52,8 +52,8 @@ async def cropped_square_avatar(item_icon: Image.Image, size: int) -> Image.Imag
     return resized_image
 
 
-async def get_square_weapon(char_name: str = "") -> Image.Image:
-    name = f"weapon_{char_name}.png"
+async def get_square_weapon(resource_id: Union[int, str]) -> Image.Image:
+    name = f"weapon_{resource_id}.png"
     path = WEAPON_PATH / name
     if path.exists():
         return Image.open(path).convert("RGBA")

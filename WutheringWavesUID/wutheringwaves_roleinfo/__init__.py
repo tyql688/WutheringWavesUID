@@ -3,8 +3,9 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from .draw_role_info import draw_role_img
-from ..utils.database.models import WavesBind, WavesUser
+from ..utils.database.models import WavesBind
 from ..utils.hint import BIND_UID_HINT
+from ..utils.waves_api import waves_api
 from ..utils.waves_prefix import PREFIX
 
 waves_role_info = SV('waves查询信息')
@@ -19,7 +20,7 @@ async def send_role_info(bot: Bot, ev: Event):
     if not uid:
         return await bot.send(BIND_UID_HINT)
 
-    ck = await WavesUser.get_ck(uid)
+    ck = await waves_api.get_ck(uid)
     if not ck:
         return await bot.send(BIND_UID_HINT)
 

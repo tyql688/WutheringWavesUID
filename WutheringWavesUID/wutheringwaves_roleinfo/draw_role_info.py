@@ -5,13 +5,12 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
-from ..utils.api.api import SERVER_ID
 from ..utils.api.model import KuroRoleInfo, AccountBaseInfo, Role, RoleDetailData, CalabashData, RoleList
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.fonts.waves_fonts import waves_font_25, waves_font_30, waves_font_26, waves_font_40, waves_font_42
-from ..utils.image import get_waves_bg, add_footer, GOLD, get_attribute, GREY, cropped_square_avatar
+from ..utils.image import get_waves_bg, add_footer, GOLD, get_attribute, GREY, cropped_square_avatar, \
+    get_square_avatar, get_square_weapon
 from ..utils.resource.constant import NORMAL_LIST
-from ..utils.resource.download_file import get_square_avatar, get_square_weapon
 from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -49,7 +48,7 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
         {"key": "活跃天数", "value": f"{account_info.activeDays}", "info_block": "color_y.png"},
         {"key": "解锁角色", "value": f"{account_info.roleNum}", "info_block": ""},
         {"key": "UP角色", "value": f"{up_num}", "info_block": "color_g.png"},
-        {"key": "数据坞等级", "value": f"{calabash_data.level}", "info_block": ""},
+        {"key": "数据坞等级", "value": f"{calabash_data.level if calabash_data.isUnlock else 0}", "info_block": ""},
         {"key": "已达成成就", "value": f"{account_info.achievementCount}", "info_block": "color_p.png"},
         {"key": "成就星数", "value": f"{account_info.achievementStar}", "info_block": ""},
         {"key": "小型信标", "value": f"{account_info.smallCount}", "info_block": ""},
@@ -105,7 +104,7 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
         char_bg = Image.open(TEXT_PATH / 'char_bg.png')
         char_attribute = await get_attribute(roleInfo.attributeName)
         char_attribute = char_attribute.resize((40, 40)).convert('RGBA')
-        role_avatar = await get_square_avatar(roleInfo.roleName, uid, ck, SERVER_ID)
+        role_avatar = await get_square_avatar(roleInfo.roleId)
         role_avatar = await cropped_square_avatar(role_avatar, 130)
         char_bg.paste(role_avatar, (10, 25), role_avatar)
         char_bg.paste(char_attribute, (155, 13), char_attribute)
@@ -118,8 +117,8 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
             # char_bg_draw.text((20, 173), f'{temp.get_chain_name()}', 'white', waves_font_26, 'lm')
 
             weapon_bg = Image.open(TEXT_PATH / 'weapon_bg.png')
-            weapon_name = temp.weaponData.weapon.weaponName
-            weapon_icon = await get_square_weapon(weapon_name)
+            weaponId = temp.weaponData.weapon.weaponId
+            weapon_icon = await get_square_weapon(weaponId)
             weapon_icon = weapon_icon.resize((75, 75)).convert('RGBA')
             weapon_bg.paste(weapon_icon, (123, 73), weapon_icon)
             char_bg.paste(weapon_bg, (0, 5), weapon_bg)

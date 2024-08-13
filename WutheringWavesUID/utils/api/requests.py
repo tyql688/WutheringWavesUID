@@ -1,4 +1,5 @@
 import copy
+import random
 import uuid
 from datetime import datetime
 from typing import Any, Dict, Union, Literal, Optional
@@ -7,6 +8,7 @@ from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 
 from gsuid_core.logger import logger
 from .api import *
+from ..database.models import WavesUser
 from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_106
 from ..hint import error_reply
 
@@ -27,6 +29,32 @@ class WavesApi:
         "source": "android",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
     }
+
+    async def get_ck(self, uid: str, mode: Literal['OWNER', 'RANDOM'] = 'RANDOM') -> Optional[str]:
+        if mode == 'RANDOM':
+            return await self.get_waves_random_cookie(uid)
+        else:
+            return await WavesUser.get_user_cookie_by_uid(uid)
+
+    async def get_waves_random_cookie(self, uid: str) -> Optional[str]:
+        # 有绑定自己CK 并且该CK有效的前提下，优先使用自己CK
+        ck = await WavesUser.get_user_cookie_by_uid(uid)
+        if ck:
+            return ck
+
+        # 公共ck 随机一个
+        user_list = await WavesUser.get_all_user()
+        ck_list = []
+        for user in user_list:
+            if not await WavesUser.cookie_validate(uid):
+                continue
+            succ, _ = await self.refresh_data(user.uid, user.cookie)
+            if not succ:
+                await WavesUser.mark_invalid(user.cookie, '无效')
+                continue
+            ck_list.append(user.cookie)
+        if len(ck_list) > 0:
+            return random.choices(ck_list, k=1)[0]
 
     async def get_active_list(self) -> (bool, Union[Dict, str]):
         """活动"""
@@ -248,6 +276,50 @@ class KuroLogin:
             pass
 
     async def _kuro_request(
+        self,
+        url: str,
+        method: Literal["GET", "POST"] = "GET",
+        header=None,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        data: Optional[FormData] = None,
+    ) -> Union[Dict, int]:
+
+        if header is None:
+            header = self._HEADER
+
+        async with ClientSession(
+            connector=TCPConnector(verify_ssl=self.ssl_verify)
+        ) as client:
+            async with client.request(
+                method,
+                url=url,
+                headers=header,
+                params=params,
+                json=json,
+                data=data,
+                timeout=300,
+            ) as resp:
+                try:
+                    raw_data = await resp.json()
+                except ContentTypeError:
+                    _raw_data = await resp.text()
+                    raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
+                logger.debug(raw_data)
+                return raw_data
+
+
+class HakushWiki:
+    ssl_verify = True
+    _HEADER = {
+        "Content-Type": "application/json;charset=UTF-8"
+    }
+
+    async def get_all_character(self):
+        """获取所有角色"""
+        return await self._hakush_request(HAKUSH_CHARACTER_URL, "GET")
+
+    async def _hakush_request(
         self,
         url: str,
         method: Literal["GET", "POST"] = "GET",

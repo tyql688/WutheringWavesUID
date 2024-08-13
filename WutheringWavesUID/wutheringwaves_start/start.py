@@ -2,10 +2,7 @@ import asyncio
 import threading
 
 from gsuid_core.logger import logger
-
-
-async def startup():
-    pass
+from ..wutheringwaves_resource import startup
 
 
 async def all_start():

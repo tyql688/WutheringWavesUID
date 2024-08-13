@@ -21,7 +21,8 @@ async def add_cookie(ev: Event, ck: str):
                 'uid': data.roleId
             },
             update_data={
-                'cookie': ck
+                'cookie': ck,
+                'status': ''
             })
     else:
         await WavesUser.insert_data(ev.user_id, ev.bot_id, cookie=ck, uid=data.roleId)

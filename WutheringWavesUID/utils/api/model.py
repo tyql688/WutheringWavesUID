@@ -57,15 +57,15 @@ class DailyData(BaseModel):
 class Role(BaseModel):
     roleId: int
     level: int
-    breach: int
+    breach: Optional[int]
     roleName: str
-    roleIconUrl: str
-    rolePicUrl: str
+    roleIconUrl: Optional[str]
+    rolePicUrl: Optional[str]
     starLevel: int
     attributeId: int
-    attributeName: str
+    attributeName: Optional[str]
     weaponTypeId: int
-    weaponTypeName: str
+    weaponTypeName: Optional[str]
     acronym: str
     # mapRoleId: int | None
 
@@ -96,10 +96,10 @@ class AccountBaseInfo(BaseModel):
 
 
 class Chain(BaseModel):
-    name: str
+    name: Optional[str]
     order: int
-    description: str
-    iconUrl: str
+    description: Optional[str]
+    iconUrl: Optional[str]
     unlocked: bool
 
 
@@ -108,15 +108,15 @@ class Weapon(BaseModel):
     weaponName: str
     weaponType: int
     weaponStarLevel: int
-    weaponIcon: str
-    weaponEffectName: str
-    effectDescription: str
+    weaponIcon: Optional[str]
+    weaponEffectName: Optional[str]
+    effectDescription: Optional[str]
 
 
 class WeaponData(BaseModel):
     weapon: Weapon
     level: int
-    breach: int
+    breach: Optional[int]
     # resonLevel: int
 
 
@@ -126,23 +126,23 @@ class PhantomProp(BaseModel):
     phantomId: int
     quality: int
     cost: int
-    iconUrl: str
-    skillDescription: str
+    iconUrl: Optional[str]
+    skillDescription: Optional[str]
 
 
 class FetterDetail(BaseModel):
     groupId: int
-    name: str
-    iconUrl: str
+    name: Optional[str]
+    iconUrl: Optional[str]
     num: int
-    firstDescription: str
-    secondDescription: str
+    firstDescription: Optional[str]
+    secondDescription: Optional[str]
 
 
 class Props(BaseModel):
-    attributeName: str
-    iconUrl: Union[str, None] = None
-    attributeValue: str
+    attributeName: Optional[str]
+    iconUrl: Optional[str]
+    attributeValue: Optional[str]
 
 
 class EquipPhantom(BaseModel):
@@ -151,8 +151,8 @@ class EquipPhantom(BaseModel):
     quality: int
     level: int
     fetterDetail: FetterDetail
-    mainProps: List[Props]
-    subProps: Union[List[Props], None] = None
+    mainProps: Optional[List[Props]]
+    subProps: Optional[List[Props]]
 
 
 class EquipPhantomData(BaseModel):
@@ -196,13 +196,13 @@ class RoleDetailData(BaseModel):
 
 class CalabashData(BaseModel):
     """数据坞"""
-    level: int  # 数据坞等级
-    baseCatch: str  # 基础吸收概率
-    strengthenCatch: str  # 强化吸收概率
-    catchQuality: int  # 最高可吸收品质
-    cost: int  # cost上限
-    maxCount: int  # 声骸收集进度-max
-    unlockCount: int  # 声骸收集进度-curr
+    level: Optional[int]  # 数据坞等级
+    baseCatch: Optional[str]  # 基础吸收概率
+    strengthenCatch: Optional[str]  # 强化吸收概率
+    catchQuality: Optional[int]  # 最高可吸收品质
+    cost: Optional[int]  # cost上限
+    maxCount: Optional[int]  # 声骸收集进度-max
+    unlockCount: Optional[int]  # 声骸收集进度-curr
     isUnlock: bool  # 解锁
 
 

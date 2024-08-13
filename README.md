@@ -19,6 +19,9 @@
 > **如果已经是最新版本的`gsuid_core`, 可以直接对bot发送`core安装插件WutheringWavesUID`，然后重启core以应用安装**
 >
 >
+> 如使用命令缺失素材可尝试使用命令`ww下载全部资源`
+>
+>
 > 支持NoneBot2 & HoshinoBot & ZeroBot & YunzaiBot的鸣潮Bot插件
 >
 > 🚧插件目前还在施工中，功能快速迭代中...🚧
@@ -68,6 +71,10 @@
 </p></details>
 
 <details><summary>签到相关 - 命令: ww签到 / ww开启自动签到 / ww全部重签 (需要管理员)</summary><p>
+还没有图
+</p></details>
+
+<details><summary>资源相关 - 命令: ww下载全部资源</summary><p>
 还没有图
 </p></details>
 
