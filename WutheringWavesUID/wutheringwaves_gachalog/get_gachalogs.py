@@ -41,17 +41,17 @@ def find_length(A, B) -> int:
 
 
 async def get_new_gachalog(
-        uid: str,
-        record_id: str,
-        full_data: Dict[str, List[GachaLog]],
-        is_force: bool,
-        server_id: str = SERVER_ID) -> (Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]):
+    uid: str,
+    record_id: str,
+    full_data: Dict[str, List[GachaLog]],
+    is_force: bool,
+    server_id: str = SERVER_ID) -> (Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]):
     new = {}
     new_count = {}
     for gacha_name in gacha_type_meta_data:
         for card_pool_type in gacha_type_meta_data[gacha_name]:
             res = await waves_api.get_gacha_log(card_pool_type, record_id, uid, server_id)
-            if not isinstance(res, dict) or res.get('code') != 0 or not res.get('data', None):
+            if not isinstance(res, dict) or res.get('code') != 0 or res.get('data', None) is None:
                 # 抽卡记录获取失败
                 return WAVES_CODE_104, None, None
             gacha_log = [GachaLog(**log) for log in res['data']]
@@ -64,10 +64,10 @@ async def get_new_gachalog(
 
 
 async def save_gachalogs(
-        ev: Event,
-        uid: str,
-        record_id: str,
-        is_force: bool = False
+    ev: Event,
+    uid: str,
+    record_id: str,
+    is_force: bool = False
 ) -> str:
     path = PLAYER_PATH / str(uid)
     if not path.exists():
