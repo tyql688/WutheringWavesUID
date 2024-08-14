@@ -135,9 +135,9 @@ async def draw_card(user: WavesUser, ev: Event):
                     current_data['level'] = get_level_from_list(current_data['avg_up'], [74, 87, 99, 105, 120])
                 elif current_data['avg'] != '-':
                     current_data['level'] = get_level_from_list(current_data['avg'], [53, 60, 68, 73, 75])
-            elif gacha_name == ['武器精准调谐', '角色调谐（常驻池）', '武器调谐（常驻池）', '新手自选唤取']:
+            elif gacha_name in ['武器精准调谐', '角色调谐（常驻池）', '武器调谐（常驻池）', '新手自选唤取']:
                 if current_data['avg'] != '-':
-                    current_data['level'] = get_level_from_list(current_data['avg'], [51, 55, 61, 68, 70])
+                    current_data['level'] = get_level_from_list(current_data['avg'], [45, 52, 59, 65, 70])
             elif gacha_name == '新手调谐':
                 if current_data['avg'] != '-':
                     current_data['level'] = get_level_from_list(current_data['avg'], [10, 20, 30, 40, 45])
