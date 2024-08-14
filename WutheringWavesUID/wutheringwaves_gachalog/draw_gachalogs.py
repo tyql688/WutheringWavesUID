@@ -213,12 +213,19 @@ async def draw_card(user: WavesUser, ev: Event):
                 item_temp.paste(item_icon, (22, 28), item_icon)
 
             item_bg.paste(item_temp, (-2, -2), item_temp)
-
-            info_block = Image.new("RGBA", (50, 25), "white")
+            gnum = item['gacha_num']
+            if gnum >= 70:
+                # gcolor = (223, 88, 75)
+                gcolor = (230, 58, 58)
+            elif gnum <= 40:
+                gcolor = (43, 210, 43)
+            else:
+                gcolor = 'white'
+            info_block = Image.new("RGBA", (110, 25), "white")
             info_block_draw = ImageDraw.Draw(info_block)
-            info_block_draw.rectangle([0, 0, 110, 70], fill=(0, 0, 0, int(0.5 * 255)))
-            info_block_draw.text((25, 14), f'{item["gacha_num"]}抽', 'white', waves_font_20, 'mm')
-            item_bg.paste(info_block, (61, 131), info_block)
+            info_block_draw.rectangle([0, 0, 110, 25], fill=(0, 0, 0, int(0.8 * 255)))
+            info_block_draw.text((55, 14), f'{item["gacha_num"]}抽', gcolor, waves_font_20, 'mm')
+            item_bg.paste(info_block, (28, 131), info_block)
 
             _x = 95 + 162 * (index % 5)
             _y = 670 + bset * (index // 5) + y + gindex * oset
