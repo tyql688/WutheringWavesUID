@@ -9,7 +9,7 @@ from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 from gsuid_core.logger import logger
 from .api import *
 from ..database.models import WavesUser
-from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_106
+from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_106, WAVES_CODE_101
 from ..hint import error_reply
 
 
@@ -43,7 +43,7 @@ class WavesApi:
             return ck
 
         # 公共ck 随机一个
-        user_list = await WavesUser.get_all_user()
+        user_list = await WavesUser.get_waves_all_user()
         ck_list = []
         for user in user_list:
             if not await WavesUser.cookie_validate(uid):
@@ -70,7 +70,19 @@ class WavesApi:
         if kuro_uid:
             data.update({'queryUserId': kuro_uid})
         raw_data = await self._waves_request(KURO_ROLE_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        logger.info(f"get_kuro_role_info: {raw_data}")
+        if isinstance(raw_data, dict):
+            if raw_data.get('code') == 200 and raw_data.get('data'):
+                return True, raw_data['data']
+
+            if int(raw_data.get('code', 0)) == 500:
+                # ? 服了
+                await WavesUser.mark_invalid(token, '无效')
+                return False, error_reply(WAVES_CODE_101)
+
+            if raw_data.get('msg'):
+                return False, raw_data['msg']
+        return False, error_reply(WAVES_CODE_999)
 
     async def get_game_role_info(
         self,
@@ -239,7 +251,7 @@ class WavesApi:
                 except ContentTypeError:
                     _raw_data = await resp.text()
                     raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                logger.debug(raw_data)
+                logger.debug(f'url:[{url}] raw_data:{raw_data}')
                 return raw_data
 
 
@@ -305,49 +317,5 @@ class KuroLogin:
                 except ContentTypeError:
                     _raw_data = await resp.text()
                     raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                logger.debug(raw_data)
-                return raw_data
-
-
-class HakushWiki:
-    ssl_verify = True
-    _HEADER = {
-        "Content-Type": "application/json;charset=UTF-8"
-    }
-
-    async def get_all_character(self):
-        """获取所有角色"""
-        return await self._hakush_request(HAKUSH_CHARACTER_URL, "GET")
-
-    async def _hakush_request(
-        self,
-        url: str,
-        method: Literal["GET", "POST"] = "GET",
-        header=None,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        data: Optional[FormData] = None,
-    ) -> Union[Dict, int]:
-
-        if header is None:
-            header = self._HEADER
-
-        async with ClientSession(
-            connector=TCPConnector(verify_ssl=self.ssl_verify)
-        ) as client:
-            async with client.request(
-                method,
-                url=url,
-                headers=header,
-                params=params,
-                json=json,
-                data=data,
-                timeout=300,
-            ) as resp:
-                try:
-                    raw_data = await resp.json()
-                except ContentTypeError:
-                    _raw_data = await resp.text()
-                    raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                logger.debug(raw_data)
+                logger.debug(f'url:{url} raw_data:{raw_data}')
                 return raw_data

@@ -39,13 +39,13 @@ async def sign_in(uid: str, ck: str) -> str:
 
 
 async def single_daily_sign(
-        bot_id: str,
-        uid: str,
-        gid: str,
-        qid: str,
-        ck: str,
-        private_msgs: Dict,
-        group_msgs: Dict,
+    bot_id: str,
+    uid: str,
+    gid: str,
+    qid: str,
+    ck: str,
+    private_msgs: Dict,
+    group_msgs: Dict,
 ):
     im = await sign_in(uid, ck)
     if gid == 'on':
@@ -80,17 +80,16 @@ async def daily_sign():
     tasks = []
     private_msgs = {}
     group_msgs = {}
-    _user_list: List[WavesUser] = await WavesUser.get_all_user()
-    uid_list = []
+    _user_list: List[WavesUser] = await WavesUser.get_waves_all_user()
+
     user_list: List[WavesUser] = []
     for user in _user_list:
         _uid = user.user_id
         _switch = user.sign_switch
         if _switch != 'off' and not user.status and _uid:
-            uid_list.append(_uid)
             user_list.append(user)
 
-    logger.info(f'[鸣潮] [全部重签] [UID列表] {uid_list}')
+    logger.info(f'[鸣潮] [全部重签] [UID列表] {[user.uid for user in user_list]}')
     for user in user_list:
         tasks.append(
             single_daily_sign(

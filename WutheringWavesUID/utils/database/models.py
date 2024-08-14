@@ -1,8 +1,10 @@
-from typing import Optional, Any, Type
+from typing import Optional, Any, Type, List
 
-from sqlmodel import Field
+from sqlalchemy import and_, or_, null
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import Field, select
 
-from gsuid_core.utils.database.base_models import Bind, User, T_User
+from gsuid_core.utils.database.base_models import Bind, User, T_User, with_session
 from gsuid_core.webconsole.mount_app import PageSchema, GsAdminModel, site
 
 
@@ -30,6 +32,23 @@ class WavesUser(User, table=True):
             if getattr(user, attr_key) != attr_value:
                 continue
             return user
+
+    @classmethod
+    @with_session
+    async def get_waves_all_user(
+        cls: Type[T_User], session: AsyncSession
+    ) -> List[T_User]:
+        sql = select(cls).where(
+            and_(
+                or_(
+                    cls.status == null(),
+                    cls.status == ''
+                ), cls.cookie != null(), cls.cookie != ''
+            )
+        )
+        result = await session.execute(sql)
+        data = result.scalars().all()
+        return data
 
 
 @site.register_admin
