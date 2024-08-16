@@ -13,8 +13,13 @@ PLAYER_PATH = MAIN_PATH / 'players'
 
 # 游戏素材
 RESOURCE_PATH = MAIN_PATH / 'resource'
+PHANTOM_PATH = RESOURCE_PATH / 'phantom'
 AVATAR_PATH = RESOURCE_PATH / 'waves_avatar'
 WEAPON_PATH = RESOURCE_PATH / 'waves_weapon'
+ROLE_PILE_PATH = RESOURCE_PATH / 'role_pile'
+ROLE_DETAIL_PATH = RESOURCE_PATH / 'role_detail'
+ROLE_DETAIL_SKILL_PATH = ROLE_DETAIL_PATH / 'skill'
+ROLE_DETAIL_CHAINS_PATH = ROLE_DETAIL_PATH / 'chains'
 
 
 def init_dir():
@@ -22,8 +27,13 @@ def init_dir():
         MAIN_PATH,
         PLAYER_PATH,
         RESOURCE_PATH,
+        PHANTOM_PATH,
         AVATAR_PATH,
         WEAPON_PATH,
+        ROLE_PILE_PATH,
+        ROLE_DETAIL_PATH,
+        ROLE_DETAIL_SKILL_PATH,
+        ROLE_DETAIL_CHAINS_PATH,
     ]:
         i.mkdir(parents=True, exist_ok=True)
 

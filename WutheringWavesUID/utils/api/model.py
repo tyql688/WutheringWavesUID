@@ -117,7 +117,7 @@ class WeaponData(BaseModel):
     weapon: Weapon
     level: int
     breach: Optional[int]
-    # resonLevel: int
+    resonLevel: Optional[int]
 
 
 class PhantomProp(BaseModel):
@@ -157,7 +157,7 @@ class EquipPhantom(BaseModel):
 
 class EquipPhantomData(BaseModel):
     cost: int
-    equipPhantomList: Union[List[Optional[EquipPhantom]], None, List[None]] = None
+    equipPhantomList: Union[List[Optional[EquipPhantom]], None, List[None]]
 
 
 class Skill(BaseModel):
@@ -178,7 +178,7 @@ class RoleDetailData(BaseModel):
     level: int
     chainList: List[Chain]
     weaponData: WeaponData
-    phantomData: Union[EquipPhantomData, None] = None
+    phantomData: Optional[EquipPhantomData]
     skillList: List[SkillData]
 
     def get_chain_num(self):

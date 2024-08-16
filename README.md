@@ -70,6 +70,10 @@
 还没有图
 </p></details>
 
+<details><summary>角色面板 - 命令: ww查询长离</summary><p>
+<a><img src="https://s2.loli.net/2024/08/16/5pb7CLzVcd3x2yj.jpg"></a>
+</p></details>
+
 <details><summary>签到相关 - 命令: ww签到 / ww开启自动签到 / ww全部重签 (需要管理员)</summary><p>
 还没有图
 </p></details>

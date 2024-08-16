@@ -36,23 +36,40 @@ class WavesApi:
         else:
             return await WavesUser.get_user_cookie_by_uid(uid)
 
+    async def get_self_waves_ck(self, uid: str) -> Optional[str]:
+        cookie = await WavesUser.get_user_cookie_by_uid(uid)
+        if not cookie:
+            return
+
+        if not await WavesUser.cookie_validate(uid):
+            return
+
+        succ, _ = await self.refresh_data(uid, cookie)
+        if not succ:
+            await WavesUser.mark_invalid(cookie, '无效')
+            return
+
+        return cookie
+
     async def get_waves_random_cookie(self, uid: str) -> Optional[str]:
         # 有绑定自己CK 并且该CK有效的前提下，优先使用自己CK
-        ck = await WavesUser.get_user_cookie_by_uid(uid)
+        ck = await self.get_self_waves_ck(uid)
         if ck:
             return ck
 
         # 公共ck 随机一个
         user_list = await WavesUser.get_waves_all_user()
+        logger.info(f"get_waves_random_cookie: {user_list}")
         ck_list = []
         for user in user_list:
-            if not await WavesUser.cookie_validate(uid):
+            if not await WavesUser.cookie_validate(user.uid):
                 continue
             succ, _ = await self.refresh_data(user.uid, user.cookie)
             if not succ:
                 await WavesUser.mark_invalid(user.cookie, '无效')
                 continue
             ck_list.append(user.cookie)
+        logger.info(f"get_waves_random_cookie: {ck_list}")
         if len(ck_list) > 0:
             return random.choices(ck_list, k=1)[0]
 

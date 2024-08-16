@@ -6,7 +6,7 @@ from typing import Literal, Union
 from PIL import Image, ImageOps
 
 from gsuid_core.utils.image.image_tools import crop_center_img
-from ..utils.resource.RESOURCE_PATH import AVATAR_PATH, WEAPON_PATH
+from ..utils.resource.RESOURCE_PATH import AVATAR_PATH, WEAPON_PATH, ROLE_PILE_PATH
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 GREY = (216, 216, 216)
@@ -17,12 +17,15 @@ GOLD = (224, 202, 146)
 
 
 async def get_random_waves_role_pile():
-    pic_path_list = os.listdir(f'{TEXT_PATH}/role_pile')
-    if pic_path_list:
-        path = random.choice(pic_path_list)
-    else:
-        path = 'role_pile_anke.png'
-    return Image.open(TEXT_PATH / f'role_pile/{path}').convert('RGBA')
+    path = random.choice(os.listdir(f'{ROLE_PILE_PATH}'))
+    return Image.open(f'{ROLE_PILE_PATH}/{path}').convert('RGBA')
+
+
+async def get_role_pile(resource_id: Union[int, str]) -> Image.Image:
+    name = f"role_pile_{resource_id}.png"
+    path = ROLE_PILE_PATH / name
+    if path.exists():
+        return Image.open(path).convert("RGBA")
 
 
 async def get_square_avatar(resource_id: Union[int, str]) -> Image.Image:
@@ -61,6 +64,14 @@ async def get_square_weapon(resource_id: Union[int, str]) -> Image.Image:
 
 async def get_attribute(name: str = "") -> Image.Image:
     return Image.open(TEXT_PATH / f'attribute/attr_{name}.png').convert("RGBA")
+
+
+async def get_attribute_prop(name: str = "") -> Image.Image:
+    return Image.open(TEXT_PATH / f'attribute_prop/attr_prop_{name}.png').convert("RGBA")
+
+
+async def get_weapon_type(name: str = "") -> Image.Image:
+    return Image.open(TEXT_PATH / f'weapon_type/weapon_type_{name}.png').convert("RGBA")
 
 
 def get_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
