@@ -7,12 +7,13 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
 from ..utils.api.model import RoleDetailData, AccountBaseInfo, WeaponData
+from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
     waves_font_24
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
-    get_square_weapon, get_attribute_prop
+    get_square_weapon, get_attribute_prop, GREY
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.download_file import get_skill_img, get_chain_img, get_phantom_img
 from ..utils.waves_api import waves_api
@@ -195,14 +196,24 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
     if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
         totalCost = role_detail.phantomData.cost
         equipPhantomList = role_detail.phantomData.equipPhantomList
+        phantom_score = 0
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new('RGBA', (350, 550))
             sh_temp_draw = ImageDraw.Draw(sh_temp)
-            sh_title = Image.open(TEXT_PATH / 'sh_title1.png')
             sh_bg = Image.open(TEXT_PATH / 'sh_bg.png')
-            sh_temp.alpha_composite(sh_title, dest=(0, 0))
             sh_temp.alpha_composite(sh_bg, dest=(0, 0))
             if _phantom and _phantom.phantomProp:
+                props = []
+                if _phantom.mainProps:
+                    props.extend(_phantom.mainProps)
+                if _phantom.subProps:
+                    props.extend(_phantom.subProps)
+                _score, _bg = calc_phantom_score(char_name, props, _phantom.cost)
+                phantom_score += _score
+                sh_title = Image.open(TEXT_PATH / f'sh_title_{_bg}.png')
+
+                sh_temp.alpha_composite(sh_title, dest=(0, 0))
+
                 phantom_icon = await get_phantom_img(_phantom.phantomProp.phantomId, _phantom.phantomProp.iconUrl)
                 phantom_icon = phantom_icon.resize((100, 100))
                 sh_temp.alpha_composite(phantom_icon, dest=(20, 20))
@@ -214,12 +225,6 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                     promote_icon = promote_icon.resize((30, 30))
                     sh_temp.alpha_composite(promote_icon, dest=(145 + 30 * index, 90))
 
-                props = []
-                if _phantom.mainProps:
-                    props.extend(_phantom.mainProps)
-                if _phantom.subProps:
-                    props.extend(_phantom.subProps)
-
                 for index, _prop in enumerate(props):
                     oset = 55
                     prop_img = await get_attribute_prop(_prop.attributeName)
@@ -227,12 +232,29 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                     sh_temp.alpha_composite(prop_img, (15, 167 + index * oset))
                     sh_temp_draw = ImageDraw.Draw(sh_temp)
                     _color = 'white'
+                    if index > 1:
+                        _color = get_valid_color(char_name, _prop.attributeName)
                     sh_temp_draw.text((60, 187 + index * oset), f'{_prop.attributeName[:6]}', _color, waves_font_24,
                                       'lm')
                     sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', _color, waves_font_24,
                                       'rm')
 
             phantom_temp.alpha_composite(sh_temp, dest=(40 + (i % 3) * 380, 120 + (i // 3) * 600))
+
+        if phantom_score > 0:
+            _bg = get_total_score_bg(char_name, phantom_score)
+            sh_score_bg_c = Image.open(TEXT_PATH / f'sh_score_bg_{_bg}.png')
+            score_temp = Image.new('RGBA', sh_score_bg_c.size)
+            score_temp.alpha_composite(sh_score_bg_c)
+            sh_score_c = Image.open(TEXT_PATH / f'sh_score_{_bg}.png')
+            score_temp.alpha_composite(sh_score_c)
+            score_temp_draw = ImageDraw.Draw(score_temp)
+
+            score_temp_draw.text((180, 260), f'声骸评级', GREY, waves_font_40, 'mm')
+            score_temp_draw.text((180, 380), f'{phantom_score:.2f}分', 'white', waves_font_40, 'mm')
+            score_temp_draw.text((180, 440), f'声骸评分', GREY, waves_font_40, 'mm')
+
+            phantom_temp.alpha_composite(score_temp, dest=(800, 750))
 
     img.paste(phantom_temp, (0, 1320), phantom_temp)
     img = add_footer(img)

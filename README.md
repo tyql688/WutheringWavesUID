@@ -97,7 +97,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 - [ ] 公告推送
 - [ ] 深渊
 - [ ] 全息战略
-- [ ] 角色面板
+- [x] 角色面板
 - [ ] 练度查询
 - [ ] 帮助图
 
@@ -110,6 +110,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 
 - 特别鸣谢 [Wuyi无疑](https://github.com/KimigaiiWuyi) 为 WutheringWavesUID 作出的巨大贡献！本插件的设计图均出自 Wuyi无疑
   之手！！！
+- [鸣潮声骸评分工具](http://asfaz.cn/mingchao/rule.html) 鸣潮声骸评分工具
 - [waves-plugin](https://github.com/erzaozi/waves-plugin) Yunzai 鸣潮游戏数据查询插件
 - [Yunzai-Kuro-Plugin](https://github.com/TomyJan/Yunzai-Kuro-Plugin) Yunzai 库洛插件
 - [Kuro-API-Collection](https://github.com/TomyJan/Kuro-API-Collection) 库街区 API 文档
