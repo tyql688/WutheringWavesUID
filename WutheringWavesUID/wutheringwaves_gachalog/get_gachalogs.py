@@ -12,7 +12,7 @@ from gsuid_core.models import Event
 from ..utils.api.api import SERVER_ID
 from ..utils.api.model import GachaLog
 from ..utils.database.models import WavesUser
-from ..utils.error_reply import WAVES_CODE_104
+from ..utils.error_reply import WAVES_CODE_104, WAVES_CODE_108
 from ..utils.hint import error_reply
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
@@ -53,7 +53,10 @@ async def get_new_gachalog(
             res = await waves_api.get_gacha_log(card_pool_type, record_id, uid, server_id)
             if not isinstance(res, dict) or res.get('code') != 0 or res.get('data', None) is None:
                 # 抽卡记录获取失败
-                return WAVES_CODE_104, None, None
+                if res.get('code') == -1:
+                    return WAVES_CODE_108, None, None
+                else:
+                    return WAVES_CODE_104, None, None
             gacha_log = [GachaLog(**log) for log in res['data']]
             old_length = find_length(full_data[gacha_name], gacha_log)
             _add = gacha_log if old_length == 0 else gacha_log[:-old_length]
