@@ -19,6 +19,25 @@ class WavesWeaponResult:
         self.effectName = None
 
 
+def get_breach(breach: Union[int, None], level: int):
+    if breach is None:
+        if level <= 20:
+            breach = 0
+        elif level <= 40:
+            breach = 1
+        elif level <= 50:
+            breach = 2
+        elif level <= 60:
+            breach = 3
+        elif level <= 70:
+            breach = 4
+        elif level <= 80:
+            breach = 5
+        elif level <= 90:
+            breach = 6
+    return breach
+
+
 def get_weapon_detail(
     weapon_id: Union[str, int],
     level: int,
@@ -31,6 +50,8 @@ def get_weapon_detail(
     """
     if str(weapon_id) not in weapon_id_data:
         return None
+
+    breach = get_breach(breach, level)
 
     weapon_data = weapon_id_data[str(weapon_id)]
     result = WavesWeaponResult()

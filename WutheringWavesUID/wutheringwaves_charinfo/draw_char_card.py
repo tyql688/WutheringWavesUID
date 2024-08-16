@@ -16,7 +16,7 @@ from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_wea
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.download_file import get_skill_img, get_chain_img, get_phantom_img
 from ..utils.waves_api import waves_api
-from ..utils.weapon_detail import get_weapon_detail, WavesWeaponResult
+from ..utils.weapon_detail import get_weapon_detail, WavesWeaponResult, get_breach
 from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -141,7 +141,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
     weapon_bg_temp_draw.text((_x, _y), f'精{weaponData.resonLevel}', 'white',
                              waves_font_24, 'lm')
 
-    for i in range(0, weaponData.breach):
+    weapon_breach = get_breach(weaponData.breach, weaponData.level)
+    for i in range(0, weapon_breach):
         promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
         weapon_bg_temp.alpha_composite(promote_icon, dest=(200 + 40 * i, 100))
 
@@ -169,8 +170,6 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
     mz_temp = Image.new('RGBA', (1200, 300))
 
     for i, _mz in enumerate(role_detail.chainList):
-        if not _mz.unlocked:
-            transparency = 0
         mz_bg = Image.open(TEXT_PATH / 'mz_bg.png')
         mz_bg_temp = Image.new('RGBA', mz_bg.size)
         mz_bg_temp_draw = ImageDraw.Draw(mz_bg_temp)
@@ -203,32 +202,34 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
             sh_bg = Image.open(TEXT_PATH / 'sh_bg.png')
             sh_temp.alpha_composite(sh_title, dest=(0, 0))
             sh_temp.alpha_composite(sh_bg, dest=(0, 0))
+            if _phantom and _phantom.phantomProp:
+                phantom_icon = await get_phantom_img(_phantom.phantomProp.phantomId, _phantom.phantomProp.iconUrl)
+                phantom_icon = phantom_icon.resize((100, 100))
+                sh_temp.alpha_composite(phantom_icon, dest=(20, 20))
+                phantomName = _phantom.phantomProp.name.replace("·", " ").replace("（", " ").replace("）", "")
+                sh_temp_draw.text((150, 40), f'{phantomName}', SPECIAL_GOLD, waves_font_30, 'lm')
+                sh_temp_draw.text((150, 70), f'Lv.{_phantom.level}', 'white', waves_font_24, 'lm')
+                for index in range(0, _phantom.cost):
+                    promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
+                    promote_icon = promote_icon.resize((30, 30))
+                    sh_temp.alpha_composite(promote_icon, dest=(145 + 30 * index, 90))
 
-            phantom_icon = await get_phantom_img(_phantom.phantomProp.phantomId, _phantom.phantomProp.iconUrl)
-            phantom_icon = phantom_icon.resize((100, 100))
-            sh_temp.alpha_composite(phantom_icon, dest=(20, 20))
-            phantomName = _phantom.phantomProp.name.replace("·", " ").replace("（", " ").replace("）", "")
-            sh_temp_draw.text((150, 40), f'{phantomName}', SPECIAL_GOLD, waves_font_30, 'lm')
-            sh_temp_draw.text((150, 70), f'Lv.{_phantom.level}', 'white', waves_font_24, 'lm')
-            for index in range(0, _phantom.cost):
-                promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
-                promote_icon = promote_icon.resize((30, 30))
-                sh_temp.alpha_composite(promote_icon, dest=(145 + 30 * index, 90))
+                props = []
+                if _phantom.mainProps:
+                    props.extend(_phantom.mainProps)
+                if _phantom.subProps:
+                    props.extend(_phantom.subProps)
 
-            props = []
-            if _phantom.mainProps:
-                props.extend(_phantom.mainProps)
-            if _phantom.subProps:
-                props.extend(_phantom.subProps)
-
-            for index, _prop in enumerate(props):
-                oset = 55
-                prop_img = await get_attribute_prop(_prop.attributeName)
-                prop_img = prop_img.resize((40, 40))
-                sh_temp.alpha_composite(prop_img, (15, 167 + index * oset))
-                sh_temp_draw = ImageDraw.Draw(sh_temp)
-                sh_temp_draw.text((60, 187 + index * oset), f'{_prop.attributeName[:6]}', 'white', waves_font_24, 'lm')
-                sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', 'white', waves_font_24, 'rm')
+                for index, _prop in enumerate(props):
+                    oset = 55
+                    prop_img = await get_attribute_prop(_prop.attributeName)
+                    prop_img = prop_img.resize((40, 40))
+                    sh_temp.alpha_composite(prop_img, (15, 167 + index * oset))
+                    sh_temp_draw = ImageDraw.Draw(sh_temp)
+                    sh_temp_draw.text((60, 187 + index * oset), f'{_prop.attributeName[:6]}', 'white', waves_font_24,
+                                      'lm')
+                    sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', 'white', waves_font_24,
+                                      'rm')
 
             phantom_temp.alpha_composite(sh_temp, dest=(40 + (i % 3) * 380, 120 + (i // 3) * 600))
 
