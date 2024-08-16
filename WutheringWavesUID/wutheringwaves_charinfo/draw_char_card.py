@@ -185,10 +185,10 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
             mz_bg_temp = ImageEnhance.Brightness(mz_bg_temp).enhance(0.5)
         mz_temp.alpha_composite(mz_bg_temp, dest=(i * 190, 0))
 
-    img.paste(mz_temp, (0, 1100), mz_temp)
+    img.paste(mz_temp, (0, 1080), mz_temp)
 
     # 声骸
-    phantom_temp = Image.new('RGBA', (1200, 1200))
+    phantom_temp = Image.new('RGBA', (1200, 1280))
     banner3 = Image.open(TEXT_PATH / 'banner3.png')
     phantom_temp.alpha_composite(banner3, dest=(0, 0))
 
@@ -226,14 +226,15 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                     prop_img = prop_img.resize((40, 40))
                     sh_temp.alpha_composite(prop_img, (15, 167 + index * oset))
                     sh_temp_draw = ImageDraw.Draw(sh_temp)
-                    sh_temp_draw.text((60, 187 + index * oset), f'{_prop.attributeName[:6]}', 'white', waves_font_24,
+                    _color = 'white'
+                    sh_temp_draw.text((60, 187 + index * oset), f'{_prop.attributeName[:6]}', _color, waves_font_24,
                                       'lm')
-                    sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', 'white', waves_font_24,
+                    sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', _color, waves_font_24,
                                       'rm')
 
             phantom_temp.alpha_composite(sh_temp, dest=(40 + (i % 3) * 380, 120 + (i // 3) * 600))
 
-    img.paste(phantom_temp, (0, 1350), phantom_temp)
+    img.paste(phantom_temp, (0, 1320), phantom_temp)
     img = add_footer(img)
     img = await convert_img(img)
     return img
