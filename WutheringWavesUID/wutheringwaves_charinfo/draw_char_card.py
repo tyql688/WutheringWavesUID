@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
+from ..utils import hint
 from ..utils.api.model import RoleDetailData, AccountBaseInfo, WeaponData
 from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color
 from ..utils.char_info_utils import get_all_role_detail_info
@@ -27,7 +28,7 @@ SPECIAL_GOLD = (234, 183, 4)
 async def draw_char_detail_img(ev: Event, uid: str, char: str):
     ck = await waves_api.get_ck(uid)
     if not ck:
-        return WAVES_CODE_102
+        return hint.error_reply(WAVES_CODE_102)
     # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck)
     if not succ:
