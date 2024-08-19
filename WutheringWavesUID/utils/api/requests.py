@@ -47,7 +47,8 @@ class WavesApi:
         succ, _ = await self.refresh_data(uid, cookie)
         if not succ:
             await WavesUser.mark_invalid(cookie, '无效')
-            return
+            # 返回空串 表示绑定已失效
+            return ''
 
         return cookie
 

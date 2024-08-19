@@ -10,7 +10,7 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img, get_event_avatar
 from ..utils.api.model import DailyData
-from ..utils.database.models import WavesBind, WavesUser
+from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103, ERROR_CODE, WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25
 from ..utils.image import add_footer, GREY, GOLD, get_random_waves_role_pile, YELLOW
@@ -33,7 +33,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
         # 进行校验UID是否绑定CK
         valid_daily_list = []
         for uid in uid_list:
-            ck = await WavesUser.get_user_cookie_by_uid(uid)
+            ck = await waves_api.get_self_waves_ck(uid)
             if not ck:
                 continue
             succ, _ = await waves_api.refresh_data(uid, ck)

@@ -26,4 +26,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '关闭后将不再给任何人推送当天签到任务完成情况',
         False,
     ),
+    "CrazyNotice": GsBoolConfig(
+        "催命模式",
+        "开启后当达到推送阈值将会一直推送",
+        False
+    ),
 }

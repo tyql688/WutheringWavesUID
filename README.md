@@ -47,6 +47,12 @@
 <a><img src="https://s2.loli.net/2024/08/11/uVR3F6AWZvMXSkD.jpg"></a>
 </p></details>
 
+<details><summary>体力恢复提醒 </summary><p>
+1.开启/关闭全局推送 命令: ww开启推送
+2.开启/关闭体力推送 命令：ww开启体力推送
+3.设置体力阈值 命令：ww设置体力阈值 180
+</p></details>
+
 <details><summary>基本信息汇总 - 命令: ww查询</summary><p>
 <a><img src="https://s2.loli.net/2024/08/11/IpZ7GliB5HMY9CA.jpg"></a>
 </p></details>
@@ -66,7 +72,7 @@
 <a><img src="https://s2.loli.net/2024/08/11/MD87eW3sUFwQqm2.jpg"></a>
 </p></details>
 
-<details><summary>面板更新 - 命令: ww刷新面板</summary><p>
+<details><summary>面板更新 - 命令: ww刷新面板 / ww强制刷新</summary><p>
 还没有图
 </p></details>
 
@@ -83,7 +89,7 @@
 </p></details>
 
 <details><summary>其他 - 网页控制台相关功能</summary><p>
-请自行查阅文档, 可控制签到时间等
+请自行查阅文档, 可控制签到时间，推送等
 </p></details>
 
 <details><summary>ck获取方法</summary><p>
@@ -93,7 +99,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 ## 后续
 
 - [ ] 手机号登录
-- [ ] 体力恢复提醒
+- [x] 体力恢复提醒
 - [ ] 公告推送
 - [ ] 深渊
 - [ ] 全息战略
