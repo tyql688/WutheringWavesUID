@@ -31,8 +31,6 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
 
     # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck, game_info.serverId)
-    if not succ:
-        return account_info
     account_info = AccountBaseInfo(**account_info)
 
     # 数据坞
@@ -44,34 +42,35 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
     # five_num = sum(1 for i in role_info.roleList if i.starLevel == 5)
     up_num = sum(1 for i in role_info.roleList if i.starLevel == 5 and i.roleName not in NORMAL_LIST)
 
-    base_info_value_list = [
-        {"key": "活跃天数", "value": f"{account_info.activeDays}", "info_block": "color_y.png"},
-        {"key": "解锁角色", "value": f"{account_info.roleNum}", "info_block": ""},
-        {"key": "UP角色", "value": f"{up_num}", "info_block": "color_g.png"},
-        {"key": "数据坞等级", "value": f"{calabash_data.level if calabash_data.isUnlock else 0}", "info_block": ""},
-        {"key": "已达成成就", "value": f"{account_info.achievementCount}", "info_block": "color_p.png"},
-        {"key": "成就星数", "value": f"{account_info.achievementStar}", "info_block": ""},
-        {"key": "小型信标", "value": f"{account_info.smallCount}", "info_block": ""},
-        {"key": "中型信标", "value": f"{account_info.bigCount}", "info_block": ""},
-    ]
+    base_info_value_list = []
+    if account_info.is_full:
+        base_info_value_list = [
+            {"key": "活跃天数", "value": f"{account_info.activeDays}", "info_block": "color_y.png"},
+            {"key": "解锁角色", "value": f"{account_info.roleNum}", "info_block": ""},
+            {"key": "UP角色", "value": f"{up_num}", "info_block": "color_g.png"},
+            {"key": "数据坞等级", "value": f"{calabash_data.level if calabash_data.isUnlock else 0}", "info_block": ""},
+            {"key": "已达成成就", "value": f"{account_info.achievementCount}", "info_block": "color_p.png"},
+            {"key": "成就星数", "value": f"{account_info.achievementStar}", "info_block": ""},
+            {"key": "小型信标", "value": f"{account_info.smallCount}", "info_block": ""},
+            {"key": "中型信标", "value": f"{account_info.bigCount}", "info_block": ""},
+        ]
 
-    for b in account_info.boxList:
-        base_info_value_list.append({"key": b.boxName, "value": f"{b.num}", "info_block": ""})
+        for b in account_info.boxList:
+            base_info_value_list.append({"key": b.boxName, "value": f"{b.num}", "info_block": ""})
+
+    # 初始化基础信息栏位
+    bs = Image.open(TEXT_PATH / 'bs.png')
 
     # 角色信息
-
+    roleTotalNum = account_info.roleNum if account_info.is_full else len(role_info.roleList)
     xset = 50
-    yset = 870
+    yset = 470
+    if account_info.is_full:
+        yset += bs.size[1]
 
     w = 1000
-    h = 100 + yset + 200 * int(account_info.roleNum / 4 + (1 if account_info.roleNum % 4 else 0))
+    h = 100 + yset + 200 * int(roleTotalNum / 4 + (1 if roleTotalNum % 4 else 0))
     card_img = get_waves_bg(w, h)
-    char = Image.open(TEXT_PATH / 'char.png')
-    base_info_bg = Image.open(TEXT_PATH / 'base_info_bg.png')
-    title_bar = Image.open(TEXT_PATH / 'title_bar.png')
-    line = Image.open(TEXT_PATH / 'line.png')
-    line2 = Image.open(TEXT_PATH / 'line.png')
-    bs = Image.open(TEXT_PATH / 'bs.png')
 
     def calc_info_block(_x: int, _y: int, key: str, value: str, color_path: str = ''):
         if not color_path:
@@ -98,6 +97,7 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
                 base_info_value_list[_len]['value'],
                 base_info_value_list[_len]['info_block'])
 
+    # 根据面板数据获取详细信息
     role_detail_info_map = await get_all_role_detail_info(uid)
 
     async def calc_role_info(_x: int, _y: int, roleInfo: Role):
@@ -137,36 +137,46 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
         _y = yset + 200 * int(index / 4)
         await calc_role_info(_x, _y, role)
 
+    # 基础信息 名字 特征码
+    base_info_bg = Image.open(TEXT_PATH / 'base_info_bg.png')
     base_info_draw = ImageDraw.Draw(base_info_bg)
     base_info_draw.text((275, 120), f'{account_info.name[:7]}', 'white', waves_font_30, 'lm')
     base_info_draw.text((226, 173), f'特征码:  {account_info.id}', GOLD, waves_font_25, 'lm')
+    card_img.paste(base_info_bg, (35, 170), base_info_bg)
 
-    line_draw = ImageDraw.Draw(line)
-    line_draw.text((475, 30), f'基本信息', 'white', waves_font_30, 'mm')
-
-    line2_draw = ImageDraw.Draw(line2)
-    line2_draw.text((475, 30), f'角色信息', 'white', waves_font_30, 'mm')
-
-    title_bar_draw = ImageDraw.Draw(title_bar)
-    title_bar_draw.text((660, 125), '账号等级', GREY, waves_font_26, 'mm')
-    title_bar_draw.text((660, 78), f'Lv.{account_info.level}', 'white', waves_font_42, 'mm')
-
-    title_bar_draw.text((810, 125), '世界等级', GREY, waves_font_26, 'mm')
-    title_bar_draw.text((810, 78), f'Lv.{account_info.worldLevel}', 'white', waves_font_42, 'mm')
-
+    # 头像 头像环
     avatar = await draw_pic_with_ring(ev)
     avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
-
     card_img.paste(avatar, (45, 220), avatar)
     avatar_ring = avatar_ring.resize((180, 180))
     card_img.paste(avatar_ring, (55, 230), avatar_ring)
 
-    card_img.paste(base_info_bg, (35, 170), base_info_bg)
+    # 右侧装饰
+    char = Image.open(TEXT_PATH / 'char.png')
     card_img.paste(char, (910, 0), char)
-    card_img.paste(line, (0, 400), line)
-    card_img.paste(bs, (-10, 400), bs)
-    card_img.paste(line2, (0, 800), line2)
-    card_img.paste(title_bar, (0, 220), title_bar)
+
+    # 账号基本信息，由于可能会没有，放在一起
+    if account_info.is_full:
+        line = Image.open(TEXT_PATH / 'line.png')
+        line_draw = ImageDraw.Draw(line)
+        line_draw.text((475, 30), f'基本信息', 'white', waves_font_30, 'mm')
+
+        title_bar = Image.open(TEXT_PATH / 'title_bar.png')
+        title_bar_draw = ImageDraw.Draw(title_bar)
+        title_bar_draw.text((660, 125), '账号等级', GREY, waves_font_26, 'mm')
+        title_bar_draw.text((660, 78), f'Lv.{account_info.level}', 'white', waves_font_42, 'mm')
+
+        title_bar_draw.text((810, 125), '世界等级', GREY, waves_font_26, 'mm')
+        title_bar_draw.text((810, 78), f'Lv.{account_info.worldLevel}', 'white', waves_font_42, 'mm')
+        card_img.paste(line, (0, yset - bs.size[1] - 70), line)
+        card_img.paste(bs, (-10, yset - bs.size[1] - 70), bs)
+        card_img.paste(title_bar, (0, 220), title_bar)
+
+    line2 = Image.open(TEXT_PATH / 'line.png')
+    line2_draw = ImageDraw.Draw(line2)
+    line2_draw.text((475, 30), f'角色信息', 'white', waves_font_30, 'mm')
+    card_img.paste(line2, (0, yset - 70), line2)
+
     card_img = add_footer(card_img, 600, 20)
     card_img = await convert_img(card_img)
     return card_img

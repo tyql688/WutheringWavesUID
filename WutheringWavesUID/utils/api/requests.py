@@ -9,7 +9,7 @@ from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 from gsuid_core.logger import logger
 from .api import *
 from ..database.models import WavesUser
-from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_106, WAVES_CODE_101
+from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_101
 from ..hint import error_reply
 
 
@@ -127,10 +127,11 @@ class WavesApi:
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
         raw_data = await self._waves_request(BASE_DATA_URL, "POST", header, data=data)
-        flag, res = await _check_response(raw_data)
-        if flag and res.get('creatTime') is None:
-            return False, error_reply(WAVES_CODE_106)
-        return flag, res
+        # flag, res = await _check_response(raw_data)
+        # if flag and res.get('creatTime') is None:
+        #     return False, error_reply(WAVES_CODE_106)
+        # return flag, res
+        return await _check_response(raw_data)
 
     async def get_role_info(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)

@@ -94,6 +94,11 @@ class AccountBaseInfo(BaseModel):
     achievementStar: Optional[int]  # 成就星数
     boxList: Optional[list[Optional[Box]]]  # 宝箱
 
+    @property
+    def is_full(self):
+        """完整数据，没有隐藏库街区数据"""
+        return isinstance(self.creatTime, int)
+
 
 class Chain(BaseModel):
     name: Optional[str]

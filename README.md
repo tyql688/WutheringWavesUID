@@ -64,7 +64,7 @@
 <p>4. 直接格式: ww导入抽卡链接 5e4d436ea1</p>
 </details>
 
-<details><summary>刷新抽卡记录（导入抽卡链接的recordId，后续可直接命令刷新） - 命令: ww刷新抽卡记录</summary><p>
+<details><summary>刷新抽卡记录（导入抽卡链接的recordId，recordId的有效期变短了） - 命令: ww刷新抽卡记录</summary><p>
 还没有图
 </p></details>
 
