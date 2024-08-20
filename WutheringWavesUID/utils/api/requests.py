@@ -73,13 +73,6 @@ class WavesApi:
         if len(ck_list) > 0:
             return random.choices(ck_list, k=1)[0]
 
-    async def get_active_list(self) -> (bool, Union[Dict, str]):
-        """活动"""
-        header = copy.deepcopy(self._HEADER)
-        header.update({'gameId': GAME_ID})
-        raw_data = await self._waves_request(EVENT_LIST_URL, "POST", header)
-        return await _check_response(raw_data)
-
     async def get_kuro_role_info(self, token: str, kuro_uid: str = '') -> (bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})

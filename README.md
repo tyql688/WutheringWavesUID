@@ -88,6 +88,10 @@
 还没有图
 </p></details>
 
+<details><summary>公告相关 - 命令: ww公告 / ww公告#1456 / ww订阅公告 (需要管理员) / ww取消订阅公告 (需要管理员) </summary><p>
+还没有图
+</p></details>
+
 <details><summary>其他 - 网页控制台相关功能</summary><p>
 请自行查阅文档, 可控制签到时间，推送等
 </p></details>
@@ -100,7 +104,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 
 - [ ] 手机号登录
 - [x] 体力恢复提醒
-- [ ] 公告推送
+- [x] 公告推送
 - [ ] 深渊
 - [ ] 全息战略
 - [x] 角色面板

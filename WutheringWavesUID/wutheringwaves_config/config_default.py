@@ -2,10 +2,19 @@ from typing import Dict
 
 from gsuid_core.utils.plugins_config.models import (
     GSC,
-    GsStrConfig, GsListStrConfig, GsBoolConfig,
-)
+    GsStrConfig, GsListStrConfig, GsBoolConfig, GsDictConfig, )
 
 CONFIG_DEFAULT: Dict[str, GSC] = {
+    'WavesAnnGroups': GsDictConfig(
+        '推送公告群组',
+        '鸣潮公告推送群组',
+        {},
+    ),
+    'WavesAnnIds': GsListStrConfig(
+        '推送公告ID',
+        '鸣潮公告推送ID列表',
+        [],
+    ),
     'WavesPrefix': GsStrConfig(
         '插件命令前缀（确认无冲突再修改）',
         '用于设置WutheringWavesUID前缀的配置',
