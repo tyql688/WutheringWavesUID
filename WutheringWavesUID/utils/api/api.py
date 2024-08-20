@@ -23,7 +23,9 @@ ANN_CONTENT_URL = f'{MAIN_URL}/forum/getPostDetail'
 ANN_LIST_URL = f'{MAIN_URL}/forum/companyEvent/findEventList'
 TOWER_INDEX_URL = f'{MAIN_URL}/gamer/roleBox/aki/towerIndex'
 TOWER_DETAIL_URL = f'{MAIN_URL}/gamer/roleBox/aki/towerDataDetail'
-WIKI_URL = f'{MAIN_URL}/wiki/core/catalogue/item/getPage'
+HOME_WIKI_DETAIL_URL = f'{MAIN_URL}/wiki/core/homepage/getPage'
+WIKI_TREE_URL = f'{MAIN_URL}/wiki/core/catalogue/config/getTree'
+WIKI_DETAIL_URL = f'{MAIN_URL}/wiki/core/catalogue/item/getPage'
 
 WIKI_CATALOGUE_MAP = {
     "共鸣者": "1105",
@@ -36,5 +38,6 @@ WIKI_CATALOGUE_MAP = {
     "补给": "1217",
     "资源": "1161",
     "素材": "1218",
-    "特殊道具": "1223"
+    "特殊道具": "1223",
+    "活动": "1293"
 }

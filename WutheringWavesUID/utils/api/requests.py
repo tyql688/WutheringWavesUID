@@ -143,11 +143,17 @@ class WavesApi:
             return False, error_reply(WAVES_CODE_107)
         return flag, res
 
+    async def get_tree(self) -> (bool, Union[Dict, str]):
+        header = copy.deepcopy(self._HEADER)
+        header.update({'wiki_type': '9'})
+        data = {'devcode': ''}
+        return await self._waves_request(WIKI_TREE_URL, "POST", header, data=data)
+
     async def get_wiki(self, catalogueId: str) -> (bool, Union[Dict, str]):
         header = copy.deepcopy(self._HEADER)
         header.update({'wiki_type': '9'})
         data = {'catalogueId': catalogueId, 'limit': 1000}
-        raw_data = await self._waves_request(WIKI_URL, "POST", header, data=data)
+        raw_data = await self._waves_request(WIKI_DETAIL_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
     async def get_role_detail_info(self, charId: str, roleId: str, token: str, serverId: str = SERVER_ID) -> (

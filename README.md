@@ -84,7 +84,7 @@
 还没有图
 </p></details>
 
-<details><summary>资源相关 - 命令: ww下载全部资源</summary><p>
+<details><summary>资源相关 - 命令: ww下载全部资源 / ww补充资源 </summary><p>
 还没有图
 </p></details>
 
