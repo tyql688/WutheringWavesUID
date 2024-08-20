@@ -97,13 +97,13 @@ async def ann_list_card() -> bytes:
     return await convert_img(bg)
 
 
-async def ann_detail_card(ann_id: str):
+async def ann_detail_card(ann_id: str) -> bytes | str:
     ann_list = await ann().get_ann_list()
     if not ann_list:
-        raise Exception('获取游戏公告失败,请检查接口是否正常')
+        raise '获取游戏公告失败,请检查接口是否正常'
     content = filter_list(ann_list, lambda x: x['id'] == ann_id)
     if not content:
-        raise Exception('没有找到对应的公告ID :%s' % ann_id)
+        return '未找到该公告'
 
     postId = content[0]['postId']
     res = await ann().get_ann_detail(postId)
