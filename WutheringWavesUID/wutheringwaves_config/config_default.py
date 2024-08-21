@@ -2,7 +2,7 @@ from typing import Dict
 
 from gsuid_core.utils.plugins_config.models import (
     GSC,
-    GsStrConfig, GsListStrConfig, GsBoolConfig, GsDictConfig, )
+    GsStrConfig, GsListStrConfig, GsBoolConfig, GsDictConfig, GsListConfig, )
 
 CONFIG_DEFAULT: Dict[str, GSC] = {
     'WavesAnnGroups': GsDictConfig(
@@ -10,7 +10,7 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '鸣潮公告推送群组',
         {},
     ),
-    'WavesAnnIds': GsListStrConfig(
+    'WavesAnnNewIds': GsListConfig(
         '推送公告ID',
         '鸣潮公告推送ID列表',
         [],
@@ -39,5 +39,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "催命模式",
         "开启后当达到推送阈值将会一直推送",
         False
+    ),
+    "WavesGuideProvide": GsStrConfig(
+        "角色攻略图提供方",
+        "使用ww角色攻略时选择的提供方",
+        "Moealkyne",
+        options=["all", "Moealkyne", "小沐XMu"]
     ),
 }

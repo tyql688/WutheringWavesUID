@@ -28,7 +28,7 @@ async def ann_(bot: Bot, ev: Event):
     if not ann_id.isdigit():
         raise Exception('公告ID不正确')
 
-    img = await ann_detail_card(ann_id)
+    img = await ann_detail_card(int(ann_id))
     if isinstance(img, str):
         raise Exception(img)
     img = await convert_img(img)
@@ -56,7 +56,7 @@ async def check_ann():
 
 async def check_ann_state():
     logger.info('[鸣潮公告] 定时任务: 鸣潮公告查询..')
-    ids = WutheringWavesConfig.get_config('WavesAnnIds').data
+    ids = WutheringWavesConfig.get_config('WavesAnnNewIds').data
     sub_list = WutheringWavesConfig.get_config('WavesAnnGroups').data
 
     if not sub_list:
@@ -67,7 +67,7 @@ async def check_ann_state():
         ids = await ann().get_ann_ids()
         if not ids:
             raise Exception('获取鸣潮公告ID列表错误,请检查接口')
-        WutheringWavesConfig.set_config('WavesAnnIds', ids)
+        WutheringWavesConfig.set_config('WavesAnnNewIds', ids)
         logger.info('[鸣潮公告] 初始成功, 将在下个轮询中更新.')
         return
 
@@ -98,4 +98,4 @@ async def check_ann_state():
             logger.exception(str(e))
 
     logger.info('[鸣潮公告] 推送完毕, 更新数据库')
-    WutheringWavesConfig.set_config('WavesAnnIds', new_ids)
+    WutheringWavesConfig.set_config('WavesAnnNewIds', new_ids)

@@ -97,7 +97,7 @@ async def ann_list_card() -> bytes:
     return await convert_img(bg)
 
 
-async def ann_detail_card(ann_id: str) -> bytes | str:
+async def ann_detail_card(ann_id: int) -> bytes | str:
     ann_list = await ann().get_ann_list()
     if not ann_list:
         raise '获取游戏公告失败,请检查接口是否正常'

@@ -21,6 +21,18 @@ ROLE_DETAIL_PATH = RESOURCE_PATH / 'role_detail'
 ROLE_DETAIL_SKILL_PATH = ROLE_DETAIL_PATH / 'skill'
 ROLE_DETAIL_CHAINS_PATH = ROLE_DETAIL_PATH / 'chains'
 
+# 攻略
+GUIDE_PATH = MAIN_PATH / 'guide'
+# 小沐XMu 攻略库
+XMU_GUIDE_PATH = GUIDE_PATH / 'XMu'
+# Moealkyne 攻略库
+MOEALKYNE_GUIDE_PATH = GUIDE_PATH / 'Moealkyne'
+
+GUIDE_CONFIG_MAP = {
+    '小沐XMu': (XMU_GUIDE_PATH, 10450567),
+    'Moealkyne': (MOEALKYNE_GUIDE_PATH, 10422445),
+}
+
 
 def init_dir():
     for i in [
@@ -34,6 +46,9 @@ def init_dir():
         ROLE_DETAIL_PATH,
         ROLE_DETAIL_SKILL_PATH,
         ROLE_DETAIL_CHAINS_PATH,
+        GUIDE_PATH,
+        XMU_GUIDE_PATH,
+        MOEALKYNE_GUIDE_PATH,
     ]:
         i.mkdir(parents=True, exist_ok=True)
 

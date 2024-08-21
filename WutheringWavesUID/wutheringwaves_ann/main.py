@@ -55,7 +55,8 @@ class ann:
         for _event in self.event_type.keys():
             res = await self._get_ann_list(eventType=_event, pageSize=5)
             if res.code == 200:
-                self.ann_list_data.extend(res.data.list)
+                value = [{**x, 'id': int(x['id'])} for x in res.data.list]
+                self.ann_list_data.extend(value)
 
         return self.ann_list_data
 

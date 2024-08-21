@@ -92,6 +92,10 @@
 还没有图
 </p></details>
 
+<details><summary>角色攻略相关 - 命令: ww角色攻略长离 / ww刷新角色攻略长离</summary><p>
+还没有图
+</p></details>
+
 <details><summary>其他 - 网页控制台相关功能</summary><p>
 请自行查阅文档, 可控制签到时间，推送等
 </p></details>
@@ -110,6 +114,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 - [x] 角色面板
 - [ ] 练度查询
 - [ ] 帮助图
+- [x] 角色攻略
 
 ## 丨其他
 
@@ -124,3 +129,6 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 - [waves-plugin](https://github.com/erzaozi/waves-plugin) Yunzai 鸣潮游戏数据查询插件
 - [Yunzai-Kuro-Plugin](https://github.com/TomyJan/Yunzai-Kuro-Plugin) Yunzai 库洛插件
 - [Kuro-API-Collection](https://github.com/TomyJan/Kuro-API-Collection) 库街区 API 文档
+- 特别鸣谢以下攻略作者
+  - [Moealkyne](https://www.douyin.com/user/MS4wLjABAAAAizgh6etfiwTeiOrZvUW1gBhtJx8OB5Rac67oz5OdoKQzUOppTjARBlOueycZc0oC)
+  - [小沐XMu](https://www.kurobbs.com/person-center?id=10450567)
