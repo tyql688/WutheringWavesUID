@@ -88,12 +88,12 @@ async def save_card_info(uid: str, waves_data: List):
 @waves_char_detail.on_prefix((f'{PREFIX}角色面板', f'{PREFIX}查询'))
 async def send_char_detail_msg(bot: Bot, ev: Event):
     char = ev.text.strip(' ')
-    logger.info(f'[鸣潮] [角色面板] CHAR: {char}')
+    logger.debug(f'[鸣潮] [角色面板] CHAR: {char}')
     user_id = ev.at if ev.at else ev.user_id
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))
-    logger.info(f'[鸣潮] [角色面板] UID: {uid}')
+    logger.debug(f'[鸣潮] [角色面板] UID: {uid}')
     if not char:
         return
 

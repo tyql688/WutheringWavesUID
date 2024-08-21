@@ -240,7 +240,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                     sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', _color, waves_font_24,
                                       'rm')
 
-            phantom_temp.alpha_composite(sh_temp, dest=(40 + (i % 3) * 380, 120 + (i // 3) * 600))
+            phantom_temp.alpha_composite(sh_temp, dest=(40 + ((i + 1) % 3) * 380, 120 + ((i + 1) // 3) * 600))
 
         if phantom_score > 0:
             _bg = get_total_score_bg(char_name, phantom_score)
@@ -254,8 +254,15 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
             score_temp_draw.text((180, 260), f'声骸评级', GREY, waves_font_40, 'mm')
             score_temp_draw.text((180, 380), f'{phantom_score:.2f}分', 'white', waves_font_40, 'mm')
             score_temp_draw.text((180, 440), f'声骸评分', GREY, waves_font_40, 'mm')
+        else:
+            abs_bg = Image.open(TEXT_PATH / f'abs.png')
+            score_temp = Image.new('RGBA', abs_bg.size)
+            score_temp.alpha_composite(abs_bg)
+            score_temp_draw = ImageDraw.Draw(score_temp)
+            score_temp_draw.text((180, 130), f'暂无', 'white', waves_font_40, 'mm')
+            score_temp_draw.text((180, 380), f'- 分', 'white', waves_font_40, 'mm')
 
-            phantom_temp.alpha_composite(score_temp, dest=(800, 750))
+        phantom_temp.alpha_composite(score_temp, dest=(40, 120))
 
     img.paste(phantom_temp, (0, 1320), phantom_temp)
     img = add_footer(img)

@@ -19,7 +19,7 @@ with open(MAP_PATH / "CharId2Data.json", "r", encoding="UTF-8") as f:
 def alias_to_char_name(char_name: str) -> str:
     for i in char_alias_data:
         if (char_name in i) or (char_name in char_alias_data[i]):
-            logger.info(f"别名转换: {char_name} -> {i}")
+            logger.debug(f"别名转换: {char_name} -> {i}")
             return i
     return char_name
 
