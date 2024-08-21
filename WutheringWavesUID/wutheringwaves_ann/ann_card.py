@@ -126,8 +126,8 @@ async def ann_detail_card(ann_id: int) -> bytes | str:
 
     drow_height = 0
     for msg in msg_list:
-        if msg.strip().endswith(('jpg', 'png')):
-            _msg = re.search(r'(https://.*[png|jpg])', msg)
+        if msg.strip().endswith(('jpg', 'png', 'jpeg')):
+            _msg = re.search(r'(https://.*[png|jpg|jpeg])', msg)
             if _msg:
                 msg = _msg.group(0)
             img = await get_pic(msg.strip())
@@ -151,8 +151,8 @@ async def ann_detail_card(ann_id: int) -> bytes | str:
     # 左上角开始
     x, y = 0, 0
     for msg in msg_list:
-        if msg.strip().endswith(('jpg', 'png')):
-            _msg = re.search(r'(https://.*[png|jpg])', msg)
+        if msg.strip().endswith(('jpg', 'png', 'jpeg')):
+            _msg = re.search(r'(https://.*[png|jpg|jpeg])', msg)
             if _msg:
                 msg = _msg.group(0)
             img = await get_pic(msg.strip())
