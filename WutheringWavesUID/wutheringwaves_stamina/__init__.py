@@ -35,7 +35,7 @@ async def send_daily_info_pic(bot: Bot, ev: Event):
 
 
 @scheduler.scheduled_job('cron', minute='*/30')
-async def daily_info_notice_job():
+async def waves_daily_info_notice_job():
     result = await get_notice_list()
     logger.debug(f"鸣潮推送开始：{result}")
     # 执行私聊推送

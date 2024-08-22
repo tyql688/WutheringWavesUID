@@ -50,11 +50,11 @@ async def unsub_ann_(bot: Bot, ev: Event):
 
 
 @scheduler.scheduled_job('cron', minute=10)
-async def check_ann():
-    await check_ann_state()
+async def check_waves_ann():
+    await check_waves_ann_state()
 
 
-async def check_ann_state():
+async def check_waves_ann_state():
     logger.info('[鸣潮公告] 定时任务: 鸣潮公告查询..')
     ids = WutheringWavesConfig.get_config('WavesAnnNewIds').data
     sub_list = WutheringWavesConfig.get_config('WavesAnnGroups').data
