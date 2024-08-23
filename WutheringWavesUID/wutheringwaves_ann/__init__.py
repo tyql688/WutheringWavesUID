@@ -29,9 +29,6 @@ async def ann_(bot: Bot, ev: Event):
         raise Exception('公告ID不正确')
 
     img = await ann_detail_card(int(ann_id))
-    if isinstance(img, str):
-        raise Exception(img)
-    img = await convert_img(img)
     await bot.send(img)
 
 

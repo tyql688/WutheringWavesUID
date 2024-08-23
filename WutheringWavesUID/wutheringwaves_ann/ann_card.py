@@ -1,8 +1,6 @@
-import re
 from pathlib import Path
 
 from PIL import Image, ImageOps, ImageDraw
-from bs4 import BeautifulSoup
 
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_pic, easy_paste, draw_text_by_line, easy_alpha_composite
@@ -107,71 +105,61 @@ async def ann_detail_card(ann_id: int) -> bytes | str:
 
     postId = content[0]['postId']
     res = await ann().get_ann_detail(postId)
-    soup = BeautifulSoup(res['postH5Content'], 'lxml')
-
-    for a in soup.find_all('a'):
-        a.string = ''
-
-    msg_list = ['']
-    for img in soup.find_all('img'):
-        msg_list.append(img.get('src'))
-
-    msg_list.extend(
-        [
-            BeautifulSoup(x.get_text('').replace('<<', ''), 'lxml').get_text()
-            + '\n'
-            for x in soup.find_all('p')
-        ]
-    )
-
+    if not res:
+        return '未找到该公告'
+    post_content = sorted(res['postContent'], key=lambda x: x['contentType'], reverse=True)
+    
     drow_height = 0
-    for msg in msg_list:
-        if msg.strip().endswith(('jpg', 'png', 'jpeg')):
-            _msg = re.search(r'(https://.*[png|jpg|jpeg])', msg)
-            if _msg:
-                msg = _msg.group(0)
-            img = await get_pic(msg.strip())
-            img_height = img.size[1]
-            if img.width > 1080:
-                img_height = int(img.height * 0.6)
-            drow_height += img_height + 40
-        elif msg.strip().endswith(('gif', 'mp4')):
-            pass
-        else:
+    for temp in post_content:
+        content_type = temp['contentType']
+        if content_type == 1:
+            # 文案
+            content = temp['content']
             (
                 x_drow_duanluo,
                 x_drow_note_height,
                 x_drow_line_height,
                 x_drow_height,
-            ) = split_text(msg)
+            ) = split_text(content)
             drow_height += x_drow_height
+        elif content_type == 2 and 'url' in temp and temp['url'].endswith(('jpg', 'png', 'jpeg')):
+            # 图片
+            _size = (temp['imgWidth'], temp['imgHeight'])
+            img = await get_pic(temp['url'], _size)
+            img_height = img.size[1]
+            if img.width > 1080:
+                ratio = 1080 / img.width
+                img_height = int(img.height * ratio)
+            drow_height += img_height + 40
 
     im = Image.new('RGB', (1080, drow_height), '#f9f6f2')
     draw = ImageDraw.Draw(im)
     # 左上角开始
     x, y = 0, 0
-    for msg in msg_list:
-        if msg.strip().endswith(('jpg', 'png', 'jpeg')):
-            _msg = re.search(r'(https://.*[png|jpg|jpeg])', msg)
-            if _msg:
-                msg = _msg.group(0)
-            img = await get_pic(msg.strip())
-            if img.width > im.width:
-                img = img.resize((int(img.width * 0.6), int(img.height * 0.6)))
-            easy_paste(im, img, (0, y))
-            y += img.size[1] + 40
-        elif msg.strip().endswith(('gif', 'mp4')):
-            pass
-        else:
+
+    for temp in post_content:
+        content_type = temp['contentType']
+        if content_type == 1:
+            # 文案
+            content = temp['content']
             (
                 drow_duanluo,
                 drow_note_height,
                 drow_line_height,
                 drow_height,
-            ) = split_text(msg)
+            ) = split_text(content)
             for duanluo, line_count in drow_duanluo:
                 draw.text((x, y), duanluo, fill=(0, 0, 0), font=waves_font_26)
                 y += drow_line_height * line_count
+        elif content_type == 2 and 'url' in temp and temp['url'].endswith(('jpg', 'png', 'jpeg')):
+            # 图片
+            _size = (temp['imgWidth'], temp['imgHeight'])
+            img = await get_pic(temp['url'], _size)
+            if img.width > im.width:
+                ratio = im.width / img.width
+                img = img.resize((int(img.width * ratio), int(img.height * ratio)))
+            easy_paste(im, img, (0, y))
+            y += img.size[1] + 40
 
     if hasattr(waves_font_26, 'getsize'):
         _x, _y = waves_font_26.getsize('囗')  # type: ignore
