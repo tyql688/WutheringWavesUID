@@ -99,7 +99,7 @@ async def draw_abyss_img(
             tower_name_bg_draw = ImageDraw.Draw(tower_name_bg)
             tower_name_bg_draw.text((170, 50), f'{tower.areaName}', 'white', waves_font_42, 'lm')
             tower_name_bg_draw.text((500, 60), f'{tower.star}/{tower.maxStar}', 'white', waves_font_32, 'mm')
-            frame.paste(tower_name_bg, (0, 300 + yset), tower_name_bg)
+            frame.paste(tower_name_bg, (-20, 300 + yset), tower_name_bg)
 
             yset += 150
             for floor_index, floor in enumerate(tower.floorList):
@@ -145,7 +145,7 @@ async def draw_abyss_img(
                         abyss_bg_temp.alpha_composite(char_bg, (300 + role_index * 150, -20))
 
                 abyss_bg.paste(abyss_bg_temp, (0, 0), abyss_bg_temp)
-                frame.paste(abyss_bg, (100, 240 + yset), abyss_bg)
+                frame.paste(abyss_bg, (80, 240 + yset), abyss_bg)
                 yset += 141
 
     card_img.paste(frame, (0, 0), frame)
