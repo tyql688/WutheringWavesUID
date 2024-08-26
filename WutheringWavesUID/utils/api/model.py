@@ -266,7 +266,7 @@ class AbyssArea(BaseModel):
     areaName: str
     star: int
     maxStar: int
-    floorList: List[AbyssFloor]
+    floorList: Optional[List[AbyssFloor]]
 
 
 # 定义难度模型

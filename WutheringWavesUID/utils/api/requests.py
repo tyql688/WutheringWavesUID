@@ -214,8 +214,7 @@ class WavesApi:
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
-        raw_data = await self._waves_request(TOWER_INDEX_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        return await self._waves_request(TOWER_INDEX_URL, "POST", header, data=data)
 
     async def sign_in(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         """签到"""

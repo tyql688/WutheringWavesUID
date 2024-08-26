@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
-from ..utils.api.model import KuroRoleInfo, AccountBaseInfo, AbyssChallenge, RoleList, RoleDetailData
+from ..utils.api.model import KuroRoleInfo, AccountBaseInfo, AbyssChallenge, RoleList, RoleDetailData, AbyssFloor
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_32, \
@@ -18,13 +18,39 @@ from ..utils.waves_api import waves_api
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 
 
+async def get_ck(uid):
+    ck = await waves_api.get_self_waves_ck(uid)
+    if ck:
+        return True, ck
+    ck = await waves_api.get_ck(uid)
+    return False, ck
+
+
+async def get_abyss_data(uid: str, ck: str, serverId: str, is_self_ck: bool):
+    if is_self_ck:
+        abyss_data = await waves_api.get_abyss_data(uid, ck, serverId)
+    else:
+        abyss_data = await waves_api.get_abyss_index(uid, ck, serverId)
+
+    if abyss_data.get('code') == 200:
+        if not abyss_data.get('data'):
+            return "当前暂无深渊数据"
+        else:
+            return AbyssChallenge(**abyss_data['data'])
+    else:
+        msg = error_reply(WAVES_CODE_999)
+        if abyss_data.get('msg'):
+            msg = abyss_data['msg']
+        return error_reply(msg=msg)
+
+
 async def draw_abyss_img(
     ev: Event,
     uid: str,
     floor: Optional[int] = None,
     schedule_type: str = '1',
 ) -> Union[bytes, str]:
-    ck = await waves_api.get_ck(uid)
+    is_self_ck, ck = await get_ck(uid)
     if not ck:
         return error_reply(WAVES_CODE_102)
 
@@ -44,19 +70,14 @@ async def draw_abyss_img(
     role_info = RoleList(**role_info)
 
     # 深渊
-    abyss_data = await waves_api.get_abyss_data(uid, ck, game_info.serverId)
-    if abyss_data.get('code') == 200:
-        if not abyss_data.get('data'):
-            return "当前暂无深渊数据"
-        else:
-            abyss_data = AbyssChallenge(**abyss_data['data'])
+    abyss_data = await get_abyss_data(uid, ck, game_info.serverId, is_self_ck)
+    if isinstance(abyss_data, str):
+        return abyss_data
+    if is_self_ck:
+        h = 2200
     else:
-        msg = error_reply(WAVES_CODE_999)
-        if abyss_data.get('msg'):
-            msg = abyss_data['msg']
-        return error_reply(msg=msg)
-
-    card_img = get_waves_bg(950, 2200, 'bg4')
+        h = 1300
+    card_img = get_waves_bg(950, h, 'bg4')
 
     # 基础信息 名字 特征码
     base_info_bg = Image.open(TEXT_PATH / 'base_info_bg.png')
@@ -88,7 +109,7 @@ async def draw_abyss_img(
 
     # frame
     frame = Image.open(TEXT_PATH / 'frame.png')
-    frame = frame.resize((frame.size[0], 2200))
+    frame = frame.resize((frame.size[0], h - 50 if is_self_ck else h - 100), box=(0, 0, frame.size[0], h))
 
     for _abyss in abyss_data.difficultyList:
         if _abyss.difficultyName != '深境区':
@@ -98,10 +119,13 @@ async def draw_abyss_img(
             tower_name_bg = Image.open(TEXT_PATH / f'tower_name_bg{tower.areaId}.png')
             tower_name_bg_draw = ImageDraw.Draw(tower_name_bg)
             tower_name_bg_draw.text((170, 50), f'{tower.areaName}', 'white', waves_font_42, 'lm')
-            tower_name_bg_draw.text((500, 60), f'{tower.star}/{tower.maxStar}', 'white', waves_font_32, 'mm')
+            if is_self_ck:
+                tower_name_bg_draw.text((500, 60), f'{tower.star}/{tower.maxStar}', 'white', waves_font_32, 'mm')
             frame.paste(tower_name_bg, (-20, 300 + yset), tower_name_bg)
 
             yset += 150
+            if not tower.floorList:
+                tower.floorList = [AbyssFloor(**{"floor": 1, "picUrl": "", "star": 0, "roleList": None})]
             for floor_index, floor in enumerate(tower.floorList):
                 abyss_bg = Image.open(TEXT_PATH / f'abyss_bg_{floor.floor}.jpg').convert('RGBA')
                 abyss_bg = abyss_bg.resize((abyss_bg.size[0] + 100, abyss_bg.size[1]))
@@ -114,6 +138,8 @@ async def draw_abyss_img(
                     _floor = '二'
                 elif floor.floor == 3:
                     _floor = '三'
+                elif floor.floor == 4:
+                    _floor = '四'
                 name_bg_draw.text((70, 50), f'第{_floor}层', 'white', waves_font_40, 'lm')
                 abyss_bg_temp.paste(name_bg, (0, 0), name_bg)
 
