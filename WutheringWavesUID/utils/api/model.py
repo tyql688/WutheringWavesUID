@@ -244,3 +244,40 @@ class GachaLog(BaseModel):
 
     def __hash__(self):
         return hash((self.resourceId, self.time))
+
+
+# 定义角色模型
+class AbyssRole(BaseModel):
+    roleId: int
+    iconUrl: str
+
+
+# 定义楼层模型
+class AbyssFloor(BaseModel):
+    floor: int
+    picUrl: str
+    star: int
+    roleList: Optional[List[AbyssRole]]
+
+
+# 定义区域模型
+class AbyssArea(BaseModel):
+    areaId: int
+    areaName: str
+    star: int
+    maxStar: int
+    floorList: List[AbyssFloor]
+
+
+# 定义难度模型
+class AbyssDifficulty(BaseModel):
+    difficulty: int
+    difficultyName: str
+    towerAreaList: List[AbyssArea]
+
+
+# 定义顶层模型
+class AbyssChallenge(BaseModel):
+    isUnlock: bool
+    seasonEndTime: Optional[int]
+    difficultyList: Optional[List[AbyssDifficulty]]

@@ -202,15 +202,14 @@ class WavesApi:
         raw_data = await self._waves_request(CHALLENGE_INDEX_URL, "POST", header, data=data)
         return await _check_response(raw_data)
 
-    async def get_tower_data(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
+    async def get_abyss_data(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         """深渊"""
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': serverId, 'roleId': roleId}
-        raw_data = await self._waves_request(TOWER_DETAIL_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        return await self._waves_request(TOWER_DETAIL_URL, "POST", header, data=data)
 
-    async def get_tower_index(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
+    async def get_abyss_index(self, roleId: str, token: str, serverId: str = SERVER_ID) -> (bool, Union[Dict, str]):
         """深渊"""
         header = copy.deepcopy(self._HEADER)
         header.update({'token': token})

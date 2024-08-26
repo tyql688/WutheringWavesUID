@@ -96,6 +96,10 @@
 还没有图
 </p></details>
 
+<details><summary>深渊相关 - 命令: ww深渊 / wwsy / ww查询深渊</summary><p>
+<a><img src="https://s2.loli.net/2024/08/26/tW7BaoxZmLeidkR.jpg"></a>
+</p></details>
+
 <details><summary>其他 - 网页控制台相关功能</summary><p>
 请自行查阅文档, 可控制签到时间，推送等
 </p></details>
@@ -109,7 +113,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 - [ ] 手机号登录
 - [x] 体力恢复提醒
 - [x] 公告推送
-- [ ] 深渊
+- [x] 深渊
 - [ ] 全息战略
 - [x] 角色面板
 - [ ] 练度查询
