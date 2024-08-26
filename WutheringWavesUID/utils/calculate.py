@@ -56,26 +56,29 @@ def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int) -> (in
             score += skill_weight[2] * value * ratio
         elif prop.attributeName == "共鸣解放伤害加成":
             score += skill_weight[3] * value * ratio
-        elif prop.attributeName[:2] in ["冷凝", "导电", "气动", "湮灭", "热熔", "物理", "衍射"]:
-            score += score_type.get("属性伤害", 0) * value * ratio
         else:
             score += score_type.get(prop.attributeName, 0) * value * ratio
-    logger.info(f"{char_name} [声骸评分]: {score}")
 
     if cost == 1:
-        max_score = score_type['score_max'][2]
+        max_score = rule_map[char_name]['score_max'][2]
+        fix_max_score = calculate_data['score_max'][2]
     elif cost == 3:
-        max_score = score_type['score_max'][1]
+        max_score = rule_map[char_name]['score_max'][1]
+        fix_max_score = calculate_data['score_max'][1]
     elif cost == 4:
-        max_score = score_type['score_max'][0]
+        max_score = rule_map[char_name]['score_max'][0]
+        fix_max_score = calculate_data['score_max'][0]
 
-    ratio = score / max_score
     _temp = 0
-    for index, _score in enumerate(score_type['score_interval_ratio']):
-        if ratio >= _score:
+    cost_level = rule_map[char_name]['cost_level']
+    for index, _score in enumerate(cost_level[str(cost)]):
+        if score >= _score:
             _temp = index
 
-    return round(score, 1), score_type['score_interval'][_temp]
+    score = round((score / max_score) * fix_max_score, 1)
+    score_level = score_type['score_interval'][_temp]
+    logger.debug(f"{char_name} [声骸评分]: {score} [声骸评分等级]:{score_level}")
+    return score, score_level
 
 
 def get_total_score_bg(char_name: str, score: int):
@@ -85,13 +88,14 @@ def get_total_score_bg(char_name: str, score: int):
     custom_score = copy.deepcopy(rule_map[char_name]["score_type"])
     score_type = copy.deepcopy(calculate_data["score_type_map"][str(custom_score["type"])])
     score_type.update(custom_score)
-    ratio = score / score_type['total_score_max']
+    ratio = score / calculate_data['total_score_max']
     _temp = 0
     for index, _score in enumerate(score_type['score_interval_ratio']):
         if ratio >= _score:
             _temp = index
-
-    return score_type['score_interval'][_temp]
+    score_level = score_type['score_interval'][_temp]
+    logger.debug(f"{char_name} [声骸评分]: {score} [总声骸评分等级]:{score_level} [总声骸评分系数]:{ratio:.2f}")
+    return score_level
 
 
 def get_valid_color(char_name: str, attribute_name: str):
