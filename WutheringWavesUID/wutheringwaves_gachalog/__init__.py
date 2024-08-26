@@ -85,9 +85,5 @@ async def send_gacha_log_card_info(bot: Bot, ev: Event):
     if not uid:
         return await bot.send(ERROR_CODE[WAVES_CODE_103])
 
-    user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, 'uid', uid)
-    if not user or not user.record_id:
-        return await bot.send(ERROR_CODE[WAVES_CODE_105])
-
-    im = await draw_card(user, ev)
+    im = await draw_card(uid, ev)
     await bot.send(im)

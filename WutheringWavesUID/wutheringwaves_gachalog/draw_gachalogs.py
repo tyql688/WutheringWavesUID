@@ -10,7 +10,6 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
-from ..utils.database.models import WavesUser
 from ..utils.fonts.waves_fonts import waves_font_25, waves_font_18, waves_font_32, waves_font_20, waves_font_40, \
     waves_font_23, waves_font_24
 from ..utils.image import get_waves_bg, add_footer, GOLD, cropped_square_avatar, get_square_avatar, get_square_weapon
@@ -52,9 +51,9 @@ def get_level_from_list(ast: int, lst: List) -> int:
     return level
 
 
-async def draw_card(user: WavesUser, ev: Event):
+async def draw_card(uid: int, ev: Event):
     # 获取数据
-    gacha_log_path = PLAYER_PATH / user.uid / 'gacha_logs.json'
+    gacha_log_path = PLAYER_PATH / str(uid) / 'gacha_logs.json'
     if not gacha_log_path.exists():
         return f'[鸣潮] 你还没有抽卡记录噢!\n 请发送 {PREFIX}导入抽卡链接 后重试!'
     async with aiofiles.open(gacha_log_path, 'r', encoding='UTF-8') as f:
@@ -251,7 +250,7 @@ async def draw_card(user: WavesUser, ev: Event):
 
     title = Image.open(TEXT_PATH / 'title.png')
     base_info_draw = ImageDraw.Draw(title)
-    base_info_draw.text((346, 370), f'特征码:  {user.uid}', GOLD, waves_font_25, 'lm')
+    base_info_draw.text((346, 370), f'特征码:  {uid}', GOLD, waves_font_25, 'lm')
 
     avatar = await draw_pic_with_ring(ev)
     avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
