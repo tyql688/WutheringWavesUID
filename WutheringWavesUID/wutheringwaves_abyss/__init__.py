@@ -7,7 +7,7 @@ from ..utils.hint import error_reply
 from ..wutheringwaves_abyss.draw_abyss_card import draw_abyss_img
 from ..wutheringwaves_config import PREFIX
 
-sv_waves_abyss = SV('sr查询深渊')
+sv_waves_abyss = SV('waves查询深渊')
 
 
 @sv_waves_abyss.on_command(

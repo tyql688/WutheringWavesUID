@@ -17,13 +17,9 @@ from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 
-
-async def get_ck(uid):
-    ck = await waves_api.get_self_waves_ck(uid)
-    if ck:
-        return True, ck
-    ck = await waves_api.get_ck(uid)
-    return False, ck
+ABYSS_ERROR_MESSAGE_NO_DATA = "当前暂无深渊数据"
+ABYSS_ERROR_MESSAGE_NO_UNLOCK = "深渊暂未解锁"
+ABYSS_ERROR_MESSAGE_NO_DEEP = "当前暂无深境区深渊数据"
 
 
 async def get_abyss_data(uid: str, ck: str, serverId: str, is_self_ck: bool):
@@ -34,7 +30,7 @@ async def get_abyss_data(uid: str, ck: str, serverId: str, is_self_ck: bool):
 
     if abyss_data.get('code') == 200:
         if not abyss_data.get('data'):
-            return "当前暂无深渊数据"
+            return ABYSS_ERROR_MESSAGE_NO_DATA
         else:
             return AbyssChallenge(**abyss_data['data'])
     else:
@@ -50,7 +46,7 @@ async def draw_abyss_img(
     floor: Optional[int] = None,
     schedule_type: str = '1',
 ) -> Union[bytes, str]:
-    is_self_ck, ck = await get_ck(uid)
+    is_self_ck, ck = await waves_api.get_ck_result(uid)
     if not ck:
         return error_reply(WAVES_CODE_102)
 
@@ -73,6 +69,13 @@ async def draw_abyss_img(
     abyss_data = await get_abyss_data(uid, ck, game_info.serverId, is_self_ck)
     if isinstance(abyss_data, str):
         return abyss_data
+    if not abyss_data.isUnlock:
+        return ABYSS_ERROR_MESSAGE_NO_UNLOCK
+
+    abyss_check = next((abyss for abyss in abyss_data.difficultyList if abyss.difficultyName == '深境区'), None)
+    if not abyss_check:
+        return ABYSS_ERROR_MESSAGE_NO_DEEP
+
     if is_self_ck:
         h = 2200
     else:

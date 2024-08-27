@@ -30,6 +30,13 @@ class WavesApi:
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
     }
 
+    async def get_ck_result(self, uid) -> (bool, str):
+        ck = await self.get_self_waves_ck(uid)
+        if ck:
+            return True, ck
+        ck = await self.get_ck(uid)
+        return False, ck
+
     async def get_ck(self, uid: str, mode: Literal['OWNER', 'RANDOM'] = 'RANDOM') -> Optional[str]:
         if mode == 'RANDOM':
             return await self.get_waves_random_cookie(uid)
