@@ -77,7 +77,7 @@
 </p></details>
 
 <details><summary>角色面板 - 命令: ww查询长离</summary><p>
-<a><img src="https://s2.loli.net/2024/08/16/5pb7CLzVcd3x2yj.jpg"></a>
+<a><img src="https://s2.loli.net/2024/08/27/Z37qLHIecz6wFVu.jpg"></a>
 </p></details>
 
 <details><summary>签到相关 - 命令: ww签到 / ww开启自动签到 / ww全部重签 (需要管理员)</summary><p>
@@ -97,7 +97,7 @@
 </p></details>
 
 <details><summary>深渊相关 - 命令: ww深渊 / wwsy / ww查询深渊</summary><p>
-<a><img src="https://s2.loli.net/2024/08/26/tW7BaoxZmLeidkR.jpg"></a>
+<a><img src="https://s2.loli.net/2024/08/27/7YedKVE4Xfo9xgz.jpg"></a>
 </p></details>
 
 <details><summary>其他 - 网页控制台相关功能</summary><p>
