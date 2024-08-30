@@ -31,7 +31,7 @@ def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int) -> (in
         ratio = 1
         if index < 2:
             # 主属性
-            ratio = 0.4
+            ratio = 0.34 if cost == 1 else 0.25
 
         value = prop.attributeValue
         if "%" in prop.attributeValue:
