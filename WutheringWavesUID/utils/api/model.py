@@ -92,7 +92,7 @@ class AccountBaseInfo(BaseModel):
     smallCount: Optional[int]  # 小型信标解锁数
     achievementCount: Optional[int]  # 成就数量
     achievementStar: Optional[int]  # 成就星数
-    boxList: Optional[list[Optional[Box]]]  # 宝箱
+    boxList: Optional[List[Optional[Box]]]  # 宝箱
 
     @property
     def is_full(self):
