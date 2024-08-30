@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Union
 
 from PIL import Image, ImageOps, ImageDraw
 
@@ -95,7 +96,7 @@ async def ann_list_card() -> bytes:
     return await convert_img(bg)
 
 
-async def ann_detail_card(ann_id: int) -> bytes | str:
+async def ann_detail_card(ann_id: int) -> Union[bytes, str]:
     ann_list = await ann().get_ann_list()
     if not ann_list:
         raise '获取游戏公告失败,请检查接口是否正常'
@@ -108,7 +109,7 @@ async def ann_detail_card(ann_id: int) -> bytes | str:
     if not res:
         return '未找到该公告'
     post_content = sorted(res['postContent'], key=lambda x: x['contentType'], reverse=True)
-    
+
     drow_height = 0
     for temp in post_content:
         content_type = temp['contentType']

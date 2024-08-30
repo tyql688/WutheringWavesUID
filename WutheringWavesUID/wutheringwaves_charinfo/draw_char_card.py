@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from typing import Tuple
 
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
@@ -289,7 +290,7 @@ def draw_text_with_shadow(
     font: ImageFont,
     fill_color: str = "white",
     shadow_color: str = "black",
-    offset: tuple[int, int] = (2, 2),
+    offset: Tuple[int, int] = (2, 2),
     anchor='rm'
 ):
     """描边"""

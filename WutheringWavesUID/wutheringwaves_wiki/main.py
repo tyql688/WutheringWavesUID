@@ -1,4 +1,5 @@
 import copy
+from typing import Union
 
 import httpx
 
@@ -36,7 +37,7 @@ class Guide:
             res = await client.post(BBS_LIST, headers=headers, data=data, timeout=10)
             return res.json(object_hook=_Dict)
 
-    async def _get_ann_detail(self, post_id: int | str):
+    async def _get_ann_detail(self, post_id: Union[int, str]):
         headers = copy.deepcopy(self._headers)
         headers.update({"devcode": "", "token": "", })
         data = {
@@ -53,7 +54,7 @@ class Guide:
         if res.code == 200:
             return res.data.postList
 
-    async def get_ann_detail(self, post_id: int | str):
+    async def get_ann_detail(self, post_id: Union[int, str]):
         res = await self._get_ann_detail(post_id)
         if res.code == 200:
             return res.data.postDetail

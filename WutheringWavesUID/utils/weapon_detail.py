@@ -43,7 +43,7 @@ def get_weapon_detail(
     level: int,
     breach: int = 0,
     resonLevel: Union[int, None] = 1
-) -> WavesWeaponResult | None:
+) -> Union[WavesWeaponResult, None]:
     """
     breach 突破
     resonLevel 精炼
