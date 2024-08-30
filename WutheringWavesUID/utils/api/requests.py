@@ -286,7 +286,8 @@ class KuroLogin:
 
     async def login(self, mobile: int, code: str):
         header = copy.deepcopy(self._HEADER)
-        data = {"mobile": mobile, "code": code, "devCode": str(uuid.uuid4()).upper()}
+        header.update({"devCode": str(uuid.uuid4()).upper()})
+        data = {"mobile": mobile, "code": code}
         return await self._kuro_request(LOGIN_URL, "POST", header, data=data)
 
     async def send_phone_code(
