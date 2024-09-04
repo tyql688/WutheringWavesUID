@@ -8,12 +8,12 @@ from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import crop_center_img, get_event_avatar
+from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import DailyData
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103, ERROR_CODE, WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25
-from ..utils.image import add_footer, GREY, GOLD, get_random_waves_role_pile, YELLOW
+from ..utils.image import add_footer, GREY, GOLD, get_random_waves_role_pile, YELLOW, get_event_avatar
 from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -131,7 +131,7 @@ async def _draw_stamina_img(ev: Event, daily_info: DailyData) -> Union[str, Imag
 
 
 async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev)
+    pic = await get_event_avatar(ev, is_valid_at=False)
 
     mask_pic = Image.open(TEXT_PATH / 'avatar_mask.png')
     img = Image.new('RGBA', (200, 200))

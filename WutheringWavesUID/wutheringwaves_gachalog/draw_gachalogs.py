@@ -9,10 +9,11 @@ from PIL import Image, ImageDraw
 
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
+from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.fonts.waves_fonts import waves_font_25, waves_font_18, waves_font_32, waves_font_20, waves_font_40, \
     waves_font_23, waves_font_24
-from ..utils.image import get_waves_bg, add_footer, GOLD, cropped_square_avatar, get_square_avatar, get_square_weapon
+from ..utils.image import get_waves_bg, add_footer, GOLD, cropped_square_avatar, get_square_avatar, get_square_weapon, \
+    get_event_avatar
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.resource.constant import NORMAL_LIST
 from ..wutheringwaves_config import PREFIX
@@ -267,7 +268,7 @@ async def draw_card(uid: int, ev: Event):
 
 
 async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev)
+    pic = await get_event_avatar(ev, is_valid_at=False)
 
     mask_pic = Image.open(TEXT_PATH / 'avatar_mask.png')
     img = Image.new('RGBA', (320, 320))

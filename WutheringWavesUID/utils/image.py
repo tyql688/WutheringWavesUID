@@ -1,11 +1,14 @@
 import os
 import random
+from io import BytesIO
 from pathlib import Path
-from typing import Literal, Union
+from typing import Literal, Union, Optional
 
 from PIL import Image, ImageOps
 
-from gsuid_core.utils.image.image_tools import crop_center_img
+from gsuid_core.models import Event
+from gsuid_core.utils.image.image_tools import crop_center_img, get_qq_avatar
+from gsuid_core.utils.image.utils import sget
 from ..utils.resource.RESOURCE_PATH import AVATAR_PATH, WEAPON_PATH, ROLE_PILE_PATH
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -77,6 +80,30 @@ async def get_weapon_type(name: str = "") -> Image.Image:
 def get_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
     img = Image.open(TEXT_PATH / f'{bg}.jpg').convert('RGBA')
     return crop_center_img(img, w, h)
+
+
+async def get_event_avatar(
+    ev: Event, avatar_path: Optional[Path] = None, is_valid_at: bool = True
+) -> Image.Image:
+    img = None
+    if ev.bot_id == 'onebot' and ev.at and is_valid_at:
+        return await get_qq_avatar(ev.at)
+    elif 'avatar' in ev.sender and ev.sender['avatar']:
+        avatar_url = ev.sender['avatar']
+        content = (await sget(avatar_url)).content
+        return Image.open(BytesIO(content)).convert('RGBA')
+    elif ev.bot_id == 'onebot' and not ev.sender:
+        return await get_qq_avatar(ev.user_id)
+    elif avatar_path:
+        pic_path_list = list(avatar_path.iterdir())
+        if pic_path_list:
+            path = random.choice(pic_path_list)
+            img = Image.open(path).convert('RGBA')
+
+    if img is None:
+        img = await get_square_avatar(1203)
+
+    return img
 
 
 def add_footer(
