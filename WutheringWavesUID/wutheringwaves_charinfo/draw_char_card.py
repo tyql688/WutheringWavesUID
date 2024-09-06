@@ -15,7 +15,7 @@ from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
     waves_font_24
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
-    get_square_weapon, get_attribute_prop, GREY
+    get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.download_file import get_skill_img, get_chain_img, get_phantom_img
 from ..utils.waves_api import waves_api
@@ -23,7 +23,6 @@ from ..utils.weapon_detail import get_weapon_detail, WavesWeaponResult, get_brea
 from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
-SPECIAL_GOLD = (234, 183, 4)
 
 
 async def draw_char_detail_img(ev: Event, uid: str, char: str):

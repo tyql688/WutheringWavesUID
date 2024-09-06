@@ -100,6 +100,10 @@
 <a><img src="https://s2.loli.net/2024/08/27/7YedKVE4Xfo9xgz.jpg"></a>
 </p></details>
 
+<details><summary>练度查询 - 命令: ww练度统计 / ww角色列表</summary><p>
+还没有图
+</p></details>
+
 <details><summary>其他 - 网页控制台相关功能</summary><p>
 请自行查阅文档, 可控制签到时间，推送等
 </p></details>
@@ -116,7 +120,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 - [x] 深渊
 - [ ] 全息战略
 - [x] 角色面板
-- [ ] 练度查询
+- [x] 练度查询
 - [ ] 帮助图
 - [x] 角色攻略
 

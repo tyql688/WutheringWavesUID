@@ -17,6 +17,7 @@ BLACK_G = (40, 40, 40)
 YELLOW = (255, 200, 1)
 BLUE = (1, 183, 255)
 GOLD = (224, 202, 146)
+SPECIAL_GOLD = (234, 183, 4)
 
 
 async def get_random_waves_role_pile():
@@ -65,8 +66,12 @@ async def get_square_weapon(resource_id: Union[int, str]) -> Image.Image:
         return Image.open(path).convert("RGBA")
 
 
-async def get_attribute(name: str = "") -> Image.Image:
-    return Image.open(TEXT_PATH / f'attribute/attr_{name}.png').convert("RGBA")
+async def get_attribute(name: str = "", is_simple: bool = False) -> Image.Image:
+    if is_simple:
+        name = f'attribute/attr_simple_{name}.png'
+    else:
+        name = f'attribute/attr_{name}.png'
+    return Image.open(TEXT_PATH / name).convert("RGBA")
 
 
 async def get_attribute_prop(name: str = "") -> Image.Image:
