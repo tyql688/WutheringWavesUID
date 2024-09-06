@@ -10,7 +10,7 @@ from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
 from ..utils.calculate import calc_phantom_score, get_total_score_bg
 from ..utils.char_info_utils import get_all_role_detail_info
-from ..utils.error_reply import WAVES_CODE_102
+from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_15, \
     waves_font_22, waves_font_40, waves_font_24
 from ..utils.hint import error_reply
@@ -49,7 +49,7 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
     # 根据面板数据获取详细信息
     all_role_detail = await get_all_role_detail_info(uid)
     if not all_role_detail:
-        return '角色信息获取失败，请检查UID是否正确'
+        return error_reply(WAVES_CODE_107)
 
     waves_char_rank = []
     for char_name, role_detail in all_role_detail.items():

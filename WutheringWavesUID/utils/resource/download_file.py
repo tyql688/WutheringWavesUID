@@ -14,6 +14,7 @@ async def get_skill_img(
     _dir = ROLE_DETAIL_SKILL_PATH / str(char_id)
     _dir.mkdir(parents=True, exist_ok=True)
 
+    skill_name = skill_name.strip()
     name = f"skill_{skill_name}.png"
     _path = _dir / name
     if not _path.exists():
