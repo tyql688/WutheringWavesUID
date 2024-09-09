@@ -101,7 +101,11 @@
 </p></details>
 
 <details><summary>练度查询 - 命令: ww练度统计 / ww角色列表</summary><p>
-还没有图
+<a><img src="https://s2.loli.net/2024/09/09/hPsCBINHKOcFq4t.jpg"></a>
+</p></details>
+
+<details><summary>全息查询 - 命令: ww查询全息 / ww全息 / ww全息战略</summary><p>
+<a><img src="https://s2.loli.net/2024/09/09/RWgU46FityKM1IO.jpg"></a>
 </p></details>
 
 <details><summary>其他 - 网页控制台相关功能</summary><p>
@@ -118,7 +122,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 - [x] 体力恢复提醒
 - [x] 公告推送
 - [x] 深渊
-- [ ] 全息战略
+- [x] 全息战略
 - [x] 角色面板
 - [x] 练度查询
 - [ ] 帮助图

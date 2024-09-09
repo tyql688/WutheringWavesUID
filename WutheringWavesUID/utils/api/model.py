@@ -1,4 +1,4 @@
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Any, Dict
 
 from msgspec import UNSET, Struct, UnsetType, field
 from pydantic import BaseModel
@@ -281,3 +281,32 @@ class AbyssChallenge(BaseModel):
     isUnlock: bool
     seasonEndTime: Optional[int]
     difficultyList: Optional[List[AbyssDifficulty]]
+
+
+class ChallengeRole(BaseModel):
+    roleName: Optional[str]
+    roleHeadIcon: Optional[str]
+    roleLevel: Optional[int]
+    natureId: Optional[int]
+    natureIcon: Optional[Any] = None
+
+
+class Challenge(BaseModel):
+    bossId: Optional[Any]
+    challengeId: Optional[int]
+    bossHeadIcon: Optional[str]
+    bossIconUrl: Optional[str]
+    bossLevel: Optional[int]
+    bossName: Optional[str]
+    passTime: Optional[int]
+    difficulty: Optional[int]
+    roles: Optional[List[ChallengeRole]]
+
+
+class ChallengeArea(BaseModel):
+    areaId: Optional[Any]
+    areaName: Optional[Any]
+    challengeInfo: Optional[Dict[str, List[Challenge]]]
+    open: bool
+    wikiUrl: Optional[Any]
+    isUnlock: bool
