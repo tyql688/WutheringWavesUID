@@ -12,7 +12,7 @@ from ..utils.calculate import calc_phantom_score, get_total_score_bg
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_15, \
-    waves_font_22, waves_font_40, waves_font_24
+    waves_font_22, waves_font_40, waves_font_24, waves_font_18
 from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, get_event_avatar, add_footer, GOLD, GREY, get_attribute, get_square_avatar, \
     get_square_weapon, SPECIAL_GOLD
@@ -127,9 +127,17 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
         bar_star.alpha_composite(role_attribute, (170, 20))
         bar_star_draw.text((180, 83), f'Lv.{_rank.level}', GREY, waves_font_22, 'mm')
 
+        # 命座
+        info_block = Image.new("RGBA", (40, 20), color=(255, 255, 255, 0))
+        info_block_draw = ImageDraw.Draw(info_block)
+        info_block_draw.rectangle([0, 0, 40, 20], fill=(220, 39, 36, int(0.9 * 255)))
+        info_block_draw.text((2, 10), f'{role_detail.get_chain_name()}', 'white', waves_font_18, 'lm')
+        bar_star.alpha_composite(info_block, (120, 15))
+
         # 评分
-        score_bg = Image.open(TEXT_PATH / f'score_{_rank.score_bg}.png')
-        bar_star.alpha_composite(score_bg, (200, 2))
+        if _rank.score > 0.0:
+            score_bg = Image.open(TEXT_PATH / f'score_{_rank.score_bg}.png')
+            bar_star.alpha_composite(score_bg, (200, 2))
 
         # 技能
         skill_img_temp = Image.new('RGBA', (1500, 300))
