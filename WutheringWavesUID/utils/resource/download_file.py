@@ -3,7 +3,7 @@ from typing import Union
 from PIL import Image
 
 from gsuid_core.utils.download_resource.download_file import download
-from .RESOURCE_PATH import ROLE_DETAIL_SKILL_PATH, ROLE_DETAIL_CHAINS_PATH, PHANTOM_PATH
+from .RESOURCE_PATH import ROLE_DETAIL_SKILL_PATH, ROLE_DETAIL_CHAINS_PATH, PHANTOM_PATH, FETTER_PATH
 
 
 async def get_skill_img(
@@ -47,5 +47,17 @@ async def get_phantom_img(
     _path = PHANTOM_PATH / name
     if not _path.exists():
         await download(pic_url, PHANTOM_PATH, name, tag="[鸣潮]")
+
+    return Image.open(_path).convert("RGBA")
+
+
+async def get_fetter_img(
+    name: str,
+    pic_url: str
+) -> Union[Image.Image, str, None]:
+    name = f"fetter_{name}.png"
+    _path = FETTER_PATH / name
+    if not _path.exists():
+        await download(pic_url, FETTER_PATH, name, tag="[鸣潮]")
 
     return Image.open(_path).convert("RGBA")

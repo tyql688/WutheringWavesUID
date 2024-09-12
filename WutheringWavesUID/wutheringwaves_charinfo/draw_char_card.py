@@ -17,7 +17,7 @@ from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_5
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from ..utils.resource.download_file import get_skill_img, get_chain_img, get_phantom_img
+from ..utils.resource.download_file import get_skill_img, get_chain_img, get_phantom_img, get_fetter_img
 from ..utils.waves_api import waves_api
 from ..utils.weapon_detail import get_weapon_detail, WavesWeaponResult, get_breach
 from ..wutheringwaves_config import PREFIX
@@ -216,6 +216,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                 sh_temp.alpha_composite(sh_title, dest=(0, 0))
 
                 phantom_icon = await get_phantom_img(_phantom.phantomProp.phantomId, _phantom.phantomProp.iconUrl)
+                fetter_icon = await get_fetter_img(_phantom.fetterDetail.name, _phantom.fetterDetail.iconUrl)
+                phantom_icon.alpha_composite(fetter_icon, dest=(210, 0))
                 phantom_icon = phantom_icon.resize((100, 100))
                 sh_temp.alpha_composite(phantom_icon, dest=(20, 20))
                 phantomName = _phantom.phantomProp.name.replace("·", " ").replace("（", " ").replace("）", "")
