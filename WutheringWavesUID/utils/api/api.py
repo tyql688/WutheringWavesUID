@@ -27,6 +27,7 @@ TOWER_DETAIL_URL = f'{MAIN_URL}/gamer/roleBox/aki/towerDataDetail'
 HOME_WIKI_DETAIL_URL = f'{MAIN_URL}/wiki/core/homepage/getPage'
 WIKI_TREE_URL = f'{MAIN_URL}/wiki/core/catalogue/config/getTree'
 WIKI_DETAIL_URL = f'{MAIN_URL}/wiki/core/catalogue/item/getPage'
+WIKI_ENTRY_DETAIL_URL = f'{MAIN_URL}/wiki/core/catalogue/item/getEntryDetail'
 
 WIKI_CATALOGUE_MAP = {
     "共鸣者": "1105",

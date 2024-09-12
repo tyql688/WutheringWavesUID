@@ -108,6 +108,10 @@
 <a><img src="https://s2.loli.net/2024/09/09/RWgU46FityKM1IO.jpg"></a>
 </p></details>
 
+<details><summary>wiki - 命令: ww角色wiki维里奈 / ww角色介绍维里奈</summary><p>
+<a><img src="https://s2.loli.net/2024/09/12/xEXf4yvhLUigQao.jpg"></a>
+</p></details>
+
 <details><summary>其他 - 网页控制台相关功能</summary><p>
 请自行查阅文档, 可控制签到时间，推送等
 </p></details>
@@ -115,18 +119,6 @@
 <details><summary>ck获取方法</summary><p>
 https://github.com/tyql688/WutheringWavesUID/wiki
 </details>
-
-## 后续
-
-- [ ] 手机号登录
-- [x] 体力恢复提醒
-- [x] 公告推送
-- [x] 深渊
-- [x] 全息战略
-- [x] 角色面板
-- [x] 练度查询
-- [ ] 帮助图
-- [x] 角色攻略
 
 ## 丨其他
 

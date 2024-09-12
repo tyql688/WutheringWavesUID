@@ -10,6 +10,7 @@ from gsuid_core.sv import SV
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 from .main import Guide
+from .wiki import draw_wiki_detail
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.RESOURCE_PATH import (
     GUIDE_CONFIG_MAP,
@@ -17,6 +18,28 @@ from ..utils.resource.RESOURCE_PATH import (
 from ..wutheringwaves_config import WutheringWavesConfig, PREFIX
 
 sv_waves_guide = SV('鸣潮攻略')
+sv_waves_wiki = SV('鸣潮wiki')
+
+
+@sv_waves_wiki.on_prefix((
+    f'{PREFIX}角色wiki',
+    f'{PREFIX}角色介绍',
+    f'{PREFIX}武器wiki',
+    f'{PREFIX}武器介绍',
+))
+async def send_waves_wiki(bot: Bot, ev: Event):
+    if "角色" in ev.command:
+        char_name = ev.text.strip(' ')
+        char_id = char_name_to_char_id(char_name)
+        if not char_id:
+            return f'[鸣潮] 角色名{char_name}无法找到, 可能暂未适配, 请先检查输入是否正确！'
+
+        name = alias_to_char_name(char_name)
+        if name == '漂泊者':
+            name = '漂泊者·衍射'
+        await bot.logger.info(f'[鸣潮] 开始获取{name}wiki')
+        img = await draw_wiki_detail("角色", name)
+        await bot.send(img)
 
 
 @sv_waves_guide.on_prefix((f'{PREFIX}角色攻略', f'{PREFIX}刷新角色攻略'))
@@ -102,7 +125,7 @@ async def download_guide_pic(auth_id: int, name: str, _dir: Path, is_force: bool
             if all(fragment in post_title for fragment in name_split):
                 post_id = i['postId']
                 break
-        elif name in post_title:
+        elif name in post_title and '一图流' in post_title:
             post_id = i['postId']
             break
 
