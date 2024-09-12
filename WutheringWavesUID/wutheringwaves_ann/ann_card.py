@@ -109,6 +109,11 @@ async def ann_detail_card(ann_id: int) -> Union[bytes, str]:
     if not res:
         return '未找到该公告'
     post_content = sorted(res['postContent'], key=lambda x: x['contentType'], reverse=True)
+    content_type2_first = filter_list(post_content, lambda x: x['contentType'] == 2)
+    if not content_type2_first and 'coverImages' in res:
+        _node = res['coverImages'][0]
+        _node['contentType'] = 2
+        post_content.insert(0, _node)
 
     drow_height = 0
     for temp in post_content:
