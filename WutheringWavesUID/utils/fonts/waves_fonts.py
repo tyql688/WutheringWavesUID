@@ -11,6 +11,7 @@ def waves_font_origin(size: int) -> ImageFont.FreeTypeFont:
 
 waves_font_12 = waves_font_origin(12)
 waves_font_14 = waves_font_origin(14)
+waves_font_16 = waves_font_origin(16)
 waves_font_15 = waves_font_origin(15)
 waves_font_18 = waves_font_origin(18)
 waves_font_20 = waves_font_origin(20)

@@ -8,9 +8,13 @@ from gsuid_core.logger import logger
 MAP_PATH = Path(__file__).parent / "map"
 ALIAS_LIST = Path(__file__).parent / "alias"
 CHAR_ALIAS = ALIAS_LIST / "char_alias.json"
+WEAPON_ALIAS = ALIAS_LIST / "weapon_alias.json"
 
 with open(CHAR_ALIAS, "r", encoding="UTF-8") as f:
     char_alias_data = msgjson.decode(f.read(), type=Dict[str, List[str]])
+
+with open(WEAPON_ALIAS, "r", encoding="UTF-8") as f:
+    weapon_alias_data = msgjson.decode(f.read(), type=Dict[str, List[str]])
 
 with open(MAP_PATH / "CharId2Data.json", "r", encoding="UTF-8") as f:
     char_id_data = msgjson.decode(f.read(), type=Dict[str, Dict[str, str]])
@@ -40,3 +44,11 @@ def char_name_to_char_id(char_name: str) -> Optional[str]:
             return i
     else:
         return None
+
+
+def alias_to_weapon_name(weapon_name: str) -> str:
+    for i in weapon_alias_data:
+        if (weapon_name in i) or (weapon_name in weapon_alias_data[i]):
+            logger.debug(f"别名转换: {weapon_name} -> {i}")
+            return i
+    return weapon_name

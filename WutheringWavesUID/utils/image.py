@@ -87,6 +87,18 @@ def get_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
     return crop_center_img(img, w, h)
 
 
+def get_crop_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
+    img = Image.open(TEXT_PATH / f'{bg}.jpg').convert('RGBA')
+
+    width, height = img.size
+
+    crop_box = (0, height // 2, width, height)
+
+    cropped_image = img.crop(crop_box)
+
+    return crop_center_img(cropped_image, w, h)
+
+
 async def get_event_avatar(
     ev: Event, avatar_path: Optional[Path] = None, is_valid_at: bool = True
 ) -> Image.Image:

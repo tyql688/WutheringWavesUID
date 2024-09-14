@@ -41,7 +41,7 @@ def get_breach(breach: Union[int, None], level: int):
 def get_weapon_detail(
     weapon_id: Union[str, int],
     level: int,
-    breach: int = 0,
+    breach: Union[int, None] = None,
     resonLevel: Union[int, None] = 1
 ) -> Union[WavesWeaponResult, None]:
     """
@@ -77,3 +77,15 @@ def get_weapon_detail(
             stat["value"] = f'{int(stat["value"])}'
 
     return result
+
+
+def get_weapon_id(weapon_name):
+    return next((_id for _id, value in weapon_id_data.items() if value['name'] == weapon_name), None)
+
+
+def get_weapon_star(weapon_name):
+    weapon_id = get_weapon_id(weapon_name)
+
+    result = get_weapon_detail(weapon_id, 90)
+
+    return result.starLevel

@@ -11,7 +11,7 @@ from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 from .main import Guide
 from .wiki import draw_wiki_detail
-from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
+from ..utils.name_convert import alias_to_char_name, char_name_to_char_id, alias_to_weapon_name
 from ..utils.resource.RESOURCE_PATH import (
     GUIDE_CONFIG_MAP,
 )
@@ -38,7 +38,15 @@ async def send_waves_wiki(bot: Bot, ev: Event):
         if name == '漂泊者':
             name = '漂泊者·衍射'
         await bot.logger.info(f'[鸣潮] 开始获取{name}wiki')
-        img = await draw_wiki_detail("角色", name)
+        img = await draw_wiki_detail("共鸣者", name)
+        await bot.send(img)
+    elif "武器" in ev.command:
+        weapon_name = ev.text.strip(' ')
+        weapon_name = alias_to_weapon_name(weapon_name)
+        if not weapon_name:
+            return f'[鸣潮] 武器名{weapon_name}无法找到, 可能暂未适配, 请先检查输入是否正确！'
+        await bot.logger.info(f'[鸣潮] 开始获取{weapon_name}wiki')
+        img = await draw_wiki_detail("武器", weapon_name)
         await bot.send(img)
 
 
