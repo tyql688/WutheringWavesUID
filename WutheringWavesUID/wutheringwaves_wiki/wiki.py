@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw
 from bs4 import BeautifulSoup
 
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import draw_text_by_line, crop_center_img
+from gsuid_core.utils.image.image_tools import crop_center_img
 from gsuid_core.utils.image.utils import sget
 from ..utils.api.api import WIKI_DETAIL_URL, WIKI_ENTRY_DETAIL_URL, WIKI_CATALOGUE_MAP
 from ..utils.fonts.waves_fonts import waves_font_70, waves_font_30, waves_font_24, waves_font_40, waves_font_origin
@@ -213,6 +213,9 @@ async def parse_weapon_material_content(content, card_img):
 
 async def draw_wiki_char(raw_data: Dict):
     name = raw_data['name']
+    names = name.split('-')
+    if len(names) > 1:
+        name = names[0] + '-' + names[2]
     content = raw_data['content']
     # 基础资料
     base_data = next((i for i in content['modules'] if i['title'] == '基础资料'), None)
@@ -326,8 +329,12 @@ async def parse_mz_content(content):
     data = []
     for row in rows[1:]:  # 跳过标题行
         columns = row.find_all('td')
-        temp = {'name': columns[0].text.strip(), 'effect': columns[1].text.strip()}
-
+        # temp = {'name': columns[0].text.strip(), 'effect': columns[1].text.strip()}
+        temp = {
+            'name': columns[0].text.strip(),
+            'effect': [collect_text_and_style(columns[1], parent_font_size=24, is_force_parent_font_size=True,
+                                              parent_color='rgb(255, 255, 255)')]
+        }
         # 如果单元格中有图像
         img_tag = columns[0].find('img')
         if img_tag:
@@ -350,15 +357,17 @@ async def parse_mz_content(content):
         image.alpha_composite(mz_bg_temp, (0, index * 250))
 
         draw.text((250, 80 + index * 250), _data['name'], fill=SPECIAL_GOLD, font=waves_font_40, anchor='lm')
-        draw_text_by_line(
-            image,
-            (250, 150 + index * 250),
-            _data['effect'],
-            waves_font_24,
-            "white",
-            550,
-            False
-        )
+        # draw_text_by_line(
+        #     image,
+        #     (250, 150 + index * 250),
+        #     _data['effect'],
+        #     waves_font_24,
+        #     "white",
+        #     550,
+        #     False
+        # )
+        draw_text(_data['effect'], waves_font_origin, image=image, padding=(0, 0),
+                  init_padding=(250, 150 + index * 250), max_line_width=950, column_spacing=0)
     return image
 
 
@@ -471,6 +480,93 @@ def draw_html_text(html_content, font_origin, image=None, image_width=500, image
                                           fill=rgb_color)
                             y_offset += font_size + auto_line_spacing
                             x_offset = padding[0]
+                            current_line = word
+                        else:
+                            current_line += word
+                    if current_line:
+                        draw.text((x_offset, y_offset), current_line, font=font_origin(font_size),
+                                  fill=rgb_color)
+                        current_line_bbox = draw.textbbox((0, 0), current_line, font=font_origin(font_size))
+                        current_line_bbox_width = current_line_bbox[2] - current_line_bbox[0]
+                        x_offset += current_line_bbox_width
+                else:
+                    draw.text((x_offset, y_offset), text, font=font_origin(font_size), fill=rgb_color)
+                    # 更新 x_offset，准备绘制下一个文本段
+                    x_offset += text_width + column_spacing  # 增加列间距
+
+        # 完成一行后，y_offset 更新，进入下一行
+        y_offset += font_size + line_spacing  # 更新 y_offset，保证下一行绘制
+
+    return image
+
+
+def collect_text_and_style(element, parent_color='rgb(0, 0, 0)', parent_font_size=16, is_force_parent_color=False,
+                           is_force_parent_font_size=False, forbid_color='rgb(0, 0, 0)'):
+    segments = []
+    font_size = parent_font_size  # 默认使用父级字体大小
+    color = parent_color  # 默认使用父级颜色
+
+    # 获取样式
+    style = element.get('style')
+    if style:
+        styles = style.split(';')
+        for s in styles:
+            if 'font-size' in s and not is_force_parent_font_size:
+                font_size = int(s.split(':')[1].strip().replace('px', ''))
+            elif 'color' in s and not is_force_parent_color:
+                _color = s.split(':')[1].strip()
+                if _color != forbid_color:
+                    color = _color
+
+    # 转换颜色为RGB格式
+    rgb_color = tuple(map(int, color.replace('rgb(', '').replace(')', '').split(',')))
+
+    # 获取该标签中的文本和子元素
+    for content in element.contents:
+        if isinstance(content, str):
+            segments.append((content, font_size, rgb_color))  # 收集文本块及其样式
+        else:
+            # 对于非字符串内容，递归处理子元素
+            nested_segments = collect_text_and_style(content, color, font_size, is_force_parent_color,
+                                                     is_force_parent_font_size, forbid_color)
+            segments.extend(nested_segments)  # 将子元素的段落添加到列表中
+
+    return segments
+
+
+def draw_text(segments_in_lines, font_origin, image=None, image_width=500, image_height=600,
+              background_color=(255, 255, 255, 255), padding=(10, 10),
+              line_spacing=5, column_spacing=5, auto_line_spacing=5, init_padding=(0, 0), max_line_width=None):
+    # 创建或使用现有的图像对象
+    if image is None:
+        image = Image.new("RGBA", (image_width, image_height), background_color)
+    draw = ImageDraw.Draw(image)
+
+    y_offset = padding[1] + init_padding[1]  # 开始绘制的Y偏移，根据边距设置
+    if not max_line_width:
+        max_line_width = image.size[0] - int(padding[0] * 1.5)  # 文本的最大宽度
+
+    for segments_in_line in segments_in_lines:
+        x_offset = padding[0] + init_padding[0]  # 初始 x 偏移
+        # 绘制每个文本段
+        for text, font_size, rgb_color in segments_in_line:
+            if text.strip():  # 如果有非空文本内容
+                # 计算文本段的宽度
+                bbox = draw.textbbox((0, 0), text, font=font_origin(font_size))
+                text_width = bbox[2] - bbox[0]
+
+                # 如果 x_offset + 当前文本段宽度超过最大宽度，换行
+                if x_offset + text_width > max_line_width:
+                    current_line = ''
+                    for word in text:
+                        current_line_bbox = draw.textbbox((0, 0), current_line, font=font_origin(font_size))
+                        current_line_bbox_width = current_line_bbox[2] - current_line_bbox[0]
+                        if x_offset + current_line_bbox_width > max_line_width:
+                            if current_line:
+                                draw.text((x_offset, y_offset), current_line, font=font_origin(font_size),
+                                          fill=rgb_color)
+                            y_offset += font_size + auto_line_spacing
+                            x_offset = padding[0] + init_padding[0]
                             current_line = word
                         else:
                             current_line += word
