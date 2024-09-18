@@ -18,6 +18,11 @@ from ..utils.weapon_detail import get_weapon_star
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 
+QUERY_ROLE_TYPE = {
+    '命座': '1',
+    '天赋': '2',
+}
+
 
 class Wiki:
     _HEADER = {
@@ -56,14 +61,14 @@ class Wiki:
             return res.json()
 
 
-async def draw_wiki_detail(query_type: str, name: str):
+async def draw_wiki_detail(query_type: str, name: str, query_role_type: str = None):
     if query_type not in WIKI_CATALOGUE_MAP:
         return "暂无该类型wiki"
 
     res = await Wiki().get_entry_detail(name, WIKI_CATALOGUE_MAP[query_type])
 
     if query_type == "共鸣者":
-        return await draw_wiki_char(res['data'])
+        return await draw_wiki_char(res['data'], query_role_type)
     elif query_type == "武器":
         return await draw_wiki_weapon(res['data'])
 
@@ -211,7 +216,7 @@ async def parse_weapon_material_content(content, card_img):
     card_img.alpha_composite(material_img, (650, 30))
 
 
-async def draw_wiki_char(raw_data: Dict):
+async def draw_wiki_char(raw_data: Dict, query_role_type: str):
     name = raw_data['name']
     names = name.split('-')
     if len(names) > 1:
@@ -229,6 +234,8 @@ async def draw_wiki_char(raw_data: Dict):
     char_statistics = next((i for i in base_data['components'] if i['type'] == 'tabs-component'), None)
     # 共鸣链
     mz_data = next((i for i in char_data['components'] if i['type'] == 'basic-component'), None)
+    # 技能介绍
+    skill_data = next((i for i in char_data['components'] if i['title'] == '技能介绍'), None)
 
     char_pic = Image.open(BytesIO((await sget(role_data['figures'][0]['url'])).content)).convert('RGBA')
     char_pic = char_pic.resize((600, int(600 / char_pic.size[0] * char_pic.size[1])))
@@ -244,16 +251,51 @@ async def draw_wiki_char(raw_data: Dict):
     # 角色统计信息
     role_statistic_pic = await parse_role_statistic_content(char_statistics['tabs'][-1]['content'])
 
-    # 命座 共鸣链
-    mz_bg = await parse_mz_content(mz_data['content'])
-
     card_img = get_waves_bg(1000, 2180, 'bg2')
+
+    if query_role_type == "天赋":
+        # 技能
+        skill_height = 610
+        images = []
+        for index, tab in enumerate(skill_data['tabs']):
+            image = draw_html_text2(tab['content'], waves_font_origin, image_width=1000,
+                                    default_font_color='rgb(255, 255, 255)',
+                                    padding=(40, 30),
+                                    line_spacing=20, auto_line_spacing=5, background_color=(255, 255, 255, 0),
+                                    init_padding=(210, 0))
+            soup = BeautifulSoup(tab['content'], 'html.parser')
+            skill_image = soup.find('img')['src']
+            skill_image = Image.open(BytesIO((await sget(skill_image)).content)).convert('RGBA')
+            images.append((tab['title'], skill_image, image))
+            skill_height += image.size[1]
+
+        card_img = get_waves_bg(1000, skill_height + 100, 'bg2')
+        card_draw = ImageDraw.Draw(card_img)
+
+        skill_height = 610
+        index = 0
+        for name, skill_image, image in images:
+            mz_bg = Image.open(TEXT_PATH / 'mz_bg.png')
+            mz_bg_temp = Image.new('RGBA', mz_bg.size)
+            chain = await change_white_color(skill_image)
+            chain = chain.resize((100, 100))
+            mz_bg.paste(chain, (95, 75), chain)
+            mz_bg_temp.alpha_composite(mz_bg, dest=(0, 0))
+
+            card_img.alpha_composite(image, (0, 20 + skill_height))
+            card_img.alpha_composite(mz_bg_temp, (0, 70 + skill_height))
+            card_draw.text((70, skill_height + 70), name, fill=SPECIAL_GOLD, font=waves_font_40, anchor='lm')
+            index += 1
+            skill_height += image.size[1]
+
+    else:
+        # 命座 共鸣链
+        mz_bg = await parse_mz_content(mz_data['content'])
+        card_img.alpha_composite(mz_bg, (0, 600))
 
     char_bg.alpha_composite(char_pic, (0, 0))
     char_bg.alpha_composite(role_statistic_pic, (580, 220))
     card_img.paste(char_bg, (0, -5), char_bg)
-    card_img.alpha_composite(mz_bg, (0, 600))
-
     card_img = add_footer(card_img, 600, 20)
     card_img = await convert_img(card_img)
     return card_img
@@ -344,7 +386,7 @@ async def parse_mz_content(content):
 
     image = Image.new('RGBA', (1000, 1550), (255, 255, 255, 0))
     draw = ImageDraw.Draw(image)
-    draw.rounded_rectangle([20, 20, 980, 1530], radius=20, fill=(40, 40, 40, int(1 * 255)))
+    draw.rectangle([20, 20, 980, 1530], fill=(0, 0, 0, int(0.3 * 255)))
 
     for index, _data in enumerate(data):
         mz_bg = Image.open(TEXT_PATH / 'mz_bg.png')
@@ -393,7 +435,10 @@ def draw_html_text(html_content, font_origin, image=None, image_width=500, image
                    background_color=(255, 255, 255, 255), text_align='left', padding=(10, 10),
                    line_spacing=5, column_spacing=5, auto_line_spacing=5,
                    default_font_size=16,
-                   default_font_color='rgb(0, 0, 0)'):
+                   default_font_color='rgb(0, 0, 0)',
+                   is_force_parent_color=False,
+                   is_force_parent_font_size=False,
+                   forbid_color='rgb(0, 0, 0)'):
     """
     根据 HTML 内容绘制图像文本，保持嵌套样式和布局，并支持自动换行。
 
@@ -425,7 +470,10 @@ def draw_html_text(html_content, font_origin, image=None, image_width=500, image
     max_line_width = image.size[0] - int(padding[0] * 1.5)  # 文本的最大宽度
 
     # 递归函数处理嵌套的 <span>，并直接绘制文本
-    def collect_text_and_style(element, parent_color=default_font_color, parent_font_size=default_font_size):
+    def collect_text_and_style(element, parent_color=default_font_color, parent_font_size=default_font_size,
+                               is_force_parent_color=is_force_parent_color,
+                               is_force_parent_font_size=is_force_parent_font_size,
+                               forbid_color=forbid_color):
         segments = []
         font_size = parent_font_size  # 默认使用父级字体大小
         color = parent_color  # 默认使用父级颜色
@@ -435,21 +483,27 @@ def draw_html_text(html_content, font_origin, image=None, image_width=500, image
         if style:
             styles = style.split(';')
             for s in styles:
-                if 'font-size' in s:
+                if 'font-size' in s and not is_force_parent_font_size:
                     font_size = int(s.split(':')[1].strip().replace('px', ''))
-                elif 'color' in s:
-                    color = s.split(':')[1].strip()
+                elif 'color' in s and not is_force_parent_color:
+                    _color = s.split(':')[1].strip()
+                    if _color != forbid_color:
+                        color = _color
 
         # 转换颜色为RGB格式
         rgb_color = tuple(map(int, color.replace('rgb(', '').replace(')', '').split(',')))
 
         # 获取该标签中的文本和子元素
-        for content in element.contents:
+        for content in element.children:
             if isinstance(content, str):
-                segments.append((content, font_size, rgb_color))  # 收集文本块及其样式
+                if content:
+                    segments.append((content.strip(), font_size, rgb_color))  # 收集文本块及其样式
+            elif content.name == 'br':
+                segments.append(('\n', font_size, rgb_color))
             else:
                 # 对于非字符串内容，递归处理子元素
-                nested_segments = collect_text_and_style(content, color, font_size)
+                nested_segments = collect_text_and_style(content, color, font_size, is_force_parent_color,
+                                                         is_force_parent_font_size, forbid_color)
                 segments.extend(nested_segments)  # 将子元素的段落添加到列表中
 
         return segments
@@ -458,9 +512,8 @@ def draw_html_text(html_content, font_origin, image=None, image_width=500, image
     for p in soup.find_all('p'):
         x_offset = padding[0]  # 初始 x 偏移
         segments_in_line = []
-        for span in p.find_all('span', recursive=False):
-            segments_in_line.extend(collect_text_and_style(span))
-
+        # for span in p.find_all('span', recursive=False):
+        segments_in_line.extend(collect_text_and_style(p))
         # 绘制每个文本段
         for text, font_size, rgb_color in segments_in_line:
             if text.strip():  # 如果有非空文本内容
@@ -493,10 +546,152 @@ def draw_html_text(html_content, font_origin, image=None, image_width=500, image
                     draw.text((x_offset, y_offset), text, font=font_origin(font_size), fill=rgb_color)
                     # 更新 x_offset，准备绘制下一个文本段
                     x_offset += text_width + column_spacing  # 增加列间距
+            else:
+                x_offset = padding[0]
+                y_offset += font_size + line_spacing
 
-        # 完成一行后，y_offset 更新，进入下一行
         y_offset += font_size + line_spacing  # 更新 y_offset，保证下一行绘制
 
+    return image
+
+
+def draw_html_text2(html_content, font_origin, image=None, image_width=500,
+                    background_color=(255, 255, 255, 255), text_align='left', padding=(10, 10),
+                    line_spacing=5, column_spacing=0, auto_line_spacing=5,
+                    default_font_size=16,
+                    default_font_color='rgb(0, 0, 0)',
+                    is_force_parent_color=False,
+                    is_force_parent_font_size=False,
+                    forbid_color='rgb(0, 0, 0)',
+                    init_padding=(0, 0)):
+    """
+    根据 HTML 内容绘制图像文本，保持嵌套样式和布局，并支持自动换行。
+
+    Args:
+        html_content (str): 要绘制的 HTML 内容。
+        font_origin (function): 自定义字体生成函数，接受字体大小作为参数。
+        image (Image, optional): 可选的自定义图像对象。如果未提供，将创建新的图像。
+        image_width (int): 图像的宽度，默认为800像素。
+        background_color (tuple): 图像背景颜色，默认为白色。
+        text_align (str): 文本对齐方式，选择 'left', 'center' 或 'right'，默认为 'left'。
+        padding (tuple): 文本与图像边缘的 padding，默认为 (10, 10)。
+        line_spacing (int): 行间距，默认为5像素。
+        column_spacing (int): 列间距，默认为5像素。
+        auto_line_spacing (int): 自动换行的行间距，默认为5像素。
+
+    Returns:
+        Image: 返回包含绘制文本的图像对象。
+    """
+    # 使用 BeautifulSoup 解析 HTML
+    soup = BeautifulSoup(html_content, 'html.parser')
+    temp_image = Image.new("RGBA", (image_width, 1), background_color)
+    draw = ImageDraw.Draw(temp_image)
+
+    # 递归函数处理嵌套的 <span>，并直接绘制文本
+    def collect_text_and_style(element, parent_color=default_font_color, parent_font_size=default_font_size,
+                               is_force_parent_color=is_force_parent_color,
+                               is_force_parent_font_size=is_force_parent_font_size,
+                               forbid_color=forbid_color):
+        segments = []
+        font_size = parent_font_size  # 默认使用父级字体大小
+        color = parent_color  # 默认使用父级颜色
+
+        # 获取样式
+        style = element.get('style')
+        if style:
+            styles = style.split(';')
+            for s in styles:
+                if 'font-size' in s and not is_force_parent_font_size:
+                    font_size = int(s.split(':')[1].strip().replace('px', ''))
+                elif 'color' in s and not is_force_parent_color:
+                    _color = s.split(':')[1].strip()
+                    if _color != forbid_color:
+                        color = _color
+
+        # 转换颜色为RGB格式
+        rgb_color = tuple(map(int, color.replace('rgb(', '').replace(')', '').split(',')))
+
+        # 获取该标签中的文本和子元素
+        for content in element.children:
+            if isinstance(content, str):
+                if content:
+                    segments.append((content.strip(), font_size, rgb_color))  # 收集文本块及其样式
+            elif content.name == 'br':
+                segments.append(('\n', font_size, rgb_color))
+            else:
+                # 对于非字符串内容，递归处理子元素
+                nested_segments = collect_text_and_style(content, color, font_size, is_force_parent_color,
+                                                         is_force_parent_font_size, forbid_color)
+                segments.extend(nested_segments)  # 将子元素的段落添加到列表中
+
+        return segments
+
+    def draw_my_text(segments_in_lines, x_offset, y_offset, draw, max_line_width, is_draw=True):
+
+        # 遍历所有的 <p> 标签，处理其中的 <span> 标签
+        for segments_in_line in segments_in_lines:
+            x_offset = padding[0] + init_padding[0]  # 初始 x 偏移
+            # 绘制每个文本段
+            for text, font_size, rgb_color in segments_in_line:
+                if text.strip():  # 如果有非空文本内容
+                    # 计算文本段的宽度
+                    bbox = draw.textbbox((0, 0), text, font=font_origin(font_size))
+                    text_width = bbox[2] - bbox[0]
+
+                    # 如果 x_offset + 当前文本段宽度超过最大宽度，换行
+                    if x_offset + text_width > max_line_width:
+                        current_line = ''
+                        for word in text:
+                            current_line_bbox = draw.textbbox((0, 0), current_line, font=font_origin(font_size))
+                            current_line_bbox_width = current_line_bbox[2] - current_line_bbox[0]
+                            if x_offset + current_line_bbox_width > max_line_width:
+                                if current_line:
+                                    if is_draw:
+                                        draw.text((x_offset, y_offset), current_line, font=font_origin(font_size),
+                                                  fill=rgb_color)
+                                y_offset += font_size + auto_line_spacing
+                                x_offset = padding[0] + init_padding[0]
+                                current_line = word
+                            else:
+                                current_line += word
+                        if current_line:
+                            if is_draw:
+                                draw.text((x_offset, y_offset), current_line, font=font_origin(font_size),
+                                          fill=rgb_color)
+                            current_line_bbox = draw.textbbox((0, 0), current_line, font=font_origin(font_size))
+                            current_line_bbox_width = current_line_bbox[2] - current_line_bbox[0]
+                            x_offset += current_line_bbox_width
+                    else:
+                        if is_draw:
+                            draw.text((x_offset, y_offset), text, font=font_origin(font_size), fill=rgb_color)
+                        # 更新 x_offset，准备绘制下一个文本段
+                        x_offset += text_width + column_spacing  # 增加列间距
+                else:
+                    x_offset = padding[0] + init_padding[0]
+                    y_offset += font_size + line_spacing
+
+            y_offset += font_size + line_spacing  # 更新 y_offset，保证下一行绘制
+
+        return y_offset
+
+    max_line_width = temp_image.size[0] - int(padding[0] * 1.5)  # 文本的最大宽度
+
+    segments_in_lines = []
+    for p in soup.find_all('p'):
+        segments_in_line = []
+        segments_in_line.extend(collect_text_and_style(p))
+        segments_in_lines.append(segments_in_line)
+
+    if not image:
+        y_offset = draw_my_text(segments_in_lines, padding[0] + init_padding[0], padding[1] + init_padding[1], draw,
+                                max_line_width, False)
+
+        needed_height = y_offset + padding[1]
+        image = Image.new("RGBA", (image_width, needed_height), background_color)
+    draw = ImageDraw.Draw(image)
+
+    draw_my_text(segments_in_lines, padding[0] + init_padding[0], padding[1] + init_padding[1], draw, max_line_width,
+                 True)
     return image
 
 

@@ -108,9 +108,16 @@
 <a><img src="https://s2.loli.net/2024/09/09/RWgU46FityKM1IO.jpg"></a>
 </p></details>
 
-<details><summary>wiki - 命令: ww角色wiki维里奈 / ww角色介绍维里奈 / ww武器介绍琼枝冰绡/ ww武器wiki折枝专武 </summary><p>
-<a><img src="https://s2.loli.net/2024/09/12/xEXf4yvhLUigQao.jpg"></a>
+<details><summary>武器wiki - 命令: ww武器介绍琼枝冰绡/ ww武器wiki折枝专武 </summary><p>
 <a><img src="https://s2.loli.net/2024/09/14/sTELiBho7e6ZODY.jpg"></a>
+</p></details>
+
+<details><summary>角色命座 - 命令: ww角色wiki维里奈 / ww角色介绍维里奈 / ww角色命座维里奈 / ww角色共鸣链维里奈 </summary><p>
+<a><img src="https://s2.loli.net/2024/09/12/xEXf4yvhLUigQao.jpg"></a>
+</p></details>
+
+<details><summary>角色天赋 - 命令: ww角色天赋维里奈 / ww角色技能维里奈</summary><p>
+<a><img src="https://s2.loli.net/2024/09/18/Ijec3GyQJhWf4iV.jpg"></a>
 </p></details>
 
 <details><summary>其他 - 网页控制台相关功能</summary><p>

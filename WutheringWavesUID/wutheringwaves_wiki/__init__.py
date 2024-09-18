@@ -24,6 +24,10 @@ sv_waves_wiki = SV('鸣潮wiki')
 @sv_waves_wiki.on_prefix((
     f'{PREFIX}角色wiki',
     f'{PREFIX}角色介绍',
+    f'{PREFIX}角色命座',
+    f'{PREFIX}角色天赋',
+    f'{PREFIX}角色共鸣链',
+    f'{PREFIX}角色技能',
     f'{PREFIX}武器wiki',
     f'{PREFIX}武器介绍',
 ))
@@ -40,7 +44,8 @@ async def send_waves_wiki(bot: Bot, ev: Event):
         elif name == '漂泊者·湮灭':
             name = '漂泊者-女-湮灭'
         await bot.logger.info(f'[鸣潮] 开始获取{name}wiki')
-        img = await draw_wiki_detail("共鸣者", name)
+        query_role_type = "天赋" if "技能" in ev.command or "天赋" in ev.command else "命座"
+        img = await draw_wiki_detail("共鸣者", name, query_role_type)
         await bot.send(img)
     elif "武器" in ev.command:
         weapon_name = ev.text.strip(' ')
