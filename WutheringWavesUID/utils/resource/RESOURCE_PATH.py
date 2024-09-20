@@ -61,5 +61,8 @@ init_dir()
 
 # 设置 Jinja2 环境
 waves_templates = Environment(
-    loader=FileSystemLoader("plugins/WutheringWavesUID/WutheringWavesUID/templates")
+    loader=FileSystemLoader([
+        "gsuid_core/plugins/WutheringWavesUID/WutheringWavesUID/templates",
+        "plugins/WutheringWavesUID/WutheringWavesUID/templates",
+    ])
 )
