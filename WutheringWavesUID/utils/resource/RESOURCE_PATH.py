@@ -1,5 +1,7 @@
 import sys
 
+from jinja2 import Environment, FileSystemLoader
+
 from gsuid_core.data_store import get_res_path
 
 MAIN_PATH = get_res_path() / 'WutheringWavesUID'
@@ -56,3 +58,8 @@ def init_dir():
 
 
 init_dir()
+
+# 设置 Jinja2 环境
+waves_templates = Environment(
+    loader=FileSystemLoader("plugins/WutheringWavesUID/WutheringWavesUID/templates")
+)

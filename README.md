@@ -39,6 +39,10 @@
 还没有图
 </details>
 
+<details><summary>库街区登录 - 命令: ww登录</summary><p>
+<a><img src="https://s2.loli.net/2024/09/20/DoUSIGch6yrOTzs.png"></a>
+</p></details>
+
 <details><summary>库街区登录手机+验证码方式 - 命令: ww登录 13333333333,114114</summary><p>
 还没有图
 </p></details>
