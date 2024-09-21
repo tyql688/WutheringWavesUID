@@ -1,0 +1,309 @@
+{
+  "绑定账号": {
+    "desc": "在执行查询之前请绑定账号",
+    "data": [
+      {
+        "name": "绑定UID",
+        "desc": "绑定自己的账户",
+        "eg": "绑定UID123456",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "切换UID",
+        "desc": "切换绑定的账户",
+        "eg": "切换UID123456",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "删除UID",
+        "desc": "解除绑定",
+        "eg": "删除UID123456",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "查看UID",
+        "desc": "查看绑定的UID列表",
+        "eg": "查看UID",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "库街区登录": {
+    "desc": "在执行查询之前请库街区登录",
+    "data": [
+      {
+        "name": "登录页登录",
+        "desc": "登录页登录",
+        "eg": "登录",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "手机号登录",
+        "desc": "手机号+验证码登录",
+        "eg": "登录 13333333333,114114",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "添加CK",
+        "desc": "绑定自己的库街区CK",
+        "eg": "添加CK xxxxxxy",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "删除CK",
+        "desc": "删除当前的库街区CK",
+        "eg": "删除CK",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "信息查询": {
+    "desc": "在执行查询之前请绑定账号",
+    "data": [
+      {
+        "name": "体力",
+        "desc": "获取自己的每日状态",
+        "eg": "mr",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "查询",
+        "desc": "查询基本信息",
+        "eg": "查询",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "深渊",
+        "desc": "查询深渊",
+        "eg": "深渊",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "全息战略",
+        "desc": "查询全息战略",
+        "eg": "全息战略",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "练度统计",
+        "desc": "查询练度统计一览",
+        "eg": "练度统计",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "鸣潮面板更新",
+        "desc": "鸣潮面板更新",
+        "eg": "刷新面板",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "查询角色面板",
+        "desc": "查询角色面板",
+        "eg": "查询今汐",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "抽卡记录": {
+    "desc": "抽卡记录",
+    "data": [
+      {
+        "name": "导入抽卡链接",
+        "desc": "导入抽卡链接",
+        "eg": "导入抽卡链接 https://...record_id=5e4d436ea1",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "刷新抽卡记录",
+        "desc": "需要导入抽卡链接",
+        "eg": "刷新抽卡记录",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "抽卡记录",
+        "desc": "查询自己的抽卡记录",
+        "eg": "抽卡记录",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "WIKI": {
+    "desc": "获取游戏信息&攻略",
+    "data": [
+      {
+        "name": "角色攻略",
+        "desc": "角色攻略",
+        "eg": "角色攻略长离",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "角色共鸣链",
+        "desc": "角色共鸣链",
+        "eg": "角色共鸣链安可",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "角色技能",
+        "desc": "角色技能",
+        "eg": "角色技能维里奈",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "武器介绍",
+        "desc": "武器介绍",
+        "eg": "武器介绍琼枝冰绡",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "游戏公告列表",
+        "desc": "游戏公告列表",
+        "eg": "公告",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "游戏公告明细",
+        "desc": "游戏公告明细",
+        "eg": "公告#1456",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "个人服务": {
+    "desc": "该配置项仅针对个人使用",
+    "data": [
+      {
+        "name": "开启全局推送",
+        "desc": "是否开启全局推送",
+        "eg": "开启推送",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "开启体力推送",
+        "desc": "是否开启体力推送",
+        "eg": "开启体力推送",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "设置体力阈值",
+        "desc": "超过阈值才会推送体力信息",
+        "eg": "设置体力阈值160",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "签到",
+        "desc": "鸣潮签到",
+        "eg": "签到",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "开启自动签到",
+        "desc": "开启每天的自动签到功能",
+        "eg": "开启自动签到",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "管理员功能": {
+    "desc": "管理员功能",
+    "data": [
+      {
+        "name": "全部重新签到",
+        "desc": "全部重新签到所有人",
+        "eg": "全部重签",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "下载全部资源",
+        "desc": "下载全部资源",
+        "eg": "下载全部资源",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "补充Hakush资源",
+        "desc": "补充Hakush资源",
+        "eg": "补充资源",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "订阅鸣潮公告",
+        "desc": "订阅鸣潮公告",
+        "eg": "订阅公告",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "取消订阅鸣潮公告",
+        "desc": "取消订阅鸣潮公告",
+        "eg": "取消订阅公告",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      }
+    ]
+  }
+}
