@@ -31,5 +31,9 @@ class TimedCache:
 
     def _clean_up(self):
         current_time = time.time()
-        while self.cache and self.cache[next(reversed(self.cache))][1][1] <= current_time:
-            self.cache.popitem(last=False)
+        keys_to_delete = []
+        for key, (value, expiry_time) in self.cache.items():
+            if expiry_time <= current_time:
+                keys_to_delete.append(key)
+        for key in keys_to_delete:
+            del self.cache[key]

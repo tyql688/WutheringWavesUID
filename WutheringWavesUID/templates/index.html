@@ -312,9 +312,12 @@
         if (res.success) {
           showSuccessModal();
         } else {
-          alert('登录失败，请重试');
+          if (res.msg) {
+            alert('登录失败：' + res.msg);
+          } else {
+            alert('登录失败，请重试');
+          }
         }
-
       },
       error: function (jqXHR, textStatus, errorThrown) {
         console.error('登录失败:', textStatus, errorThrown);

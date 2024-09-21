@@ -46,4 +46,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "Moealkyne",
         options=["all", "Moealkyne", "小沐XMu"]
     ),
+    'WavesLoginUrl': GsStrConfig(
+        '鸣潮登录url',
+        '用于设置WutheringWavesUID登录界面的配置',
+        '',
+    ),
 }
