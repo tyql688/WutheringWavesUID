@@ -25,6 +25,28 @@ cache = TimedCache(timeout=600, maxsize=10)
 sv_kuro_login = SV("库洛登录")
 
 
+async def get_public_ip(host):
+    # 尝试从 ipify 获取 IP 地址
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.get('https://api.ipify.org/?format=json', timeout=4)
+            ip = r.json()['ip']
+            return ip
+    except:  # noqa:E722, B001
+        pass
+
+    # 尝试从 httpbin.org 获取 IP 地址
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.get('http://httpbin.org/ip', timeout=4)
+            ip = r.json()['origin']
+            return ip
+    except:
+        pass
+
+    return host
+
+
 async def get_url() -> (str, bool):
     url = WutheringWavesConfig.get_config('WavesLoginUrl').data
     if url:
@@ -35,14 +57,7 @@ async def get_url() -> (str, bool):
     if HOST == 'localhost' or HOST == '127.0.0.1':
         _host = 'localhost'
     else:
-        try:
-            async with httpx.AsyncClient() as client:
-                r = await client.get(
-                    'https://api.ipify.org/?format=json', timeout=4
-                )
-            _host = r.json()['ip']
-        except:  # noqa:E722, B001
-            _host = HOST
+        _host = await get_public_ip(HOST)
 
     return f'http://{_host}:{PORT}', True
 
