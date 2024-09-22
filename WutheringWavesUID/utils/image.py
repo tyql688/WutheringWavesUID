@@ -2,14 +2,18 @@ import os
 import random
 from io import BytesIO
 from pathlib import Path
-from typing import Literal, Union, Optional
+from typing import Union, Literal, Optional
 
 from PIL import Image, ImageOps
-
 from gsuid_core.models import Event
-from gsuid_core.utils.image.image_tools import crop_center_img, get_qq_avatar
 from gsuid_core.utils.image.utils import sget
-from ..utils.resource.RESOURCE_PATH import AVATAR_PATH, WEAPON_PATH, ROLE_PILE_PATH
+from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
+
+from ..utils.resource.RESOURCE_PATH import (
+    AVATAR_PATH,
+    WEAPON_PATH,
+    ROLE_PILE_PATH,
+)
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 GREY = (216, 216, 216)
@@ -123,6 +127,10 @@ async def get_event_avatar(
     return img
 
 
+def get_footer(color: Literal["white", "black"] = 'white'):
+    return Image.open(TEXT_PATH / f'footer_{color}.png')
+
+
 def add_footer(
     img: Image.Image,
     w: int = 0,
@@ -130,7 +138,7 @@ def add_footer(
     is_invert: bool = False,
     color: Literal["white", "black"] = 'white'
 ):
-    footer = Image.open(TEXT_PATH / f'footer_{color}.png')
+    footer = get_footer(color)
     if is_invert:
         r, g, b, a = footer.split()
         rgb_image = Image.merge('RGB', (r, g, b))
