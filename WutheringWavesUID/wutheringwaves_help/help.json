@@ -48,7 +48,7 @@
         "need_admin": false
       },
       {
-        "name": "手机号登录",
+        "name": "手机号登录(私聊",
         "desc": "手机号+验证码登录",
         "eg": "登录 13333333333,114114",
         "need_ck": false,
@@ -56,7 +56,7 @@
         "need_admin": false
       },
       {
-        "name": "添加CK",
+        "name": "添加CK(私聊",
         "desc": "绑定自己的库街区CK",
         "eg": "添加CK xxxxxxy",
         "need_ck": false,
@@ -137,6 +137,14 @@
   "抽卡记录": {
     "desc": "抽卡记录",
     "data": [
+      {
+        "name": "抽卡帮助",
+        "desc": "抽卡帮助",
+        "eg": "抽卡帮助",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
       {
         "name": "导入抽卡链接",
         "desc": "导入抽卡链接",

@@ -4,13 +4,14 @@ from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from .draw_gachalogs import draw_card
+from .draw_gachalogs import draw_card, draw_card_help
 from .get_gachalogs import save_gachalogs
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import WAVES_CODE_103, ERROR_CODE, WAVES_CODE_105
 from ..wutheringwaves_config import PREFIX
 
 sv_gacha_log = SV('waves抽卡记录')
+sv_gacha_help_log = SV('waves抽卡记录帮助')
 sv_get_gachalog_by_link = SV('waves导入抽卡链接', area='DIRECT')
 
 
@@ -86,4 +87,10 @@ async def send_gacha_log_card_info(bot: Bot, ev: Event):
         return await bot.send(ERROR_CODE[WAVES_CODE_103])
 
     im = await draw_card(uid, ev)
+    await bot.send(im)
+
+
+@sv_gacha_help_log.on_fullmatch(f'{PREFIX}抽卡帮助')
+async def send_gacha_log_help(bot: Bot, ev: Event):
+    im = await draw_card_help()
     await bot.send(im)

@@ -52,6 +52,23 @@ def get_level_from_list(ast: int, lst: List) -> int:
     return level
 
 
+async def draw_card_help():
+    card_img = get_waves_bg(850, 330)
+    card_draw = ImageDraw.Draw(card_img)
+
+    card_draw.text((20, 50), "抽卡帮助（私聊", "white", waves_font_40, 'lm')
+    text = [
+        '1. http格式: ww导入抽卡链接 https://......record_id=5e4d436ea1',
+        '2. json格式: ww导入抽卡链接 {"recordId":"5e4d436ea1"}',
+        '3. 手动格式: ww导入抽卡链接 recordId=5e4d436ea1',
+        '4. 直接格式: ww导入抽卡链接 5e4d436ea1'
+    ]
+    for i, t in enumerate(text):
+        card_draw.text((20, 100 + i * 50), t, "white", waves_font_25, 'lm')
+    card_img = add_footer(card_img, 600, 20)
+    return await convert_img(card_img)
+
+
 async def draw_card(uid: int, ev: Event):
     # 获取数据
     gacha_log_path = PLAYER_PATH / str(uid) / 'gacha_logs.json'
