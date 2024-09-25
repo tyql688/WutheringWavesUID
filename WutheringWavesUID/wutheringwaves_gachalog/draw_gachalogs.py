@@ -221,11 +221,11 @@ async def draw_card(uid: int, ev: Event):
                 gcolor = (43, 210, 43)
             else:
                 gcolor = 'white'
-            info_block = Image.new("RGBA", (110, 25), "white")
+            info_block = Image.new("RGBA", (50, 25), "white")
             info_block_draw = ImageDraw.Draw(info_block)
-            info_block_draw.rectangle([0, 0, 110, 25], fill=(0, 0, 0, int(0.8 * 255)))
-            info_block_draw.text((55, 14), f'{item["gacha_num"]}抽', gcolor, waves_font_20, 'mm')
-            item_bg.paste(info_block, (28, 131), info_block)
+            info_block_draw.rectangle([0, 0, 50, 25], fill=(0, 0, 0, int(0.9 * 255)))
+            info_block_draw.text((25, 12), f'{item["gacha_num"]}抽', gcolor, waves_font_20, 'mm')
+            item_bg.paste(info_block, (15, 130), info_block)
 
             _x = 95 + 162 * (index % 5)
             _y = 670 + bset * (index // 5) + y + gindex * oset

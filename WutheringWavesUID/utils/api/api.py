@@ -2,10 +2,12 @@
 
 GAME_ID = 3
 SERVER_ID = "76402e5b20be2c39f095a152090afddc"
+SERVER_ID_NET = "919752ae5ea09c1ced910dd668a63ffb"
 
 MAIN_URL = 'https://api.kurobbs.com'
 KURO_GET_CODE_URL = 'https://api.kurobbs.com/user/getSmsCode'
 GACHA_LOG_URL = 'https://gmserver-api.aki-game2.com/gacha/record/query'
+GACHA_NET_LOG_URL = 'https://gmserver-api.aki-game2.net/gacha/record/query'
 
 LOGIN_URL = f'{MAIN_URL}/user/sdkLogin'
 KURO_ROLE_URL = f'{MAIN_URL}/gamer/role/default'

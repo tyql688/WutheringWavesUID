@@ -35,7 +35,7 @@ async def draw_challenge_img(
     game_info = KuroRoleInfo(**game_info)
 
     # 全息数据
-    succ, challenge_data = await waves_api.get_challenge_data(uid, ck, game_info.serverId)
+    succ, challenge_data = await waves_api.get_challenge_data(uid, ck)
     if not succ:
         return challenge_data
     challenge_data = ChallengeArea(**challenge_data)
@@ -43,11 +43,11 @@ async def draw_challenge_img(
         return '您未打开库街区[全息挑战]的对外展示'
 
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck, game_info.serverId)
+    succ, account_info = await waves_api.get_base_info(uid, ck)
     account_info = AccountBaseInfo(**account_info)
 
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(uid, ck, game_info.serverId)
+    succ, role_info = await waves_api.get_role_info(uid, ck)
     if not succ:
         return role_info
     role_info = RoleList(**role_info)

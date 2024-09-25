@@ -25,7 +25,7 @@ async def sign_in(uid: str, ck: str) -> str:
         logger.info(f'{sign_title} UID{uid} 该用户今日已签到,跳过...')
         return f'{sign_title} UID{uid} 今日已签到！'
 
-    sign_in_res = await waves_api.sign_in(daily_info.roleId, ck, daily_info.serverId)
+    sign_in_res = await waves_api.sign_in(daily_info.roleId, ck)
     if isinstance(sign_in_res, dict):
         if sign_in_res.get('code') == 200 and sign_in_res.get('data'):
             # 签到成功

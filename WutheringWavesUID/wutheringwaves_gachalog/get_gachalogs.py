@@ -9,7 +9,6 @@ import aiofiles
 import msgspec
 
 from gsuid_core.models import Event
-from ..utils.api.api import SERVER_ID
 from ..utils.api.model import GachaLog
 from ..utils.database.models import WavesUser
 from ..utils.error_reply import WAVES_CODE_104, WAVES_CODE_108
@@ -44,13 +43,12 @@ async def get_new_gachalog(
     uid: str,
     record_id: str,
     full_data: Dict[str, List[GachaLog]],
-    is_force: bool,
-    server_id: str = SERVER_ID) -> (Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]):
+    is_force: bool) -> (Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]):
     new = {}
     new_count = {}
     for gacha_name in gacha_type_meta_data:
         for card_pool_type in gacha_type_meta_data[gacha_name]:
-            res = await waves_api.get_gacha_log(card_pool_type, record_id, uid, server_id)
+            res = await waves_api.get_gacha_log(card_pool_type, record_id, uid)
             if not isinstance(res, dict) or res.get('code') != 0 or res.get('data', None) is None:
                 # 抽卡记录获取失败
                 if res.get('code') == -1:

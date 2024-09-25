@@ -3,7 +3,6 @@ from typing import List, Union
 
 from msgspec import json as msgjson
 
-from ..utils.api.api import SERVER_ID
 from ..utils.api.model import RoleList
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.hint import error_reply
@@ -32,20 +31,20 @@ async def save_card_info(uid: str, waves_data: List):
         file.write(msgjson.format(msgjson.encode(list(old_data.values()))))
 
 
-async def refresh_char(uid: str, ck: str = '', serverId: str = SERVER_ID) -> Union[str, List]:
+async def refresh_char(uid: str, ck: str = '') -> Union[str, List]:
     waves_datas = []
     if not ck:
         ck = await waves_api.get_ck(uid)
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(uid, ck, serverId)
+    succ, role_info = await waves_api.get_role_info(uid, ck)
     if not succ:
         return role_info
 
     role_info = RoleList(**role_info)
     for r in role_info.roleList:
-        succ, role_detail_info = await waves_api.get_role_detail_info(r.roleId, uid, ck, serverId)
+        succ, role_detail_info = await waves_api.get_role_detail_info(r.roleId, uid, ck)
         if not succ or role_detail_info['role'] is None or role_detail_info['level'] is None:
             continue
         if role_detail_info['phantomData']['cost'] == 0:

@@ -22,11 +22,11 @@ ABYSS_ERROR_MESSAGE_NO_UNLOCK = "深渊暂未解锁"
 ABYSS_ERROR_MESSAGE_NO_DEEP = "当前暂无深境区深渊数据"
 
 
-async def get_abyss_data(uid: str, ck: str, serverId: str, is_self_ck: bool):
+async def get_abyss_data(uid: str, ck: str, is_self_ck: bool):
     if is_self_ck:
-        abyss_data = await waves_api.get_abyss_data(uid, ck, serverId)
+        abyss_data = await waves_api.get_abyss_data(uid, ck)
     else:
-        abyss_data = await waves_api.get_abyss_index(uid, ck, serverId)
+        abyss_data = await waves_api.get_abyss_index(uid, ck)
 
     if abyss_data.get('code') == 200:
         if not abyss_data.get('data'):
@@ -56,17 +56,17 @@ async def draw_abyss_img(
     game_info = KuroRoleInfo(**game_info)
 
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck, game_info.serverId)
+    succ, account_info = await waves_api.get_base_info(uid, ck)
     account_info = AccountBaseInfo(**account_info)
 
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(uid, ck, game_info.serverId)
+    succ, role_info = await waves_api.get_role_info(uid, ck)
     if not succ:
         return role_info
     role_info = RoleList(**role_info)
 
     # 深渊
-    abyss_data = await get_abyss_data(uid, ck, game_info.serverId, is_self_ck)
+    abyss_data = await get_abyss_data(uid, ck, is_self_ck)
     if isinstance(abyss_data, str):
         return abyss_data
     if not abyss_data.isUnlock:
