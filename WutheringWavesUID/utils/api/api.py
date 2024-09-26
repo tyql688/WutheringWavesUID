@@ -11,7 +11,7 @@ GACHA_NET_LOG_URL = 'https://gmserver-api.aki-game2.net/gacha/record/query'
 
 LOGIN_URL = f'{MAIN_URL}/user/sdkLogin'
 KURO_ROLE_URL = f'{MAIN_URL}/gamer/role/default'
-REFRESH_URL = f'{MAIN_URL}/gamer/roleBox/aki/refreshData'
+REFRESH_URL = f'{MAIN_URL}/gamer/roleBox/akiBox/refreshData'
 GAME_DATA_URL = f'{MAIN_URL}/gamer/widget/game3/refresh'
 BASE_DATA_URL = f'{MAIN_URL}/gamer/roleBox/aki/baseData'
 ROLE_DATA_URL = f'{MAIN_URL}/gamer/roleBox/aki/roleData'
