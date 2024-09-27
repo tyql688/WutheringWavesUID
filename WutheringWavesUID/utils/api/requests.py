@@ -7,6 +7,7 @@ from typing import Any, Dict, Union, Literal, Optional
 from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 
 from gsuid_core.logger import logger
+from . import ds
 from .api import *
 from ..database.models import WavesUser
 from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_101
@@ -288,6 +289,12 @@ class WavesApi:
                 except ContentTypeError:
                     _raw_data = await resp.text()
                     raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
+                if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
+                    try:
+                        des_data = ds.decrypt(raw_data['data'])
+                        raw_data['data'] = des_data
+                    except:
+                        pass
                 logger.debug(f'url:[{url}] raw_data:{raw_data}')
                 return raw_data
 
@@ -304,26 +311,6 @@ class KuroLogin:
         header.update({"devCode": str(uuid.uuid4()).upper()})
         data = {"mobile": mobile, "code": code}
         return await self._kuro_request(LOGIN_URL, "POST", header, data=data)
-
-    async def send_phone_code(
-        self,
-        mobile: int,
-        override_geetest: Dict = None,
-    ):
-        header = copy.deepcopy(self._HEADER)
-        header.update({"devCode": str(uuid.uuid4()).upper()})
-
-        data = {
-            "mobile": mobile,
-            "geeTestData": ""
-        }
-        if override_geetest:
-            data['geeTestData'] = override_geetest
-
-        response = await self._kuro_request(KURO_GET_CODE_URL, "POST", header, data=data)
-        if response.get('code') == 200 & response.get('data'):
-            geeTest = response.get('data', {}).get("geeTest", False)
-            pass
 
     async def _kuro_request(
         self,

@@ -18,8 +18,30 @@ repository = "https://github.com/tyql688/WutheringWavesUID"
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
+pycryptodome = "^3.20.0"
 
 
+
+[tool.pdm.build]
+includes = []
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+[project]
+authors = [
+    {name = "tyql688", email = "632558678@qq.com"},
+]
+license = {text = "GPL-3.0-or-later"}
+requires-python = "<4.0,>=3.8.1"
+dependencies = [
+    "pycryptodome>=3.20.0",
+]
+name = "WutheringWavesUID"
+version = "1.0.0"
+description = "支持OneBot(QQ)、OneBotV12、QQ频道、微信、KOOK（开黑啦）、Telegram（电报）、FeiShu（飞书）、DoDo、Villa（米游社大别野）、Discord的全功能HoshinoBot/NoneBot2/Koishi/yunzai/ZeroBot鸣潮机器人插件"
+readme = "README.md"
+
+[project.urls]
+homepage = "https://github.com/tyql688/WutheringWavesUID"
+repository = "https://github.com/tyql688/WutheringWavesUID"

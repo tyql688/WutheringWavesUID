@@ -146,7 +146,7 @@ class FetterDetail(BaseModel):
 
 class Props(BaseModel):
     attributeName: Optional[str]
-    iconUrl: Optional[str]
+    iconUrl: Optional[str] = None
     attributeValue: Optional[str]
 
 
@@ -249,7 +249,7 @@ class GachaLog(BaseModel):
 # 定义角色模型
 class AbyssRole(BaseModel):
     roleId: int
-    iconUrl: str
+    iconUrl: Optional[str] = None
 
 
 # 定义楼层模型
@@ -257,7 +257,7 @@ class AbyssFloor(BaseModel):
     floor: int
     picUrl: str
     star: int
-    roleList: Optional[List[AbyssRole]]
+    roleList: Optional[List[AbyssRole]] = None
 
 
 # 定义区域模型
@@ -292,21 +292,21 @@ class ChallengeRole(BaseModel):
 
 
 class Challenge(BaseModel):
-    bossId: Optional[Any]
-    challengeId: Optional[int]
-    bossHeadIcon: Optional[str]
-    bossIconUrl: Optional[str]
-    bossLevel: Optional[int]
-    bossName: Optional[str]
-    passTime: Optional[int]
-    difficulty: Optional[int]
-    roles: Optional[List[ChallengeRole]]
+    bossId: Optional[Any] = None
+    challengeId: Optional[int] = None
+    bossHeadIcon: Optional[str] = None
+    bossIconUrl: Optional[str] = None
+    bossLevel: Optional[int] = None
+    bossName: Optional[str] = None
+    passTime: Optional[int] = None
+    difficulty: Optional[int] = None
+    roles: Optional[List[ChallengeRole]] = None
 
 
 class ChallengeArea(BaseModel):
-    areaId: Optional[Any]
-    areaName: Optional[Any]
-    challengeInfo: Optional[Dict[str, List[Challenge]]]
+    areaId: Optional[Any] = None
+    areaName: Optional[Any] = None
+    challengeInfo: Optional[Dict[str, List[Challenge]]] = None
     open: bool
-    wikiUrl: Optional[Any]
+    wikiUrl: Optional[Any] = None
     isUnlock: bool
