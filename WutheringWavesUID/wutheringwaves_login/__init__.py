@@ -18,33 +18,12 @@ from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_103
 from ..utils.kuro_api import kuro_api
 from ..utils.resource.RESOURCE_PATH import waves_templates
+from ..utils.util import get_public_ip
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 from ..wutheringwaves_user import deal
 
 cache = TimedCache(timeout=600, maxsize=10)
 sv_kuro_login = SV("库洛登录")
-
-
-async def get_public_ip(host):
-    # 尝试从 ipify 获取 IP 地址
-    try:
-        async with httpx.AsyncClient() as client:
-            r = await client.get('https://api.ipify.org/?format=json', timeout=4)
-            ip = r.json()['ip']
-            return ip
-    except:  # noqa:E722, B001
-        pass
-
-    # 尝试从 httpbin.org 获取 IP 地址
-    try:
-        async with httpx.AsyncClient() as client:
-            r = await client.get('http://httpbin.org/ip', timeout=4)
-            ip = r.json()['origin']
-            return ip
-    except:
-        pass
-
-    return host
 
 
 async def get_url() -> (str, bool):
