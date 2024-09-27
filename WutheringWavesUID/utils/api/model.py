@@ -83,16 +83,16 @@ class AccountBaseInfo(BaseModel):
     """账户基本信息"""
     name: str  # 名字
     id: int  # 特征码
-    creatTime: Optional[int]  # 创建时间 ms
-    activeDays: Optional[int]  # 活跃天数
-    level: Optional[int]  # 等级
-    worldLevel: Optional[int]  # 世界等级
-    roleNum: Optional[int]  # 角色数量
-    bigCount: Optional[int]  # 大型信标解锁数
-    smallCount: Optional[int]  # 小型信标解锁数
-    achievementCount: Optional[int]  # 成就数量
-    achievementStar: Optional[int]  # 成就星数
-    boxList: Optional[List[Optional[Box]]]  # 宝箱
+    creatTime: Optional[int] = None  # 创建时间 ms
+    activeDays: Optional[int] = None  # 活跃天数
+    level: Optional[int] = None  # 等级
+    worldLevel: Optional[int] = None  # 世界等级
+    roleNum: Optional[int] = None  # 角色数量
+    bigCount: Optional[int] = None  # 大型信标解锁数
+    smallCount: Optional[int] = None  # 小型信标解锁数
+    achievementCount: Optional[int] = None  # 成就数量
+    achievementStar: Optional[int] = None  # 成就星数
+    boxList: Optional[List[Optional[Box]]] = None  # 宝箱
 
     @property
     def is_full(self):
@@ -157,12 +157,12 @@ class EquipPhantom(BaseModel):
     level: int
     fetterDetail: FetterDetail
     mainProps: Optional[List[Props]]
-    subProps: Optional[List[Props]]
+    subProps: Optional[List[Props]] = None
 
 
 class EquipPhantomData(BaseModel):
     cost: int
-    equipPhantomList: Union[List[Optional[EquipPhantom]], None, List[None]]
+    equipPhantomList: Union[List[Optional[EquipPhantom]], None, List[None]] = None
 
 
 class Skill(BaseModel):

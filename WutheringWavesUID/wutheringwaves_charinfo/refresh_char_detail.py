@@ -45,7 +45,11 @@ async def refresh_char(uid: str, ck: str = '') -> Union[str, List]:
     role_info = RoleList(**role_info)
     for r in role_info.roleList:
         succ, role_detail_info = await waves_api.get_role_detail_info(r.roleId, uid, ck)
-        if not succ or role_detail_info['role'] is None or role_detail_info['level'] is None:
+        if (not succ
+            or 'role' not in role_detail_info
+            or role_detail_info['role'] is None
+            or 'level' not in role_detail_info
+            or role_detail_info['level'] is None):
             continue
         if role_detail_info['phantomData']['cost'] == 0:
             role_detail_info['phantomData']['equipPhantomList'] = None
