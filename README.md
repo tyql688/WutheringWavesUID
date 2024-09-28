@@ -21,6 +21,7 @@
 >
 > 如使用命令缺失素材可尝试使用命令`ww下载全部资源`
 >
+> 依赖pycryptodome，请自行安装 `poetry run pip install pycryptodome` or `pdm run pip install pycryptodome`
 >
 > 支持NoneBot2 & HoshinoBot & ZeroBot & YunzaiBot的鸣潮Bot插件
 >
