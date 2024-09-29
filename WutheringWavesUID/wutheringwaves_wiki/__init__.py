@@ -1,7 +1,7 @@
 import os
-import re
 import shutil
 from pathlib import Path
+from typing import List, Union
 
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
@@ -10,6 +10,7 @@ from gsuid_core.sv import SV
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 from .main import Guide
+from .tap import GuideTap
 from .wiki import draw_wiki_detail
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id, alias_to_weapon_name
 from ..utils.resource.RESOURCE_PATH import (
@@ -79,20 +80,22 @@ async def send_role_guide_pic(bot: Bot, ev: Event):
                 continue
             name_dir = GUIDE_CONFIG_MAP[i][0] / name
             auth_id = GUIDE_CONFIG_MAP[i][1]
-            zip_list.append((i, name_dir, auth_id))
+            source_type = GUIDE_CONFIG_MAP[i][2]
+            zip_list.append((i, name_dir, auth_id, source_type))
     else:
         if config.data in GUIDE_CONFIG_MAP:
             name_dir = GUIDE_CONFIG_MAP[config.data][0] / name
             auth_id = GUIDE_CONFIG_MAP[config.data][1]
-            zip_list.append((config.data, name_dir, auth_id))
+            source_type = GUIDE_CONFIG_MAP[config.data][2]
+            zip_list.append((config.data, name_dir, auth_id, source_type))
 
     if not zip_list:
         return f'[鸣潮] 角色名{char_name}无法找到角色攻略图提供方, 请检查配置！'
 
     imgs = []
-    for auth_name, name_dir, auth_id in zip_list:
+    for auth_name, name_dir, auth_id, source_type in zip_list:
         if is_force or not name_dir.exists() or len(os.listdir(name_dir)) == 0:
-            await download_guide_pic(auth_id, name, name_dir, is_force)
+            await download_guide_pic(auth_id, name, name_dir, is_force, source_type)
 
         imgs.extend(await process_images(auth_name, name_dir))
 
@@ -127,47 +130,29 @@ async def process_images(auth_name: str, _dir: Path):
     return imgs
 
 
-async def download_guide_pic(auth_id: int, name: str, _dir: Path, is_force: bool):
-    all_bbs_data = await Guide().get_guide_data(auth_id)
-    if not all_bbs_data:
-        return
+async def fetch_urls(auth_id, name, source_type) -> Union[List[str], None]:
+    urls = None
 
-    post_id = None
-    for i in all_bbs_data:
-        post_title = i['postTitle']
-        if '·' in name:
-            name_split = name.split('·')
-            if all(fragment in post_title for fragment in name_split):
-                post_id = i['postId']
-                break
-        elif name in post_title and '一图流' in post_title:
-            post_id = i['postId']
-            break
+    try:
+        if source_type == 'kuro':
+            urls = await Guide().get(name, auth_id)
+        elif source_type == 'tap':
+            urls = await GuideTap().get(name, auth_id)
+    except Exception as e:
+        return None
 
-    if not post_id:
-        return
+    return urls if urls else None
 
-    res = await Guide().get_ann_detail(post_id)
-    if not res:
+
+async def download_guide_pic(auth_id: int, name: str, _dir: Path, is_force: bool, source_type: str):
+    urls = await fetch_urls(auth_id, name, source_type)
+    if not urls:
         return
     if is_force:
         force_delete_dir(_dir)
-
-    for index, _temp in enumerate(res['postContent']):
-        if _temp['contentType'] != 2:
-            continue
-        _msg = re.search(r'(https://.*[png|jpg])', _temp['url'])
-        url = _msg.group(0) if _msg else ''
-
-        if _temp['imgWidth'] < 1910:
-            # Moealkyne 的攻略 1910起步
-            # XMu 的攻略 2500起步
-            # TODO
-            continue
-
-        if url:
-            _dir.mkdir(parents=True, exist_ok=True)
-            await download(url, _dir, f'{name}_{index}.jpg', tag="[鸣潮]")
+    for index, url in enumerate(urls):
+        _dir.mkdir(parents=True, exist_ok=True)
+        await download(url, _dir, f'{name}_{index}.jpg', tag="[鸣潮]")
 
 
 def force_delete_dir(_dir: Path):

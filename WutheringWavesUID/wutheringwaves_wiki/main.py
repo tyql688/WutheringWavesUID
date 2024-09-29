@@ -1,5 +1,6 @@
 import copy
-from typing import Union
+import re
+from typing import Union, List
 
 import httpx
 
@@ -58,3 +59,43 @@ class Guide:
         res = await self._get_ann_detail(post_id)
         if res.code == 200:
             return res.data.postDetail
+
+    async def get(self, role_name: str, auther_id: int) -> Union[List[str], None]:
+        all_bbs_data = await self.get_guide_data(auther_id)
+        if not all_bbs_data:
+            return
+
+        post_id = None
+        for i in all_bbs_data:
+            post_title = i['postTitle']
+            if '·' in role_name:
+                name_split = role_name.split('·')
+                if all(fragment in post_title for fragment in name_split):
+                    post_id = i['postId']
+                    break
+            elif role_name in post_title and '一图流' in post_title:
+                post_id = i['postId']
+                break
+
+        if not post_id:
+            return
+
+        res = await self.get_ann_detail(post_id)
+        if not res:
+            return
+
+        result = []
+        for index, _temp in enumerate(res['postContent']):
+            if _temp['contentType'] != 2:
+                continue
+            _msg = re.search(r'(https://.*[png|jpg])', _temp['url'])
+            url = _msg.group(0) if _msg else ''
+
+            if _temp['imgWidth'] < 1910:
+                # XMu 的攻略 2500起步
+                # TODO
+                continue
+            if url:
+                result.append(url)
+
+        return result
