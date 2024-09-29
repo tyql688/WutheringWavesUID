@@ -79,4 +79,4 @@ class GuideTap:
         if not monent:
             return
 
-        return await self.get_ann_detail_pic(monent)
+        return await self.get_ann_detail_pic(monent, auther_id)
