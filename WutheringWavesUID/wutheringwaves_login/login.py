@@ -2,10 +2,10 @@ import asyncio
 import random
 import re
 import string
-from asyncio import timeout
 from typing import Union
 
 import httpx
+from async_timeout import timeout
 from pydantic import BaseModel
 from starlette.responses import HTMLResponse
 
@@ -78,7 +78,7 @@ async def page_login(bot: Bot, ev: Event):
                     cache.delete(token)
                     break
                 await asyncio.sleep(1)
-                
+
         return await code_login(bot, ev, text)
     else:
         auth = {"bot_id": ev.bot_id, "user_id": ev.user_id}
