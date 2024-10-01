@@ -152,7 +152,7 @@ async def waves_login_index(auth: str):
     temp = cache.get(auth)
     if temp is None:
         template = waves_templates.get_template("404.html")
-        return HTMLResponse(template)
+        return HTMLResponse(template.render())
     else:
         url, _ = await get_url()
         template = waves_templates.get_template("index.html")
