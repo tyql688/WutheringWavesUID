@@ -1,18 +1,17 @@
 import copy
 import random
-import uuid
 from datetime import datetime
 from typing import Any, Dict, Union, Literal, Optional
 
 from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 
 from gsuid_core.logger import logger
+from gsuid_core.plugins.core_command.core_webconsole import generate_random_string
 from . import ds
 from .api import *
 from ..database.models import WavesUser
 from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_101
 from ..hint import error_reply
-from ..util import get_public_ip
 
 
 async def _check_response(res: Dict) -> (bool, Union[Dict, str]):
@@ -26,12 +25,11 @@ async def _check_response(res: Dict) -> (bool, Union[Dict, str]):
 
 
 async def get_headers():
-    ip = await get_public_ip()
+    devCode = generate_random_string()
     header = {
-        "source": "ios",
+        "source": "h5",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.2.4",
-        "devCode": f"{ip}, Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) KurogameBox/2.2.4"
+        "devCode": devCode
     }
     return header
 
@@ -312,7 +310,6 @@ class KuroLogin:
 
     async def login(self, mobile: int, code: str):
         header = copy.deepcopy(await get_headers())
-        header.update({"devCode": str(uuid.uuid4()).upper()})
         data = {"mobile": mobile, "code": code}
         return await self._kuro_request(LOGIN_URL, "POST", header, data=data)
 

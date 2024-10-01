@@ -5,18 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>登录界面</title>
   <link rel="icon" href="https://web-static.kurobbs.com/resource/prod/icon.ico" type="image/x-icon">
-  <script src="http://static.geetest.com/v4/gt4.js"></script>
-  <script src="http://apps.bdimg.com/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="https://static.geetest.com/v4/gt4.js"></script>
+  <script src="https://apps.bdimg.com/libs/jquery/1.6.4/jquery.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
-      font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
-      background-color: #f0f2f5;
+      font-family: 'Microsoft YaHei', sans-serif;
     }
+
 
     body {
       background-image: url('https://prod-alicdn-community.kurobbs.com/forum/465dcb694966492aba4d4982c47f0e8520240914.jpg');
@@ -185,6 +183,56 @@
       text-decoration: none;
       cursor: pointer;
     }
+
+    .user-id-display {
+      text-align: right;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.8em;
+      margin-bottom: 10px;
+      transition: opacity 0.3s ease;
+    }
+
+    .user-id-display:hover {
+      opacity: 1;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 300px;
+      border-radius: 10px;
+      text-align: center;
+      transform: scale(0.7);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .modal.show .modal-content {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .countdown {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .redirect-button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .redirect-button:hover {
+      background-color: #357abd;
+    }
   </style>
 </head>
 <body>
@@ -202,6 +250,7 @@
         <button type="button" id="getCodeBtn" disabled>获取验证码</button>
       </div>
     </div>
+    <div id="userIdDisplay" class="user-id-display">当前识别码: {{ userId }}</div>
     <button type="submit" id="loginBtn">登录</button>
   </form>
 </div>
@@ -211,6 +260,8 @@
     <span class="close">&times;</span>
     <h2>登录成功</h2>
     <p>欢迎回来！</p>
+    <p class="countdown">5秒后自动跳转到首页</p>
+    <button class="redirect-button">立即跳转</button>
   </div>
 </div>
 
@@ -326,11 +377,40 @@
     });
   });
 
+
   function showSuccessModal() {
+    const homeHref = 'https://github.com/tyql688/WutheringWavesUID'
+    const modal = document.getElementById('successModal');
+    const countdownElement = modal.querySelector('.countdown');
+    const redirectButton = modal.querySelector('.redirect-button');
+    let countdown = 5;
+
     modal.classList.add('show');
     setTimeout(() => {
       modal.querySelector('.modal-content').style.transform = 'scale(1)';
+      modal.querySelector('.modal-content').style.opacity = '1';
     }, 10);
+
+    function updateCountdown() {
+      countdownElement.textContent = `${countdown}秒后自动跳转到首页`;
+      if (countdown <= 0) {
+        clearInterval(timer);
+        window.location.href = homeHref;
+      }
+      countdown--;
+    }
+
+    const timer = setInterval(updateCountdown, 1000);
+
+    redirectButton.addEventListener('click', () => {
+      clearInterval(timer);
+      window.location.href = homeHref;
+    });
+
+    modal.querySelector('.close').addEventListener('click', () => {
+      clearInterval(timer);
+      window.location.href = homeHref;
+    });
   }
 
   closeBtn.addEventListener('click', closeModal);

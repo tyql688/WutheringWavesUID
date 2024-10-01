@@ -1,3 +1,5 @@
+import random
+import string
 import time
 from functools import wraps
 
@@ -47,3 +49,11 @@ async def get_public_ip(host='127.0.0.1'):
         pass
 
     return host
+
+
+def generate_random_string(length=32):
+    # 定义可能的字符集合
+    characters = string.ascii_letters + string.digits + string.punctuation
+    # 使用random.choice随机选择字符，并连接成字符串
+    random_string = ''.join(random.choice(characters) for i in range(length))
+    return random_string

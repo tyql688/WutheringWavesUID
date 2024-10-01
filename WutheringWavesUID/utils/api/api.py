@@ -9,7 +9,7 @@ KURO_GET_CODE_URL = 'https://api.kurobbs.com/user/getSmsCode'
 GACHA_LOG_URL = 'https://gmserver-api.aki-game2.com/gacha/record/query'
 GACHA_NET_LOG_URL = 'https://gmserver-api.aki-game2.net/gacha/record/query'
 
-LOGIN_URL = f'{MAIN_URL}/user/sdkLogin'
+LOGIN_URL = f'{MAIN_URL}/user/sdkLoginForH5'
 KURO_ROLE_URL = f'{MAIN_URL}/gamer/role/default'
 REFRESH_URL = f'{MAIN_URL}/gamer/roleBox/akiBox/refreshData'
 GAME_DATA_URL = f'{MAIN_URL}/gamer/widget/game3/refresh'
