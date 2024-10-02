@@ -30,7 +30,7 @@ async def get_url() -> (str, bool):
     if url:
         if not url.startswith('http'):
             url = f'https://{url}'
-        return url, False
+        return url, WutheringWavesConfig.get_config('WavesLoginUrlSelf').data
     else:
         HOST = core_config.get_config('HOST')
         PORT = core_config.get_config('PORT')

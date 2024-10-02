@@ -51,4 +51,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '用于设置WutheringWavesUID登录界面的配置',
         '',
     ),
+    'WavesLoginUrlSelf': GsBoolConfig(
+        '强制【鸣潮登录url】为自己的域名',
+        '强制【鸣潮登录url】为自己的域名',
+        False,
+    ),
 }
