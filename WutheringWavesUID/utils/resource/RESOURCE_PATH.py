@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -60,9 +61,9 @@ def init_dir():
 init_dir()
 
 # 设置 Jinja2 环境
+TEMP_PATH = Path(__file__).parents[1].parent / "templates"
 waves_templates = Environment(
     loader=FileSystemLoader([
-        "gsuid_core/plugins/WutheringWavesUID/WutheringWavesUID/templates",
-        "plugins/WutheringWavesUID/WutheringWavesUID/templates",
+        str(TEMP_PATH),
     ])
 )
