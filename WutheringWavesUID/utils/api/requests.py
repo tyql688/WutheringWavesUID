@@ -12,6 +12,7 @@ from .api import *
 from ..database.models import WavesUser
 from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_101
 from ..hint import error_reply
+from ...wutheringwaves_config import WutheringWavesConfig
 
 
 async def _check_response(res: Dict) -> (bool, Union[Dict, str]):
@@ -60,7 +61,7 @@ class WavesApi:
         if mode == 'RANDOM':
             return await self.get_waves_random_cookie(uid)
         else:
-            return await WavesUser.get_user_cookie_by_uid(uid)
+            return await self.get_self_waves_ck(uid)
 
     async def get_self_waves_ck(self, uid: str) -> Optional[str]:
         cookie = await WavesUser.get_user_cookie_by_uid(uid)
@@ -83,6 +84,9 @@ class WavesApi:
         ck = await self.get_self_waves_ck(uid)
         if ck:
             return ck
+
+        if WutheringWavesConfig.get_config('WavesOnlySelfCk').data:
+            return None
 
         # 公共ck 随机一个
         user_list = await WavesUser.get_waves_all_user()

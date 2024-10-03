@@ -56,4 +56,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '强制【鸣潮登录url】为自己的域名',
         False,
     ),
+    'WavesOnlySelfCk': GsBoolConfig(
+        '所有查询使用自己的ck',
+        '所有查询使用自己的ck',
+        False,
+    ),
 }
