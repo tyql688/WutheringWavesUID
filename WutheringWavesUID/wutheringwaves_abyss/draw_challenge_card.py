@@ -87,8 +87,10 @@ async def draw_challenge_img(
         boss_title_bg_draw = ImageDraw.Draw(boss_title_bg)
         boss_difficulty = 1
         boss_level = 1
-        boss_icon_bg = Image.open(BytesIO((await sget(_challenge[0].bossIconUrl)).content)).convert('RGBA')
-        boss_icon_bg = boss_icon_bg.resize((800, 212))
+        boss_icon_bg = Image.new("RGBA", (800, 212))
+        boss_icon_bg_temp = Image.open(BytesIO((await sget(_challenge[0].bossIconUrl)).content)).convert('RGBA')
+        # boss_icon_bg = boss_icon_bg.resize((800, 212))
+        boss_icon_bg.alpha_composite(boss_icon_bg_temp, (0, 30))
         for _temp in reversed(_challenge):
             boss_difficulty = _temp.difficulty
             boss_level = _temp.bossLevel
