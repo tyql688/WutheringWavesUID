@@ -109,6 +109,14 @@
         "need_admin": false
       },
       {
+        "name": "查询区域深渊",
+        "desc": "查询深渊超载区",
+        "eg": "深渊超载区",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "全息战略",
         "desc": "查询全息战略",
         "eg": "全息战略",

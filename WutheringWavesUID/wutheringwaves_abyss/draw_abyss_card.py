@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
-from ..utils.api.model import KuroRoleInfo, AccountBaseInfo, AbyssChallenge, RoleList, RoleDetailData, AbyssFloor
+from ..utils.api.model import AccountBaseInfo, AbyssChallenge, RoleList, RoleDetailData, AbyssFloor
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_32, \
@@ -50,10 +50,19 @@ async def draw_abyss_img(
     if not ck:
         return error_reply(WAVES_CODE_102)
 
-    succ, game_info = await waves_api.get_game_role_info(ck)
-    if not succ:
-        return game_info
-    game_info = KuroRoleInfo(**game_info)
+    # succ, game_info = await waves_api.get_game_role_info(ck)
+    # if not succ:
+    #     return game_info
+    # game_info = KuroRoleInfo(**game_info)
+
+    text = ev.text.strip()
+    difficultyName = "深境区"
+    if "超载" in text:
+        difficultyName = '超载区'
+    elif "稳定" in text:
+        difficultyName = '稳定区'
+    elif "实验" in text:
+        difficultyName = '实验区'
 
     # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck)
@@ -114,10 +123,10 @@ async def draw_abyss_img(
     frame = Image.open(TEXT_PATH / 'frame.png')
     frame = frame.resize((frame.size[0], h - 50 if is_self_ck else h - 100), box=(0, 0, frame.size[0], h))
 
+    yset = 0
     for _abyss in abyss_data.difficultyList:
-        if _abyss.difficultyName != '深境区':
+        if _abyss.difficultyName != difficultyName:
             continue
-        yset = 0
         for tower_index, tower in enumerate(_abyss.towerAreaList):
             tower_name_bg = Image.open(TEXT_PATH / f'tower_name_bg{tower.areaId}.png')
             tower_name_bg_draw = ImageDraw.Draw(tower_name_bg)
@@ -176,6 +185,9 @@ async def draw_abyss_img(
                 abyss_bg.paste(abyss_bg_temp, (0, 0), abyss_bg_temp)
                 frame.paste(abyss_bg, (80, 240 + yset), abyss_bg)
                 yset += 141
+        break
+    else:
+        return ABYSS_ERROR_MESSAGE_NO_DATA
 
     card_img.paste(frame, (0, 0), frame)
 
