@@ -1,8 +1,11 @@
+from typing import Union, List
+
+from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from ..utils import hint
 from ..utils.api.model import KuroRoleInfo
-from ..utils.database.models import WavesUser
-from ..utils.error_reply import WAVES_CODE_101
+from ..utils.database.models import WavesUser, WavesBind
+from ..utils.error_reply import WAVES_CODE_101, ERROR_CODE, WAVES_CODE_103
 from ..utils.waves_api import waves_api
 
 
@@ -35,3 +38,22 @@ async def delete_cookie(uid: str) -> str:
         return '删除成功!'
     else:
         return '删除失败...不存在该UID的CK...'
+
+
+async def get_cookie(bot: Bot, ev: Event) -> Union[List[str], str]:
+    uid_list = await WavesBind.get_uid_list_by_game(ev.user_id, ev.bot_id)
+    if uid_list is None:
+        return await bot.send(ERROR_CODE[WAVES_CODE_103])
+
+    msg = []
+    for uid in uid_list:
+        ck = await waves_api.get_self_waves_ck(uid)
+        if not ck:
+            continue
+        msg.append(f'鸣潮uid:{uid}')
+        msg.append(ck)
+
+    if not msg:
+        return '您当前未绑定ck或者ck已全部失效'
+
+    return msg

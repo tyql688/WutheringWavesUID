@@ -66,8 +66,16 @@
       {
         "name": "删除CK",
         "desc": "删除当前的库街区CK",
-        "eg": "删除CK",
+        "eg": "删除CK 123456",
         "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "获取CK(私聊",
+        "desc": "获取账号下的所有库街区CK",
+        "eg": "获取CK",
+        "need_ck": true,
         "need_sk": false,
         "need_admin": false
       }
