@@ -3,10 +3,11 @@ import re
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from .login import page_login, code_login
+from .login import page_login, code_login, login_help
 from ..wutheringwaves_config import PREFIX
 
 sv_kuro_login = SV("库洛登录")
+sv_kuro_login_help = SV("库洛登录帮助", pm=0, priority=4)
 
 
 @sv_kuro_login.on_command(f"{PREFIX}登录")
@@ -26,3 +27,8 @@ async def get_resp_msg(bot: Bot, ev: Event):
         return await code_login(bot, ev, text)
 
     return await bot.send(f"{game_title} 账号登录失败")
+
+
+@sv_kuro_login_help.on_fullmatch(f"{PREFIX}登录帮助", block=True)
+async def get_resp_msg(bot: Bot, ev: Event):
+    return await bot.send(await login_help())

@@ -5,6 +5,7 @@ import string
 from typing import Union
 
 import httpx
+from PIL import ImageDraw
 from async_timeout import timeout
 from pydantic import BaseModel
 from starlette.responses import HTMLResponse
@@ -13,9 +14,12 @@ from gsuid_core.bot import Bot
 from gsuid_core.config import core_config
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
+from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.web_app import app
 from ..utils.cache import TimedCache
 from ..utils.database.models import WavesUser, WavesBind
+from ..utils.fonts.waves_fonts import waves_font_40, waves_font_25
+from ..utils.image import get_waves_bg, add_footer
 from ..utils.kuro_api import kuro_api
 from ..utils.resource.RESOURCE_PATH import waves_templates
 from ..utils.util import get_public_ip
@@ -135,6 +139,33 @@ async def code_login(bot: Bot, ev: Event, text: str):
     else:
         return await bot.send(f"{game_title} 账号登录失败\n\n请参照以下格式:\n{PREFIX}登录 手机号,验证码",
                               at_sender=at_sender)
+
+
+async def login_help():
+    card_img = get_waves_bg(900, 800)
+    card_draw = ImageDraw.Draw(card_img)
+
+    card_draw.text((20, 50), "登录帮助", "white", waves_font_40, 'lm')
+    text = [
+        '1. 直接暴露服务器公网ip给用户（云服务器）',
+        '   1.1 gscore控制台将HOST设置为 0.0.0.0',
+        '   1.2 服务器开放gscore的端口，默认为8765（注意及时修改账号或者密码',
+        '2. 使用自己的域名',
+        '   2.1 在ww配置`鸣潮登录url`中填写自己的域名',
+        '   2.2 在ww配置`强制【鸣潮登录url】为自己的域名`开关开启',
+        '   2.3 注意：域名需要解析到bot服务器，请选用你了解的方式进行配置',
+        '       http://域名',
+        '       http://域名:port',
+        '       https://域名',
+        '       https://域名:port',
+        '3. 家里云或者不想暴露公网ip',
+        '   3.1 询要域名地址请加群: 929275476',
+        '   3.2 在ww配置`鸣潮登录url`中填写提供的域名'
+    ]
+    for i, t in enumerate(text):
+        card_draw.text((20, 100 + i * 50), t, "white", waves_font_25, 'lm')
+    card_img = add_footer(card_img, 600, 20)
+    return await convert_img(card_img)
 
 
 async def add_cookie(ev, token) -> Union[WavesUser, None]:

@@ -289,6 +289,14 @@
     "desc": "管理员功能",
     "data": [
       {
+        "name": "登录帮助",
+        "desc": "登录帮助",
+        "eg": "登录帮助",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
         "name": "全部重新签到",
         "desc": "全部重新签到所有人",
         "eg": "全部重签",
