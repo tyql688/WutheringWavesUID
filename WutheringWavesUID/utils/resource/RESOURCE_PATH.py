@@ -33,11 +33,14 @@ XMU_GUIDE_PATH = GUIDE_PATH / 'XMu'
 MOEALKYNE_GUIDE_PATH = GUIDE_PATH / 'Moealkyne'
 # 金铃子攻略组 攻略库
 JINLINGZI_GUIDE_PATH = GUIDE_PATH / 'JinLingZi'
+# 結星 攻略库
+JIEXING_GUIDE_PATH = GUIDE_PATH / 'JieXing'
 
 GUIDE_CONFIG_MAP = {
     '小沐XMu': (XMU_GUIDE_PATH, 10450567, 'kuro'),
     'Moealkyne': (MOEALKYNE_GUIDE_PATH, 533395803, 'tap'),
     '金铃子攻略组': (JINLINGZI_GUIDE_PATH, 487275027, 'bilibili'),
+    '結星': (JIEXING_GUIDE_PATH, 10015697, 'kuro')
 }
 
 
@@ -58,6 +61,7 @@ def init_dir():
         XMU_GUIDE_PATH,
         MOEALKYNE_GUIDE_PATH,
         JINLINGZI_GUIDE_PATH,
+        JIEXING_GUIDE_PATH,
     ]:
         i.mkdir(parents=True, exist_ok=True)
 

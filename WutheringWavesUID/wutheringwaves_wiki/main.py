@@ -5,6 +5,7 @@ from typing import Union, List
 import httpx
 
 from ..utils.api.api import BBS_LIST, ANN_CONTENT_URL
+from ..utils.resource.RESOURCE_PATH import GUIDE_CONFIG_MAP
 
 
 class _Dict(dict):
@@ -19,12 +20,12 @@ class Guide:
     }
 
     async def get_bbs_list(
-        self,
-        auther_id: int,
-        type: int = 2,
-        searchType: int = 1,
-        pageIndex: int = 1,
-        pageSize: int = 99
+            self,
+            auther_id: int,
+            type: int = 2,
+            searchType: int = 1,
+            pageIndex: int = 1,
+            pageSize: int = 99
     ):
         headers = copy.deepcopy(self._headers)
         data = {
@@ -73,7 +74,7 @@ class Guide:
                 if all(fragment in post_title for fragment in name_split):
                     post_id = i['postId']
                     break
-            elif role_name in post_title and '一图流' in post_title:
+            elif await self.check_title(role_name, post_title, auther_id):
                 post_id = i['postId']
                 break
 
@@ -91,11 +92,27 @@ class Guide:
             _msg = re.search(r'(https://.*[png|jpg])', _temp['url'])
             url = _msg.group(0) if _msg else ''
 
-            if _temp['imgWidth'] < 1910:
-                # XMu 的攻略 2500起步
-                # TODO
+            if await self.check_width(_temp['imgWidth'], _temp['imgHeight'], auther_id):
                 continue
+
             if url:
                 result.append(url)
 
         return result
+
+    async def check_width(self, imgWidth: int, imgHeight: int, auther_id: int) -> bool:
+        if GUIDE_CONFIG_MAP['結星'][1] == auther_id:
+            # 結星
+            return imgHeight < 2500
+        elif GUIDE_CONFIG_MAP['XMu'][1] == auther_id:
+            # XMu
+            return imgWidth < 1910
+        else:
+            return True
+
+    async def check_title(self, role_name: str, post_title: str, auther_id: int) -> bool:
+        if role_name in post_title and '一图流' in post_title:
+            return True
+        if GUIDE_CONFIG_MAP['結星'][1] == auther_id and role_name in post_title and '攻略' in post_title:
+            return True
+        return False
