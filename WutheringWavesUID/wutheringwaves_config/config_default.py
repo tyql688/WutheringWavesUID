@@ -44,7 +44,7 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "角色攻略图提供方",
         "使用ww角色攻略时选择的提供方",
         "Moealkyne",
-        options=["all", "Moealkyne", "小沐XMu"]
+        options=["all", "Moealkyne", "小沐XMu", "金铃子攻略组"]
     ),
     'WavesLoginUrl': GsStrConfig(
         '鸣潮登录url',

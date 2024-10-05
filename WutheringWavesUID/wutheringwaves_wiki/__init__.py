@@ -9,6 +9,7 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
+from .bilibili import GuideBilibili
 from .main import Guide
 from .tap import GuideTap
 from .wiki import draw_wiki_detail
@@ -23,14 +24,14 @@ sv_waves_wiki = SV('鸣潮wiki')
 
 
 @sv_waves_wiki.on_prefix((
-    f'{PREFIX}角色wiki',
-    f'{PREFIX}角色介绍',
-    f'{PREFIX}角色命座',
-    f'{PREFIX}角色天赋',
-    f'{PREFIX}角色共鸣链',
-    f'{PREFIX}角色技能',
-    f'{PREFIX}武器wiki',
-    f'{PREFIX}武器介绍',
+        f'{PREFIX}角色wiki',
+        f'{PREFIX}角色介绍',
+        f'{PREFIX}角色命座',
+        f'{PREFIX}角色天赋',
+        f'{PREFIX}角色共鸣链',
+        f'{PREFIX}角色技能',
+        f'{PREFIX}武器wiki',
+        f'{PREFIX}武器介绍',
 ))
 async def send_waves_wiki(bot: Bot, ev: Event):
     if "角色" in ev.command:
@@ -138,6 +139,8 @@ async def fetch_urls(auth_id, name, source_type) -> Union[List[str], None]:
             urls = await Guide().get(name, auth_id)
         elif source_type == 'tap':
             urls = await GuideTap().get(name, auth_id)
+        elif source_type == 'bilibili':
+            urls = await GuideBilibili().get(name, auth_id)
     except Exception as e:
         return None
 
