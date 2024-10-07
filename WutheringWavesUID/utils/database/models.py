@@ -5,7 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Field, select
 
 from gsuid_core.utils.database.base_models import Bind, User, T_User, with_session, Push
+from gsuid_core.utils.database.startup import exec_list
 from gsuid_core.webconsole.mount_app import PageSchema, GsAdminModel, site
+
+exec_list.append('ALTER TABLE WavesUser ADD COLUMN platform TEXT DEFAULT ""')
 
 
 class WavesBind(Bind, table=True):
@@ -16,6 +19,19 @@ class WavesUser(User, table=True):
     cookie: str = Field(default='', title='Cookie')
     uid: Optional[str] = Field(default=None, title='鸣潮UID')
     record_id: Optional[str] = Field(default=None, title='鸣潮记录ID')
+    platform: str = Field(default="", title='ck平台')
+
+    @classmethod
+    @with_session
+    async def select_data_by_cookie(
+        cls: Type[T_User],
+        session: AsyncSession,
+        cookie: str
+    ) -> Optional[T_User]:
+        sql = select(cls).where(cls.cookie == cookie)
+        result = await session.execute(sql)
+        data = result.scalars().all()
+        return data[0] if data else None
 
     @classmethod
     async def get_user_by_attr(
@@ -36,7 +52,8 @@ class WavesUser(User, table=True):
     @classmethod
     @with_session
     async def get_waves_all_user(
-        cls: Type[T_User], session: AsyncSession
+        cls: Type[T_User],
+        session: AsyncSession
     ) -> List[T_User]:
         sql = select(cls).where(
             and_(

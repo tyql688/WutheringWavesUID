@@ -4,7 +4,7 @@ from typing import List, Union
 from msgspec import json as msgjson
 
 from ..utils.api.model import RoleList
-from ..utils.error_reply import WAVES_CODE_102
+from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_101
 from ..utils.hint import error_reply
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
@@ -56,5 +56,8 @@ async def refresh_char(uid: str, ck: str = '') -> Union[str, List]:
         waves_datas.append(role_detail_info)
 
     await save_card_info(uid, waves_datas)
+
+    if not waves_datas:
+        return error_reply(WAVES_CODE_101)
 
     return waves_datas

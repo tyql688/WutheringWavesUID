@@ -15,6 +15,14 @@ async def add_cookie(ev: Event, ck: str):
         return hint.error_reply(code=WAVES_CODE_101)
     data = KuroRoleInfo(**game_info)
 
+    platform_list = ['h5', 'ios']
+    for platform in platform_list:
+        succ, _ = await waves_api.refresh_data_for_platform(data.roleId, ck, data.serverId, platform)
+        if succ:
+            break
+    else:
+        return hint.error_reply(code=WAVES_CODE_101)
+
     user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, 'uid', data.roleId)
     if user:
         await WavesUser.update_data_by_data(
@@ -25,7 +33,8 @@ async def add_cookie(ev: Event, ck: str):
             },
             update_data={
                 'cookie': ck,
-                'status': ''
+                'status': '',
+                'platform': platform
             })
     else:
         await WavesUser.insert_data(ev.user_id, ev.bot_id, cookie=ck, uid=data.roleId)

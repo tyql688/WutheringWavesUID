@@ -44,7 +44,9 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
         return account_info
     account_info = AccountBaseInfo(**account_info)
 
-    await refresh_char(uid, ck=ck)
+    waves_datas = await refresh_char(uid, ck=ck)
+    if isinstance(waves_datas, str):
+        return waves_datas
 
     # 根据面板数据获取详细信息
     all_role_detail = await get_all_role_detail_info(uid)
