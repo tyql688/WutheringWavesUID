@@ -20,12 +20,12 @@ class Guide:
     }
 
     async def get_bbs_list(
-            self,
-            auther_id: int,
-            type: int = 2,
-            searchType: int = 1,
-            pageIndex: int = 1,
-            pageSize: int = 99
+        self,
+        auther_id: int,
+        type: int = 2,
+        searchType: int = 1,
+        pageIndex: int = 1,
+        pageSize: int = 99
     ):
         headers = copy.deepcopy(self._headers)
         data = {
@@ -104,9 +104,9 @@ class Guide:
         if GUIDE_CONFIG_MAP['結星'][1] == auther_id:
             # 結星
             return imgHeight < 2500
-        elif GUIDE_CONFIG_MAP['XMu'][1] == auther_id:
-            # XMu
-            return imgWidth < 1910
+        elif GUIDE_CONFIG_MAP['小沐XMu'][1] == auther_id:
+            # 小沐XMu
+            return imgHeight < 5000
         else:
             return True
 
