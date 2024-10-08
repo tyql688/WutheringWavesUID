@@ -1,8 +1,7 @@
 # WutheringWavesUID
 
 <p align="center">
-  <a href="https://github.com/tyql688/WutheringWavesUID"><img src="https://s2.loli.net/2024/10/01/fP1nioG7HMd5Ult.png" width="480" height="270" alt="WutheringWavesUID"></a>
-</p>
+  <a href="https://github.com/tyql688/WutheringWavesUID"><img src="https://s2.loli.net/2024/10/08/ku3pLJBPoGjfQWq.png" width="256" height="256" alt="WutheringWavesUID"></a>
 <h1 align = "center">WutheringWavesUID 1.0</h1>
 <h4 align = "center">🚧支持OneBot(QQ)、QQ频道、微信、开黑啦、Telegram的全功能鸣潮Bot插件🚧</h4>
 <div align = "center">
@@ -54,7 +53,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 - [Yunzai-Kuro-Plugin](https://github.com/TomyJan/Yunzai-Kuro-Plugin) Yunzai 库洛插件
 - [Kuro-API-Collection](https://github.com/TomyJan/Kuro-API-Collection) 库街区 API 文档
 - 特别鸣谢以下攻略作者
-    - [Moealkyne](https://www.douyin.com/user/MS4wLjABAAAAizgh6etfiwTeiOrZvUW1gBhtJx8OB5Rac67oz5OdoKQzUOppTjARBlOueycZc0oC)
-    - [小沐XMu](https://www.kurobbs.com/person-center?id=10450567)
-    - [金铃子攻略组](https://space.bilibili.com/487275027)
-    - [結星](https://www.kurobbs.com/person-center?id=10015697)
+  - [Moealkyne](https://www.douyin.com/user/MS4wLjABAAAAizgh6etfiwTeiOrZvUW1gBhtJx8OB5Rac67oz5OdoKQzUOppTjARBlOueycZc0oC)
+  - [小沐XMu](https://www.kurobbs.com/person-center?id=10450567)
+  - [金铃子攻略组](https://space.bilibili.com/487275027)
+  - [結星](https://www.kurobbs.com/person-center?id=10015697)
