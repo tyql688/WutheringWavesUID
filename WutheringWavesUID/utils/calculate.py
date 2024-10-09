@@ -1,4 +1,3 @@
-import copy
 from pathlib import Path
 from typing import List
 
@@ -7,31 +6,62 @@ from msgspec import json as msgjson
 from gsuid_core.logger import logger
 from ..utils.api.model import Props
 
-MAP_PATH = Path(__file__).parent / "map"
+MAP_PATH = Path(__file__).parent / "map/character"
 
-with open(MAP_PATH / "calculate.json", "r", encoding="UTF-8") as f:
-    calculate_data = msgjson.decode(f.read())
+character_calculate_data = {}
+score_interval = [
+    "c",
+    "b",
+    "a",
+    "s"
+]
+
+
+def read_calc_json_files(directory):
+    files = directory.rglob('calc*.json')
+
+    for file in files:
+        try:
+            with open(file, 'r', encoding='utf-8') as f:
+                data = msgjson.decode(f.read())
+
+                char_name = file.parents[0].name
+                file_name = file.name
+                if char_name not in character_calculate_data:
+                    character_calculate_data[char_name] = {}
+
+                character_calculate_data[char_name][file_name] = data
+
+        except Exception as e:
+            logger.exception(f"Error decoding {file}", e)
+
+
+read_calc_json_files(MAP_PATH)
+
+
+def check_calc_map(char_name: str):
+    return char_name if char_name in character_calculate_data else "default"
 
 
 def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int) -> (int, str):
-    rule_map = calculate_data["rule_map"]
-    if char_name not in rule_map:
+    calc_map = character_calculate_data.get(check_calc_map(char_name), {}).get("calc.json", {})
+
+    if not calc_map:
         return 0, "c"
 
-    custom_score = copy.deepcopy(rule_map[char_name]["score_type"])
-    score_type = copy.deepcopy(calculate_data["score_type_map"][str(custom_score["type"])])
-    score_type.update(custom_score)
-
-    skill_weight = rule_map[char_name].get("skill_weight", [])
+    skill_weight = calc_map.get("skill_weight", [])
     if not skill_weight:
         skill_weight = [0, 0, 0, 0]
 
     score = 0
+    main_props = calc_map['main_props']
+    sub_pros = calc_map['sub_props']
     for index, prop in enumerate(prop_list):
-        ratio = 1
         if index < 2:
             # 主属性
-            ratio = 0.34 if cost == 1 else 0.25
+            pros_temp = main_props.get(str(cost))
+        else:
+            pros_temp = sub_pros
 
         value = prop.attributeValue
         if "%" in prop.attributeValue:
@@ -40,69 +70,72 @@ def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int) -> (in
             value = float(value)
         if prop.attributeName == "攻击":
             if "%" in prop.attributeValue:
-                score += score_type.get("攻击%", 0) * value * ratio
+                score += pros_temp.get("攻击%", 0) * value
             else:
-                score += score_type.get("攻击", 0) * value * ratio
+                score += pros_temp.get("攻击", 0) * value
         elif prop.attributeName == "生命":
             if "%" in prop.attributeValue:
-                score += score_type.get("生命%", 0) * value * ratio
+                score += pros_temp.get("生命%", 0) * value
             else:
-                score += score_type.get("生命", 0) * value * ratio
+                score += pros_temp.get("生命", 0) * value
         elif prop.attributeName == "普攻伤害加成":
-            score += skill_weight[0] * value * ratio
+            score += pros_temp.get("技能伤害加成", 0) * skill_weight[0] * value
         elif prop.attributeName == "重击伤害加成":
-            score += skill_weight[1] * value * ratio
+            score += pros_temp.get("技能伤害加成", 0) * skill_weight[1] * value
         elif prop.attributeName == "共鸣技能伤害加成":
-            score += skill_weight[2] * value * ratio
+            score += pros_temp.get("技能伤害加成", 0) * skill_weight[2] * value
         elif prop.attributeName == "共鸣解放伤害加成":
-            score += skill_weight[3] * value * ratio
+            score += pros_temp.get("技能伤害加成", 0) * skill_weight[3] * value
+        elif prop.attributeName[0:2] in ["冷凝", "衍射", "导电", "热熔", "气动"]:
+            score += pros_temp.get("属性伤害加成", 0) * value
         else:
-            score += score_type.get(prop.attributeName, 0) * value * ratio
+            score += pros_temp.get(prop.attributeName, 0) * value
 
+    fix_max_score = 50
     if cost == 1:
-        max_score = rule_map[char_name]['score_max'][2]
-        fix_max_score = calculate_data['score_max'][2]
+        max_score = calc_map['score_max'][0]
+        props_grade = calc_map['props_grade'][0]
     elif cost == 3:
-        max_score = rule_map[char_name]['score_max'][1]
-        fix_max_score = calculate_data['score_max'][1]
-    elif cost == 4:
-        max_score = rule_map[char_name]['score_max'][0]
-        fix_max_score = calculate_data['score_max'][0]
+        max_score = calc_map['score_max'][1]
+        props_grade = calc_map['props_grade'][1]
+    else:
+        max_score = calc_map['score_max'][2]
+        props_grade = calc_map['props_grade'][2]
+
+    percent_score = score / max_score
 
     _temp = 0
-    cost_level = rule_map[char_name]['cost_level']
-    for index, _score in enumerate(cost_level[str(cost)]):
-        if score >= _score:
+    for index, _temp_per in enumerate(props_grade):
+        if percent_score >= _temp_per:
             _temp = index
 
-    score = round((score / max_score) * fix_max_score, 1)
-    score_level = score_type['score_interval'][_temp]
-    logger.debug(f"{char_name} [声骸评分]: {score} [声骸评分等级]:{score_level}")
-    return score, score_level
+    final_score = round(percent_score * fix_max_score, 1)
+    score_level = score_interval[_temp]
+    logger.debug(f"{char_name} [声骸评分]: {final_score} [声骸评分等级]: {score_level}")
+    return final_score, score_level
 
 
 def get_total_score_bg(char_name: str, score: int):
-    rule_map = calculate_data["rule_map"]
-    if char_name not in rule_map:
-        return "c"
-    custom_score = copy.deepcopy(rule_map[char_name]["score_type"])
-    score_type = copy.deepcopy(calculate_data["score_type_map"][str(custom_score["type"])])
-    score_type.update(custom_score)
-    ratio = score / calculate_data['total_score_max']
+    calc_map = character_calculate_data.get(check_calc_map(char_name), {}).get("calc.json", {})
+
+    if not calc_map:
+        return 0, "c"
+
+    ratio = score / 250
     _temp = 0
-    for index, _score in enumerate(score_type['score_interval_ratio']):
+    for index, _score in enumerate(calc_map['total_grade']):
         if ratio >= _score:
             _temp = index
-    score_level = score_type['score_interval'][_temp]
-    logger.debug(f"{char_name} [声骸评分]: {score} [总声骸评分等级]:{score_level} [总声骸评分系数]:{ratio:.2f}")
+    score_level = score_interval[_temp]
+    logger.debug(f"{char_name} [声骸评分]: {score} [总声骸评分等级]: {score_level} [总声骸评分系数]: {ratio:.2f}")
     return score_level
 
 
 def get_valid_color(char_name: str, attribute_name: str):
-    rule_map = calculate_data["rule_map"]
-    if char_name not in rule_map:
+    calc_map = character_calculate_data.get(check_calc_map(char_name), {}).get("calc.json", {})
+    if not calc_map:
         return 255, 255, 255
-    _temp = rule_map[char_name]
+    _temp = calc_map['grade']
     if "valid_s" in _temp:
         if attribute_name in _temp["valid_s"]:
             return 234, 183, 4
