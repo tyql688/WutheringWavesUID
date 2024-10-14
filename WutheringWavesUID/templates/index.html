@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>登录界面</title>
+  <title>WutheringWavesUID 登录</title>
   <link rel="icon" href="https://web-static.kurobbs.com/resource/prod/icon.ico" type="image/x-icon">
   <script src="https://static.geetest.com/v4/gt4.js"></script>
   <script src="https://apps.bdimg.com/libs/jquery/1.6.4/jquery.min.js"></script>
@@ -14,7 +14,6 @@
       height: 100%;
       font-family: 'Microsoft YaHei', sans-serif;
     }
-
 
     body {
       background-image: url('https://prod-alicdn-community.kurobbs.com/forum/465dcb694966492aba4d4982c47f0e8520240914.jpg');
@@ -58,12 +57,56 @@
       box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.45);
     }
 
-    h2 {
-      text-align: center;
+    .login-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      justify-content: space-between;
+    }
+
+    .banner {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-right: 0.5rem;
+    }
+
+    .banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .banner-text {
+      flex: 1;
+      padding-right: 1rem;
+      margin-left: 0.5rem;
+    }
+
+    .welcome-text {
+      font-size: 1.5rem;
+      font-weight: 700;
       color: #fff;
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      margin-bottom: 0.25rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo-text {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.25rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .kurobbs-text {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #e6e6e6;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
 
     .input-group {
@@ -237,7 +280,16 @@
 </head>
 <body>
 <div class="login-container">
-  <h2>欢迎登录</h2>
+  <div class="login-header">
+    <div class="banner-text">
+      <div class="welcome-text">欢迎登录</div>
+      <div class="logo-text">WutheringWavesUID</div>
+      <div class="kurobbs-text">库街区</div>
+    </div>
+    <div class="banner">
+      <img src="https://s2.loli.net/2024/10/08/ku3pLJBPoGjfQWq.png" alt="Banner">
+    </div>
+  </div>
   <form id="loginForm">
     <div class="input-group">
       <label for="phone">手机号</label>
@@ -307,33 +359,20 @@
         type: 'POST', // 通常发送数据使用 POST
         data: {"mobile": phoneInput.value, "geeTestData": JSON.stringify(result)},
         headers: headers,
-        success: function (res) {
-          if (res.success) {
-            alert('验证码已发送');
-          } else {
-            alert('验证码发送失败 : ' + res.msg);
-          }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.error('请求错误:', textStatus, errorThrown);
-          alert('请求出错，请检查网络连接');
-        }
+        success: res => alert(res.success ? '验证码已发送' : '验证码发送失败 : ' + res.msg),
+        error: () => alert('请求出错，请检查网络连接')
       });
     }).onError(function () {
-      //your code
       alert('请求出错，请检查网络连接');
     })
-    // 按钮提交事件
+
     getCodeBtn.onclick = function () {
-      // 禁用按钮，防止多次点击
       this.disabled = true;
       let countdown = 60;
       const originalText = this.textContent;
 
-      // 显示验证码
       captcha.showBox();
 
-      // 倒计时逻辑
       const timer = setInterval(() => {
         this.textContent = `${countdown}秒后重试`;
         countdown--;
@@ -341,7 +380,7 @@
           clearInterval(timer);
           this.textContent = originalText;
           this.disabled = false;
-          captcha.hideBox(); // 倒计时结束后隐藏验证码
+          captcha.hideBox();
         }
       }, 1000);
     }
@@ -359,21 +398,8 @@
       type: 'POST',
       data: JSON.stringify(data),
       contentType: 'application/json',
-      success: function (res) {
-        if (res.success) {
-          showSuccessModal();
-        } else {
-          if (res.msg) {
-            alert('登录失败：' + res.msg);
-          } else {
-            alert('登录失败，请重试');
-          }
-        }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.error('登录失败:', textStatus, errorThrown);
-        alert('登录失败，请重试');
-      }
+      success: res => res.success ? showSuccessModal() : alert('登录失败' + (res.msg ? res.msg : '，请重试')),
+      error: () => alert('登录失败，请重试')
     });
   });
 
@@ -428,7 +454,6 @@
     }
   });
 
-  // 优化背景图加载
   function loadBackgroundImage() {
     const img = new Image();
     img.onload = function () {
