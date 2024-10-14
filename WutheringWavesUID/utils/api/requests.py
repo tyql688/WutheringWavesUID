@@ -1,4 +1,5 @@
 import copy
+import json as j
 import random
 from datetime import datetime
 from typing import Any, Dict, Union, Literal, Optional
@@ -341,6 +342,12 @@ class WavesApi:
                 if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
                     try:
                         des_data = ds.decrypt(raw_data['data'])
+                        raw_data['data'] = des_data
+                    except:
+                        pass
+                if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
+                    try:
+                        des_data = j.loads(raw_data['data'])
                         raw_data['data'] = des_data
                     except:
                         pass
