@@ -24,14 +24,16 @@ sv_waves_wiki = SV('鸣潮wiki')
 
 
 @sv_waves_wiki.on_prefix((
-        f'{PREFIX}角色wiki',
-        f'{PREFIX}角色介绍',
-        f'{PREFIX}角色命座',
-        f'{PREFIX}角色天赋',
-        f'{PREFIX}角色共鸣链',
-        f'{PREFIX}角色技能',
-        f'{PREFIX}武器wiki',
-        f'{PREFIX}武器介绍',
+    f'{PREFIX}角色wiki',
+    f'{PREFIX}角色介绍',
+    f'{PREFIX}角色命座',
+    f'{PREFIX}角色天赋',
+    f'{PREFIX}角色共鸣链',
+    f'{PREFIX}角色技能',
+    f'{PREFIX}武器wiki',
+    f'{PREFIX}武器介绍',
+    f'{PREFIX}声骸wiki',
+    f'{PREFIX}声骸介绍',
 ))
 async def send_waves_wiki(bot: Bot, ev: Event):
     if "角色" in ev.command:
@@ -56,6 +58,11 @@ async def send_waves_wiki(bot: Bot, ev: Event):
             return f'[鸣潮] 武器名{weapon_name}无法找到, 可能暂未适配, 请先检查输入是否正确！'
         await bot.logger.info(f'[鸣潮] 开始获取{weapon_name}wiki')
         img = await draw_wiki_detail("武器", weapon_name)
+        await bot.send(img)
+    elif "声骸" in ev.command:
+        echo_name = ev.text.strip(' ')
+        await bot.logger.info(f'[鸣潮] 开始获取{echo_name}wiki')
+        img = await draw_wiki_detail("声骸", echo_name)
         await bot.send(img)
 
 

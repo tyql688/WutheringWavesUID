@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import Union, Literal, Optional
 
 from PIL import Image, ImageOps
-from gsuid_core.models import Event
-from gsuid_core.utils.image.utils import sget
-from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
 
+from gsuid_core.models import Event
+from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
+from gsuid_core.utils.image.utils import sget
 from ..utils.resource.RESOURCE_PATH import (
     AVATAR_PATH,
     WEAPON_PATH,
@@ -22,6 +22,37 @@ YELLOW = (255, 200, 1)
 BLUE = (1, 183, 255)
 GOLD = (224, 202, 146)
 SPECIAL_GOLD = (234, 183, 4)
+
+# 冷凝-凝夜白霜
+WAVES_FREEZING = (53, 152, 219)
+# 热熔-熔山裂谷
+WAVES_MOLTEN = (186, 55, 42)
+# 导电-彻空冥雷
+WAVES_VOID = (185, 106, 217)
+# 气动-啸谷长风
+WAVES_SIERRA = (22, 145, 121)
+# 衍射-浮星祛暗
+WAVES_CELESTIAL = (241, 196, 15)
+# 湮灭-沉日劫明
+WAVES_SINKING = (132, 63, 161)
+# 治疗-隐世回光
+WAVES_REJUVENATING = (45, 194, 107)
+# 辅助-轻云出月
+WAVES_MOONLIT = (149, 165, 166)
+# 攻击-不绝余音
+WAVES_LINGERING = (52, 73, 94)
+
+WAVES_ECHO_MAP = {
+    "凝夜白霜": WAVES_FREEZING,
+    "熔山裂谷": WAVES_MOLTEN,
+    "彻空冥雷": WAVES_VOID,
+    "啸谷长风": WAVES_SIERRA,
+    "浮星祛暗": WAVES_CELESTIAL,
+    "沉日劫明": WAVES_SINKING,
+    "隐世回光": WAVES_REJUVENATING,
+    "轻云出月": WAVES_MOONLIT,
+    "不绝余音": WAVES_LINGERING,
+}
 
 
 async def get_random_waves_role_pile():
@@ -80,6 +111,10 @@ async def get_attribute(name: str = "", is_simple: bool = False) -> Image.Image:
 
 async def get_attribute_prop(name: str = "") -> Image.Image:
     return Image.open(TEXT_PATH / f'attribute_prop/attr_prop_{name}.png').convert("RGBA")
+
+
+async def get_attribute_effect(name: str = "") -> Image.Image:
+    return Image.open(TEXT_PATH / f'attribute_effect/attr_{name}.webp').convert("RGBA")
 
 
 async def get_weapon_type(name: str = "") -> Image.Image:

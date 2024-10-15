@@ -223,6 +223,14 @@
         "need_admin": false
       },
       {
+        "name": "声骸介绍",
+        "desc": "声骸介绍",
+        "eg": "声骸介绍角",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "游戏公告列表",
         "desc": "游戏公告列表",
         "eg": "公告",

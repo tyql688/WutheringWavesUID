@@ -10,7 +10,7 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 from gsuid_core.utils.image.utils import sget
-from ..utils.api.model import KuroRoleInfo, AccountBaseInfo, RoleList, ChallengeArea
+from ..utils.api.model import AccountBaseInfo, RoleList, ChallengeArea
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_26, waves_font_42, waves_font_30, waves_font_25, waves_font_18, \
     waves_font_24
@@ -29,10 +29,10 @@ async def draw_challenge_img(
     if not ck:
         return error_reply(WAVES_CODE_102)
 
-    succ, game_info = await waves_api.get_game_role_info(ck)
-    if not succ:
-        return game_info
-    game_info = KuroRoleInfo(**game_info)
+    # succ, game_info = await waves_api.get_game_role_info(ck)
+    # if not succ:
+    #     return game_info
+    # game_info = KuroRoleInfo(**game_info)
 
     # 全息数据
     succ, challenge_data = await waves_api.get_challenge_data(uid, ck)

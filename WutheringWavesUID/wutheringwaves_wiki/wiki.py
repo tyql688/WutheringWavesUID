@@ -1,7 +1,7 @@
 import copy
 from io import BytesIO
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Union, List
 
 import httpx
 from PIL import Image, ImageDraw
@@ -13,7 +13,7 @@ from gsuid_core.utils.image.utils import sget
 from ..utils.api.api import WIKI_DETAIL_URL, WIKI_ENTRY_DETAIL_URL, WIKI_CATALOGUE_MAP
 from ..utils.fonts.waves_fonts import waves_font_70, waves_font_30, waves_font_24, waves_font_40, waves_font_origin
 from ..utils.image import get_waves_bg, add_footer, GOLD, GREY, SPECIAL_GOLD, get_weapon_type, get_crop_waves_bg, \
-    get_attribute_prop
+    get_attribute_prop, WAVES_ECHO_MAP, get_attribute_effect
 from ..utils.weapon_detail import get_weapon_star
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -62,15 +62,111 @@ class Wiki:
 
 
 async def draw_wiki_detail(query_type: str, name: str, query_role_type: str = None):
+    noi = f"[鸣潮] 暂无【{name}】对应{query_type}wiki"
     if query_type not in WIKI_CATALOGUE_MAP:
-        return "暂无该类型wiki"
+        return noi
 
     res = await Wiki().get_entry_detail(name, WIKI_CATALOGUE_MAP[query_type])
+    if not res:
+        return noi
 
     if query_type == "共鸣者":
         return await draw_wiki_char(res['data'], query_role_type)
     elif query_type == "武器":
         return await draw_wiki_weapon(res['data'])
+    elif query_type == "声骸":
+        return await draw_wiki_echo(name, res['data'])
+
+
+async def draw_wiki_echo(name, raw_data: Dict):
+    content = raw_data['content']
+    # 基础信息
+    base_data = next((i for i in content['modules'] if i['title'] == '基本信息' or i['title'] == '基础信息'), None)
+    if not base_data:
+        return "暂无该声骸wiki"
+    # 声骸技能
+    skill_data = next((i for i in content['modules'] if i['title'] == '声骸技能'), None)
+    if skill_data:
+        skill_data = next((i for i in skill_data['components'] if i['title'] == '声骸技能'), None)
+    else:
+        skill_data = next((i for i in base_data['components'] if i['title'] == '声骸技能'), None)
+    card_img = get_crop_waves_bg(950, 420, 'bg2')
+
+    # 声骸展示
+    echo_show_data = next((i for i in base_data['components'] if i['title'] == '声骸展示'), None)
+    # 声骸信息
+    echo_data = next((i for i in base_data['components'] if i['title'] == '声骸信息'), None)
+
+    echo_image = Image.new('RGBA', (350, 400), (255, 255, 255, 0))
+    echo_image_draw = ImageDraw.Draw(echo_image)
+    echo_image_draw.rectangle([20, 20, 330, 380], fill=(0, 0, 0, int(0.4 * 255)))
+    soup = BeautifulSoup(echo_show_data['content'], 'html.parser')
+    # echo 图片
+    echo_pic = Image.open(BytesIO((await sget(soup.find_all('img')[0]['src'])).content)).convert('RGBA')
+    echo_pic = crop_center_img(echo_pic, 230, 230)
+    echo_image.alpha_composite(echo_pic, (50, 20))
+
+    card_img_draw = ImageDraw.Draw(card_img)
+    card_img_draw.text((370, 50), f'{name}', GOLD, waves_font_40, 'lm')
+
+    # 部分效果
+    soup = BeautifulSoup(echo_data['content'], 'html.parser')
+    effect = []
+    rows = []
+    for row in soup.find_all('tr'):
+        cells = row.find_all('td')
+        if not cells:
+            continue
+        first_cell_text = cells[0].text.strip()
+        if first_cell_text in ["声骸等级", "「COST」"]:
+            next_cell_text = cells[-1].text.strip() if len(cells) > 1 else ""
+            # base_results[first_cell_text] = next_cell_text
+            rows.append([first_cell_text.strip(), next_cell_text.strip()])
+        if first_cell_text in ["合鸣效果"]:
+            next_cell_text = cells[-1].text.strip() if len(cells) > 1 else ""
+            effect = next_cell_text.split("、")
+
+    # logger.info(f"rows : {rows}")
+    weapon_bg = Image.open(TEXT_PATH / 'weapon_bg.png')
+    echo_bg_temp = Image.new('RGBA', weapon_bg.size)
+    echo_bg_temp.alpha_composite(weapon_bg, dest=(0, 0))
+    echo_bg_temp_draw = ImageDraw.Draw(echo_bg_temp)
+    for index, row in enumerate(rows):
+        echo_bg_temp_draw.text((100, 207 + index * 50), f'{row[0]}', 'white', waves_font_30, 'lm')
+        echo_bg_temp_draw.text((450, 207 + index * 50), f'{row[1]}', 'white', waves_font_30, 'rm')
+
+    echo_bg_temp = echo_bg_temp.resize((350, 175))
+    echo_image.alpha_composite(echo_bg_temp, (10, 200))
+
+    # 合鸣效果
+    for index, e in enumerate(effect):
+        color = WAVES_ECHO_MAP.get(e)
+        if not color:
+            continue
+        effect_image = await get_attribute_effect(e)
+        effect_image = effect_image.resize((30, 30))
+        effect_image = await change_color(effect_image, color)
+        echo_image.alpha_composite(effect_image, (250, 20 + index * 20))
+        # echo_image_draw.text((250, 20 + index * 20), f'{e}', color, waves_font_18, 'lm')
+
+    # 明细
+    detail_image = Image.new('RGBA', (600, 270), (255, 255, 255, 0))
+    detail_image_draw = ImageDraw.Draw(detail_image)
+    detail_image_draw.rounded_rectangle([20, 20, 580, 250], radius=20, fill=(0, 0, 0, int(0.3 * 255)))
+
+    detail_image = draw_html_text(skill_data['tabs'][0]['content'], waves_font_origin, detail_image,
+                                  default_font_color='rgb(255, 255, 255)',
+                                  padding=(40, 30),
+                                  column_spacing=0,
+                                  line_spacing=20,
+                                  auto_line_spacing=5,
+                                  forbid_color=['rgb(0, 0, 0)', 'rgb(24, 24, 24)'])
+    card_img.alpha_composite(detail_image, (330, 80))
+
+    card_img.alpha_composite(echo_image, (0, 0))
+    card_img = add_footer(card_img, 600, 20)
+    card_img = await convert_img(card_img)
+    return card_img
 
 
 async def draw_wiki_weapon(raw_data: Dict):
@@ -431,6 +527,19 @@ async def change_white_color(chain):
     return chain
 
 
+async def change_color(chain, color: tuple = (255, 255, 255)):
+    # 获取图像数据
+    pixels = chain.load()  # 加载像素数据
+
+    # 遍历图像的每个像素
+    for y in range(chain.size[1]):  # 图像高度
+        for x in range(chain.size[0]):  # 图像宽度
+            r, g, b, a = pixels[x, y]
+            pixels[x, y] = color + (a,)
+
+    return chain
+
+
 def draw_html_text(html_content, font_origin, image=None, image_width=500, image_height=600,
                    background_color=(255, 255, 255, 255), text_align='left', padding=(10, 10),
                    line_spacing=5, column_spacing=5, auto_line_spacing=5,
@@ -438,7 +547,7 @@ def draw_html_text(html_content, font_origin, image=None, image_width=500, image
                    default_font_color='rgb(0, 0, 0)',
                    is_force_parent_color=False,
                    is_force_parent_font_size=False,
-                   forbid_color='rgb(0, 0, 0)'):
+                   forbid_color: Union[str, List] = 'rgb(0, 0, 0)'):
     """
     根据 HTML 内容绘制图像文本，保持嵌套样式和布局，并支持自动换行。
 
@@ -487,7 +596,9 @@ def draw_html_text(html_content, font_origin, image=None, image_width=500, image
                     font_size = int(s.split(':')[1].strip().replace('px', ''))
                 elif 'color' in s and not is_force_parent_color:
                     _color = s.split(':')[1].strip()
-                    if _color != forbid_color:
+                    if isinstance(forbid_color, str) and _color != forbid_color:
+                        color = _color
+                    if isinstance(forbid_color, list) and _color not in forbid_color:
                         color = _color
 
         # 转换颜色为RGB格式
