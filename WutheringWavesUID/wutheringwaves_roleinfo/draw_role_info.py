@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
-from ..utils.api.model import KuroRoleInfo, AccountBaseInfo, Role, RoleDetailData, CalabashData, RoleList
+from ..utils.api.model import AccountBaseInfo, Role, RoleDetailData, CalabashData, RoleList
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.fonts.waves_fonts import waves_font_25, waves_font_30, waves_font_26, waves_font_40, waves_font_42
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_attribute, GREY, cropped_square_avatar, \
@@ -17,10 +17,10 @@ TEXT_PATH = Path(__file__).parent / 'texture2d'
 
 
 async def draw_role_img(uid: str, ck: str, ev: Event):
-    succ, game_info = await waves_api.get_game_role_info(ck)
-    if not succ:
-        return game_info
-    game_info = KuroRoleInfo(**game_info)
+    # succ, game_info = await waves_api.get_game_role_info(ck)
+    # if not succ:
+    #     return game_info
+    # game_info = KuroRoleInfo(**game_info)
 
     # 共鸣者信息
     succ, role_info = await waves_api.get_role_info(uid, ck)

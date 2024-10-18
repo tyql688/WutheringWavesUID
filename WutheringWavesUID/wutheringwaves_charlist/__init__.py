@@ -15,6 +15,8 @@ sv_waves_char_list = SV(f'{PREFIX}角色练度统计')
     (
         f'{PREFIX}练度统计',
         f'{PREFIX}角色列表',
+        f'{PREFIX}刷新练度统计',
+        f'{PREFIX}刷新角色列表',
     )
 )
 async def send_char_list_msg(bot: Bot, ev: Event):

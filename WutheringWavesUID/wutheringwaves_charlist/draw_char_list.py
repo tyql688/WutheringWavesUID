@@ -12,10 +12,11 @@ from ..utils.calculate import calc_phantom_score, get_total_score_bg
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_15, \
-    waves_font_22, waves_font_40, waves_font_24, waves_font_18
+    waves_font_22, waves_font_40, waves_font_24, waves_font_18, waves_font_20
 from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, get_event_avatar, add_footer, GOLD, GREY, get_attribute, get_square_avatar, \
     get_square_weapon, SPECIAL_GOLD
+from ..utils.resource.constant import NORMAL_LIST
 from ..utils.resource.download_file import get_skill_img
 from ..utils.waves_api import waves_api
 from ..utils.weapon_detail import get_breach
@@ -44,12 +45,21 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
         return account_info
     account_info = AccountBaseInfo(**account_info)
 
-    waves_datas = await refresh_char(uid, ck=ck)
-    if isinstance(waves_datas, str):
-        return waves_datas
-
     # 根据面板数据获取详细信息
-    all_role_detail = await get_all_role_detail_info(uid)
+    all_role_detail = None
+    if '刷新' in ev.command:
+        waves_datas = await refresh_char(uid, ck=ck)
+        if isinstance(waves_datas, str):
+            return waves_datas
+    else:
+        all_role_detail = await get_all_role_detail_info(uid)
+        if not all_role_detail:
+            waves_datas = await refresh_char(uid, ck=ck)
+            if isinstance(waves_datas, str):
+                return waves_datas
+
+    if not all_role_detail:
+        all_role_detail = await get_all_role_detail_info(uid)
     if not all_role_detail:
         return error_reply(WAVES_CODE_107)
 
@@ -112,11 +122,23 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
         title_bar_draw.text((810, 78), f'Lv.{account_info.worldLevel}', 'white', waves_font_42, 'mm')
         card_img.paste(title_bar, (-20, 70), title_bar)
 
-    # 简单描述
-    info_bg = Image.open(TEXT_PATH / 'info_bg.png')
-    card_img.paste(info_bg, (0, avatar_h), info_bg)
+    # up角色
+    up_num = 0
+    # 高练角色
+    level_num = 0
+    # 高链角色
+    chain_num = 0
+    # 高链五星角色
+    chain_num_5 = 0
+    # 五星武器比例
+    weapon_num = 0
+    # 所有角色
+    all_num = 0
+    # 五星角色数量
+    all_num_5 = 0
 
     for index, _rank in enumerate(waves_char_rank):
+        _rank: WavesCharRank
         role_detail: RoleDetailData = all_role_detail[_rank.roleName]
         bar_star = Image.open(TEXT_PATH / f'bar_{_rank.starLevel}star.png')
         bar_star_draw = ImageDraw.Draw(bar_star)
@@ -190,6 +212,42 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
         bar_star.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(700, 25))
 
         card_img.paste(bar_star, (0, avatar_h + info_bg_h + index * bar_star_h), bar_star)
+
+        if _rank.starLevel == 5 and _rank.roleName not in NORMAL_LIST:
+            up_num += 1
+
+        if _rank.score >= 175 and _rank.score_bg in ['s', 's+', 'ace']:
+            level_num += 1
+
+        if role_detail.get_chain_num() == 6:
+            if _rank.starLevel == 5:
+                chain_num_5 += 1
+            else:
+                chain_num += 1
+
+        if weaponData.weapon.weaponStarLevel == 5:
+            weapon_num += 1
+
+        all_num += 1
+        if _rank.starLevel == 5:
+            all_num_5 += 1
+
+    # 简单描述
+    info_bg = Image.open(TEXT_PATH / 'info_bg.png')
+    info_bg_draw = ImageDraw.Draw(info_bg)
+    info_bg_draw.text((240, 120), f'{up_num}/{all_num}', 'white', waves_font_40, 'mm')
+    info_bg_draw.text((240, 160), f'up角色', 'white', waves_font_20, 'mm')
+
+    info_bg_draw.text((410, 120), f'{level_num}/{all_num}', 'white', waves_font_40, 'mm')
+    info_bg_draw.text((410, 160), f'高练角色', 'white', waves_font_20, 'mm')
+
+    info_bg_draw.text((580, 120), f'{chain_num}/{all_num - all_num_5}', 'white', waves_font_40, 'mm')
+    info_bg_draw.text((580, 160), f'高链4星', 'white', waves_font_20, 'mm')
+
+    info_bg_draw.text((750, 120), f'{chain_num_5}/{all_num_5}', 'white', waves_font_40, 'mm')
+    info_bg_draw.text((750, 160), f'高链5星', 'white', waves_font_20, 'mm')
+
+    card_img.paste(info_bg, (0, avatar_h), info_bg)
 
     card_img = add_footer(card_img)
     card_img = await convert_img(card_img)
