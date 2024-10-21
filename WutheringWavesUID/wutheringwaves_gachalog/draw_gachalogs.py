@@ -78,7 +78,7 @@ async def draw_card(uid: int, ev: Event):
         raw_data: Dict = json.loads(await f.read())
 
     gachalogs = raw_data['data']
-    title_num = len(gachalogs)
+    title_num = len([1 for i in gachalogs.keys() if '新手' not in i])
 
     total_data = {}
     for gacha_name in gachalogs:
@@ -163,18 +163,66 @@ async def draw_card(uid: int, ev: Event):
     bset = 180
 
     _numlen = 0
+    newbie_flag = False
     for name in total_data:
         _num = len(total_data[name]['rank_s_list'])
-        _numlen += bset * get_num_h(_num, 5)
-    w, h = 1000, 330 + title_num * oset + _numlen
+        if '新手' in name:
+            if _num > 0:
+                newbie_flag = True
+        else:
+            _num = len(total_data[name]['rank_s_list'])
+            _numlen += bset * get_num_h(_num, 5)
+
+    _newbielen = 320 if newbie_flag else 0
+    w, h = 1000, 350 + title_num * oset + _numlen + _newbielen
 
     card_img = get_waves_bg(w, h)
     card_draw = ImageDraw.Draw(card_img)
 
-    y = 0
     item_fg = Image.open(TEXT_PATH / 'char_bg.png')
     up_icon = Image.open(TEXT_PATH / 'up_tag.png')
-    for gindex, gacha_name in enumerate(total_data):
+    up_icon = up_icon.resize((68, 52))
+
+    async def draw_pic(item) -> Image:
+        item_bg = Image.new('RGBA', (167, 170))
+        item_fg_cp = item_fg.copy()
+        item_bg.paste(item_fg_cp, (0, 0), item_fg_cp)
+
+        item_temp = Image.new('RGBA', (167, 170))
+        if item['resourceType'] == '武器':
+            item_icon = await get_square_weapon(item['resourceId'])
+            item_icon = item_icon.resize((130, 130)).convert('RGBA')
+            item_temp.paste(item_icon, (22, 28), item_icon)
+        else:
+            item_icon = await get_square_avatar(item['resourceId'])
+            item_icon = await cropped_square_avatar(item_icon, 130)
+            item_temp.paste(item_icon, (22, 28), item_icon)
+
+        item_bg.paste(item_temp, (-2, -2), item_temp)
+        gnum = item['gacha_num']
+        if gnum >= 70:
+            # gcolor = (223, 88, 75)
+            gcolor = (230, 58, 58)
+        elif gnum <= 40:
+            gcolor = (43, 210, 43)
+        else:
+            gcolor = 'white'
+        info_block = Image.new("RGBA", (50, 25), "white")
+        info_block_draw = ImageDraw.Draw(info_block)
+        info_block_draw.rectangle([0, 0, 50, 25], fill=(0, 0, 0, int(0.9 * 255)))
+        info_block_draw.text((25, 12), f'{item["gacha_num"]}抽', gcolor, waves_font_20, 'mm')
+        item_bg.paste(info_block, (15, 130), info_block)
+
+        if item['is_up']:
+            up_icon_cp = up_icon.copy()
+            item_bg.paste(up_icon_cp, (88, 3), up_icon_cp)
+        return item_bg
+
+    y = 0
+    gindex = 0
+    for _, gacha_name in enumerate(total_data):
+        if '新手' in gacha_name:
+            continue
         gacha_data = total_data[gacha_name]
         title = Image.open(TEXT_PATH / 'bar.png')
         title_draw = ImageDraw.Draw(title)
@@ -213,43 +261,13 @@ async def draw_card(uid: int, ev: Event):
         title.paste(level_icon, (710, 51), level_icon)
         title_draw.text((783, 225), tag, 'white', waves_font_24, 'mm')
 
-        card_img.paste(title, (10, 400 + y + gindex * oset), title)
+        card_img.paste(title, (10, 400 + y + gindex * oset + _newbielen), title)
         s_list = gacha_data['rank_s_list']
         for index, item in enumerate(s_list):
-            item_bg = Image.new('RGBA', (167, 170))
-            item_bg.paste(item_fg, (0, 0), item_fg)
-
-            item_temp = Image.new('RGBA', (167, 170))
-            if item['resourceType'] == '武器':
-                item_icon = await get_square_weapon(item['resourceId'])
-                item_icon = item_icon.resize((130, 130)).convert('RGBA')
-                item_temp.paste(item_icon, (22, 28), item_icon)
-            else:
-                item_icon = await get_square_avatar(item['resourceId'])
-                item_icon = await cropped_square_avatar(item_icon, 130)
-                item_temp.paste(item_icon, (22, 28), item_icon)
-
-            item_bg.paste(item_temp, (-2, -2), item_temp)
-            gnum = item['gacha_num']
-            if gnum >= 70:
-                # gcolor = (223, 88, 75)
-                gcolor = (230, 58, 58)
-            elif gnum <= 40:
-                gcolor = (43, 210, 43)
-            else:
-                gcolor = 'white'
-            info_block = Image.new("RGBA", (50, 25), "white")
-            info_block_draw = ImageDraw.Draw(info_block)
-            info_block_draw.rectangle([0, 0, 50, 25], fill=(0, 0, 0, int(0.9 * 255)))
-            info_block_draw.text((25, 12), f'{item["gacha_num"]}抽', gcolor, waves_font_20, 'mm')
-            item_bg.paste(info_block, (15, 130), info_block)
+            item_bg = await draw_pic(item)
 
             _x = 95 + 162 * (index % 5)
-            _y = 670 + bset * (index // 5) + y + gindex * oset
-
-            if item['is_up']:
-                up_icon = up_icon.resize((68, 52))
-                item_bg.paste(up_icon, (88, 3), up_icon)
+            _y = 670 + bset * (index // 5) + y + gindex * oset + _newbielen
 
             card_img.paste(
                 item_bg,
@@ -258,13 +276,48 @@ async def draw_card(uid: int, ev: Event):
             )
         if not s_list:
             card_draw.text(
-                (475, 690 + y + gindex * oset),
+                (475, 690 + y + gindex * oset + _newbielen),
                 '当前该卡池暂未有5星数据噢!',
                 (157, 157, 157),
                 waves_font_20,
                 'mm',
             )
         y += get_num_h(len(s_list), 5) * 150
+        gindex += 1
+
+    newbie_bg = Image.open(TEXT_PATH / 'newbie.png')
+    nindex = 0
+    for _, gacha_name in enumerate(total_data):
+        if '新手' not in gacha_name:
+            continue
+        gacha_data = total_data[gacha_name]
+
+        s_list = gacha_data['rank_s_list']
+        if not s_list:
+            continue
+        item_bg = await draw_pic(s_list[0])
+
+        newbie_bg_cp = newbie_bg.copy()
+        newbie_bg_cp_draw = ImageDraw.Draw(newbie_bg_cp)
+        newbie_bg_cp.paste(item_bg, (115, 210), item_bg)
+        newbie_bg_cp_draw.text((200, 160), gacha_type_meta_rename[gacha_name], 'white', waves_font_40, 'mm')
+        if gacha_data['time_range']:
+            time_range = gacha_data['time_range'].split("~")[1] \
+                if "~" in gacha_data['time_range'] else \
+                gacha_data['time_range']
+        else:
+            time_range = '暂未抽过卡!'
+        newbie_bg_cp_draw.text(
+            (100, 200),
+            time_range,
+            "white",
+            waves_font_18,
+            'lm',
+        )
+
+        # card_img.paste(newbie_bg_cp, (10 + nindex * 300, 400 + y + gindex * oset), newbie_bg_cp)
+        card_img.paste(newbie_bg_cp, (10 + nindex * 300, _newbielen), newbie_bg_cp)
+        nindex += 1
 
     title = Image.open(TEXT_PATH / 'title.png')
     base_info_draw = ImageDraw.Draw(title)
