@@ -8,7 +8,6 @@ from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 
 from gsuid_core.logger import logger
 from gsuid_core.plugins.core_command.core_webconsole import generate_random_string
-from . import ds
 from .api import *
 from ..database.models import WavesUser
 from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_101
@@ -339,12 +338,12 @@ class WavesApi:
                 except ContentTypeError:
                     _raw_data = await resp.text()
                     raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
-                    try:
-                        des_data = ds.decrypt(raw_data['data'])
-                        raw_data['data'] = des_data
-                    except:
-                        pass
+                # if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
+                #     try:
+                #         des_data = ds.decrypt(raw_data['data'])
+                #         raw_data['data'] = des_data
+                #     except:
+                #         pass
                 if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
                     try:
                         des_data = j.loads(raw_data['data'])
