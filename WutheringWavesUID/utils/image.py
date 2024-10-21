@@ -19,6 +19,7 @@ TEXT_PATH = Path(__file__).parent / 'texture2d'
 GREY = (216, 216, 216)
 BLACK_G = (40, 40, 40)
 YELLOW = (255, 200, 1)
+RED = (255, 0, 0)
 BLUE = (1, 183, 255)
 GOLD = (224, 202, 146)
 SPECIAL_GOLD = (234, 183, 4)
