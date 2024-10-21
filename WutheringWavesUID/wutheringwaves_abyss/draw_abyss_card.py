@@ -10,7 +10,7 @@ from ..utils.api.model import AccountBaseInfo, AbyssChallenge, RoleList, RoleDet
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_32, \
-    waves_font_18, waves_font_40
+    waves_font_18, waves_font_40, waves_font_36
 from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, add_footer, GOLD, GREY, get_square_avatar
 from ..utils.waves_api import waves_api
@@ -29,7 +29,7 @@ async def get_abyss_data(uid: str, ck: str, is_self_ck: bool):
         abyss_data = await waves_api.get_abyss_index(uid, ck)
 
     if abyss_data.get('code') == 200:
-        if not abyss_data.get('data'):
+        if not abyss_data.get('data') or not abyss_data['data'].get("isUnlock", False):
             return ABYSS_ERROR_MESSAGE_NO_DATA
         else:
             return AbyssChallenge(**abyss_data['data'])
@@ -130,7 +130,7 @@ async def draw_abyss_img(
         for tower_index, tower in enumerate(_abyss.towerAreaList):
             tower_name_bg = Image.open(TEXT_PATH / f'tower_name_bg{tower.areaId}.png')
             tower_name_bg_draw = ImageDraw.Draw(tower_name_bg)
-            tower_name_bg_draw.text((170, 50), f'{tower.areaName}', 'white', waves_font_42, 'lm')
+            tower_name_bg_draw.text((170, 50), f'{difficultyName}-{tower.areaName}', 'white', waves_font_36, 'lm')
             if is_self_ck:
                 tower_name_bg_draw.text((500, 60), f'{tower.star}/{tower.maxStar}', 'white', waves_font_32, 'mm')
             frame.paste(tower_name_bg, (-20, 300 + yset), tower_name_bg)
