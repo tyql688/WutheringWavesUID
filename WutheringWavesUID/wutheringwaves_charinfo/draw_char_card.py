@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Dict
 
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
@@ -9,11 +9,12 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
 from ..utils import hint
 from ..utils.api.model import RoleDetailData, AccountBaseInfo, WeaponData
-from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color
+from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color, summation_phantom_value
+from ..utils.char_detail import get_char_detail, WavesCharResult
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
-    waves_font_24
+    waves_font_24, waves_font_28
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
@@ -23,6 +24,27 @@ from ..utils.weapon_detail import get_weapon_detail, WavesWeaponResult, get_brea
 from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
+
+ph_sort_name = [
+    [
+        ("生命", '0'),
+        ("攻击", '0'),
+        ("防御", '0'),
+        ("共鸣效率", '0%')
+    ],
+    [
+        ("暴击", '0.0%'),
+        ("暴击伤害", '0.0%'),
+        ("属性伤害加成", '0.0%'),
+        ("治疗效果加成", '0.0%')
+    ],
+    [
+        ("普攻伤害加成", '0.0%'),
+        ("重击伤害加成", '0.0%'),
+        ("共鸣技能伤害加成", '0.0%'),
+        ("共鸣解放伤害加成", '0.0%')
+    ]
+]
 
 
 async def draw_char_detail_img(ev: Event, uid: str, char: str):
@@ -47,7 +69,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
 
     role_detail: RoleDetailData = all_role_detail[char_name]
 
-    img = get_waves_bg(1200, 2650, 'bg3')
+    ph_sum_value = 250
+    img = get_waves_bg(1200, 2650 + ph_sum_value, 'bg3')
 
     # 头像部分
     avatar = await draw_pic_with_ring(ev)
@@ -190,14 +213,17 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
     img.paste(mz_temp, (0, 1080), mz_temp)
 
     # 声骸
-    phantom_temp = Image.new('RGBA', (1200, 1280))
+    phantom_temp = Image.new('RGBA', (1200, 1280 + ph_sum_value))
     banner3 = Image.open(TEXT_PATH / 'banner3.png')
     phantom_temp.alpha_composite(banner3, dest=(0, 0))
 
+    ph_0 = Image.open(TEXT_PATH / 'ph_0.png')
+    ph_1 = Image.open(TEXT_PATH / 'ph_1.png')
     if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
         totalCost = role_detail.phantomData.cost
         equipPhantomList = role_detail.phantomData.equipPhantomList
         phantom_score = 0
+        phantom_sum_value = {}
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new('RGBA', (350, 550))
             sh_temp_draw = ImageDraw.Draw(sh_temp)
@@ -210,6 +236,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                 if _phantom.subProps:
                     props.extend(_phantom.subProps)
                 _score, _bg = calc_phantom_score(char_name, props, _phantom.cost)
+                phantom_sum_value = summation_phantom_value(phantom_sum_value, props)
                 phantom_score += _score
                 sh_title = Image.open(TEXT_PATH / f'sh_title_{_bg}.png')
 
@@ -221,12 +248,28 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                 phantom_icon = phantom_icon.resize((100, 100))
                 sh_temp.alpha_composite(phantom_icon, dest=(20, 20))
                 phantomName = _phantom.phantomProp.name.replace("·", " ").replace("（", " ").replace("）", "")
-                sh_temp_draw.text((150, 40), f'{phantomName}', SPECIAL_GOLD, waves_font_30, 'lm')
-                sh_temp_draw.text((150, 70), f'Lv.{_phantom.level}', 'white', waves_font_24, 'lm')
+                sh_temp_draw.text((130, 40), f'{phantomName}', SPECIAL_GOLD, waves_font_28, 'lm')
+
+                # 声骸等级背景
+                ph_level_img = Image.new('RGBA', (84, 30), (255, 255, 255, 0))
+                ph_level_img_draw = ImageDraw.Draw(ph_level_img)
+                ph_level_img_draw.rounded_rectangle([0, 0, 84, 30], radius=8, fill=(0, 0, 0, int(0.8 * 255)))
+                ph_level_img_draw.text((8, 13), f'Lv.{_phantom.level}', 'white', waves_font_24, 'lm')
+                sh_temp.alpha_composite(ph_level_img, (128, 58))
+
+                # 声骸分数背景
+                ph_score_img = Image.new('RGBA', (92, 30), (255, 255, 255, 0))
+                ph_score_img_draw = ImageDraw.Draw(ph_score_img)
+                ph_score_img_draw.rounded_rectangle([0, 0, 92, 30], radius=8, fill=(186, 55, 42, int(0.8 * 255)))
+                ph_score_img_draw.text((5, 13), f'{_score}分', 'white', waves_font_24, 'lm')
+                sh_temp.alpha_composite(ph_score_img, (228, 58))
+
+                # sh_temp_draw.text((142, 70), f'Lv.{_phantom.level}', 'white', waves_font_24, 'lm')
+                # sh_temp_draw.text((242, 70), f'{_score}分', 'white', waves_font_24, 'lm')
                 for index in range(0, _phantom.cost):
                     promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
                     promote_icon = promote_icon.resize((30, 30))
-                    sh_temp.alpha_composite(promote_icon, dest=(145 + 30 * index, 90))
+                    sh_temp.alpha_composite(promote_icon, dest=(128 + 30 * index, 90))
 
                 for index, _prop in enumerate(props):
                     oset = 55
@@ -242,7 +285,9 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                     sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', _color, waves_font_24,
                                       'rm')
 
-            phantom_temp.alpha_composite(sh_temp, dest=(40 + ((i + 1) % 3) * 380, 120 + ((i + 1) // 3) * 600))
+            phantom_temp.alpha_composite(
+                sh_temp,
+                dest=(40 + ((i + 1) % 3) * 380, 120 + ph_sum_value + ((i + 1) // 3) * 600))
 
         if phantom_score > 0:
             _bg = get_total_score_bg(char_name, phantom_score)
@@ -264,7 +309,37 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
             score_temp_draw.text((180, 130), f'暂无', 'white', waves_font_40, 'mm')
             score_temp_draw.text((180, 380), f'- 分', 'white', waves_font_40, 'mm')
 
-        phantom_temp.alpha_composite(score_temp, dest=(40, 120))
+        phantom_temp.alpha_composite(score_temp, dest=(40, 120 + ph_sum_value))
+
+        phantom_sum_value = enhance_summation_phantom_value(
+            char_id, role_detail.role.level, role_detail.role.breach,
+            weapon_detail,
+            phantom_sum_value)
+
+        shuxing = f"{role_detail.role.attributeName}伤害加成"
+        for mi, m in enumerate(ph_sort_name):
+            for ni, name_default in enumerate(m):
+                name, default_value = name_default
+                if name == "属性伤害加成":
+                    value = phantom_sum_value.get(shuxing, default_value)
+                    prop_img = await get_attribute_prop(shuxing)
+                    _color = get_valid_color(char_name, shuxing)
+                    name = shuxing
+                else:
+                    value = phantom_sum_value.get(name, default_value)
+                    prop_img = await get_attribute_prop(name)
+                    _color = get_valid_color(char_name, name)
+                prop_img = prop_img.resize((40, 40))
+                ph_bg = ph_0.copy() if ni % 2 == 0 else ph_1.copy()
+                ph_bg.alpha_composite(prop_img, (20, 32))
+                ph_bg_draw = ImageDraw.Draw(ph_bg)
+
+                ph_bg_draw.text((70, 50), f'{name[:6]}', _color, waves_font_24,
+                                'lm')
+                ph_bg_draw.text((343, 50), f'{value}', _color, waves_font_24,
+                                'rm')
+
+                phantom_temp.alpha_composite(ph_bg, (40 + mi * 370, 100 + ni * 50))
 
     img.paste(phantom_temp, (0, 1320), phantom_temp)
     img = add_footer(img)
@@ -308,3 +383,38 @@ def get_weapon_icon_bg(star: int = 3) -> Image.Image:
     bg_path = TEXT_PATH / f'weapon_icon_bg_{star}.png'
     bg_img = Image.open(bg_path)
     return bg_img
+
+
+def enhance_summation_phantom_value(role_id, role_level, role_breach,
+                                    weapon_result: WavesWeaponResult,
+                                    result: Dict[str, str]):
+    char_result: WavesCharResult = get_char_detail(role_id, role_level, role_breach)
+
+    # weapon_result: WavesWeaponResult = get_weapon_detail(weapon_id, weapon_level, weapon_breach, weapon_reson_level)
+
+    # 基础生命
+    _life = char_result.stats['life']
+    # 基础攻击
+    _atk = char_result.stats['atk']
+    # 基础防御
+    _def = char_result.stats['def']
+
+    # 武器基础攻击
+    _weapon_atk = weapon_result.stats[0]['value']
+
+    base_atk = float(_atk) + float(_weapon_atk)
+    per_atk = float(result.get("攻击%", "0%").replace("%", "")) * 0.01
+    new_atk = int(base_atk * per_atk) + int(result.get("攻击", "0"))
+    result["攻击"] = f"{new_atk}"
+
+    base_life = float(_life)
+    per_life = float(result.get("生命%", "0%").replace("%", "")) * 0.01
+    new_life = int(base_life * per_life) + int(result.get("生命", "0"))
+    result["生命"] = f"{new_life}"
+
+    base_def = float(_def)
+    per_def = float(result.get("防御%", "0%").replace("%", "")) * 0.01
+    new_def = int(base_def * per_def) + int(result.get("防御", "0"))
+    result["防御"] = f"{new_def}"
+
+    return result

@@ -1,12 +1,29 @@
 import copy
+from pathlib import Path
 from typing import Union
 
 from msgspec import json as msgjson
 
-from ..utils.name_convert import MAP_PATH
+from gsuid_core.logger import logger
 
-with open(MAP_PATH / "weaponData.json", "r", encoding="UTF-8") as f:
-    weapon_id_data = msgjson.decode(f.read())
+MAP_PATH = Path(__file__).parent / "map/detail_json/weapon"
+weapon_id_data = {}
+
+
+def read_weapon_json_files(directory):
+    files = directory.rglob('*.json')
+
+    for file in files:
+        try:
+            with open(file, 'r', encoding='utf-8') as f:
+                data = msgjson.decode(f.read())
+                file_name = file.name.split('.')[0]
+                weapon_id_data[file_name] = data
+        except Exception as e:
+            logger.exception(f"read_weapon_json_files load fail decoding {file}", e)
+
+
+read_weapon_json_files(MAP_PATH)
 
 
 class WavesWeaponResult:

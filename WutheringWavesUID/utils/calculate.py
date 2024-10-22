@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 from msgspec import json as msgjson
 
@@ -13,7 +13,9 @@ score_interval = [
     "c",
     "b",
     "a",
-    "s"
+    "s",
+    "ss",
+    "sss"
 ]
 
 
@@ -78,6 +80,11 @@ def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int) -> (in
                 score += pros_temp.get("生命%", 0) * value
             else:
                 score += pros_temp.get("生命", 0) * value
+        elif prop.attributeName == "防御":
+            if "%" in prop.attributeValue:
+                score += pros_temp.get("防御%", 0) * value
+            else:
+                score += pros_temp.get("防御", 0) * value
         elif prop.attributeName == "普攻伤害加成":
             score += pros_temp.get("技能伤害加成", 0) * skill_weight[0] * value
         elif prop.attributeName == "重击伤害加成":
@@ -144,3 +151,27 @@ def get_valid_color(char_name: str, attribute_name: str):
             return 107, 140, 179
 
     return 255, 255, 255
+
+
+def summation_phantom_value(result: Dict[str, str], prop_list: List[Props]):
+    name_per = ["攻击", "生命", "防御"]
+
+    for prop in prop_list:
+        per = "%" in prop.attributeValue
+        name = prop.attributeName
+        if per and name in name_per:
+            name = f'{name}%'
+        if name not in result:
+            result[name] = prop.attributeValue
+            continue
+
+        if per:
+            old = float(result[name].replace("%", ""))
+            new = float(prop.attributeValue.replace("%", ""))
+            result[name] = f"{old + new:.1f}%"
+        else:
+            old = int(result[name])
+            new = int(prop.attributeValue)
+            result[name] = f"{old + new:d}"
+
+    return result
