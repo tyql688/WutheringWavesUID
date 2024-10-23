@@ -19,6 +19,7 @@ from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_wea
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.download_file import get_skill_img, get_chain_img, get_phantom_img, get_fetter_img
+from ..utils.sonata_detail import get_sonata_detail, WavesSonataResult
 from ..utils.waves_api import waves_api
 from ..utils.weapon_detail import get_weapon_detail, WavesWeaponResult, get_breach
 from ..wutheringwaves_config import PREFIX
@@ -223,7 +224,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
         totalCost = role_detail.phantomData.cost
         equipPhantomList = role_detail.phantomData.equipPhantomList
         phantom_score = 0
-        phantom_sum_value = {}
+
+        phantom_sum_value = prepare_phantom(equipPhantomList)
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new('RGBA', (350, 550))
             sh_temp_draw = ImageDraw.Draw(sh_temp)
@@ -383,6 +385,25 @@ def get_weapon_icon_bg(star: int = 3) -> Image.Image:
     bg_path = TEXT_PATH / f'weapon_icon_bg_{star}.png'
     bg_img = Image.open(bg_path)
     return bg_img
+
+
+def prepare_phantom(equipPhantomList):
+    result = {}
+    temp_result = {}
+    for i, _phantom in enumerate(equipPhantomList):
+        if _phantom and _phantom.phantomProp:
+            sonata_result: WavesSonataResult = get_sonata_detail(_phantom.fetterDetail.name)
+            if sonata_result.name not in temp_result:
+                temp_result[sonata_result.name] = {"num": 1, "result": sonata_result}
+            else:
+                temp_result[sonata_result.name]['num'] += 1
+    for key, value in temp_result.items():
+        if value['num'] >= 2:
+            name = value['result'].set['2']['effect']
+            effect = value['result'].set['2']['param'][0]
+            result[name] = effect
+
+    return result
 
 
 def enhance_summation_phantom_value(role_id, role_level, role_breach,
