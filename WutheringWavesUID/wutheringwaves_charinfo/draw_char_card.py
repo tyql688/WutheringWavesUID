@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Tuple, Dict
+from typing import Tuple
 
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
@@ -9,17 +9,16 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
 from ..utils import hint
 from ..utils.api.model import RoleDetailData, AccountBaseInfo, WeaponData
-from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color, summation_phantom_value
-from ..utils.char_detail import get_char_detail, WavesCharResult
+from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color, get_calc_map
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102
+from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
     waves_font_24, waves_font_28
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.download_file import get_skill_img, get_chain_img, get_phantom_img, get_fetter_img
-from ..utils.sonata_detail import get_sonata_detail, WavesSonataResult
 from ..utils.waves_api import waves_api
 from ..utils.weapon_detail import get_weapon_detail, WavesWeaponResult, get_breach
 from ..wutheringwaves_config import PREFIX
@@ -226,6 +225,11 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
         phantom_score = 0
 
         phantom_sum_value = prepare_phantom(equipPhantomList)
+        phantom_sum_value = enhance_summation_phantom_value(
+            char_id, role_detail.role.level, role_detail.role.breach,
+            weapon_detail,
+            phantom_sum_value)
+        calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new('RGBA', (350, 550))
             sh_temp_draw = ImageDraw.Draw(sh_temp)
@@ -237,8 +241,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                     props.extend(_phantom.mainProps)
                 if _phantom.subProps:
                     props.extend(_phantom.subProps)
-                _score, _bg = calc_phantom_score(char_name, props, _phantom.cost)
-                phantom_sum_value = summation_phantom_value(phantom_sum_value, props)
+                _score, _bg = calc_phantom_score(char_name, props, _phantom.cost, calc_temp)
+
                 phantom_score += _score
                 sh_title = Image.open(TEXT_PATH / f'sh_title_{_bg}.png')
 
@@ -281,7 +285,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                     sh_temp_draw = ImageDraw.Draw(sh_temp)
                     _color = 'white'
                     if index > 1:
-                        _color = get_valid_color(char_name, _prop.attributeName)
+                        _color = get_valid_color(char_name, _prop.attributeName, calc_temp)
                     sh_temp_draw.text((60, 187 + index * oset), f'{_prop.attributeName[:6]}', _color, waves_font_24,
                                       'lm')
                     sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', _color, waves_font_24,
@@ -292,7 +296,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                 dest=(40 + ((i + 1) % 3) * 380, 120 + ph_sum_value + ((i + 1) // 3) * 600))
 
         if phantom_score > 0:
-            _bg = get_total_score_bg(char_name, phantom_score)
+            _bg = get_total_score_bg(char_name, phantom_score, calc_temp)
             sh_score_bg_c = Image.open(TEXT_PATH / f'sh_score_bg_{_bg}.png')
             score_temp = Image.new('RGBA', sh_score_bg_c.size)
             score_temp.alpha_composite(sh_score_bg_c)
@@ -313,11 +317,6 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
 
         phantom_temp.alpha_composite(score_temp, dest=(40, 120 + ph_sum_value))
 
-        phantom_sum_value = enhance_summation_phantom_value(
-            char_id, role_detail.role.level, role_detail.role.breach,
-            weapon_detail,
-            phantom_sum_value)
-
         shuxing = f"{role_detail.role.attributeName}伤害加成"
         for mi, m in enumerate(ph_sort_name):
             for ni, name_default in enumerate(m):
@@ -325,12 +324,12 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                 if name == "属性伤害加成":
                     value = phantom_sum_value.get(shuxing, default_value)
                     prop_img = await get_attribute_prop(shuxing)
-                    _color = get_valid_color(char_name, shuxing)
+                    _color = get_valid_color(char_name, shuxing, calc_temp)
                     name = shuxing
                 else:
                     value = phantom_sum_value.get(name, default_value)
                     prop_img = await get_attribute_prop(name)
-                    _color = get_valid_color(char_name, name)
+                    _color = get_valid_color(char_name, name, calc_temp)
                 prop_img = prop_img.resize((40, 40))
                 ph_bg = ph_0.copy() if ni % 2 == 0 else ph_1.copy()
                 ph_bg.alpha_composite(prop_img, (20, 32))
@@ -342,6 +341,13 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                                 'rm')
 
                 phantom_temp.alpha_composite(ph_bg, (40 + mi * 370, 100 + ni * 50))
+
+        ph_tips = ph_1.copy()
+        ph_tips_draw = ImageDraw.Draw(ph_tips)
+        ph_tips_draw.text((20, 50), f'[提示]评分模板', 'white', waves_font_24, 'lm')
+        ph_tips_draw.text((350, 50), f'{calc_temp["name"]}', (255, 255, 0), waves_font_24, 'rm')
+        # phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 100 + 4 * 50))
+        phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 45))
 
     img.paste(phantom_temp, (0, 1320), phantom_temp)
     img = add_footer(img)
@@ -385,57 +391,3 @@ def get_weapon_icon_bg(star: int = 3) -> Image.Image:
     bg_path = TEXT_PATH / f'weapon_icon_bg_{star}.png'
     bg_img = Image.open(bg_path)
     return bg_img
-
-
-def prepare_phantom(equipPhantomList):
-    result = {}
-    temp_result = {}
-    for i, _phantom in enumerate(equipPhantomList):
-        if _phantom and _phantom.phantomProp:
-            sonata_result: WavesSonataResult = get_sonata_detail(_phantom.fetterDetail.name)
-            if sonata_result.name not in temp_result:
-                temp_result[sonata_result.name] = {"num": 1, "result": sonata_result}
-            else:
-                temp_result[sonata_result.name]['num'] += 1
-    for key, value in temp_result.items():
-        if value['num'] >= 2:
-            name = value['result'].set['2']['effect']
-            effect = value['result'].set['2']['param'][0]
-            result[name] = effect
-
-    return result
-
-
-def enhance_summation_phantom_value(role_id, role_level, role_breach,
-                                    weapon_result: WavesWeaponResult,
-                                    result: Dict[str, str]):
-    char_result: WavesCharResult = get_char_detail(role_id, role_level, role_breach)
-
-    # weapon_result: WavesWeaponResult = get_weapon_detail(weapon_id, weapon_level, weapon_breach, weapon_reson_level)
-
-    # 基础生命
-    _life = char_result.stats['life']
-    # 基础攻击
-    _atk = char_result.stats['atk']
-    # 基础防御
-    _def = char_result.stats['def']
-
-    # 武器基础攻击
-    _weapon_atk = weapon_result.stats[0]['value']
-
-    base_atk = float(_atk) + float(_weapon_atk)
-    per_atk = float(result.get("攻击%", "0%").replace("%", "")) * 0.01
-    new_atk = int(base_atk * per_atk) + int(result.get("攻击", "0"))
-    result["攻击"] = f"{new_atk}"
-
-    base_life = float(_life)
-    per_life = float(result.get("生命%", "0%").replace("%", "")) * 0.01
-    new_life = int(base_life * per_life) + int(result.get("生命", "0"))
-    result["生命"] = f"{new_life}"
-
-    base_def = float(_def)
-    per_def = float(result.get("防御%", "0%").replace("%", "")) * 0.01
-    new_def = int(base_def * per_def) + int(result.get("防御", "0"))
-    result["防御"] = f"{new_def}"
-
-    return result

@@ -8,9 +8,10 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
-from ..utils.calculate import calc_phantom_score, get_total_score_bg
+from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_calc_map
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
+from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_15, \
     waves_font_22, waves_font_40, waves_font_24, waves_font_18, waves_font_20
 from ..utils.hint import error_reply
@@ -19,7 +20,7 @@ from ..utils.image import get_waves_bg, get_event_avatar, add_footer, GOLD, GREY
 from ..utils.resource.constant import NORMAL_LIST
 from ..utils.resource.download_file import get_skill_img
 from ..utils.waves_api import waves_api
-from ..utils.weapon_detail import get_breach
+from ..utils.weapon_detail import get_breach, WavesWeaponResult, get_weapon_detail
 from ..wutheringwaves_charinfo import refresh_char
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -66,8 +67,20 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
     waves_char_rank = []
     for char_name, role_detail in all_role_detail.items():
         phantom_score = 0
+        calc_temp = None
         if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
             equipPhantomList = role_detail.phantomData.equipPhantomList
+            weapon_detail: WavesWeaponResult = get_weapon_detail(
+                role_detail.weaponData.weapon.weaponId,
+                role_detail.weaponData.level,
+                role_detail.weaponData.breach,
+                role_detail.weaponData.resonLevel)
+            phantom_sum_value = prepare_phantom(equipPhantomList)
+            phantom_sum_value = enhance_summation_phantom_value(
+                role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
+                weapon_detail,
+                phantom_sum_value)
+            calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
             for i, _phantom in enumerate(equipPhantomList):
                 if _phantom and _phantom.phantomProp:
                     props = []
@@ -75,7 +88,7 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
                         props.extend(_phantom.mainProps)
                     if _phantom.subProps:
                         props.extend(_phantom.subProps)
-                    _score, _bg = calc_phantom_score(char_name, props, _phantom.cost)
+                    _score, _bg = calc_phantom_score(char_name, props, _phantom.cost, calc_temp)
                     phantom_score += _score
 
         wcr = WavesCharRank(**{
@@ -85,7 +98,7 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
             "level": role_detail.level,
             "chain": role_detail.get_chain_num(),
             "score": phantom_score,
-            "score_bg": get_total_score_bg(char_name, phantom_score)
+            "score_bg": get_total_score_bg(char_name, phantom_score, calc_temp)
         })
         waves_char_rank.append(wcr)
 

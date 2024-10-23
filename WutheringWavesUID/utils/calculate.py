@@ -1,14 +1,14 @@
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
+from .expression_evaluator import find_first_matching_expression
 from ..utils.api.model import Props
 
 MAP_PATH = Path(__file__).parent / "map/character"
 
-character_calculate_data = {}
 score_interval = [
     "c",
     "b",
@@ -19,35 +19,27 @@ score_interval = [
 ]
 
 
-def read_calc_json_files(directory):
-    files = directory.rglob('calc*.json')
+def get_calc_map(ctx: Dict, char_name: str):
+    char_path = MAP_PATH / char_name
+    if not char_path.is_dir():
+        char_path = MAP_PATH / 'default'
 
-    for file in files:
-        try:
-            with open(file, 'r', encoding='utf-8') as f:
-                data = msgjson.decode(f.read())
+    def check_conditions(file_name):
+        condition_path = char_path / file_name
+        if condition_path.exists():
+            with open(condition_path, 'r', encoding='utf-8') as f:
+                expressions = msgjson.decode(f.read())
+            return find_first_matching_expression(ctx, expressions)
+        return None
 
-                char_name = file.parents[0].name
-                file_name = file.name
-                if char_name not in character_calculate_data:
-                    character_calculate_data[char_name] = {}
+    # 先检查用户条件，然后是默认条件
+    calc_json_path = check_conditions('condition-user.json') or check_conditions('condition.json') or 'calc.json'
 
-                character_calculate_data[char_name][file_name] = data
-
-        except Exception as e:
-            logger.exception(f"Error decoding {file}", e)
-
-
-read_calc_json_files(MAP_PATH)
+    with open(char_path / calc_json_path, 'r', encoding='utf-8') as f:
+        return msgjson.decode(f.read())
 
 
-def check_calc_map(char_name: str):
-    return char_name if char_name in character_calculate_data else "default"
-
-
-def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int) -> (int, str):
-    calc_map = character_calculate_data.get(check_calc_map(char_name), {}).get("calc.json", {})
-
+def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int, calc_map: Union[Dict, None]) -> (int, str):
     if not calc_map:
         return 0, "c"
 
@@ -122,9 +114,7 @@ def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int) -> (in
     return final_score, score_level
 
 
-def get_total_score_bg(char_name: str, score: int):
-    calc_map = character_calculate_data.get(check_calc_map(char_name), {}).get("calc.json", {})
-
+def get_total_score_bg(char_name: str, score: int, calc_map: Union[Dict, None]):
     if not calc_map:
         return 0, "c"
 
@@ -138,8 +128,7 @@ def get_total_score_bg(char_name: str, score: int):
     return score_level
 
 
-def get_valid_color(char_name: str, attribute_name: str):
-    calc_map = character_calculate_data.get(check_calc_map(char_name), {}).get("calc.json", {})
+def get_valid_color(char_name: str, attribute_name: str, calc_map: Union[Dict, None]):
     if not calc_map:
         return 255, 255, 255
     _temp = calc_map['grade']
@@ -151,27 +140,3 @@ def get_valid_color(char_name: str, attribute_name: str):
             return 107, 140, 179
 
     return 255, 255, 255
-
-
-def summation_phantom_value(result: Dict[str, str], prop_list: List[Props]):
-    name_per = ["攻击", "生命", "防御"]
-
-    for prop in prop_list:
-        per = "%" in prop.attributeValue
-        name = prop.attributeName
-        if per and name in name_per:
-            name = f'{name}%'
-        if name not in result:
-            result[name] = prop.attributeValue
-            continue
-
-        if per:
-            old = float(result[name].replace("%", ""))
-            new = float(prop.attributeValue.replace("%", ""))
-            result[name] = f"{old + new:.1f}%"
-        else:
-            old = int(result[name])
-            new = int(prop.attributeValue)
-            result[name] = f"{old + new:d}"
-
-    return result
