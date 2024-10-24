@@ -34,7 +34,7 @@ def get_calc_map(ctx: Dict, char_name: str):
 
     # 先检查用户条件，然后是默认条件
     calc_json_path = check_conditions('condition-user.json') or check_conditions('condition.json') or 'calc.json'
-
+    logger.debug(f"{char_name} [匹配文件]: {char_path.name}/{calc_json_path}")
     with open(char_path / calc_json_path, 'r', encoding='utf-8') as f:
         return msgjson.decode(f.read())
 
@@ -116,7 +116,7 @@ def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int, calc_m
 
 def get_total_score_bg(char_name: str, score: int, calc_map: Union[Dict, None]):
     if not calc_map:
-        return 0, "c"
+        return "c"
 
     ratio = score / 250
     _temp = 0
