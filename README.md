@@ -51,7 +51,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 - [Yunzai-Kuro-Plugin](https://github.com/TomyJan/Yunzai-Kuro-Plugin) Yunzai 库洛插件
 - [Kuro-API-Collection](https://github.com/TomyJan/Kuro-API-Collection) 库街区 API 文档
 - 特别鸣谢以下攻略作者
-  - [Moealkyne](https://www.douyin.com/user/MS4wLjABAAAAizgh6etfiwTeiOrZvUW1gBhtJx8OB5Rac67oz5OdoKQzUOppTjARBlOueycZc0oC)
+  - [Moealkyne](https://www.taptap.cn/user/533395803)
   - [小沐XMu](https://www.kurobbs.com/person-center?id=10450567)
   - [金铃子攻略组](https://space.bilibili.com/487275027)
   - [結星](https://www.kurobbs.com/person-center?id=10015697)

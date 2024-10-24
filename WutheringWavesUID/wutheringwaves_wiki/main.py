@@ -92,6 +92,7 @@ class Guide:
             _msg = re.search(r'(https://.*[png|jpg])', _temp['url'])
             url = _msg.group(0) if _msg else ''
 
+            # logger.info(f'角色：{role_name} 作者：{auther_id} {url} 宽度: {_temp["imgWidth"]} 高度: {_temp["imgHeight"]}')
             if await self.check_width(_temp['imgWidth'], _temp['imgHeight'], auther_id):
                 continue
 
@@ -103,7 +104,7 @@ class Guide:
     async def check_width(self, imgWidth: int, imgHeight: int, auther_id: int) -> bool:
         if GUIDE_CONFIG_MAP['結星'][1] == auther_id:
             # 結星
-            return imgHeight < 2500
+            return imgHeight < 2000
         elif GUIDE_CONFIG_MAP['小沐XMu'][1] == auther_id:
             # 小沐XMu
             return imgHeight < 5000
