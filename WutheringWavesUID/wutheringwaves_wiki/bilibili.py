@@ -104,6 +104,9 @@ class GuideBilibili:
                     monent = monent_temp
                     break
             elif role_name in title and '一图流' in title:
+                if '忌炎' == role_name and '吟霖' in title:
+                    # 暂时 fix 屏蔽一下 蓝瘦（
+                    continue
                 monent = monent_temp
                 break
 
