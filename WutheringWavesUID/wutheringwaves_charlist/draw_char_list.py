@@ -229,7 +229,7 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
         if _rank.starLevel == 5 and _rank.roleName not in NORMAL_LIST:
             up_num += 1
 
-        if _rank.score >= 175 and _rank.score_bg in ['s', 's+', 'ace']:
+        if _rank.score >= 175 and _rank.score_bg in ['s', 'ss', 'sss']:
             level_num += 1
 
         if role_detail.get_chain_num() == 6:
