@@ -283,12 +283,13 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                     prop_img = prop_img.resize((40, 40))
                     sh_temp.alpha_composite(prop_img, (15, 167 + index * oset))
                     sh_temp_draw = ImageDraw.Draw(sh_temp)
-                    _color = 'white'
+                    name_color = 'white'
+                    num_color = 'white'
                     if index > 1:
-                        _color = get_valid_color(char_name, _prop.attributeName, calc_temp)
-                    sh_temp_draw.text((60, 187 + index * oset), f'{_prop.attributeName[:6]}', _color, waves_font_24,
+                        name_color, num_color = get_valid_color(_prop.attributeName, _prop.attributeValue, calc_temp)
+                    sh_temp_draw.text((60, 187 + index * oset), f'{_prop.attributeName[:6]}', name_color, waves_font_24,
                                       'lm')
-                    sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', _color, waves_font_24,
+                    sh_temp_draw.text((343, 187 + index * oset), f'{_prop.attributeValue}', num_color, waves_font_24,
                                       'rm')
 
             phantom_temp.alpha_composite(
@@ -324,20 +325,20 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                 if name == "属性伤害加成":
                     value = phantom_sum_value.get(shuxing, default_value)
                     prop_img = await get_attribute_prop(shuxing)
-                    _color = get_valid_color(char_name, shuxing, calc_temp)
+                    name_color, _ = get_valid_color(shuxing, value, calc_temp)
                     name = shuxing
                 else:
                     value = phantom_sum_value.get(name, default_value)
                     prop_img = await get_attribute_prop(name)
-                    _color = get_valid_color(char_name, name, calc_temp)
+                    name_color, _ = get_valid_color(name, value, calc_temp)
                 prop_img = prop_img.resize((40, 40))
                 ph_bg = ph_0.copy() if ni % 2 == 0 else ph_1.copy()
                 ph_bg.alpha_composite(prop_img, (20, 32))
                 ph_bg_draw = ImageDraw.Draw(ph_bg)
 
-                ph_bg_draw.text((70, 50), f'{name[:6]}', _color, waves_font_24,
+                ph_bg_draw.text((70, 50), f'{name[:6]}', name_color, waves_font_24,
                                 'lm')
-                ph_bg_draw.text((343, 50), f'{value}', _color, waves_font_24,
+                ph_bg_draw.text((343, 50), f'{value}', name_color, waves_font_24,
                                 'rm')
 
                 phantom_temp.alpha_composite(ph_bg, (40 + mi * 370, 100 + ni * 50))

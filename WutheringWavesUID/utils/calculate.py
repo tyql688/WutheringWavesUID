@@ -5,6 +5,8 @@ from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
 from .expression_evaluator import find_first_matching_expression
+from .image import SPECIAL_GOLD, WAVES_VOID, WAVES_SIERRA, WAVES_MOLTEN
+from .map.calc_score_script import phantom_sub_value_map as ph_sub_map
 from ..utils.api.model import Props
 
 MAP_PATH = Path(__file__).parent / "map/character"
@@ -128,15 +130,31 @@ def get_total_score_bg(char_name: str, score: int, calc_map: Union[Dict, None]):
     return score_level
 
 
-def get_valid_color(char_name: str, attribute_name: str, calc_map: Union[Dict, None]):
-    if not calc_map:
-        return 255, 255, 255
-    _temp = calc_map['grade']
-    if "valid_s" in _temp:
-        if attribute_name in _temp["valid_s"]:
-            return 234, 183, 4
-    if "valid_a" in _temp:
-        if attribute_name in _temp["valid_a"]:
-            return 107, 140, 179
+def get_valid_color(name, value, calc_map: Union[Dict, None]):
+    name_color = (255, 255, 255)
+    num_color = (255, 255, 255)
 
-    return 255, 255, 255
+    if not calc_map:
+        return name_color, num_color
+    _temp = calc_map['grade']
+    flag = False
+    if "valid_s" in _temp and name in _temp["valid_s"]:
+        name_color = SPECIAL_GOLD
+        num_color = SPECIAL_GOLD
+        flag = True
+    if "valid_a" in _temp and name in _temp["valid_a"]:
+        name_color = WAVES_VOID
+        num_color = WAVES_VOID
+        flag = True
+    if "valid_b" in _temp and name in _temp["valid_b"]:
+        name_color = WAVES_SIERRA
+        num_color = WAVES_SIERRA
+        flag = True
+
+    if flag:
+        if name in ph_sub_map and ph_sub_map[name][-1] == value:
+            num_color = WAVES_MOLTEN
+        elif name + '%' in ph_sub_map and ph_sub_map[name + '%'][-1] == value:
+            num_color = WAVES_MOLTEN
+
+    return name_color, num_color

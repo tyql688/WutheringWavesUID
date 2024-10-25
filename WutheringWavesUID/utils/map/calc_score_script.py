@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import List
 
 from loguru import logger
 from msgspec import json as msgjson
@@ -38,7 +39,7 @@ phantom_sub_value = [
     },
     {
         "name": "暴击伤害",
-        "values": ["12.6%", "13.8%", "15%", "16.2%", "17.4%", "18.6%", "19.8%", "21%"]
+        "values": ["12.6%", "13.8%", "15%", "16.2%", "17.4%", "18.6%", "19.8%", "21.0%"]
     },
     {
         "name": "普攻伤害加成",
@@ -113,12 +114,15 @@ phantom_main_value = [
 phantom_main_value_map = {i["name"]: i["values"] for i in phantom_main_value}
 
 
-def calc_sub_max_score(_temp, sub_props, jineng: float = None):
+def calc_sub_max_score(_temp, sub_props, jineng: float = None, skill_weight: List = None):
     score = 0
+    jineng_list = ["普攻伤害加成", "重击伤害加成", "共鸣技能伤害加成", "共鸣解放伤害加成"]
     for i in _temp:
         ratio = 1
         if jineng is not None and i == "技能伤害加成":
             ratio = jineng
+        elif i in jineng_list:
+            ratio = skill_weight[jineng_list.index(i)]
         _phantom_value = phantom_sub_value_map[i][-1]
         if "%" in _phantom_value:
             _phantom_value = _phantom_value.replace("%", "")
@@ -161,7 +165,7 @@ def read_calc_json_files(directory):
 
                 skill_weight = data['skill_weight']
                 jineng = max(skill_weight)
-                sub_max = calc_sub_max_score(data['max_sub_props'], data['sub_props'], jineng)
+                sub_max = calc_sub_max_score(data['max_sub_props'], data['sub_props'], jineng, skill_weight)
                 main_max = calc_main_max_score(data['max_main_props'], data['main_props'])
                 score_max = [round(sub_max + i, 2) for i in main_max]
                 logger.info(
