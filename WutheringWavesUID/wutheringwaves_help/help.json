@@ -147,6 +147,14 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "查询探索度",
+        "desc": "查询探索度",
+        "eg": "探索度",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },

@@ -211,13 +211,6 @@ class CalabashData(BaseModel):
     isUnlock: bool  # 解锁
 
 
-class ExploreData(BaseModel):
-    """探索度"""
-    countryCode: int  # 城市code: 1
-    countryName: str  # 城市名字: 瑝珑
-    countryProgress: str  # 进度: 75.81
-
-
 class KuroRoleInfo(BaseModel):
     """库洛角色信息"""
     id: int
@@ -310,3 +303,37 @@ class ChallengeArea(BaseModel):
     open: bool
     wikiUrl: Optional[Any] = None
     isUnlock: bool
+
+
+class ExploreItem(BaseModel):
+    name: str
+    progress: int
+    type: int
+
+
+class AreaInfo(BaseModel):
+    areaId: int
+    areaName: str
+    areaProgress: int
+    itemList: List[ExploreItem]
+
+
+class ExploreCountry(BaseModel):
+    countryId: int
+    countryName: str
+    detailPageFontColor: str
+    detailPagePic: str
+    detailPageProgressColor: str
+    homePageIcon: str
+
+
+class ExploreArea(BaseModel):
+    areaInfoList: Union[List[AreaInfo], None] = None
+    country: ExploreCountry
+    countryProgress: str
+
+
+class ExploreList(BaseModel):
+    """探索度"""
+    exploreList: Union[List[ExploreArea], None] = None
+    open: bool
