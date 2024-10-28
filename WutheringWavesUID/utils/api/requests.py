@@ -245,7 +245,7 @@ class WavesApi:
         self,
         roleId: str,
         token: str,
-        serverId: str = SERVER_ID,
+        serverId: str = None,
         countryCode: str = "1"
     ) -> (bool, Union[Dict, str]):
         """探索度"""

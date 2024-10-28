@@ -60,7 +60,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
         # 开始绘图任务
         task = []
         img = Image.new(
-            'RGBA', (based_w * len(valid_daily_list), based_h), (0, 0, 0, 0)
+            'RGBA', (based_w, based_h * len(valid_daily_list)), (0, 0, 0, 0)
         )
         for uid_index, temp in enumerate(valid_daily_list):
             task.append(_draw_all_stamina_img(ev, img, temp, uid_index))
@@ -77,7 +77,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
 async def _draw_all_stamina_img(ev: Event, img: Image.Image, daily_info: DailyData, index: int):
     stamina_img = await _draw_stamina_img(ev, daily_info)
     stamina_img = stamina_img.convert('RGBA')
-    img.paste(stamina_img, (based_w * index, 0), stamina_img)
+    img.paste(stamina_img, (0, based_h * index), stamina_img)
 
 
 async def _draw_stamina_img(ev: Event, daily_info: DailyData) -> Union[str, Image.Image]:
