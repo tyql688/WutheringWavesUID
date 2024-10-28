@@ -8,7 +8,12 @@ from gsuid_core.utils.database.base_models import Bind, User, T_User, with_sessi
 from gsuid_core.utils.database.startup import exec_list
 from gsuid_core.webconsole.mount_app import PageSchema, GsAdminModel, site
 
-exec_list.append('ALTER TABLE WavesUser ADD COLUMN platform TEXT DEFAULT ""')
+exec_list.extend(
+    [
+        'ALTER TABLE WavesUser ADD COLUMN platform TEXT DEFAULT ""',
+        'ALTER TABLE WavesUser ADD COLUMN stamina_bg_value TEXT DEFAULT ""',
+    ]
+)
 
 
 class WavesBind(Bind, table=True):
@@ -20,6 +25,7 @@ class WavesUser(User, table=True):
     uid: Optional[str] = Field(default=None, title='鸣潮UID')
     record_id: Optional[str] = Field(default=None, title='鸣潮记录ID')
     platform: str = Field(default="", title='ck平台')
+    stamina_bg_value: str = Field(default="", title='体力背景')
 
     @classmethod
     @with_session

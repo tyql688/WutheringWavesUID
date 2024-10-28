@@ -276,6 +276,14 @@
         "need_admin": false
       },
       {
+        "name": "设置体力背景",
+        "desc": "设置体力背景",
+        "eg": "设置体力背景长离",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "签到",
         "desc": "鸣潮签到",
         "eg": "签到",

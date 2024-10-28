@@ -11,7 +11,7 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import DailyData
-from ..utils.database.models import WavesBind
+from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import WAVES_CODE_103, ERROR_CODE, WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_24
 from ..utils.image import add_footer, GREY, GOLD, get_random_waves_role_pile, YELLOW, get_event_avatar, RED
@@ -104,7 +104,8 @@ async def _draw_stamina_img(ev: Event, daily_info: DailyData) -> Union[str, Imag
     avatar = await draw_pic_with_ring(ev)
 
     # 随机获得pile
-    pile = await get_random_waves_role_pile()
+    user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, 'uid', daily_info.roleId)
+    pile = await get_random_waves_role_pile(user.stamina_bg_value if user else None)
     pile = pile.crop((0, 0, pile.size[0], pile.size[1] - 155))
 
     base_info_draw = ImageDraw.Draw(base_info_bg)

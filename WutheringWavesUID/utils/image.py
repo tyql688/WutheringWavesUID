@@ -9,6 +9,7 @@ from PIL import Image, ImageOps
 from gsuid_core.models import Event
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
 from gsuid_core.utils.image.utils import sget
+from .name_convert import char_name_to_char_id
 from ..utils.resource.RESOURCE_PATH import (
     AVATAR_PATH,
     WEAPON_PATH,
@@ -56,7 +57,13 @@ WAVES_ECHO_MAP = {
 }
 
 
-async def get_random_waves_role_pile():
+async def get_random_waves_role_pile(name: str = None):
+    if name:
+        char_id = char_name_to_char_id(name)
+        png_name = f'role_pile_{char_id}.png'
+        if os.path.exists(f'{ROLE_PILE_PATH}/{png_name}'):
+            return Image.open(f'{ROLE_PILE_PATH}/{png_name}').convert('RGBA')
+        
     path = random.choice(os.listdir(f'{ROLE_PILE_PATH}'))
     return Image.open(f'{ROLE_PILE_PATH}/{path}').convert('RGBA')
 
