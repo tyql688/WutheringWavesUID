@@ -14,9 +14,9 @@ from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
-    waves_font_24, waves_font_28
+    waves_font_24, waves_font_28, waves_font_26, waves_font_42
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
-    get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD
+    get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.download_file import get_skill_img, get_chain_img, get_phantom_img, get_fetter_img
 from ..utils.waves_api import waves_api
@@ -85,6 +85,19 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
     base_info_draw.text((275, 120), f'{account_info.name[:7]}', 'white', waves_font_30, 'lm')
     base_info_draw.text((226, 173), f'特征码:  {account_info.id}', GOLD, waves_font_25, 'lm')
     img.paste(base_info_bg, (35, -30), base_info_bg)
+
+    if account_info.is_full:
+        title_bar = Image.open(TEXT_PATH / 'title_bar.png')
+        title_bar_draw = ImageDraw.Draw(title_bar)
+        title_bar_draw.text((510, 125), '账号等级', GREY, waves_font_26, 'mm')
+        title_bar_draw.text((510, 78), f'Lv.{account_info.level}', 'white', waves_font_42, 'mm')
+
+        title_bar_draw.text((660, 125), '世界等级', GREY, waves_font_26, 'mm')
+        title_bar_draw.text((660, 78), f'Lv.{account_info.worldLevel}', 'white', waves_font_42, 'mm')
+
+        logo_img = get_small_logo(2)
+        title_bar.alpha_composite(logo_img, dest=(780, 65))
+        img.paste(title_bar, (200, 15), title_bar)
 
     # 左侧pile部分
     role_pile = await get_role_pile(role_detail.role.roleId)

@@ -170,6 +170,10 @@ async def get_event_avatar(
     return img
 
 
+def get_small_logo(logo_num=1):
+    return Image.open(TEXT_PATH / f'logo_small_{logo_num}.png')
+
+
 def get_footer(color: Literal["white", "black"] = 'white'):
     return Image.open(TEXT_PATH / f'footer_{color}.png')
 
