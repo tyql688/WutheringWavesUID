@@ -63,7 +63,7 @@ async def get_random_waves_role_pile(name: str = None):
         png_name = f'role_pile_{char_id}.png'
         if os.path.exists(f'{ROLE_PILE_PATH}/{png_name}'):
             return Image.open(f'{ROLE_PILE_PATH}/{png_name}').convert('RGBA')
-        
+
     path = random.choice(os.listdir(f'{ROLE_PILE_PATH}'))
     return Image.open(f'{ROLE_PILE_PATH}/{path}').convert('RGBA')
 
@@ -201,3 +201,20 @@ def add_footer(
 
     img.paste(footer, (x, y), footer)
     return img
+
+
+async def change_color(chain, color: tuple = (255, 255, 255), w: int = None, h: int = None):
+    # 获取图像数据
+    pixels = chain.load()  # 加载像素数据
+    if w is None:
+        w = chain.size[0]
+    if h is None:
+        h = chain.size[1]
+
+    # 遍历图像的每个像素
+    for y in range(h):  # 图像高度
+        for x in range(w):  # 图像宽度
+            r, g, b, a = pixels[x, y]
+            pixels[x, y] = color + (a,)
+
+    return chain

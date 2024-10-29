@@ -11,8 +11,10 @@ from gsuid_core.utils.image.utils import sget
 from ..utils import hint
 from ..utils.api.model import AccountBaseInfo, ExploreList, AreaInfo, ExploreItem, ExploreArea
 from ..utils.error_reply import WAVES_CODE_102
-from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_36
-from ..utils.image import get_event_avatar, get_waves_bg, GOLD, add_footer, GREY, YELLOW
+from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_36, \
+    waves_font_24
+from ..utils.image import get_event_avatar, get_waves_bg, GOLD, add_footer, GREY, YELLOW, change_color, WAVES_FREEZING, \
+    WAVES_MOLTEN, WAVES_SIERRA, WAVES_SINKING, WAVES_VOID, WAVES_MOONLIT, WAVES_LINGERING
 from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -23,6 +25,31 @@ tag_yes_draw.text((85, 30), '已完成', 'white', waves_font_36, 'mm')
 tag_no = Image.open(TEXT_PATH / 'tag_no.png')
 tag_no_draw = ImageDraw.Draw(tag_no)
 tag_no_draw.text((85, 30), '未完成', 'white', waves_font_36, 'mm')
+
+country_color_map = {
+    "黑海岸": (28, 55, 118),
+    "瑝珑": (140, 113, 58),
+}
+
+progress_color = [
+    (10, WAVES_MOONLIT),
+    (20, WAVES_LINGERING),
+    (35, WAVES_FREEZING),
+    (50, WAVES_SIERRA),
+    (70, WAVES_SINKING),
+    (80, WAVES_VOID),
+    (90, YELLOW),
+    (100, WAVES_MOLTEN)
+]
+
+
+def get_progress_color(progress):
+    float_progress = float(progress)
+    result = WAVES_MOONLIT
+    for _p, color in progress_color:
+        if float_progress >= _p:
+            result = color
+    return result
 
 
 async def draw_explore_img(ev: Event, uid: str):
@@ -79,11 +106,12 @@ async def draw_explore_img(ev: Event, uid: str):
 
     explore_frame = Image.open(TEXT_PATH / 'explore_frame.png')
     explore_bar = Image.open(TEXT_PATH / 'explore_bar.png')
-    max_len = 360
+    max_len = 357
     hi = 250
     for mi, _explore in enumerate(explore_data.exploreList):
         _explore: ExploreArea
         _explore_title = explore_title.copy()
+        _explore_title = await change_color(_explore_title, country_color_map.get(_explore.country.countryName, YELLOW))
         # 大区域探索度
         content_img = Image.open(BytesIO((await sget(_explore.country.homePageIcon)).content)).convert('RGBA')
         _explore_title.alpha_composite(content_img, (150, 30))
@@ -98,6 +126,11 @@ async def draw_explore_img(ev: Event, uid: str):
         for ni, _subArea in enumerate(_explore.areaInfoList):
             _subArea: AreaInfo
             _explore_frame = explore_frame.copy()
+            _explore_frame = await change_color(
+                _explore_frame,
+                get_progress_color(_subArea.areaProgress),
+                h=83
+            )
             _explore_frame_draw = ImageDraw.Draw(_explore_frame)
 
             _explore_frame_draw.text((30, 50), f'{_subArea.areaName}', 'white', waves_font_36, 'lm')
@@ -113,11 +146,16 @@ async def draw_explore_img(ev: Event, uid: str):
                 _explore_frame_draw.rounded_rectangle(
                     (131, 113 + 70 * bi, int(131 + ratio * max_len), 126 + 70 * bi),
                     radius=10,
-                    fill=YELLOW)
+                    fill=get_progress_color(_item.progress))
 
                 # 小地区探索度
-                _explore_frame_draw.text((65, 120 + 70 * bi), f'{_item.name}', 'white', waves_font_30, 'mm')
-                _explore_frame_draw.text((590, 120 + 70 * bi), f'{_item.progress}%', 'white', waves_font_30, 'rm')
+                if len(_item.name) >= 4:
+                    s = len(_item.name) // 2
+                    _explore_frame_draw.text((68, 95 + 70 * bi), f'{_item.name[:s]}', 'white', waves_font_24, 'mm')
+                    _explore_frame_draw.text((68, 125 + 70 * bi), f'{_item.name[s:]}', 'white', waves_font_24, 'mm')
+                else:
+                    _explore_frame_draw.text((68, 120 + 70 * bi), f'{_item.name}', 'white', waves_font_30, 'mm')
+                _explore_frame_draw.text((580, 120 + 70 * bi), f'{_item.progress}%', 'white', waves_font_30, 'rm')
 
             _w = 100 + 600 * (ni % 3)
             _h = hi + 250 + 510 * int(ni / 3)
