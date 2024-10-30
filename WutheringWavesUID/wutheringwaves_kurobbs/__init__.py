@@ -36,6 +36,7 @@ async def bbs_recheck(bot: Bot, ev: Event):
     if not IS_REPORT:
         result['private_msg_dict'] = {}
     await send_board_cast_msg(result)
+    await bot.send('[鸣潮] [全部社区签到] 执行完成!')
 
 
 @scheduler.scheduled_job('cron', hour=SIGN_TIME[0], minute=SIGN_TIME[1])

@@ -182,7 +182,7 @@ async def do_sign_in(taskData, uid, token, form_result):
             # 签到成功
             form_result[uid][key] = taskData['needActionTimes']
             return
-    logger.exception(f'[鸣潮][社区签到]签到失败 uid: {uid}')
+    logger.warning(f'[鸣潮][社区签到]签到失败 uid: {uid}')
 
 
 async def do_detail(taskData, uid, token, form_result, post_list):
@@ -203,7 +203,7 @@ async def do_detail(taskData, uid, token, form_result, post_list):
         if detail_succ >= taskData['needActionTimes'] - taskData['completeTimes']:
             return
 
-    logger.exception(f'[鸣潮][社区签到]浏览失败 uid: {uid}')
+    logger.warning(f'[鸣潮][社区签到]浏览失败 uid: {uid}')
 
 
 async def do_like(taskData, uid, token, form_result, post_list):
@@ -225,7 +225,7 @@ async def do_like(taskData, uid, token, form_result, post_list):
         if like_succ >= taskData['needActionTimes'] - taskData['completeTimes']:
             return
 
-    logger.exception(f'[鸣潮][社区签到]点赞失败 uid: {uid}')
+    logger.warning(f'[鸣潮][社区签到]点赞失败 uid: {uid}')
 
 
 async def do_share(taskData, uid, token, form_result):

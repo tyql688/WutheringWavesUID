@@ -345,6 +345,14 @@
         "need_admin": true
       },
       {
+        "name": "全部重新库街区签到",
+        "desc": "全部重新库街区签到所有人",
+        "eg": "att",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
         "name": "下载全部资源",
         "desc": "下载全部资源",
         "eg": "下载全部资源",
