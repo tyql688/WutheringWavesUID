@@ -314,6 +314,14 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "开启库街区自动任务",
+        "desc": "开启每天的库街区自动任务",
+        "eg": "开启自动社区签到",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },

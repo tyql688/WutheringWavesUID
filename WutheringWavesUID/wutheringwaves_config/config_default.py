@@ -22,12 +22,22 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     ),
     'SignTime': GsListStrConfig(
         '每晚签到时间设置',
-        '每晚米游社签到时间设置（时，分）',
+        '每晚库街区签到时间设置（时，分）',
         ['0', '10'],
     ),
     'SchedSignin': GsBoolConfig(
         '定时签到',
         '开启后每晚00:10将开始自动签到任务',
+        True,
+    ),
+    'BBSSignTime': GsListStrConfig(
+        '库街区每日任务时间设置',
+        '库街区每日任务时间设置（时，分）',
+        ['0', '20'],
+    ),
+    'BBSSchedSignin': GsBoolConfig(
+        '定时库街区每日任务',
+        '开启后每晚00:20将开始自动库街区每日任务',
         True,
     ),
     'PrivateSignReport': GsBoolConfig(

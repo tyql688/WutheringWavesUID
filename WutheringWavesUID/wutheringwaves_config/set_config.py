@@ -7,6 +7,7 @@ PUSH_MAP = {
 }
 SIGN_MAP = {
     "自动签到": "sign",
+    "自动社区签到": "bbs_sign",
     "推送": "push",
 }
 WAVES_USER_MAP = {

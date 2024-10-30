@@ -12,6 +12,7 @@ exec_list.extend(
     [
         'ALTER TABLE WavesUser ADD COLUMN platform TEXT DEFAULT ""',
         'ALTER TABLE WavesUser ADD COLUMN stamina_bg_value TEXT DEFAULT ""',
+        'ALTER TABLE WavesUser ADD COLUMN bbs_sign_switch TEXT DEFAULT "off"',
     ]
 )
 
@@ -26,6 +27,7 @@ class WavesUser(User, table=True):
     record_id: Optional[str] = Field(default=None, title='鸣潮记录ID')
     platform: str = Field(default="", title='ck平台')
     stamina_bg_value: str = Field(default="", title='体力背景')
+    bbs_sign_switch: str = Field(default='off', title='自动社区签到')
 
     @classmethod
     @with_session

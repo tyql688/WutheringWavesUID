@@ -20,6 +20,14 @@ async def open_switch_func(bot: Bot, ev: Event):
     if uid is None:
         return await bot.send(f"您还未绑定鸣潮id, 请使用 {PREFIX}绑定UID 完成绑定！")
 
+    from ..utils.waves_api import waves_api
+    ck = await waves_api.get_self_waves_ck(uid)
+    if not ck:
+        from ..utils.error_reply import WAVES_CODE_102, ERROR_CODE
+        return await bot.send(
+            f'当前特征码：{uid}\n'
+            f'{ERROR_CODE[WAVES_CODE_102]}')
+
     logger.info(f"[{ev.user_id}]尝试[{ev.command[2:]}]了[{ev.text}]功能")
 
     im = await set_config_func(ev, uid)

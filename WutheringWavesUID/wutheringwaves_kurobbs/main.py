@@ -1,6 +1,8 @@
+import asyncio
 import copy
 import json as j
-from typing import Literal, Optional, Union, Dict, Any
+import random
+from typing import Literal, Optional, Union, Dict, Any, List
 
 from PIL import Image, ImageDraw
 from aiohttp import FormData, ClientSession, TCPConnector, ContentTypeError
@@ -8,6 +10,8 @@ from aiohttp import FormData, ClientSession, TCPConnector, ContentTypeError
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
+from gsuid_core.segment import MessageSegment
+from gsuid_core.utils.boardcast.models import BoardCastMsg, BoardCastMsgDict
 from gsuid_core.utils.image.convert import convert_img
 from ..utils.api.api import MAIN_URL
 from ..utils.database.models import WavesUser, WavesBind
@@ -161,7 +165,10 @@ class KuroBBS:
                 return raw_data
 
 
-async def do_sign_in(bbs_api, taskData, uid, token, form_result):
+bbs_api = KuroBBS()
+
+
+async def do_sign_in(taskData, uid, token, form_result):
     key = '签到'
     form_result[uid][key] = -1
     if taskData['completeTimes'] == taskData['needActionTimes']:
@@ -178,7 +185,7 @@ async def do_sign_in(bbs_api, taskData, uid, token, form_result):
     logger.exception(f'[鸣潮][社区签到]签到失败 uid: {uid}')
 
 
-async def do_detail(bbs_api, taskData, uid, token, form_result, post_list):
+async def do_detail(taskData, uid, token, form_result, post_list):
     key = '浏览'
     form_result[uid][key] = -1
     if taskData['completeTimes'] == taskData['needActionTimes']:
@@ -199,7 +206,7 @@ async def do_detail(bbs_api, taskData, uid, token, form_result, post_list):
     logger.exception(f'[鸣潮][社区签到]浏览失败 uid: {uid}')
 
 
-async def do_like(bbs_api, taskData, uid, token, form_result, post_list):
+async def do_like(taskData, uid, token, form_result, post_list):
     key = '点赞'
     form_result[uid][key] = -1
     if taskData['completeTimes'] == taskData['needActionTimes']:
@@ -221,7 +228,7 @@ async def do_like(bbs_api, taskData, uid, token, form_result, post_list):
     logger.exception(f'[鸣潮][社区签到]点赞失败 uid: {uid}')
 
 
-async def do_share(bbs_api, taskData, uid, token, form_result):
+async def do_share(taskData, uid, token, form_result):
     key = '分享'
     form_result[uid][key] = -1
     if taskData['completeTimes'] == taskData['needActionTimes']:
@@ -258,59 +265,67 @@ async def do_task(bot: Bot, ev: Event):
     if len(valid_ck_list) == 0:
         return ERROR_CODE[WAVES_CODE_102]
 
-    bbs_api = KuroBBS()
     form_result = {}
     for uid, token in valid_ck_list:
-        form_result[uid] = {
-            '签到': '', '浏览': '', '点赞': '', '分享': '', '库洛币': ''
-        }
-        # 任务列表
-        task_res = await bbs_api.get_task(token)
-        if not isinstance(task_res, dict):
-            continue
-        if task_res.get('code') != 200 or not task_res.get('data'):
-            continue
-
-        # check 1
-        need_post_list_flag = False
-        for i in task_res['data']['dailyTask']:
-            if i['completeTimes'] == i['needActionTimes']:
-                continue
-            if '签到' not in i['remark'] or '分享' not in i['remark']:
-                need_post_list_flag = True
-
-        post_list = []
-        if need_post_list_flag:
-            # 获取帖子
-            form_list_res = await bbs_api.get_form_list(token)
-            if isinstance(form_list_res, dict):
-                if form_list_res.get('code') == 200 and form_list_res.get('data'):
-                    # 获取到帖子列表
-                    post_list = form_list_res['data']['postList']
-            if not post_list:
-                logger.exception(f'[鸣潮][社区签到]获取帖子列表失败 uid: {uid} res: {form_list_res}')
-                # 未获取帖子列表
-                continue
-
-        # 获取到任务列表
-        for i in task_res['data']['dailyTask']:
-            if '签到' in i['remark']:
-                await do_sign_in(bbs_api, i, uid, token, form_result)
-            elif '浏览' in i['remark']:
-                await do_detail(bbs_api, i, uid, token, form_result, post_list)
-            elif '点赞' in i['remark']:
-                await do_like(bbs_api, i, uid, token, form_result, post_list)
-            elif '分享' in i['remark']:
-                await do_share(bbs_api, i, uid, token, form_result)
-
-        gold_res = await bbs_api.get_gold(token)
-        if isinstance(gold_res, dict):
-            if gold_res.get('code') == 200:
-                form_result[uid]['库洛币'] = gold_res["data"]["goldNum"]
+        res = await do_single_task(uid, token)
+        if res:
+            form_result[uid] = res[uid]
 
     card_img = await draw_task(form_result)
     card_img = await convert_img(card_img)
     return card_img
+
+
+async def do_single_task(uid, token):
+    # 任务列表
+    task_res = await bbs_api.get_task(token)
+    if not isinstance(task_res, dict):
+        return
+    if task_res.get('code') != 200 or not task_res.get('data'):
+        return
+
+        # check 1
+    need_post_list_flag = False
+    for i in task_res['data']['dailyTask']:
+        if i['completeTimes'] == i['needActionTimes']:
+            continue
+        if '签到' not in i['remark'] or '分享' not in i['remark']:
+            need_post_list_flag = True
+
+    post_list = []
+    if need_post_list_flag:
+        # 获取帖子
+        form_list_res = await bbs_api.get_form_list(token)
+        if isinstance(form_list_res, dict):
+            if form_list_res.get('code') == 200 and form_list_res.get('data'):
+                # 获取到帖子列表
+                post_list = form_list_res['data']['postList']
+        if not post_list:
+            logger.exception(f'[鸣潮][社区签到]获取帖子列表失败 uid: {uid} res: {form_list_res}')
+            # 未获取帖子列表
+            return
+
+    form_result = {
+        uid: {
+            '签到': '', '浏览': '', '点赞': '', '分享': '', '库洛币': ''
+        }}
+    # 获取到任务列表
+    for i in task_res['data']['dailyTask']:
+        if '签到' in i['remark']:
+            await do_sign_in(i, uid, token, form_result)
+        elif '浏览' in i['remark']:
+            await do_detail(i, uid, token, form_result, post_list)
+        elif '点赞' in i['remark']:
+            await do_like(i, uid, token, form_result, post_list)
+        elif '分享' in i['remark']:
+            await do_share(i, uid, token, form_result)
+
+    gold_res = await bbs_api.get_gold(token)
+    if isinstance(gold_res, dict):
+        if gold_res.get('code') == 200:
+            form_result[uid]['库洛币'] = gold_res["data"]["goldNum"]
+
+    return form_result
 
 
 async def draw_task(user_data):
@@ -399,3 +414,124 @@ async def draw_task(user_data):
             x += col_widths[col]
 
     return image
+
+
+async def single_task(
+    bot_id: str,
+    uid: str,
+    gid: str,
+    qid: str,
+    ck: str,
+    private_msgs: Dict,
+    group_msgs: Dict,
+):
+    im = await do_single_task(uid, ck)
+    if not im:
+        return
+    msg = []
+    msg.append(f'特征码: {uid}')
+    for i, r in im[str(uid)].items():
+        if r == 0:
+            r = '已完成'
+        elif r == -1:
+            r = '失败'
+        else:
+            r = f'{r}' if i == '库洛币' else f'成功{r}次'
+        msg.append(f'{i}: {r}')
+
+    im = '\n'.join(msg)
+    if gid == 'on':
+        if qid not in private_msgs:
+            private_msgs[qid] = []
+        private_msgs[qid].append(
+            {'bot_id': bot_id, 'uid': uid, 'msg': [MessageSegment.text(im)]}
+        )
+    else:
+        # 向群消息推送列表添加这个群
+        if gid not in group_msgs:
+            group_msgs[gid] = {
+                'bot_id': bot_id,
+                'success': 0,
+                'failed': 0,
+                'push_message': '',
+            }
+            group_msgs[gid]['success'] += 1
+
+
+async def auto_bbs_task():
+    tasks = []
+    private_msgs = {}
+    group_msgs = {}
+    _user_list: List[WavesUser] = await WavesUser.get_waves_all_user()
+
+    user_list: List[WavesUser] = []
+    for user in _user_list:
+        _uid = user.user_id
+        _switch = user.bbs_sign_switch
+        if _switch != 'off' and not user.status and _uid:
+            user_list.append(user)
+
+    for user in user_list:
+        succ, _ = await waves_api.refresh_data(user.uid, user.cookie)
+        if not succ:
+            continue
+        tasks.append(
+            single_task(
+                user.bot_id,
+                user.uid,
+                user.bbs_sign_switch,
+                user.user_id,
+                user.cookie,
+                private_msgs,
+                group_msgs,
+            ))
+        if len(tasks) >= 1:
+            await asyncio.gather(*tasks)
+            delay = 5 + random.randint(1, 5)
+            logger.info(
+                f'[鸣潮] [社区签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
+            )
+            tasks.clear()
+            await asyncio.sleep(delay)
+
+    await asyncio.gather(*tasks)
+    tasks.clear()
+
+    # 转为广播消息
+    private_msg_dict: Dict[str, List[BoardCastMsg]] = {}
+    group_msg_dict: Dict[str, BoardCastMsg] = {}
+    for qid in private_msgs:
+        msgs = []
+        for i in private_msgs[qid]:
+            msgs.extend(i['msg'])
+
+        if qid not in private_msg_dict:
+            private_msg_dict[qid] = []
+
+        private_msg_dict[qid].append(
+            {
+                'bot_id': private_msgs[qid][0]['bot_id'],
+                'messages': msgs,
+            }
+        )
+
+    for gid in group_msgs:
+        success = group_msgs[gid]['success']
+        faild = group_msgs[gid]['failed']
+        title = f'✅[鸣潮]今日社区签到任务已完成！\n📝本群共签到成功{success}人，共签到失败{faild}人。'
+        messages = [MessageSegment.text(title)]
+        if group_msgs[gid]['push_message']:
+            messages.append(MessageSegment.text('\n'))
+            messages.extend(group_msgs[gid]['push_message'])
+        group_msg_dict[gid] = {
+            'bot_id': group_msgs[gid]['bot_id'],
+            'messages': messages,
+        }
+
+    result: BoardCastMsgDict = {
+        'private_msg_dict': private_msg_dict,
+        'group_msg_dict': group_msg_dict,
+    }
+
+    logger.info(result)
+    return result
