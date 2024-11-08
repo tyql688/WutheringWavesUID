@@ -87,7 +87,7 @@ def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int, calc_m
             score += pros_temp.get("技能伤害加成", 0) * skill_weight[2] * value
         elif prop.attributeName == "共鸣解放伤害加成":
             score += pros_temp.get("技能伤害加成", 0) * skill_weight[3] * value
-        elif prop.attributeName[0:2] in ["冷凝", "衍射", "导电", "热熔", "气动"]:
+        elif prop.attributeName[0:2] in ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]:
             score += pros_temp.get("属性伤害加成", 0) * value
         else:
             score += pros_temp.get(prop.attributeName, 0) * value

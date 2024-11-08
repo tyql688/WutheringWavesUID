@@ -66,11 +66,10 @@
   "grade": {
     "valid_s": [
       "暴击",
-      "暴击伤害"
-    ],
-    "valid_a": [
+      "暴击伤害",
       "攻击"
     ],
+    "valid_a": [],
     "valid_b": []
   },
   "total_grade": [
