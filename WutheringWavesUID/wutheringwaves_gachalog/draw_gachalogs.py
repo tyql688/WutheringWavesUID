@@ -171,10 +171,14 @@ async def draw_card(uid: int, ev: Event):
                 newbie_flag = True
         else:
             _num = len(total_data[name]['rank_s_list'])
-            _numlen += bset * get_num_h(_num, 5)
+            if _num == 0:
+                _numlen += 50
+            else:
+                _numlen += bset * get_num_h(_num, 5)
 
     _newbielen = 320 if newbie_flag else 0
-    w, h = 1000, 350 + title_num * oset + _numlen + _newbielen
+    _header = 380
+    w, h = 1000, _header + title_num * oset + _numlen + _newbielen
 
     card_img = get_waves_bg(w, h)
     card_draw = ImageDraw.Draw(card_img)
@@ -261,13 +265,14 @@ async def draw_card(uid: int, ev: Event):
         title.paste(level_icon, (710, 51), level_icon)
         title_draw.text((783, 225), tag, 'white', waves_font_24, 'mm')
 
-        card_img.paste(title, (10, 400 + y + gindex * oset + _newbielen), title)
+        card_img.paste(title, (10, _header + y + gindex * oset + _newbielen), title)
         s_list = gacha_data['rank_s_list']
+        s_list.reverse()
         for index, item in enumerate(s_list):
             item_bg = await draw_pic(item)
 
             _x = 95 + 162 * (index % 5)
-            _y = 670 + bset * (index // 5) + y + gindex * oset + _newbielen
+            _y = _header + bset * (index // 5) + y + (gindex + 1) * oset + _newbielen
 
             card_img.paste(
                 item_bg,
@@ -276,13 +281,13 @@ async def draw_card(uid: int, ev: Event):
             )
         if not s_list:
             card_draw.text(
-                (475, 690 + y + gindex * oset + _newbielen),
+                (475, _header + y + (gindex + 1) * oset + _newbielen),
                 '当前该卡池暂未有5星数据噢!',
                 (157, 157, 157),
                 waves_font_20,
                 'mm',
             )
-        y += get_num_h(len(s_list), 5) * 150
+        y += get_num_h(len(s_list), 5) * bset
         gindex += 1
 
     newbie_bg = Image.open(TEXT_PATH / 'newbie.png')
