@@ -9,18 +9,18 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
 from ..utils import hint
 from ..utils.api.model import RoleDetailData, AccountBaseInfo, WeaponData
+from ..utils.ascension.weapon import get_weapon_detail, WavesWeaponResult, get_breach
 from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color, get_calc_map
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102
-from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value
+from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value, enhance_summation_card_value
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
     waves_font_24, waves_font_28, waves_font_26, waves_font_42
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from ..utils.resource.download_file import get_skill_img, get_chain_img, get_phantom_img, get_fetter_img
+from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_fetter_img, get_skill_img
 from ..utils.waves_api import waves_api
-from ..utils.weapon_detail import get_weapon_detail, WavesWeaponResult, get_breach
 from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -44,6 +44,32 @@ ph_sort_name = [
         ("共鸣技能伤害加成", '0.0%'),
         ("共鸣解放伤害加成", '0.0%')
     ]
+]
+
+card_sort_map = {
+    '生命': '0',
+    '攻击': '0',
+    '防御': '0',
+    '共鸣效率': '0%',
+    '暴击': '0.0%',
+    '暴击伤害': '0.0%',
+    '属性伤害加成': '0.0%',
+    '治疗效果加成': '0.0%',
+    '普攻伤害加成': '0.0%',
+    '重击伤害加成': '0.0%',
+    '共鸣技能伤害加成': '0.0%',
+    '共鸣解放伤害加成': '0.0%'
+}
+
+card_sort_name = [
+    ("生命", '0'),
+    ("攻击", '0'),
+    ("防御", '0'),
+    ("共鸣效率", '0%'),
+    ("暴击", '0.0%'),
+    ("暴击伤害", '0.0%'),
+    ("属性伤害加成", '0.0%'),
+    ("治疗效果加成", '0.0%')
 ]
 
 
@@ -70,7 +96,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
     role_detail: RoleDetailData = all_role_detail[char_name]
 
     ph_sum_value = 250
-    img = get_waves_bg(1200, 2650 + ph_sum_value, 'bg3')
+    jineng_len = 180
+    img = get_waves_bg(1200, 2650 + ph_sum_value + jineng_len, 'bg3')
 
     # 头像部分
     avatar = await draw_pic_with_ring(ev)
@@ -131,30 +158,30 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
     img.paste(char_fg, (25, 170), char_fg)
 
     # 右侧属性-技能
-    right_image_temp = Image.new('RGBA', (600, 1000))
-    banner1 = Image.open(TEXT_PATH / 'banner1.png')
-    right_image_temp.alpha_composite(banner1, dest=(0, 0))
-    for i, _skill in enumerate(role_detail.skillList):
-        skill_bg = Image.open(TEXT_PATH / 'skill_bg.png')
-
-        skill_img = await get_skill_img(role_detail.role.roleId, _skill.skill.name, _skill.skill.iconUrl)
-        skill_img = skill_img.resize((70, 70))
-        skill_bg.paste(skill_img, (57, 65), skill_img)
-
-        skill_bg_draw = ImageDraw.Draw(skill_bg)
-        skill_bg_draw.text((150, 83), f'{_skill.skill.type}', 'white', waves_font_25, 'lm')
-        skill_bg_draw.text((150, 113), f'Lv.{_skill.level}', 'white', waves_font_25, 'lm')
-
-        skill_bg_temp = Image.new('RGBA', skill_bg.size)
-        skill_bg_temp = Image.alpha_composite(skill_bg_temp, skill_bg)
-
-        _x = 10 + (i % 2) * 280
-        _y = 40 + (i // 2) * 150
-        right_image_temp.alpha_composite(skill_bg_temp, dest=(_x, _y))
+    right_image_temp = Image.new('RGBA', (600, 1100))
+    # banner1 = Image.open(TEXT_PATH / 'banner1.png')
+    # right_image_temp.alpha_composite(banner1, dest=(0, 0))
+    # for i, _skill in enumerate(role_detail.skillList):
+    #     skill_bg = Image.open(TEXT_PATH / 'skill_bg.png')
+    #
+    #     skill_img = await get_skill_img(role_detail.role.roleId, _skill.skill.name, _skill.skill.iconUrl)
+    #     skill_img = skill_img.resize((70, 70))
+    #     skill_bg.paste(skill_img, (57, 65), skill_img)
+    #
+    #     skill_bg_draw = ImageDraw.Draw(skill_bg)
+    #     skill_bg_draw.text((150, 83), f'{_skill.skill.type}', 'white', waves_font_25, 'lm')
+    #     skill_bg_draw.text((150, 113), f'Lv.{_skill.level}', 'white', waves_font_25, 'lm')
+    #
+    #     skill_bg_temp = Image.new('RGBA', skill_bg.size)
+    #     skill_bg_temp = Image.alpha_composite(skill_bg_temp, skill_bg)
+    #
+    #     _x = 10 + (i % 2) * 280
+    #     _y = 40 + (i // 2) * 150
+    #     right_image_temp.alpha_composite(skill_bg_temp, dest=(_x, _y))
 
     # 武器banner
     banner2 = Image.open(TEXT_PATH / 'banner2.png')
-    right_image_temp.alpha_composite(banner2, dest=(0, 500))
+    right_image_temp.alpha_composite(banner2, dest=(0, 550))
 
     # 右侧属性-武器
     weapon_bg = Image.open(TEXT_PATH / 'weapon_bg.png')
@@ -202,8 +229,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
     weapon_bg_temp_draw.text((130, 257), f'{weapon_detail.stats[1]["name"]}', 'white', waves_font_30, 'lm')
     weapon_bg_temp_draw.text((500, 257), f'{weapon_detail.stats[1]["value"]}', 'white', waves_font_30, 'rm')
 
-    right_image_temp.alpha_composite(weapon_bg_temp, dest=(0, 600))
-    img.paste(right_image_temp, (570, 220), right_image_temp)
+    right_image_temp.alpha_composite(weapon_bg_temp, dest=(0, 650))
+
     # 命座部分
     mz_temp = Image.new('RGBA', (1200, 300))
 
@@ -223,7 +250,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
             mz_bg_temp = ImageEnhance.Brightness(mz_bg_temp).enhance(0.5)
         mz_temp.alpha_composite(mz_bg_temp, dest=(i * 190, 0))
 
-    img.paste(mz_temp, (0, 1080), mz_temp)
+    img.paste(mz_temp, (0, 1080 + jineng_len), mz_temp)
 
     # 声骸
     phantom_temp = Image.new('RGBA', (1200, 1280 + ph_sum_value))
@@ -232,6 +259,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
 
     ph_0 = Image.open(TEXT_PATH / 'ph_0.png')
     ph_1 = Image.open(TEXT_PATH / 'ph_1.png')
+    phantom_sum_value = {}
     if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
         totalCost = role_detail.phantomData.cost
         equipPhantomList = role_detail.phantomData.equipPhantomList
@@ -240,7 +268,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
         phantom_sum_value = prepare_phantom(equipPhantomList)
         phantom_sum_value = enhance_summation_phantom_value(
             char_id, role_detail.role.level, role_detail.role.breach,
-            weapon_detail,
+            weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
             phantom_sum_value)
         calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
         for i, _phantom in enumerate(equipPhantomList):
@@ -363,7 +391,71 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
         # phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 100 + 4 * 50))
         phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 45))
 
-    img.paste(phantom_temp, (0, 1320), phantom_temp)
+    img.paste(phantom_temp, (0, 1320 + jineng_len), phantom_temp)
+
+    # 面板
+    card_map = enhance_summation_card_value(char_id, role_detail.role.level, role_detail.role.breach,
+                                            role_detail.role.attributeName,
+                                            weaponData.weapon.weaponId, weaponData.level, weaponData.breach,
+                                            weaponData.resonLevel,
+                                            phantom_sum_value, card_sort_map)
+    calc_temp = get_calc_map(card_map, role_detail.role.roleName)
+
+    banner1 = Image.open(TEXT_PATH / 'banner4.png')
+    right_image_temp.alpha_composite(banner1, dest=(0, 0))
+    sh_bg = Image.open(TEXT_PATH / 'prop_bg.png')
+    sh_bg_draw = ImageDraw.Draw(sh_bg)
+
+    shuxing = f"{role_detail.role.attributeName}伤害加成"
+    for index, name_default in enumerate(card_sort_name):
+        name, default_value = name_default
+        if name == "属性伤害加成":
+            value = card_map.get(shuxing, default_value)
+            prop_img = await get_attribute_prop(shuxing)
+            name_color, _ = get_valid_color(shuxing, value, calc_temp)
+            name = shuxing
+        else:
+            value = card_map.get(name, default_value)
+            prop_img = await get_attribute_prop(name)
+            name_color, _ = get_valid_color(name, value, calc_temp)
+
+        prop_img = prop_img.resize((40, 40))
+        sh_bg.alpha_composite(prop_img, (60, 40 + index * 55))
+        sh_bg_draw.text((120, 58 + index * 55), f'{name[:6]}', name_color, waves_font_24,
+                        'lm')
+        sh_bg_draw.text((530, 58 + index * 55), f'{value}', name_color, waves_font_24,
+                        'rm')
+
+    right_image_temp.alpha_composite(sh_bg, dest=(0, 80))
+    img.paste(right_image_temp, (570, 200), right_image_temp)
+
+    # 技能
+    skill_bar = Image.open(TEXT_PATH / 'skill_bar.png')
+    skill_bg_1 = Image.open(TEXT_PATH / 'skill_bg.png')
+
+    temp_i = 0
+    for _, _skill in enumerate(role_detail.skillList):
+        if _skill.skill.type == '延奏技能':
+            continue
+        skill_bg = skill_bg_1.copy()
+
+        skill_img = await get_skill_img(role_detail.role.roleId, _skill.skill.name, _skill.skill.iconUrl)
+        skill_img = skill_img.resize((70, 70))
+        skill_bg.paste(skill_img, (57, 65), skill_img)
+
+        skill_bg_draw = ImageDraw.Draw(skill_bg)
+        skill_bg_draw.text((150, 83), f'{_skill.skill.type}', 'white', waves_font_25, 'lm')
+        skill_bg_draw.text((150, 113), f'Lv.{_skill.level}', 'white', waves_font_25, 'lm')
+
+        skill_bg_temp = Image.new('RGBA', skill_bg.size)
+        skill_bg_temp = Image.alpha_composite(skill_bg_temp, skill_bg)
+
+        _x = 20 + temp_i * 215
+        _y = -20
+        skill_bar.alpha_composite(skill_bg_temp, dest=(_x, _y))
+        temp_i += 1
+    img.alpha_composite(skill_bar, dest=(0, 1150))
+
     img = add_footer(img)
     img = await convert_img(img)
     return img

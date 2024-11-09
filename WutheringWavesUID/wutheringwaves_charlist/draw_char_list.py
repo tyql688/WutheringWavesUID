@@ -8,19 +8,19 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
+from ..utils.ascension.weapon import get_breach
 from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_calc_map
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
 from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_15, \
-    waves_font_22, waves_font_40, waves_font_24, waves_font_18, waves_font_20
+    waves_font_22, waves_font_40, waves_font_24, waves_font_18, waves_font_20, waves_font_16, waves_font_34
 from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, get_event_avatar, add_footer, GOLD, GREY, get_attribute, get_square_avatar, \
     get_square_weapon, SPECIAL_GOLD
 from ..utils.resource.constant import NORMAL_LIST
 from ..utils.resource.download_file import get_skill_img
 from ..utils.waves_api import waves_api
-from ..utils.weapon_detail import get_breach, WavesWeaponResult, get_weapon_detail
 from ..wutheringwaves_charinfo import refresh_char
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -70,15 +70,11 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
         calc_temp = None
         if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
             equipPhantomList = role_detail.phantomData.equipPhantomList
-            weapon_detail: WavesWeaponResult = get_weapon_detail(
-                role_detail.weaponData.weapon.weaponId,
-                role_detail.weaponData.level,
-                role_detail.weaponData.breach,
-                role_detail.weaponData.resonLevel)
+            weaponData = role_detail.weaponData
             phantom_sum_value = prepare_phantom(equipPhantomList)
             phantom_sum_value = enhance_summation_phantom_value(
                 role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
-                weapon_detail,
+                weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
                 phantom_sum_value)
             calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
             for i, _phantom in enumerate(equipPhantomList):
@@ -175,10 +171,14 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
         if _rank.score > 0.0:
             score_bg = Image.open(TEXT_PATH / f'score_{_rank.score_bg}.png')
             bar_star.alpha_composite(score_bg, (200, 2))
+            bar_star_draw.text((348, 45), f'{_rank.score.__round__(1)}', 'white', waves_font_34, 'mm')
+            bar_star_draw.text((348, 75), f'声骸分数', SPECIAL_GOLD, waves_font_16, 'mm')
 
         # 技能
         skill_img_temp = Image.new('RGBA', (1500, 300))
         for i, _skill in enumerate(role_detail.skillList):
+            if _skill.skill.type == '延奏技能':
+                continue
             temp = Image.new('RGBA', (120, 140))
             skill_bg = Image.open(TEXT_PATH / 'skill_bg.png')
             temp.alpha_composite(skill_bg)
@@ -191,7 +191,7 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
             temp_draw.text((62, 115), f'{_skill.skill.type}', 'white', waves_font_15, 'mm')
             temp_draw.text((62, 132), f'Lv.{_skill.level}', 'white', waves_font_15, 'mm')
 
-            _x = i * 70
+            _x = 100 + i * 65
             skill_img_temp.alpha_composite(temp.resize((70, 82)), dest=(_x, 0))
         bar_star.alpha_composite(skill_img_temp, dest=(300, 10))
 
@@ -222,7 +222,7 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
 
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
-        bar_star.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(700, 25))
+        bar_star.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(710, 25))
 
         card_img.paste(bar_star, (0, avatar_h + info_bg_h + index * bar_star_h), bar_star)
 

@@ -5,8 +5,9 @@ from typing import Union
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
+from ..ascension.constant import fixed_name, sum_percentages
 
-MAP_PATH = Path(__file__).parent / "map/detail_json/char"
+MAP_PATH = Path(__file__).parent.parent / "map/detail_json/char"
 char_id_data = {}
 
 
@@ -31,6 +32,8 @@ class WavesCharResult:
         self.name = None
         self.starLevel = None
         self.stats = None
+        self.skillTrees = None
+        self.fixed_skill = None  # 固定技能
 
 
 def get_breach(breach: Union[int, None], level: int):
@@ -72,5 +75,26 @@ def get_char_detail(
     result.name = char_data["name"]
     result.starLevel = char_data["starLevel"]
     result.stats = copy.deepcopy(char_data["stats"][str(breach)][str(level)])
+    result.skillTrees = char_data["skillTree"]
+    result.fixed_skill = {}
+
+    char_data["skillTree"].items()
+    for key, value in char_data["skillTree"].items():
+        skill_info = value.get("skill", {})
+        name = skill_info.get("name", "")
+        if name in fixed_name and breach >= 3:
+            name = name.replace("提升", "").replace("全", "")
+            if name not in result.fixed_skill:
+                result.fixed_skill[name] = "0%"
+
+            result.fixed_skill[name] = sum_percentages(skill_info['param'][0], result.fixed_skill[name])
+
+        if skill_info.get("type") == "固有技能":
+            for i, name in enumerate(fixed_name):
+                if skill_info['desc'].startswith(name) or skill_info['desc'].startswith(f"{char_data['name']}的{name}"):
+                    name = name.replace("提升", "").replace("全", "")
+                    if name not in result.fixed_skill:
+                        result.fixed_skill[name] = "0%"
+                    result.fixed_skill[name] = sum_percentages(skill_info['param'][0], result.fixed_skill[name])
 
     return result

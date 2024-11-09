@@ -1,12 +1,14 @@
 import copy
+import re
 from pathlib import Path
 from typing import Union
 
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
+from ..ascension.constant import fixed_name
 
-MAP_PATH = Path(__file__).parent / "map/detail_json/weapon"
+MAP_PATH = Path(__file__).parent.parent / "map/detail_json/weapon"
 weapon_id_data = {}
 
 
@@ -34,6 +36,7 @@ class WavesWeaponResult:
         self.stats = None
         self.effect = None
         self.effectName = None
+        self.sub_effect = None
 
 
 def get_breach(breach: Union[int, None], level: int):
@@ -92,6 +95,20 @@ def get_weapon_detail(
             stat["value"] = f'{stat["value"] * 100:.1f}%'
         else:
             stat["value"] = f'{int(stat["value"])}'
+
+    result.sub_effect = None
+    for i, v in enumerate(fixed_name):
+        if result.effect.startswith(v):
+            pattern = r'\d+%'
+            match = re.search(pattern, result.effect)
+
+            if match:
+                percentage = match.group()
+                name = v.replace("提升", "").replace("全", "")
+                result.sub_effect = {
+                    "name": name,
+                    "value": f"{percentage}%"
+                }
 
     return result
 

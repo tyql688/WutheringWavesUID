@@ -11,10 +11,10 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 from gsuid_core.utils.image.utils import sget
 from ..utils.api.api import WIKI_DETAIL_URL, WIKI_ENTRY_DETAIL_URL, WIKI_CATALOGUE_MAP
+from ..utils.ascension.weapon import get_weapon_star
 from ..utils.fonts.waves_fonts import waves_font_70, waves_font_30, waves_font_24, waves_font_40, waves_font_origin
 from ..utils.image import get_waves_bg, add_footer, GOLD, GREY, SPECIAL_GOLD, get_weapon_type, get_crop_waves_bg, \
     get_attribute_prop, WAVES_ECHO_MAP, get_attribute_effect, change_color
-from ..utils.weapon_detail import get_weapon_star
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 

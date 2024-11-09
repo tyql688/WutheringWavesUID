@@ -5,7 +5,7 @@ from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
 
-MAP_PATH = Path(__file__).parent / "map/detail_json/sonata"
+MAP_PATH = Path(__file__).parent.parent / "map/detail_json/sonata"
 sonata_id_data = {}
 
 
