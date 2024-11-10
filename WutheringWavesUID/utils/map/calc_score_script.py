@@ -176,6 +176,11 @@ def read_calc_json_files(directory):
                 )
                 data['score_max'] = score_max
                 data['total_grade'] = [0, 0.4, 0.55, 0.7, 0.78, 0.84]
+                data['props_grade'] = [
+                    [0, 0.4, 0.55, 0.7, 0.78, 0.84],
+                    [0, 0.4, 0.55, 0.7, 0.78, 0.84],
+                    [0, 0.4, 0.55, 0.7, 0.78, 0.84]
+                ]
             with open(file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
 

@@ -30,7 +30,7 @@ def sum_percentages(*args):
         except ValueError:
             return f"输入的百分比格式不正确: '{percent}'"
 
-    return f"{total}%"
+    return f"{total:.1f}%"
 
 
 def sum_numbers(*args):
