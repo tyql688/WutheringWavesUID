@@ -116,6 +116,7 @@ class WavesApi:
 
         # 公共ck 随机一个
         user_list = await WavesUser.get_waves_all_user()
+        random.shuffle(user_list)
         ck_list = []
         for user in user_list:
             if not await WavesUser.cookie_validate(user.uid):
@@ -125,6 +126,7 @@ class WavesApi:
                 await WavesUser.mark_invalid(user.cookie, '无效')
                 continue
             ck_list.append(user.cookie)
+            break
 
         if len(ck_list) > 0:
             return random.choices(ck_list, k=1)[0]
