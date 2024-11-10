@@ -1,5 +1,4 @@
 import copy
-import re
 from pathlib import Path
 from typing import Union
 
@@ -96,19 +95,15 @@ def get_weapon_detail(
         else:
             stat["value"] = f'{int(stat["value"])}'
 
-    result.sub_effect = None
+    result.sub_effect = {}
     for i, v in enumerate(fixed_name):
         if result.effect.startswith(v):
-            pattern = r'\d+%'
-            match = re.search(pattern, result.effect)
-
-            if match:
-                percentage = match.group()
-                name = v.replace("提升", "").replace("全", "")
-                result.sub_effect = {
-                    "name": name,
-                    "value": f"{percentage}%"
-                }
+            value = weapon_data["param"][0][0]
+            name = v.replace("提升", "").replace("全", "")
+            result.sub_effect = {
+                "name": name,
+                "value": f"{value}"
+            }
 
     return result
 
