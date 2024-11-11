@@ -32,7 +32,7 @@ async def send_card_info(bot: Bot, ev: Event):
         return await bot.send(waves_datas)
 
     # 更新groupid
-    await WavesBind.insert_waves_uid(ev.user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9)
+    await WavesBind.insert_waves_uid(user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9)
 
     msg = f'[鸣潮] 刷新完成！本次刷新{len(waves_datas)}个角色!'
     msg += f'\n刷新角色列表:{",".join([i["role"]["roleName"] for i in waves_datas])}'
