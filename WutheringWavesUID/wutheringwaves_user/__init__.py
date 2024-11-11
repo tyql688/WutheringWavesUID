@@ -42,16 +42,12 @@ async def send_waves_del_ck_msg(bot: Bot, ev: Event):
 
 @waves_bind_uid.on_command(
     (
-        f'{PREFIX}绑定',
         f'{PREFIX}绑定uid',
         f'{PREFIX}绑定UID',
-        f'{PREFIX}切换',
         f'{PREFIX}切换uid',
         f'{PREFIX}切换UID',
-        f'{PREFIX}删除',
         f'{PREFIX}删除uid',
         f'{PREFIX}删除UID',
-        f'{PREFIX}查看',
         f'{PREFIX}查看uid',
         f'{PREFIX}查看UID',
     ),
@@ -85,7 +81,7 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
         else:
             return await bot.send(f'[鸣潮] 尚未绑定该UID{uid}')
     elif '查看' in ev.command:
-        uid_list = await WavesBind.get_uid_list_by_game(qid, ev.bot_id, uid)
+        uid_list = await WavesBind.get_uid_list_by_game(qid, ev.bot_id)
         if uid_list:
             uids = '\n'.join(uid_list)
             return await bot.send(f'[鸣潮] 绑定的UID列表为：\n{uids}')

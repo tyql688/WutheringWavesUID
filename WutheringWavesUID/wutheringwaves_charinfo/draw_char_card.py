@@ -159,25 +159,6 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
 
     # 右侧属性-技能
     right_image_temp = Image.new('RGBA', (600, 1100))
-    # banner1 = Image.open(TEXT_PATH / 'banner1.png')
-    # right_image_temp.alpha_composite(banner1, dest=(0, 0))
-    # for i, _skill in enumerate(role_detail.skillList):
-    #     skill_bg = Image.open(TEXT_PATH / 'skill_bg.png')
-    #
-    #     skill_img = await get_skill_img(role_detail.role.roleId, _skill.skill.name, _skill.skill.iconUrl)
-    #     skill_img = skill_img.resize((70, 70))
-    #     skill_bg.paste(skill_img, (57, 65), skill_img)
-    #
-    #     skill_bg_draw = ImageDraw.Draw(skill_bg)
-    #     skill_bg_draw.text((150, 83), f'{_skill.skill.type}', 'white', waves_font_25, 'lm')
-    #     skill_bg_draw.text((150, 113), f'Lv.{_skill.level}', 'white', waves_font_25, 'lm')
-    #
-    #     skill_bg_temp = Image.new('RGBA', skill_bg.size)
-    #     skill_bg_temp = Image.alpha_composite(skill_bg_temp, skill_bg)
-    #
-    #     _x = 10 + (i % 2) * 280
-    #     _y = 40 + (i // 2) * 150
-    #     right_image_temp.alpha_composite(skill_bg_temp, dest=(_x, _y))
 
     # 武器banner
     banner2 = Image.open(TEXT_PATH / 'banner2.png')
