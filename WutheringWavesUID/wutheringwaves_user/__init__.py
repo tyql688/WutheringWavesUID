@@ -12,13 +12,19 @@ waves_del_ck = SV('waves删除ck')
 waves_get_ck = SV('waves获取ck', area='DIRECT')
 
 
-@waves_add_ck.on_prefix((f'{PREFIX}添加CK', f'{PREFIX}添加ck'))
+@waves_add_ck.on_prefix((
+    f'{PREFIX}添加CK', f'{PREFIX}添加ck',
+    f'{PREFIX}添加Token', f'{PREFIX}添加token', f'{PREFIX}添加TOKEN'
+))
 async def send_waves_add_ck_msg(bot: Bot, ev: Event):
     ck = ev.text.strip()
     await bot.send(await add_cookie(ev, ck))
 
 
-@waves_del_ck.on_prefix((f'{PREFIX}删除ck', f'{PREFIX}删除CK'))
+@waves_del_ck.on_prefix((
+    f'{PREFIX}删除ck', f'{PREFIX}删除CK',
+    f'{PREFIX}删除Token', f'{PREFIX}删除token', f'{PREFIX}删除TOKEN'
+))
 async def send_waves_del_ck_msg(bot: Bot, ev: Event):
     uid = ev.text.strip()
     if not uid or len(uid) != 9:
@@ -26,19 +32,26 @@ async def send_waves_del_ck_msg(bot: Bot, ev: Event):
     await bot.send(await delete_cookie(uid))
 
 
-@waves_get_ck.on_fullmatch((f'{PREFIX}获取ck', f'{PREFIX}获取CK'))
+@waves_get_ck.on_fullmatch((
+    f'{PREFIX}获取ck', f'{PREFIX}获取CK',
+    f'{PREFIX}获取Token', f'{PREFIX}获取token', f'{PREFIX}获取TOKEN'
+))
 async def send_waves_del_ck_msg(bot: Bot, ev: Event):
     await bot.send(await get_cookie(bot, ev))
 
 
 @waves_bind_uid.on_command(
     (
+        f'{PREFIX}绑定',
         f'{PREFIX}绑定uid',
         f'{PREFIX}绑定UID',
+        f'{PREFIX}切换',
         f'{PREFIX}切换uid',
         f'{PREFIX}切换UID',
+        f'{PREFIX}删除',
         f'{PREFIX}删除uid',
         f'{PREFIX}删除UID',
+        f'{PREFIX}查看',
         f'{PREFIX}查看uid',
         f'{PREFIX}查看UID',
     ),
@@ -54,7 +67,7 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
     if '绑定' in ev.command:
         if not uid:
             return await bot.send('该命令需要带上正确的uid!\n')
-        data = await WavesBind.insert_uid(qid, ev.bot_id, uid, ev.group_id, lenth_limit=9)
+        data = await WavesBind.insert_waves_uid(qid, ev.bot_id, uid, ev.group_id, lenth_limit=9)
         return await send_diff_msg(
             bot,
             data,

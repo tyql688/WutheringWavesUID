@@ -4,7 +4,7 @@ from sqlalchemy import and_, or_, null
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Field, select
 
-from gsuid_core.utils.database.base_models import Bind, User, T_User, with_session, Push
+from gsuid_core.utils.database.base_models import Bind, User, T_User, with_session, Push, T_Bind
 from gsuid_core.utils.database.startup import exec_list
 from gsuid_core.webconsole.mount_app import PageSchema, GsAdminModel, site
 
@@ -19,6 +19,107 @@ exec_list.extend(
 
 class WavesBind(Bind, table=True):
     uid: Optional[str] = Field(default=None, title='鸣潮UID')
+
+    @classmethod
+    async def insert_waves_uid(
+        cls: Type[T_Bind],
+        user_id: str,
+        bot_id: str,
+        uid: str,
+        group_id: Optional[str] = None,
+        lenth_limit: Optional[int] = None,
+        is_digit: Optional[bool] = True,
+        game_name: Optional[str] = None,
+    ) -> int:
+        '''📝简单介绍:
+
+            基础`Bind`类的扩展方法, 为给定的`user_id`和`bot_id`插入一条uid绑定数据
+
+            可支持多uid的绑定, 如果绑定多个uid, 则数据库中uid列将会用`_`分割符相连接
+
+            可以使用`cls.get_uid_list_by_game()`方法获取相应多绑定uid列表
+
+            或者使用`cls.get_uid_by_game()`方法获得当前绑定uid（单个）
+
+        🌱参数:
+
+            🔹user_id (`str`):
+                    传入的用户id, 例如QQ号, 一般直接取`event.user_id`
+
+            🔹bot_id (`str`):
+                    传入的bot_id, 例如`onebot`, 一般直接取`event.bot_id`
+
+            🔹uid (`str`):
+                    将要插入的uid数据
+
+            🔹group_id (`Optional[str]`, 默认是 `None`):
+                    将要插入的群组数据，为绑定uid提供群组绑定
+
+            🔹lenth_limit (`Optional[int]`, 默认是 `None`):
+                    如果有传该参数, 当uid位数不等于该参数、或uid位数为0的时候, 返回`-1`
+
+            🔹is_digit (`Optional[bool]`, 默认是 `True`):
+                    如果有传该参数, 当uid不为全数字的时候, 返回`-3`
+
+            🔹game_name (`Optional[str]`, 默认是 `None`):
+                    根据该入参寻找相应列名
+
+        🚀使用范例:
+
+            `await GsBind.insert_uid(qid, ev.bot_id, uid, ev.group_id, 9)`
+
+        ✅返回值:
+
+            🔸`int`: 如果该UID已绑定, 则返回`-2`, 成功则为`0`, 合法校验失败为`-3`或`-1`
+        '''
+        if lenth_limit:
+            if len(uid) != lenth_limit:
+                return -1
+
+        if is_digit:
+            if not uid.isdigit():
+                return -3
+        if not uid:
+            return -1
+
+        # 第一次绑定
+        if not await cls.bind_exists(user_id, bot_id):
+            return await cls.insert_data(
+                user_id=user_id,
+                bot_id=bot_id,
+                **{'uid': uid, 'group_id': group_id},
+            )
+
+        result = await cls.select_data(user_id, bot_id)
+
+        uid_list = result.uid.split('_') if result and result.uid else []
+        uid_list = [i for i in uid_list if i] if uid_list else []
+
+        # 已经绑定了该UID
+        res = 0 if uid not in uid_list else -2
+
+        # 强制更新库表
+        force_update = False
+        if uid not in uid_list:
+            uid_list.append(uid)
+            force_update = True
+        new_uid = '_'.join(uid_list)
+
+        group_list = result.group_id.split('_') if result and result.group_id else []
+        group_list = [i for i in group_list if i] if group_list else []
+
+        if group_id and group_id not in group_list:
+            group_list.append(group_id)
+            force_update = True
+        new_group_id = '_'.join(group_list)
+
+        if force_update:
+            await cls.update_data(
+                user_id=user_id,
+                bot_id=bot_id,
+                **{'uid': new_uid, 'group_id': new_group_id},
+            )
+        return res
 
 
 class WavesUser(User, table=True):

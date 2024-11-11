@@ -173,7 +173,7 @@ async def add_cookie(ev, token) -> Union[WavesUser, None]:
     if "成功" in ck_res:
         user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, 'cookie', token)
         if user:
-            await WavesBind.insert_uid(ev.user_id, ev.bot_id, user.uid, ev.group_id, lenth_limit=9)
+            await WavesBind.insert_waves_uid(ev.user_id, ev.bot_id, user.uid, ev.group_id, lenth_limit=9)
         return user
     return None
 

@@ -12,6 +12,7 @@ waves_get_explore = SV('waves获取探索度')
 
 @waves_get_explore.on_fullmatch(
     (
+        f'{PREFIX}ts',
         f'{PREFIX}探索',
         f'{PREFIX}探索度',
     )

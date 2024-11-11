@@ -16,6 +16,7 @@ waves_char_detail = SV(f'waves角色面板')
 @waves_get_char_info.on_fullmatch(
     (
         f'{PREFIX}刷新面板',
+        f'{PREFIX}更新面板',
         f'{PREFIX}强制刷新',
     )
 )
@@ -29,6 +30,9 @@ async def send_card_info(bot: Bot, ev: Event):
     waves_datas = await refresh_char(uid)
     if isinstance(waves_datas, str):
         return await bot.send(waves_datas)
+
+    # 更新groupid
+    await WavesBind.insert_waves_uid(ev.user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9)
 
     msg = f'[鸣潮] 刷新完成！本次刷新{len(waves_datas)}个角色!'
     msg += f'\n刷新角色列表:{",".join([i["role"]["roleName"] for i in waves_datas])}'

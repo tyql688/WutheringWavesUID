@@ -10,7 +10,11 @@ sv_kuro_login = SV("库洛登录")
 sv_kuro_login_help = SV("库洛登录帮助", pm=0, priority=4)
 
 
-@sv_kuro_login.on_command(f"{PREFIX}登录")
+@sv_kuro_login.on_command((
+    f"{PREFIX}登录",
+    f"{PREFIX}登陆",
+    f"{PREFIX}登入",
+))
 async def get_resp_msg(bot: Bot, ev: Event):
     game_title = "[鸣潮]"
 

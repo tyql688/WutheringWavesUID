@@ -16,6 +16,7 @@ sv_waves_challenge = SV('waves查询全息')
     (
         f'{PREFIX}查询深渊',
         f'{PREFIX}sy',
+        f'{PREFIX}st',
         f'{PREFIX}深渊',
         f'{PREFIX}逆境深塔',
         f'{PREFIX}深塔',
