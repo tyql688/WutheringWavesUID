@@ -6,7 +6,7 @@ from PIL import Image, ImageOps, ImageDraw
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_pic, easy_paste, draw_text_by_line, easy_alpha_composite
 from .main import ann
-from ..utils.fonts.waves_fonts import waves_font_26, waves_font_18, waves_font_24
+from ..utils.fonts.waves_fonts import ww_font_26, ww_font_18, ww_font_24, ww_font_20
 from ..wutheringwaves_config import WutheringWavesConfig, PREFIX
 
 assets_dir = Path(__file__).parent / 'assets'
@@ -52,7 +52,7 @@ async def ann_list_card() -> bytes:
             new_item,
             (30, 30),
             subtitle,
-            waves_font_24,
+            ww_font_24,
             '#3b4354',
             270,
             True
@@ -68,16 +68,16 @@ async def ann_list_card() -> bytes:
                 new_item,
                 (30, 30),
                 subtitle,
-                waves_font_24,
+                ww_font_20,
                 '#3b4354',
-                270,
+                225
             )
 
             draw_text_by_line(
                 new_item,
                 (new_item.width - 80, 10),
                 str(ann_info['id']),
-                waves_font_18,
+                ww_font_18,
                 '#3b4354',
                 100,
             )
@@ -90,7 +90,7 @@ async def ann_list_card() -> bytes:
         f'*可以使用 {PREFIX}公告#0000(右上角ID) 来查看详细内容, 例子: {PREFIX}公告#2434'
     )
     draw_text_by_line(
-        bg, (0, bg.height - 35), tip, waves_font_18, '#767779', 1000, True
+        bg, (0, bg.height - 35), tip, ww_font_18, '#767779', 1000, True
     )
 
     return await convert_img(bg)
@@ -108,7 +108,7 @@ async def ann_detail_card(ann_id: int) -> Union[bytes, str]:
     res = await ann().get_ann_detail(postId)
     if not res:
         return '未找到该公告'
-    post_content = sorted(res['postContent'], key=lambda x: x['contentType'], reverse=True)
+    post_content = res['postContent']
     content_type2_first = filter_list(post_content, lambda x: x['contentType'] == 2)
     if not content_type2_first and 'coverImages' in res:
         _node = res['coverImages'][0]
@@ -127,7 +127,7 @@ async def ann_detail_card(ann_id: int) -> Union[bytes, str]:
                 x_drow_line_height,
                 x_drow_height,
             ) = split_text(content)
-            drow_height += x_drow_height
+            drow_height += x_drow_height + 30
         elif content_type == 2 and 'url' in temp and temp['url'].endswith(('jpg', 'png', 'jpeg')):
             # 图片
             _size = (temp['imgWidth'], temp['imgHeight'])
@@ -140,6 +140,8 @@ async def ann_detail_card(ann_id: int) -> Union[bytes, str]:
 
     im = Image.new('RGB', (1080, drow_height), '#f9f6f2')
     draw = ImageDraw.Draw(im)
+    # draw.text((0, 10), postTitle, fill=(0, 0, 0), font=ww_font_34)
+
     # 左上角开始
     x, y = 0, 0
 
@@ -155,8 +157,8 @@ async def ann_detail_card(ann_id: int) -> Union[bytes, str]:
                 drow_height,
             ) = split_text(content)
             for duanluo, line_count in drow_duanluo:
-                draw.text((x, y), duanluo, fill=(0, 0, 0), font=waves_font_26)
-                y += drow_line_height * line_count
+                draw.text((x, y), duanluo, fill=(0, 0, 0), font=ww_font_26)
+                y += drow_line_height * line_count + 30
         elif content_type == 2 and 'url' in temp and temp['url'].endswith(('jpg', 'png', 'jpeg')):
             # 图片
             _size = (temp['imgWidth'], temp['imgHeight'])
@@ -167,10 +169,10 @@ async def ann_detail_card(ann_id: int) -> Union[bytes, str]:
             easy_paste(im, img, (0, y))
             y += img.size[1] + 40
 
-    if hasattr(waves_font_26, 'getsize'):
-        _x, _y = waves_font_26.getsize('囗')  # type: ignore
+    if hasattr(ww_font_26, 'getsize'):
+        _x, _y = ww_font_26.getsize('囗')  # type: ignore
     else:
-        bbox = waves_font_26.getbbox('囗')
+        bbox = ww_font_26.getbbox('囗')
         _x, _y = bbox[2] - bbox[0], bbox[3] - bbox[1]
 
     padding = (_x, _y, _x, _y)
@@ -207,7 +209,7 @@ def get_duanluo(text: str):
     # 行高
     line_height = 0
     for char in text:
-        left, top, right, bottom = draw.textbbox((0, 0), char, waves_font_26)
+        left, top, right, bottom = draw.textbbox((0, 0), char, ww_font_26)
         width, height = (right - left, bottom - top)
         sum_width += width
         if sum_width > max_width:  # 超过预设宽度就修改段落 以及当前行数
