@@ -10,7 +10,7 @@ from gsuid_core.logger import logger
 from gsuid_core.plugins.core_command.core_webconsole import generate_random_string
 from .api import *
 from ..database.models import WavesUser
-from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_101
+from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_101, WAVES_CODE_109
 from ..hint import error_reply
 from ..util import get_public_ip
 from ...wutheringwaves_config import WutheringWavesConfig
@@ -20,6 +20,9 @@ async def _check_response(res: Dict) -> (bool, Union[Dict, str]):
     if isinstance(res, dict):
         if res.get('code') == 200 and res.get('data'):
             return True, res['data']
+
+        if res.get('msg') and res.get('msg') == '请求成功':
+            return False, error_reply(WAVES_CODE_109)
 
         if res.get('msg'):
             return False, res['msg']

@@ -66,6 +66,8 @@ async def draw_abyss_img(
 
     # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck)
+    if not succ:
+        return account_info
     account_info = AccountBaseInfo(**account_info)
 
     # 共鸣者信息

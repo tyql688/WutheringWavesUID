@@ -9,6 +9,7 @@ WAVES_CODE_105 = -105
 WAVES_CODE_106 = -106
 WAVES_CODE_107 = -107
 WAVES_CODE_108 = -108
+WAVES_CODE_109 = -109
 WAVES_CODE_998 = -998
 WAVES_CODE_999 = -999
 
@@ -22,6 +23,7 @@ ERROR_CODE = {
     WAVES_CODE_106: f"您未打开库街区我得资料的对外展示\n",
     WAVES_CODE_107: f"您未打开库街区共鸣者列表的对外展示\n",
     WAVES_CODE_108: f"当前抽卡链接已经失效，请重新导入抽卡链接\n",
+    WAVES_CODE_109: f"您的鸣潮id查询不到数据，请使用 {PREFIX}登录 或者 {PREFIX}添加CK 重新完成绑定！\n",
 
     WAVES_CODE_999: "不知道的错误，先看看日志吧"
 }

@@ -101,7 +101,7 @@ class ExpressionEvaluator:
             "!in": ExpressionFunc.func_not_in,
         }
         key, op, value = expression["key"], expression["op"], expression["value"]
-        return operations[op](self.ctx[key], value)
+        return operations[op](self.ctx.get(key), value)
 
 
 def find_first_matching_expression(ctx, expressions, default="calc.json"):
