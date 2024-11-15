@@ -16,13 +16,14 @@ from ..util import get_public_ip
 from ...wutheringwaves_config import WutheringWavesConfig
 
 
-async def _check_response(res: Dict) -> (bool, Union[Dict, str]):
+async def _check_response(res: Dict, roleId=None) -> (bool, Union[Dict, str]):
     if isinstance(res, dict):
         if res.get('code') == 200 and res.get('data'):
             return True, res['data']
 
         if res.get('msg') and res.get('msg') == '请求成功':
-            return False, error_reply(WAVES_CODE_109)
+            msg = f"\n鸣潮账号id: 【{roleId}】未绑定库街区!!!\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮账号数据"
+            return False, error_reply(WAVES_CODE_109, msg)
 
         if res.get('msg'):
             return False, res['msg']
@@ -180,7 +181,7 @@ class WavesApi:
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId}
         raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, roleId)
 
     async def refresh_data_for_platform(
         self,
@@ -194,7 +195,7 @@ class WavesApi:
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId}
         raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, roleId)
 
     async def get_base_info(self, roleId: str, token: str, serverId: str = None) -> (bool, Union[Dict, str]):
         header = copy.deepcopy(await get_headers(token))
@@ -205,14 +206,14 @@ class WavesApi:
         # if flag and res.get('creatTime') is None:
         #     return False, error_reply(WAVES_CODE_106)
         # return flag, res
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, roleId)
 
     async def get_role_info(self, roleId: str, token: str, serverId: str = None) -> (bool, Union[Dict, str]):
         header = copy.deepcopy(await get_headers(token))
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId}
         raw_data = await self._waves_request(ROLE_DATA_URL, "POST", header, data=data)
-        flag, res = await _check_response(raw_data)
+        flag, res = await _check_response(raw_data, roleId)
         if flag and res.get('roleList') is None:
             return False, error_reply(WAVES_CODE_107)
         return flag, res
@@ -244,7 +245,7 @@ class WavesApi:
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId}
         raw_data = await self._waves_request(CALABASH_DATA_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, roleId)
 
     async def get_explore_data(
         self,
@@ -259,7 +260,7 @@ class WavesApi:
         data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId,
                 'countryCode': countryCode}
         raw_data = await self._waves_request(EXPLORE_DATA_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, roleId)
 
     async def get_challenge_data(self, roleId: str, token: str, serverId: str = None) -> (bool, Union[Dict, str]):
         """全息"""
@@ -267,7 +268,7 @@ class WavesApi:
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId}
         raw_data = await self._waves_request(CHALLENGE_DATA_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, roleId)
 
     async def get_challenge_index(self, roleId: str, token: str, serverId: str = None) -> (bool, Union[Dict, str]):
         """全息"""
@@ -275,7 +276,7 @@ class WavesApi:
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId}
         raw_data = await self._waves_request(CHALLENGE_INDEX_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, roleId)
 
     async def get_abyss_data(self, roleId: str, token: str, serverId: str = None) -> (bool, Union[Dict, str]):
         """深渊"""
