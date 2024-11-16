@@ -394,7 +394,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                                             phantom_sum_value, card_sort_map)
     calc_temp = get_calc_map(card_map, role_detail.role.roleName)
 
-    if damageDetail:
+    if damageDetail and role_detail.phantomData and role_detail.phantomData.equipPhantomList:
         damageAttribute = card_sort_map_to_attribute(card_map)
         damage_title_bg = damage_bar1.copy()
         damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)

@@ -235,6 +235,7 @@ def card_sort_map_to_attribute(card_sort_map: Dict):
     attr.add_dmg_bonus(card_sort_map['dmg_bonus'])
     attr.set_dmg_bonus_phantom(card_sort_map)
     attr.set_echo_id(card_sort_map['echo_id'])
-    for ph_detail in card_sort_map['ph_detail']:
-        attr.add_ph_detail(ph_detail)
+    if card_sort_map.get('ph_detail'):
+        for ph_detail in card_sort_map['ph_detail']:
+            attr.add_ph_detail(ph_detail)
     return attr
