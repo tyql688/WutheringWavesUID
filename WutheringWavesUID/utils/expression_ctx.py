@@ -154,7 +154,7 @@ def enhance_summation_card_value(role_id, role_level, role_breach, role_attr,
     base_atk = float(sum_numbers(_atk, _weapon_atk))
     # 各种攻击百分比 = 武器副词条+武器谐振+固有技能
     per_temp = percent_to_float(card_sort_map['攻击'])
-    card_sort_map['atk_percent'] = per_temp + result['atk_percent']
+    card_sort_map['atk_percent'] = per_temp + result.get('atk_percent', 0)
     card_sort_map['atk_flat'] = float(result.get("atk_flat", 0))
     card_sort_map['攻击'] = sum_numbers(base_atk, result.get("攻击", 0), round(base_atk * per_temp))
     card_sort_map['攻击'] = f"{card_sort_map['攻击'].split('.')[0]}"
@@ -218,8 +218,8 @@ def enhance_summation_card_value(role_id, role_level, role_breach, role_attr,
         card_sort_map.get("治疗效果加成", "0%"))
     card_sort_map['heal_bonus'] = percent_to_float(card_sort_map['治疗效果加成'])
 
-    card_sort_map['ph_detail'] = result['ph_detail']
-    card_sort_map['echo_id'] = result['echo_id']
+    card_sort_map['ph_detail'] = result.get('ph_detail')
+    card_sort_map['echo_id'] = result.get('echo_id')
     # logger.debug(f"面板数据: {card_sort_map}")
     return card_sort_map
 
