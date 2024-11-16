@@ -33,6 +33,7 @@ class WavesWeaponResult:
         self.starLevel = None
         self.type = None
         self.stats = None
+        self.param = None
         self.effect = None
         self.effectName = None
         self.sub_effect = None
@@ -79,6 +80,7 @@ def get_weapon_detail(
     result.type = weapon_data["type"]
     result.effectName = weapon_data["effectName"]
     result.stats = copy.deepcopy(weapon_data["stats"][str(breach)][str(level)])
+    result.param = weapon_data["param"]
     effect = weapon_data["effect"]
     if resonLevel is None:
         resonLevel = 1

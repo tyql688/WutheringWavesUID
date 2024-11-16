@@ -1,3 +1,4 @@
+import copy
 import re
 from pathlib import Path
 from typing import Tuple
@@ -12,8 +13,10 @@ from ..utils.api.model import RoleDetailData, AccountBaseInfo, WeaponData
 from ..utils.ascension.weapon import get_weapon_detail, WavesWeaponResult, get_breach
 from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color, get_calc_map
 from ..utils.char_info_utils import get_all_role_detail_info
+from ..utils.damage.abstract import DamageDetailRegister
 from ..utils.error_reply import WAVES_CODE_102
-from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value, enhance_summation_card_value
+from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value, enhance_summation_card_value, \
+    card_sort_map_to_attribute
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
     waves_font_24, waves_font_28, waves_font_26, waves_font_42
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
@@ -72,6 +75,9 @@ card_sort_name = [
     ("治疗效果加成", '0.0%')
 ]
 
+damage_bar1 = Image.open(TEXT_PATH / 'damage_bar1.png')
+damage_bar2 = Image.open(TEXT_PATH / 'damage_bar2.png')
+
 
 async def draw_char_detail_img(ev: Event, uid: str, char: str):
     ck = await waves_api.get_ck(uid)
@@ -94,10 +100,13 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
         return f'[鸣潮] 未找到该角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!'
 
     role_detail: RoleDetailData = all_role_detail[char_name]
-
+    damageDetail = DamageDetailRegister.find_class(char_id)
     ph_sum_value = 250
     jineng_len = 180
-    img = get_waves_bg(1200, 2650 + ph_sum_value + jineng_len, 'bg3')
+    dd_len = 0
+    if damageDetail:
+        dd_len = 60 + (len(damageDetail) + 1) * 60
+    img = get_waves_bg(1200, 2650 + ph_sum_value + jineng_len + dd_len, 'bg3')
 
     # 头像部分
     avatar = await draw_pic_with_ring(ev)
@@ -381,6 +390,29 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                                             weaponData.resonLevel,
                                             phantom_sum_value, card_sort_map)
     calc_temp = get_calc_map(card_map, role_detail.role.roleName)
+
+    if damageDetail:
+        damageAttribute = card_sort_map_to_attribute(card_map)
+        damage_title_bg = damage_bar1.copy()
+        damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
+        damage_title_bg_draw.text((400, 50), f'伤害类型', 'white', waves_font_24, 'rm')
+        damage_title_bg_draw.text((700, 50), f'暴击伤害', 'white', waves_font_24, 'mm')
+        damage_title_bg_draw.text((1000, 50), f'期望伤害', 'white', waves_font_24, 'mm')
+        img.alpha_composite(damage_title_bg, dest=(0, 2600 + ph_sum_value + jineng_len))
+        for dindex, damage_temp in enumerate(damageDetail):
+            damage_title = damage_temp['title']
+            damageAttributeTemp = copy.deepcopy(damageAttribute)
+            crit_damage, expected_damage = damage_temp['func'](damageAttributeTemp, role_detail)
+            # logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
+            # logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
+            # logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
+
+            damage_bar = damage_bar2.copy() if dindex % 2 == 0 else damage_bar1.copy()
+            damage_bar_draw = ImageDraw.Draw(damage_bar)
+            damage_bar_draw.text((400, 50), f'{damage_title}', 'white', waves_font_24, 'rm')
+            damage_bar_draw.text((700, 50), f'{crit_damage}', 'white', waves_font_24, 'mm')
+            damage_bar_draw.text((1000, 50), f'{expected_damage}', 'white', waves_font_24, 'mm')
+            img.alpha_composite(damage_bar, dest=(0, 2600 + ph_sum_value + jineng_len + (dindex + 1) * 60))
 
     banner1 = Image.open(TEXT_PATH / 'banner4.png')
     right_image_temp.alpha_composite(banner1, dest=(0, 0))

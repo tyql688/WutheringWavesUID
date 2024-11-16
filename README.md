@@ -33,6 +33,10 @@
 <a><img src="https://s2.loli.net/2024/09/25/wIuqE96xG2tUhYM.jpg"></a>
 </p></details>
 
+<details><summary>面板图 - 命令: ww查询椿</summary><p>
+<a><img src="https://s2.loli.net/2024/11/16/eTjxq2nXNugMoWL.jpg"></a>
+</p></details>
+
 <details><summary>ck获取方法</summary><p>
 https://github.com/tyql688/WutheringWavesUID/wiki
 </details>
