@@ -46,7 +46,7 @@ class WeaponAbstract(object):
         weapon_breach: Union[int, None] = None,
         weapon_reson_level: Union[int, None] = 1
     ):
-        from WutheringWavesUID.utils.ascension.weapon import WavesWeaponResult, get_weapon_detail
+        from ...utils.ascension.weapon import WavesWeaponResult, get_weapon_detail
         weapon_detail: WavesWeaponResult = get_weapon_detail(weapon_id, weapon_level, weapon_breach, weapon_reson_level)
         self.weapon_id = weapon_id
         self.weapon_level = weapon_level
