@@ -18,7 +18,7 @@ from ..utils.error_reply import WAVES_CODE_102
 from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value, enhance_summation_card_value, \
     card_sort_map_to_attribute
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
-    waves_font_24, waves_font_28, waves_font_26, waves_font_42
+    waves_font_24, waves_font_28, waves_font_26, waves_font_42, waves_font_16
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
@@ -234,7 +234,10 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
         mz_bg_temp.alpha_composite(mz_bg, dest=(0, 0))
 
         name = re.sub(r'[",，]+', '', _mz.name)
-        mz_bg_temp_draw.text((147, 230), f'{name}', 'white', waves_font_20, 'mm')
+        if len(name) >= 8:
+            mz_bg_temp_draw.text((147, 230), f'{name}', 'white', waves_font_16, 'mm')
+        else:
+            mz_bg_temp_draw.text((147, 230), f'{name}', 'white', waves_font_20, 'mm')
 
         if not _mz.unlocked:
             mz_bg_temp = ImageEnhance.Brightness(mz_bg_temp).enhance(0.5)
