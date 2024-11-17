@@ -189,12 +189,16 @@ class Echo_390080007(EchoAbstract):
     # 最后一段命中敌人后，自身热熔伤害加成提升12.00%，普攻伤害加成提升12.00%，持续15秒。
 
     def damage(self, attr: DamageAttribute):
-        attr.add_dmg_bonus(0.12)
+        title = '燎照之骑'
+        msg = '自身热熔伤害加成提升12.00%'
+        attr.add_dmg_bonus(0.12, title, msg)
 
     def attack_damage(self, attr: DamageAttribute):
         """造成普攻伤害"""
         self.damage(attr)
-        attr.add_dmg_bonus(0.12)
+        title = '燎照之骑'
+        msg = '普攻伤害加成提升12.00%'
+        attr.add_dmg_bonus(0.12, title, msg)
 
 
 class Echo_390180010(EchoAbstract):
@@ -243,12 +247,16 @@ class Echo_6000042(EchoAbstract):
 
     # 幻形后，自身湮灭伤害加成提升12.00%，共鸣技能伤害加成提升12.00%，持续15秒。
     def damage(self, attr: DamageAttribute):
-        attr.add_dmg_bonus(0.12)
+        title = '无冠者'
+        msg = '自身湮灭伤害加成提升12.00%'
+        attr.add_dmg_bonus(0.12, title, msg)
 
     def skill_damage(self, attr: DamageAttribute):
         """造成共鸣技能伤害"""
         self.damage(attr)
-        attr.add_dmg_bonus(0.12)
+        title = '无冠者'
+        msg = '共鸣技能伤害加成提升12.00%'
+        attr.add_dmg_bonus(0.12, title, msg)
 
 
 class Echo_6000043(EchoAbstract):

@@ -172,3 +172,26 @@ class EchoAbstract(object):
     def skill_create_healing(self, attr: DamageAttribute):
         """共鸣技能造成治疗"""
         self.damage(attr)
+
+
+class CharAbstract(object):
+    name = None
+    id = None
+    starLevel = None
+
+    def do_buff(self,
+                attr: DamageAttribute,
+                chain: int = 0,
+                resonLevel: int = 1,
+                isGroup: bool = True,
+                func_list: Union[List[str], str] = None):
+        """
+        获得buff
+
+        :param attr: 人物伤害属性
+        :param chain: 命座
+        :param resonLevel: 武器谐振
+        :param isGroup: 是否组队
+
+        """
+        pass

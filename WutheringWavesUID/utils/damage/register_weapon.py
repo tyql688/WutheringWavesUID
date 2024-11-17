@@ -202,7 +202,9 @@ class Weapon_21020026(WeaponAbstract):
     def attack_damage(self, attr: DamageAttribute):
         """造成普攻伤害"""
         dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[3][self.weapon_reson_level - 1]}+{self.weapon_detail.param[4][self.weapon_reson_level - 1]}"
-        attr.add_dmg_bonus(calc_percent_expression(dmg))
+        title = "裁春"
+        msg = f"普攻伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21020034(WeaponAbstract):
@@ -485,6 +487,13 @@ class Weapon_21050036(WeaponAbstract):
     id = 21050036
     type = 5
     name = "星序协响"
+
+    def skill_create_healing(self, attr: DamageAttribute):
+        """共鸣技能造成治疗"""
+        dmg = f"{self.weapon_detail.param[4][self.weapon_reson_level - 1]}"
+        title = "星序协响"
+        msg = f"使附近队伍中所有角色的攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21050043(WeaponAbstract):

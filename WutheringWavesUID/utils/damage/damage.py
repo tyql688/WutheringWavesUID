@@ -7,7 +7,14 @@ class WavesEffect(object):
         self.element_value = element_value
 
     def __str__(self):
-        return f"msg={self.element_msg}, value={self.element_value})\n"
+        return f"msg={self.element_msg}, value={self.element_value})"
+
+    @classmethod
+    def add_effect(cls, title, msg):
+        if not title or not msg:
+            return
+        e = WavesEffect(f'{title}', f'{msg}')
+        return e
 
 
 def calc_percent_expression(express) -> float:
@@ -162,8 +169,13 @@ class DamageAttribute:
         # 效果
         self.effect = []
 
+        if self.enemy_resistance:
+            self.set_enemy_resistance(self.enemy_resistance, '敌人抗性', f'{self.enemy_resistance:.0%}')
+        self.add_effect('敌人防御', '1512')
+
     def __str__(self):
         ph_details_str = '\n'.join(str(ph) for ph in self.ph_detail)
+        effect_str = '\n'.join(str(e) for e in self.effect)
         return (
             f"\nDamageAttribute(\n"
             f"  char_atk={self.char_atk}, \n"
@@ -181,99 +193,92 @@ class DamageAttribute:
             f"  enemy_resistance={self.enemy_resistance}, \n"
             f"  dmg_bonus_phantom={self.dmg_bonus_phantom}, \n"
             f"  ph_detail={ph_details_str}, \n"
-            f"  effect={self.effect}\n"
+            f"  effect={effect_str}\n"
             f")"
         )
 
-    def set_char_atk(self, char_atk: float, msg=''):
+    def add_effect(self, title: str, msg: str):
+        effect = WavesEffect.add_effect(title, msg)
+        if effect is None:
+            return
+        self.effect.append(effect)
+
+    def set_char_atk(self, char_atk: float, title='', msg=''):
         """设置角色基础攻击力"""
         self.char_atk = char_atk
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{char_atk}'))
+        self.add_effect(title, msg)
         return self
 
-    def set_weapon_atk(self, weapon_atk: float, msg=''):
+    def set_weapon_atk(self, weapon_atk: float, title='', msg=''):
         """设置武器基础攻击力"""
         self.weapon_atk = weapon_atk
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{weapon_atk}'))
+        self.add_effect(title, msg)
         return self
 
-    def add_atk_percent(self, atk_percent: float, msg=''):
+    def add_atk_percent(self, atk_percent: float, title='', msg=''):
         """增加攻击力百分比"""
         self.atk_percent += atk_percent
-        if msg:
-            self.effect.append(WavesEffect(f'{msg}', f'{atk_percent}'))
+        self.add_effect(title, msg)
         return self
 
-    def set_atk_flat(self, atk_flat: float, msg=''):
+    def set_atk_flat(self, atk_flat: float, title='', msg=''):
         """设置固定攻击数值"""
         self.atk_flat = atk_flat
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{atk_flat}'))
+        self.add_effect(title, msg)
         return self
 
-    def set_skill_multi(self, skill_multi: str, msg=''):
+    def set_skill_multi(self, skill_multi: str, title='', msg=''):
         """设置技能倍率"""
         self.skill_multi = calc_percent_expression(skill_multi)
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{skill_multi}'))
+        self.add_effect(title, msg)
         return self
 
-    def add_skill_ratio(self, skill_ratio: float, msg=''):
+    def add_skill_ratio(self, skill_ratio: float, title='', msg=''):
         """设增加技能倍率加成"""
         self.skill_ratio += skill_ratio
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{skill_ratio}'))
+        self.add_effect(title, msg)
         return self
 
-    def add_dmg_bonus(self, dmg_bonus: float, msg=''):
+    def add_dmg_bonus(self, dmg_bonus: float, title='', msg=''):
         """增加伤害加成百分比"""
         self.dmg_bonus += dmg_bonus
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{dmg_bonus}'))
+        self.add_effect(title, msg)
         return self
 
-    def add_dmg_deepen(self, dmg_deepen: float, msg=''):
+    def add_dmg_deepen(self, dmg_deepen: float, title='', msg=''):
         """增加伤害加深百分比"""
         self.dmg_deepen += dmg_deepen
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{dmg_deepen}'))
+        self.add_effect(title, msg)
         return self
 
-    def add_crit_rate(self, crit_rate: float, msg=''):
+    def add_crit_rate(self, crit_rate: float, title='', msg=''):
         """设置暴击率"""
         self.crit_rate += crit_rate
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{crit_rate}'))
+        self.add_effect(title, msg)
         return self
 
-    def add_crit_dmg(self, crit_dmg: float, msg=''):
+    def add_crit_dmg(self, crit_dmg: float, title='', msg=''):
         """设置暴击伤害倍率"""
         self.crit_dmg += crit_dmg
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{crit_dmg}'))
+        self.add_effect(title, msg)
         return self
 
-    def set_character_level(self, character_level: int, msg=''):
+    def set_character_level(self, character_level: int, title='', msg=''):
         """设置角色等级"""
         self.character_level = character_level
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{character_level}'))
+        self.add_effect(title, msg)
         return self
 
-    def add_defense_reduction(self, defense_reduction: float, msg=''):
+    def add_defense_reduction(self, defense_reduction: float, title='', msg=''):
         """增加减防百分比"""
         self.defense_reduction += defense_reduction
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{defense_reduction}'))
+        self.add_effect(title, msg)
         return self
 
-    def set_enemy_resistance(self, enemy_resistance: float, msg=''):
+    def set_enemy_resistance(self, enemy_resistance: float, title='', msg=''):
         """增加敌人抗性百分比"""
         self.enemy_resistance = enemy_resistance
-        if msg:
-            self.effect.append(WavesEffect(msg, f'{enemy_resistance}'))
+        self.add_effect(title, msg)
         return self
 
     def set_dmg_bonus_phantom(self, dmg_bonus_phantom_map: Dict):
