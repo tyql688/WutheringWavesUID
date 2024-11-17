@@ -11,7 +11,7 @@ from ..utils.waves_prefix import PREFIX
 waves_role_info = SV('waves查询信息')
 
 
-@waves_role_info.on_fullmatch(f'{PREFIX}查询', block=True)
+@waves_role_info.on_fullmatch((f'{PREFIX}查询', f'{PREFIX}卡片'), block=True)
 async def send_role_info(bot: Bot, ev: Event):
     logger.info('[鸣潮]开始执行[查询信息]')
     user_id = ev.at if ev.at else ev.user_id

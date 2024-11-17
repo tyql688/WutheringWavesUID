@@ -143,7 +143,7 @@
       {
         "name": "查询角色面板",
         "desc": "查询角色面板",
-        "eg": "查询今汐",
+        "eg": "椿面板",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
@@ -151,7 +151,7 @@
       {
         "name": "查询角色伤害",
         "desc": "查询角色伤害",
-        "eg": "查询椿3",
+        "eg": "椿伤害3",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false

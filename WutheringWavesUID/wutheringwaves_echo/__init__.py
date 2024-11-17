@@ -16,6 +16,7 @@ sv_waves_echo_list = SV(f'{PREFIX}声骸展示')
         f'{PREFIX}我的声骸',
         f'{PREFIX}声骸仓库',
         f'{PREFIX}声骸',
+        f'{PREFIX}声骇',
     )
 )
 async def send_echo_list_msg(bot: Bot, ev: Event):

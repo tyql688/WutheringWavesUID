@@ -48,6 +48,8 @@ async def send_waves_del_ck_msg(bot: Bot, ev: Event):
         f'{PREFIX}切换UID',
         f'{PREFIX}删除uid',
         f'{PREFIX}删除UID',
+        f'{PREFIX}删除全部uid',
+        f'{PREFIX}删除全部UID',
         f'{PREFIX}查看uid',
         f'{PREFIX}查看UID',
     ),
@@ -77,7 +79,8 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
     elif '切换' in ev.command:
         retcode = await WavesBind.switch_uid_by_game(qid, ev.bot_id, uid)
         if retcode == 0:
-            return await bot.send(f'[鸣潮] 切换UID{uid}成功！')
+            uid_list = await WavesBind.get_uid_list_by_game(qid, ev.bot_id)
+            return await bot.send(f'[鸣潮] 切换UID【{uid_list[0]}】成功！')
         else:
             return await bot.send(f'[鸣潮] 尚未绑定该UID{uid}')
     elif '查看' in ev.command:
@@ -85,6 +88,16 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
         if uid_list:
             uids = '\n'.join(uid_list)
             return await bot.send(f'[鸣潮] 绑定的UID列表为：\n{uids}')
+        else:
+            return await bot.send(f'[鸣潮] 尚未绑定任何UID')
+    elif '删除全部' in ev.command:
+        retcode = await WavesBind.update_data(
+            user_id=qid,
+            bot_id=ev.bot_id,
+            **{WavesBind.get_gameid_name(None): None},
+        )
+        if retcode == 0:
+            return await bot.send(f'[鸣潮] 删除全部UID成功！')
         else:
             return await bot.send(f'[鸣潮] 尚未绑定任何UID')
     else:

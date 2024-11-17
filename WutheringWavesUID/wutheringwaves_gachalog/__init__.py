@@ -19,7 +19,7 @@ sv_gacha_help_log = SV('waves抽卡记录帮助')
 sv_get_gachalog_by_link = SV('waves导入抽卡链接', area='DIRECT')
 
 
-@sv_get_gachalog_by_link.on_command(f'{PREFIX}导入抽卡链接')
+@sv_get_gachalog_by_link.on_command((f'{PREFIX}导入抽卡链接', f'{PREFIX}导入抽卡记录'))
 async def get_gacha_log_by_link(bot: Bot, ev: Event):
     await bot.logger.info(f'开始执行[{PREFIX}导入抽卡链接]')
 

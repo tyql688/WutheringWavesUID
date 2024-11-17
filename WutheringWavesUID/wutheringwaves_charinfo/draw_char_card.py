@@ -5,7 +5,6 @@ from typing import Tuple
 
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
-from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
@@ -247,26 +246,12 @@ async def ph_card_draw(
 
 async def draw_char_detail_img(ev: Event, uid: str, char: str):
     char, damageId = parse_text_and_number(char)
-    ck = await waves_api.get_ck(uid)
-    if not ck:
-        return hint.error_reply(WAVES_CODE_102)
-    # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info
-    account_info = AccountBaseInfo(**account_info)
 
     char_id = char_name_to_char_id(char)
     if not char_id:
-        return f'[鸣潮] 角色名{char}无法找到, 可能暂未适配, 请先检查输入是否正确！'
-
+        return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！'
     char_name = alias_to_char_name(char)
-    all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
 
-    if all_role_detail is None or char_name not in all_role_detail:
-        return f'[鸣潮] 未找到该角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!'
-
-    role_detail: RoleDetailData = all_role_detail[char_name]
     damageDetail = DamageDetailRegister.find_class(char_id)
     ph_sum_value = 250
     jineng_len = 180
@@ -283,7 +268,28 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                 damage_calc = dd
                 break
         else:
-            return f'[鸣潮] 角色{char}未找到该伤害类型, 请先检查输入是否正确！'
+            return f'[鸣潮] 角色【{char_name}】未找到该伤害类型[{damageId}], 请先检查输入是否正确！'
+    else:
+        if damageId and not damageDetail:
+            return f'[鸣潮] 角色【{char_name}】暂不支持伤害计算！'
+
+    ck = await waves_api.get_ck(uid)
+    if not ck:
+        return hint.error_reply(WAVES_CODE_102)
+    # 账户数据
+    succ, account_info = await waves_api.get_base_info(uid, ck)
+    if not succ:
+        return account_info
+    account_info = AccountBaseInfo(**account_info)
+
+    all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
+
+    if all_role_detail is None or char_name not in all_role_detail:
+        return f'[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!'
+
+    role_detail: RoleDetailData = all_role_detail[char_name]
+
+    # 创建背景
     img = get_waves_bg(1200, 1250 + echo_list + ph_sum_value + jineng_len + dd_len, 'bg3')
 
     # 头像部分
@@ -445,9 +451,9 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
             damage_title = damage_temp['title']
             damageAttributeTemp = copy.deepcopy(damageAttribute)
             crit_damage, expected_damage = damage_temp['func'](damageAttributeTemp, role_detail)
-            logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
-            logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
-            logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
+            # logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
+            # logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
+            # logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
 
             damage_bar = damage_bar2.copy() if dindex % 2 == 0 else damage_bar1.copy()
             damage_bar_draw = ImageDraw.Draw(damage_bar)
