@@ -149,6 +149,14 @@
         "need_admin": false
       },
       {
+        "name": "查询角色伤害",
+        "desc": "查询角色伤害",
+        "eg": "查询椿3",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "查询探索度",
         "desc": "查询探索度",
         "eg": "探索度",
