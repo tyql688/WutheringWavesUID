@@ -11,17 +11,18 @@ from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
 from ..utils.waves_prefix import PREFIX
 
-waves_get_char_info = SV('waves获取面板')
-waves_char_detail = SV(f'waves角色面板')
+waves_new_get_char_info = SV('waves新获取面板', priority=3)
 waves_new_char_detail = SV(f'waves新角色面板', priority=4)
+waves_char_detail = SV(f'waves角色面板', priority=5)
 
 
-@waves_get_char_info.on_fullmatch(
+@waves_new_get_char_info.on_fullmatch(
     (
         f'{PREFIX}刷新面板',
         f'{PREFIX}更新面板',
         f'{PREFIX}强制刷新',
-    )
+    ),
+    block=True
 )
 async def send_card_info(bot: Bot, ev: Event):
     user_id = ev.at if ev.at else ev.user_id
