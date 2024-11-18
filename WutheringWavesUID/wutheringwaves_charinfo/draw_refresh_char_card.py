@@ -55,11 +55,11 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     # 更新group id
     await WavesBind.insert_waves_uid(user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9)
 
-    at_sender = True if ev.group_id else False
-    await bot.send(
-        f'[鸣潮]{uid}开始执行[{ev.command}], 需要一定时间...请勿重复触发！',
-        at_sender=at_sender
-    )
+    # at_sender = True if ev.group_id else False
+    # await bot.send(
+    #     f'[鸣潮]{uid}开始执行[{ev.command}], 需要一定时间...请勿重复触发！',
+    #     at_sender=at_sender
+    # )
     waves_map = {
         'refresh_update': {},
         'refresh_unchanged': {}
