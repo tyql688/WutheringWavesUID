@@ -1,9 +1,8 @@
 import copy
 import re
 from pathlib import Path
-from typing import Tuple
 
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance
+from PIL import Image, ImageDraw, ImageEnhance
 
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
@@ -20,7 +19,7 @@ from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_va
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
     waves_font_24, waves_font_28, waves_font_26, waves_font_42, waves_font_16
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
-    get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo
+    get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_fetter_img, get_skill_img
 from ..utils.waves_api import waves_api
@@ -574,24 +573,6 @@ async def draw_pic_with_ring(ev: Event):
     img.paste(resize_pic, (20, 20), mask)
 
     return img
-
-
-def draw_text_with_shadow(
-    image: ImageDraw,
-    text: str,
-    _x: int, _y: int,
-    font: ImageFont,
-    fill_color: str = "white",
-    shadow_color: str = "black",
-    offset: Tuple[int, int] = (2, 2),
-    anchor='rm'
-):
-    """描边"""
-    for i in range(-offset[0], offset[0] + 1):
-        for j in range(-offset[1], offset[1] + 1):
-            image.text((_x + i, _y + j), text, font=font, fill=shadow_color, anchor=anchor)
-
-    image.text((_x, _y), text, font=font, fill=fill_color, anchor=anchor)
 
 
 def get_weapon_icon_bg(star: int = 3) -> Image.Image:

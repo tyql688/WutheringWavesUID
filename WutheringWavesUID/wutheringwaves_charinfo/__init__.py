@@ -5,7 +5,6 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from .draw_char_card import draw_char_detail_img
-from .refresh_char_detail import refresh_char
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
@@ -31,15 +30,8 @@ async def send_card_info(bot: Bot, ev: Event):
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))
 
-    waves_datas = await refresh_char(uid)
-    if isinstance(waves_datas, str):
-        return await bot.send(waves_datas)
-
-    # 更新groupid
-    await WavesBind.insert_waves_uid(user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9)
-
-    msg = f'[鸣潮] 刷新完成！本次刷新{len(waves_datas)}个角色!'
-    msg += f'\n刷新角色列表:{",".join([i["role"]["roleName"] for i in waves_datas])}'
+    from .draw_refresh_char_card import draw_refresh_char_detail_img
+    msg = await draw_refresh_char_detail_img(bot, ev, user_id, uid)
     return await bot.send(msg)
 
 

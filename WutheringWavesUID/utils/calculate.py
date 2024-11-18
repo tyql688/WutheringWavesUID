@@ -112,7 +112,7 @@ def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int, calc_m
 
     final_score = round(percent_score * fix_max_score, 1)
     score_level = score_interval[_temp]
-    logger.debug(f"{char_name} [声骸评分]: {final_score} [声骸评分等级]: {score_level}")
+    # logger.debug(f"{char_name} [声骸评分]: {final_score} [声骸评分等级]: {score_level}")
     return final_score, score_level
 
 

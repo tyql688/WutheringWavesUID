@@ -2,9 +2,9 @@ import os
 import random
 from io import BytesIO
 from pathlib import Path
-from typing import Union, Literal, Optional
+from typing import Union, Literal, Optional, Tuple
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageDraw, ImageFont
 
 from gsuid_core.models import Event
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
@@ -54,6 +54,16 @@ WAVES_ECHO_MAP = {
     "隐世回光": WAVES_REJUVENATING,
     "轻云出月": WAVES_MOONLIT,
     "不绝余音": WAVES_LINGERING,
+}
+
+CHAIN_COLOR = {
+    0: WAVES_MOONLIT,
+    1: WAVES_LINGERING,
+    2: WAVES_FREEZING,
+    3: WAVES_SIERRA,
+    4: WAVES_VOID,
+    5: WAVES_MOONLIT,
+    6: WAVES_MOLTEN,
 }
 
 
@@ -222,3 +232,21 @@ async def change_color(chain, color: tuple = (255, 255, 255), w: int = None, h: 
             pixels[x, y] = color + (a,)
 
     return chain
+
+
+def draw_text_with_shadow(
+    image: ImageDraw,
+    text: str,
+    _x: int, _y: int,
+    font: ImageFont,
+    fill_color: str = "white",
+    shadow_color: str = "black",
+    offset: Tuple[int, int] = (2, 2),
+    anchor='rm'
+):
+    """描边"""
+    for i in range(-offset[0], offset[0] + 1):
+        for j in range(-offset[1], offset[1] + 1):
+            image.text((_x + i, _y + j), text, font=font, fill=shadow_color, anchor=anchor)
+
+    image.text((_x, _y), text, font=font, fill=fill_color, anchor=anchor)

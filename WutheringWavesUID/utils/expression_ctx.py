@@ -1,12 +1,72 @@
 import copy
 from typing import Dict, List, Union
 
+from pydantic import BaseModel
+
 from .ascension.char import WavesCharResult, get_char_detail
 from .ascension.constant import sum_percentages, sum_numbers, percent_to_float
 from .ascension.weapon import WavesWeaponResult, get_weapon_detail
+from .calculate import get_calc_map, calc_phantom_score, get_total_score_bg
+from .char_info_utils import get_all_role_detail_info
 from .damage.damage import DamageAttribute
 from ..utils.api.model import Props
 from ..utils.ascension.sonata import WavesSonataResult, get_sonata_detail
+
+
+class WavesCharRank(BaseModel):
+    roleId: int  # 角色id
+    roleName: str  # 角色名字
+    starLevel: int  # 角色星级
+    level: int  # 角色等级
+    chain: int  # 命座
+    chainName: str  # 命座
+    score: float  # 角色评分
+    score_bg: str  # 评分背景
+
+
+async def get_waves_char_rank(uid, all_role_detail):
+    if not all_role_detail:
+        all_role_detail = await get_all_role_detail_info(uid)
+    if isinstance(all_role_detail, Dict):
+        temp = all_role_detail.values()
+    else:
+        temp = all_role_detail
+    waves_char_rank = []
+    for role_detail in temp:
+        phantom_score = 0
+        calc_temp = None
+        if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
+            equipPhantomList = role_detail.phantomData.equipPhantomList
+            weaponData = role_detail.weaponData
+            phantom_sum_value = prepare_phantom(equipPhantomList)
+            phantom_sum_value = enhance_summation_phantom_value(
+                role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
+                weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
+                phantom_sum_value)
+            calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
+            for i, _phantom in enumerate(equipPhantomList):
+                if _phantom and _phantom.phantomProp:
+                    props = []
+                    if _phantom.mainProps:
+                        props.extend(_phantom.mainProps)
+                    if _phantom.subProps:
+                        props.extend(_phantom.subProps)
+                    _score, _bg = calc_phantom_score(role_detail.role.roleName, props, _phantom.cost, calc_temp)
+                    phantom_score += _score
+
+        wcr = WavesCharRank(**{
+            "roleId": role_detail.role.roleId,
+            "roleName": role_detail.role.roleName,
+            "starLevel": role_detail.role.starLevel,
+            "level": role_detail.level,
+            "chain": role_detail.get_chain_num(),
+            "chainName": role_detail.get_chain_name(),
+            "score": phantom_score,
+            "score_bg": get_total_score_bg(role_detail.role.roleName, phantom_score, calc_temp)
+        })
+        waves_char_rank.append(wcr)
+
+    return waves_char_rank
 
 
 def prepare_phantom(equipPhantomList):

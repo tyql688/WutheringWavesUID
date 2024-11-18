@@ -2,38 +2,26 @@ from pathlib import Path
 from typing import Union
 
 from PIL import Image, ImageDraw
-from pydantic import BaseModel
 
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
 from ..utils.ascension.weapon import get_breach
-from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_calc_map
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
-from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value
+from ..utils.expression_ctx import get_waves_char_rank, WavesCharRank
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_15, \
     waves_font_22, waves_font_40, waves_font_24, waves_font_18, waves_font_20, waves_font_16, waves_font_34
 from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, get_event_avatar, add_footer, GOLD, GREY, get_attribute, get_square_avatar, \
     get_square_weapon, SPECIAL_GOLD
+from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NORMAL_LIST
 from ..utils.resource.download_file import get_skill_img
 from ..utils.waves_api import waves_api
-from ..wutheringwaves_charinfo import refresh_char
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
-
-
-class WavesCharRank(BaseModel):
-    roleId: int  # 角色id
-    roleName: str  # 角色名字
-    starLevel: int  # 角色星级
-    level: int  # 角色等级
-    chain: int  # 命座
-    score: float  # 角色评分
-    score_bg: str  # 评分背景
 
 
 async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
@@ -64,40 +52,7 @@ async def draw_char_list_img(uid: str, ev: Event) -> Union[str, bytes]:
     if not all_role_detail:
         return error_reply(WAVES_CODE_107)
 
-    waves_char_rank = []
-    for char_name, role_detail in all_role_detail.items():
-        phantom_score = 0
-        calc_temp = None
-        if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
-            equipPhantomList = role_detail.phantomData.equipPhantomList
-            weaponData = role_detail.weaponData
-            phantom_sum_value = prepare_phantom(equipPhantomList)
-            phantom_sum_value = enhance_summation_phantom_value(
-                role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
-                weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
-                phantom_sum_value)
-            calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
-            for i, _phantom in enumerate(equipPhantomList):
-                if _phantom and _phantom.phantomProp:
-                    props = []
-                    if _phantom.mainProps:
-                        props.extend(_phantom.mainProps)
-                    if _phantom.subProps:
-                        props.extend(_phantom.subProps)
-                    _score, _bg = calc_phantom_score(char_name, props, _phantom.cost, calc_temp)
-                    phantom_score += _score
-
-        wcr = WavesCharRank(**{
-            "roleId": role_detail.role.roleId,
-            "roleName": role_detail.role.roleName,
-            "starLevel": role_detail.role.starLevel,
-            "level": role_detail.level,
-            "chain": role_detail.get_chain_num(),
-            "score": phantom_score,
-            "score_bg": get_total_score_bg(char_name, phantom_score, calc_temp)
-        })
-        waves_char_rank.append(wcr)
-
+    waves_char_rank = await get_waves_char_rank(uid, all_role_detail)
     waves_char_rank.sort(key=lambda i: (i.score, i.starLevel, i.level, i.chain, i.roleId), reverse=True)
 
     avatar_h = 230
