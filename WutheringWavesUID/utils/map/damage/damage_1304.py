@@ -65,13 +65,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     if chain_num >= 4:
         # 4命
         title = f"{role_name}-四命"
-        msg = f"施放共鸣解放或共鸣技能时，附近队伍中所有角色全属性伤害加成提升20%"
+        msg = f"施放共鸣技能时，角色全属性伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 6:
         # 6命
         title = f"{role_name}-六命"
-        msg = "共鸣技能伤害倍率提升45%，消耗【韶光】时带来的倍率增加效果额外提升45%。"
+        msg = "共鸣技能伤害倍率提升45%，消耗韶光时倍率额外提升45%。"
         attr.add_skill_ratio(0.45)
         attr.add_effect(title, msg)
 
@@ -142,7 +142,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     if chain_num >= 4:
         # 4命
         title = f"{role_name}-四命"
-        msg = f"施放共鸣解放或共鸣技能时，附近队伍中所有角色全属性伤害加成提升20%"
+        msg = f"施放共鸣解放时，角色全属性伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 5:
