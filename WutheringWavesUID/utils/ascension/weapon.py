@@ -37,6 +37,10 @@ class WavesWeaponResult:
         self.effect = None
         self.effectName = None
         self.sub_effect = None
+        self.resonLevel = None
+
+    def get_resonLevel_name(self):
+        return f'谐振{["一", "二", "三", "四", "五"][self.resonLevel - 1]}阶'
 
 
 def get_breach(breach: Union[int, None], level: int):
@@ -84,6 +88,7 @@ def get_weapon_detail(
     effect = weapon_data["effect"]
     if resonLevel is None:
         resonLevel = 1
+    result.resonLevel = resonLevel
     for i, p in enumerate(weapon_data["param"]):
         _temp = '{' + str(i) + '}'
         effect = effect.replace(f"{_temp}", str(p[resonLevel - 1]))

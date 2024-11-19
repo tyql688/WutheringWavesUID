@@ -63,6 +63,9 @@ class WeaponAbstract(object):
             if callable(method):
                 method(attr)
 
+    def get_title(self):
+        return f"{self.name}-{self.weapon_detail.get_resonLevel_name()}"
+
     def damage(self, attr: DamageAttribute):
         """造成伤害"""
         pass

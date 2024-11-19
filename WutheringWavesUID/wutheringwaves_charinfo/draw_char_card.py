@@ -182,7 +182,7 @@ async def ph_card_draw(
             if is_draw:
                 phantom_temp.alpha_composite(
                     sh_temp,
-                    dest=(40 + ((i + 1) % 3) * 380, 120 + ph_sum_value + ((i + 1) // 3) * 600))
+                    dest=(30 + ((i + 1) % 3) * 385, 120 + ph_sum_value + ((i + 1) // 3) * 600))
 
         if phantom_score > 0:
             _bg = get_total_score_bg(char_name, phantom_score, calc_temp)
@@ -205,7 +205,7 @@ async def ph_card_draw(
             score_temp_draw.text((180, 380), f'- 分', 'white', waves_font_40, 'mm')
 
         if is_draw:
-            phantom_temp.alpha_composite(score_temp, dest=(40, 120 + ph_sum_value))
+            phantom_temp.alpha_composite(score_temp, dest=(30, 120 + ph_sum_value))
 
         shuxing = f"{role_detail.role.attributeName}伤害加成"
         for mi, m in enumerate(ph_sort_name):
@@ -442,9 +442,9 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
         damageAttribute = card_sort_map_to_attribute(card_map)
         damage_title_bg = damage_bar1.copy()
         damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
-        damage_title_bg_draw.text((400, 50), f'伤害类型', 'white', waves_font_24, 'rm')
-        damage_title_bg_draw.text((700, 50), f'暴击伤害', 'white', waves_font_24, 'mm')
-        damage_title_bg_draw.text((1000, 50), f'期望伤害', 'white', waves_font_24, 'mm')
+        damage_title_bg_draw.text((400, 50), f'伤害类型', SPECIAL_GOLD, waves_font_24, 'rm')
+        damage_title_bg_draw.text((700, 50), f'暴击伤害', SPECIAL_GOLD, waves_font_24, 'mm')
+        damage_title_bg_draw.text((1000, 50), f'期望伤害', SPECIAL_GOLD, waves_font_24, 'mm')
         img.alpha_composite(damage_title_bg, dest=(0, 2600 + ph_sum_value + jineng_len))
         for dindex, damage_temp in enumerate(damageDetail):
             damage_title = damage_temp['title']
@@ -526,9 +526,9 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
 
         damage_title_bg = damage_bar1.copy()
         damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
-        damage_title_bg_draw.text((400, 50), f'伤害类型', 'white', waves_font_24, 'rm')
-        damage_title_bg_draw.text((700, 50), f'暴击伤害', 'white', waves_font_24, 'mm')
-        damage_title_bg_draw.text((1000, 50), f'期望伤害', 'white', waves_font_24, 'mm')
+        damage_title_bg_draw.text((400, 50), f'伤害类型', SPECIAL_GOLD, waves_font_24, 'rm')
+        damage_title_bg_draw.text((700, 50), f'暴击伤害', SPECIAL_GOLD, waves_font_24, 'mm')
+        damage_title_bg_draw.text((1000, 50), f'期望伤害', SPECIAL_GOLD, waves_font_24, 'mm')
         damage_img.alpha_composite(damage_title_bg, dest=(0, 10))
 
         damage_bar = damage_bar2.copy()
