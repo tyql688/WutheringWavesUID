@@ -66,6 +66,21 @@ class Weapon_21010026(WeaponAbstract):
     type = 1
     name = "时和岁稔"
 
+    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成共鸣技能伤害"""
+        if isGroup:
+            # 施放变奏技能时，自身获得【岁蕴】，使共鸣技能伤害加成提升24%
+            dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
+            title = self.get_title()
+            msg = f"施放变奏技能时，使共鸣技能伤害加成提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+        # 施放共鸣技能时，自身获得【福泽】，使共鸣技能伤害加成提升24%
+        dmg = f"{self.weapon_detail.param[3][self.weapon_reson_level - 1]}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，使共鸣技能伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21010034(WeaponAbstract):
     id = 21010034

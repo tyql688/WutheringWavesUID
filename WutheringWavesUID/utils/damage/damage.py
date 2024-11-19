@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 
 class WavesEffect(object):
@@ -239,14 +239,18 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
-    def add_skill_multi(self, skill_multi: str, title='', msg=''):
-        """设置技能倍率"""
-        self.skill_multi += calc_percent_expression(skill_multi)
+    def add_skill_multi(self, skill_multi: Union[str, float], title='', msg=''):
+        """增加技能倍率"""
+        if isinstance(skill_multi, str):
+            skill_multi = calc_percent_expression(skill_multi)
+        self.skill_multi += skill_multi
         self.add_effect(title, msg)
         return self
 
-    def add_skill_ratio(self, skill_ratio: float, title='', msg=''):
-        """设增加技能倍率加成"""
+    def add_skill_ratio(self, skill_ratio: Union[str, float], title='', msg=''):
+        """增加技能倍率加成"""
+        if isinstance(skill_ratio, str):
+            skill_ratio = calc_percent_expression(skill_ratio)
         self.skill_ratio += skill_ratio
         self.add_effect(title, msg)
         return self

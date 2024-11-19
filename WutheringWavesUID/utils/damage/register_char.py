@@ -1,7 +1,7 @@
 from typing import Union, List
 
 from .damage import DamageAttribute
-from .utils import CHAR_ATTR_CELESTIAL
+from .utils import CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING
 from ...utils.damage.abstract import CharAbstract, WavesCharRegister, WavesWeaponRegister
 
 
@@ -53,6 +53,36 @@ class Char_1105(CharAbstract):
     id = 1105
     name = "折枝"
     starLevel = 5
+
+    def do_buff(self,
+                attr: DamageAttribute,
+                chain: int = 6,
+                resonLevel: int = 1,
+                isGroup: bool = True,
+                func_list: Union[List[str], str] = None):
+        if chain >= 4:
+            title = f"{self.name}-四命"
+            msg = "折枝施放共鸣解放虚实境趣时，队伍中角色攻击提升20%"
+            attr.add_atk_percent(0.2, title, msg)
+
+        title = f"{self.name}-合鸣效果-轻云出月"
+        msg = "使用延奏技能后，下一个登场的共鸣者攻击提升22.5%"
+        attr.add_atk_percent(0.225, title, msg)
+
+        # 无常凶鹭
+        title = f"{self.name}-声骸技能-无常凶鹭"
+        msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
+        attr.add_dmg_bonus(0.12, title, msg)
+
+        if attr.char_attr == CHAR_ATTR_FREEZING:
+            title = f"{self.name}-延奏技能"
+            msg = "下一位登场角色冷凝伤害加深20%"
+            attr.add_dmg_bonus(0.2, title, msg)
+
+        if func_list and 'skill_damage' in func_list:
+            title = f"{self.name}-延奏技能"
+            msg = "下一位登场角色共鸣技能伤害加深25%"
+            attr.add_dmg_deepen(0.25, title, msg)
 
 
 class Char_1106(CharAbstract):
@@ -200,12 +230,12 @@ class Char_1503(CharAbstract):
                 func_list: Union[List[str], str] = None):
         """获得buff"""
         title = "维里奈-固有技能-自然的献礼"
-        msg = "施放重击、空中攻击、共鸣解放或延奏技能时，队伍中的角色攻击提升20%"
+        msg = "队伍中的角色攻击提升20%"
         attr.add_atk_percent(0.2, title, msg)
 
         if chain >= 4 and attr.char_attr == CHAR_ATTR_CELESTIAL:
             title = "维里奈-四命"
-            msg = "施放重击、空中攻击、共鸣解放或延奏技能时，队伍中的角色衍射伤害加成提升15%"
+            msg = "队伍中的角色衍射伤害加成提升15%"
             attr.add_dmg_bonus(0.4, title, msg)
 
         title = "维里奈-合鸣效果-隐世回光"

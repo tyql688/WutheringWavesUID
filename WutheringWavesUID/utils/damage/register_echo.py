@@ -362,10 +362,12 @@ class Echo_6000059(EchoAbstract):
     name = "角"
 
     # 自身的共鸣技能伤害加成提升16.00%
-    def skill_damage(self, attr: DamageAttribute):
+    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣技能伤害"""
-        self.damage(attr)
-        attr.add_dmg_bonus(0.16)
+        title = self.name
+        msg = '共鸣技能伤害加成提升16.00%'
+        attr.add_dmg_bonus(0.16, title, msg)
+        return True
 
 
 class Echo_6000060(EchoAbstract):

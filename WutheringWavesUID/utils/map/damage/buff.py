@@ -31,3 +31,11 @@ def weilinai_buff(attr, chain, resonLevel, isGroup, func_list):
     if char_clz:
         s = char_clz()
         s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup, func_list=func_list)
+
+
+def zhezhi_buff(attr, chain, resonLevel, isGroup, func_list):
+    # 折枝buff
+    char_clz = WavesCharRegister.find_class(1105)
+    if char_clz:
+        s = char_clz()
+        s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup, func_list=func_list)
