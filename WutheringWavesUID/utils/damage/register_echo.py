@@ -1,4 +1,5 @@
 from .damage import DamageAttribute
+from .utils import CHAR_ATTR_SIERRA, CHAR_ATTR_SINKING
 from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
 
 
@@ -246,22 +247,39 @@ class Echo_6000042(EchoAbstract):
     name = "无冠者"
 
     # 幻形后，自身湮灭伤害加成提升12.00%，共鸣技能伤害加成提升12.00%，持续15秒。
-    def damage(self, attr: DamageAttribute):
-        title = '无冠者'
-        msg = '自身湮灭伤害加成提升12.00%'
-        attr.add_dmg_bonus(0.12, title, msg)
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.char_attr == CHAR_ATTR_SINKING:
+            title = self.name
+            msg = '自身湮灭伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
 
-    def skill_damage(self, attr: DamageAttribute):
+    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣技能伤害"""
-        self.damage(attr)
-        title = '无冠者'
+        self.damage(attr, isGroup)
+        title = self.name
         msg = '共鸣技能伤害加成提升12.00%'
         attr.add_dmg_bonus(0.12, title, msg)
+        return True
 
 
 class Echo_6000043(EchoAbstract):
     id = 6000043
     name = "飞廉之猩"
+
+    # 追击命中后，自身气动伤害加成提升12.00%，重击伤害加成提升12.00%，持续15秒。
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.char_attr == CHAR_ATTR_SIERRA:
+            title = self.name
+            msg = '气动伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
+
+    def hit_damage(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成重击伤害"""
+        self.damage(attr, isGroup)
+        title = self.name
+        msg = '重击伤害加成提升12.00%'
+        attr.add_dmg_bonus(0.12, title, msg)
+        return True
 
 
 class Echo_6000044(EchoAbstract):

@@ -114,7 +114,9 @@ class DamageAttribute:
         defense_reduction=0,
         enemy_resistance=0.1,
         dmg_bonus_phantom=None,
+        ph_detail=None,
         echo_id=0,
+        char_attr=None,
     ):
         """
         初始化 DamageAttribute 类的实例。
@@ -133,6 +135,9 @@ class DamageAttribute:
         :param defense_reduction: 减防百分比
         :param enemy_resistance: 敌人抗性百分比
         :param dmg_bonus_phantom: 伤害加成百分比 -> DamageBonusPhantom
+        :param ph_detail: 声骸个数和名字 -> List[PhantomDetail]
+        :param echo_id: 声骸技能id
+        :param char_attr: 角色属性 ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
         """
         # 角色基础攻击力
         self.char_atk = char_atk
@@ -166,6 +171,8 @@ class DamageAttribute:
         self.ph_detail: List[PhantomDetail] = []
         # 声骸技能id
         self.echo_id = echo_id
+        # 角色属性 ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
+        self.char_attr = char_attr
         # 效果
         self.effect = []
 
@@ -180,6 +187,7 @@ class DamageAttribute:
             f"\nDamageAttribute(\n"
             f"  char_atk={self.char_atk}, \n"
             f"  weapon_atk={self.weapon_atk}, \n"
+            f"  effect_attack={self.effect_attack}, \n"
             f"  atk_percent={self.atk_percent}, \n"
             f"  atk_flat={self.atk_flat}, \n"
             f"  skill_multi={self.skill_multi}, \n"
@@ -202,6 +210,10 @@ class DamageAttribute:
         if effect is None:
             return
         self.effect.append(effect)
+
+    def set_char_attr(self, char_attr: str):
+        self.char_attr = char_attr
+        return self
 
     def set_char_atk(self, char_atk: float, title='', msg=''):
         """设置角色基础攻击力"""
@@ -227,9 +239,9 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
-    def set_skill_multi(self, skill_multi: str, title='', msg=''):
+    def add_skill_multi(self, skill_multi: str, title='', msg=''):
         """设置技能倍率"""
-        self.skill_multi = calc_percent_expression(skill_multi)
+        self.skill_multi += calc_percent_expression(skill_multi)
         self.add_effect(title, msg)
         return self
 

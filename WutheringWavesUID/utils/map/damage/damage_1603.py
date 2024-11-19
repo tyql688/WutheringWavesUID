@@ -13,6 +13,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     damage_func = "attack_damage"
 
+    role_name = role.role.roleName
     role_id = role.role.roleId
     role_level = role.role.level
     role_breach = role.role.breach
@@ -23,9 +24,9 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     skillLevel = role.skillList[4].level - 1
     # 技能倍率 回路技能树 "7"
     skill_multi = skill_damage(char_result.skillTrees, "7", "1", skillLevel)
-    title = "椿-一日花技能倍率"
+    title = f"{role_name}-一日花技能倍率"
     msg = f"{skill_multi}"
-    attr.set_skill_multi(skill_multi, title, msg)
+    attr.add_skill_multi(skill_multi, title, msg)
 
     # 设置角色等级
     attr.set_character_level(role_level)
@@ -33,7 +34,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     for ph_detail in attr.ph_detail:
         if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SINKING):
             # 湮灭声骸五件套
-            title = "椿-沉日劫明"
+            title = f"{role_name}-沉日劫明"
             msg = f"湮灭伤害提升7.5%，该效果可叠加四层"
             attr.add_dmg_bonus(0.3, title, msg)
 
@@ -45,25 +46,25 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     if chain_num >= 1 and isGroup:
         # 1命
         # 变奏入场
-        title = "椿-一命"
+        title = f"{role_name}-一命"
         msg = f"施放变奏技能八千春秋时，暴击伤害提升28%"
         attr.add_crit_dmg(0.28, title, msg)
 
     if chain_num >= 2:
         # 2命
-        title = "椿-二命"
+        title = f"{role_name}-二命"
         msg = f"共鸣回路一日花伤害倍率提升120%"
         attr.add_skill_ratio(1.2, title, msg)
 
     if chain_num >= 3:
         # 3命
-        title = "椿-三命"
+        title = f"{role_name}-三命"
         msg = f"含苞状态期间，椿的攻击提升58%。"
         attr.add_atk_percent(0.58, title, msg)
 
     if chain_num >= 4 and isGroup:
         # 4命
-        title = "椿-四命"
+        title = f"{role_name}-四命"
         msg = f"变奏技能八千春秋后，队伍中的角色普攻伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 
@@ -71,7 +72,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     echo_clz = WavesEchoRegister.find_class(attr.echo_id)
     if echo_clz:
         e = echo_clz()
-        e.do_echo(damage_func, attr)
+        e.do_echo(damage_func, attr, isGroup)
 
     # 武器谐振
     weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
@@ -81,7 +82,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
                        weapon_data.level,
                        weapon_data.breach,
                        weapon_data.resonLevel)
-        w.do_action(damage_func, attr)
+        w.do_action(damage_func, attr, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -96,6 +97,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     damage_func = "liberation_damage"
 
+    role_name = role.role.roleName
     role_id = role.role.roleId
     role_level = role.role.level
     role_breach = role.role.breach
@@ -105,12 +107,12 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     skillLevel = role.skillList[2].level - 1
     # 技能倍率
     skill_multi = skill_damage(char_result.skillTrees, "3", "1", skillLevel)
-    attr.set_skill_multi(skill_multi)
+    attr.add_skill_multi(skill_multi)
 
     for ph_detail in attr.ph_detail:
         if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SINKING):
             # 湮灭声骸五件套
-            title = "椿-沉日劫明"
+            title = f"{role_name}-沉日劫明"
             msg = f"湮灭伤害提升7.5%，该效果可叠加四层"
             attr.add_dmg_bonus(0.3, title, msg)
 
@@ -125,13 +127,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     if chain_num >= 1 and isGroup:
         # 1命
         # 变奏入场
-        title = "椿-一命"
+        title = f"{role_name}-一命"
         msg = f"施放变奏技能八千春秋时，暴击伤害提升28%"
         attr.add_crit_dmg(0.28, title, msg)
 
     if chain_num >= 3:
         # 3命
-        title = "椿-三命"
+        title = f"{role_name}-三命"
         msg = f"共鸣解放芳华绽烬伤害倍率提升50%；含苞状态期间，椿的攻击提升58%。"
         attr.add_atk_percent(0.58)
         attr.add_skill_ratio(0.5)
@@ -140,7 +142,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     if chain_num >= 4 and isGroup:
         # 4命
         # 变奏入场
-        title = "椿-四命"
+        title = f"{role_name}-四命"
         msg = f"变奏技能八千春秋后，队伍中的角色普攻伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 
@@ -148,7 +150,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     echo_clz = WavesEchoRegister.find_class(attr.echo_id)
     if echo_clz:
         e = echo_clz()
-        e.do_echo(damage_func, attr)
+        e.do_echo(damage_func, attr, isGroup)
 
     # 武器谐振
     weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
@@ -158,7 +160,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
                        weapon_data.level,
                        weapon_data.breach,
                        weapon_data.resonLevel)
-        w.do_action(damage_func, attr)
+        w.do_action(damage_func, attr, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -181,18 +183,15 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
 
 damage_detail = [
     {
-        "id": 1,
         "title": "一日花",
         "func": lambda attr, role: calc_damage_0(attr, role),
     },
     {
-        "id": 2,
         "title": "芳华绽烬",
         "func": lambda attr, role: calc_damage_1(attr, role),
     },
     {
-        "id": 3,
-        "title": "0+1守6散一日花",
+        "title": "0+1守/6散/一日花",
         "func": lambda attr, role: calc_damage_2(attr, role),
     }
 ]

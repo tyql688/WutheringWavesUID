@@ -1,6 +1,7 @@
 from typing import Union, List
 
 from .damage import DamageAttribute
+from .utils import CHAR_ATTR_CELESTIAL
 from ...utils.damage.abstract import CharAbstract, WavesCharRegister, WavesWeaponRegister
 
 
@@ -21,19 +22,19 @@ class Char_1102(CharAbstract):
             msg = "队伍中的角色攻击提升20%"
             attr.add_atk_percent(0.2, title, msg)
 
+        title = "散华-合鸣效果-轻云出月"
+        msg = "下一个登场的共鸣者攻击提升22.5%"
+        attr.add_atk_percent(0.225, title, msg)
+
         # 无常凶鹭
-        title = "散华-q无常凶鹭"
-        msg = "角色伤害提升12%"
+        title = "散华-声骸技能-无常凶鹭"
+        msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
         attr.add_dmg_bonus(0.12, title, msg)
 
         if func_list and 'attack_damage' in func_list:
             title = "散华-延奏技能"
             msg = "下一位登场角色普攻伤害加深38%"
             attr.add_dmg_deepen(0.38, title, msg)
-
-        title = "散华-轻云出月"
-        msg = "下一个登场的共鸣者攻击提升22.5%"
-        attr.add_atk_percent(0.225, title, msg)
 
 
 class Char_1103(CharAbstract):
@@ -76,6 +77,42 @@ class Char_1204(CharAbstract):
     id = 1204
     name = "莫特斐"
     starLevel = 4
+
+    def do_buff(self,
+                attr: DamageAttribute,
+                chain: int = 6,
+                resonLevel: int = 1,
+                isGroup: bool = True,
+                func_list: Union[List[str], str] = None):
+        """获得buff"""
+        if chain >= 6:
+            title = "莫特斐-六命"
+            msg = "施放共鸣解放暴烈终曲时，队伍中的角色攻击提升20%"
+            attr.add_atk_percent(0.2, title, msg)
+
+        title = "莫特斐-合鸣效果-轻云出月"
+        msg = "使用延奏技能后，下一个登场的共鸣者攻击提升22.5%"
+        attr.add_atk_percent(0.225, title, msg)
+
+        # 无常凶鹭
+        title = "莫特斐-声骸技能-无常凶鹭"
+        msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
+        attr.add_dmg_bonus(0.12, title, msg)
+
+        if func_list and 'hit_damage' in func_list:
+            title = "莫特斐-延奏技能"
+            msg = "下一位登场角色重击伤害加深38%"
+            attr.add_dmg_deepen(0.38, title, msg)
+
+        # 停驻之烟
+        weapon_id = 21030015
+        weapon_clz = WavesWeaponRegister.find_class(weapon_id)
+        if weapon_clz:
+            w = weapon_clz(weapon_id,
+                           90,
+                           6,
+                           resonLevel)
+            w.do_action('damage', attr, isGroup)
 
 
 class Char_1205(CharAbstract):
@@ -155,6 +192,34 @@ class Char_1503(CharAbstract):
     name = "维里奈"
     starLevel = 5
 
+    def do_buff(self,
+                attr: DamageAttribute,
+                chain: int = 0,
+                resonLevel: int = 1,
+                isGroup: bool = True,
+                func_list: Union[List[str], str] = None):
+        """获得buff"""
+        title = "维里奈-固有技能-自然的献礼"
+        msg = "施放重击、空中攻击、共鸣解放或延奏技能时，队伍中的角色攻击提升20%"
+        attr.add_atk_percent(0.2, title, msg)
+
+        if chain >= 4 and attr.char_attr == CHAR_ATTR_CELESTIAL:
+            title = "维里奈-四命"
+            msg = "施放重击、空中攻击、共鸣解放或延奏技能时，队伍中的角色衍射伤害加成提升15%"
+            attr.add_dmg_bonus(0.4, title, msg)
+
+        title = "维里奈-合鸣效果-隐世回光"
+        msg = "全队共鸣者攻击提升15%"
+        attr.add_atk_percent(0.15, title, msg)
+
+        title = "维里奈-声骸技能-鸣钟之龟"
+        msg = "全队角色10.00%的伤害提升"
+        attr.add_dmg_bonus(0.1, title, msg)
+
+        title = "维里奈-延奏技能"
+        msg = "队伍中的角色全伤害加深15%"
+        attr.add_dmg_deepen(0.15, title, msg)
+
 
 class Char_1504(CharAbstract):
     id = 1504
@@ -178,8 +243,8 @@ class Char_1505(CharAbstract):
             title = "守岸人-二命"
             msg = "队伍中的角色攻击提升40%"
             attr.add_atk_percent(0.4, title, msg)
-            
-        title = "守岸人-e触发隐世回光"
+
+        title = "守岸人-合鸣效果-隐世回光"
         msg = "全队共鸣者攻击提升15%"
         attr.add_atk_percent(0.15, title, msg)
 
@@ -190,19 +255,19 @@ class Char_1505(CharAbstract):
                            90,
                            6,
                            resonLevel)
-            w.do_action('skill_create_healing', attr)
+            w.do_action('skill_create_healing', attr, isGroup)
 
-        title = "守岸人-q无归的谬误"
+        title = "守岸人-声骸技能-无归的谬误"
         msg = "全队角色攻击提升10%"
         attr.add_atk_percent(0.1, title, msg)
 
-        title = "守岸人-r"
+        title = "守岸人-共鸣解放"
         msg = "暴击提升12.5%+暴击伤害提升25%"
         attr.add_crit_rate(0.125)
         attr.add_crit_dmg(0.25)
         attr.add_effect(title, msg)
 
-        title = "守岸人-延奏"
+        title = "守岸人-延奏技能"
         msg = "队伍中的角色全伤害加深15%"
         attr.add_dmg_deepen(0.15, title, msg)
 

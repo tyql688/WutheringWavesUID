@@ -54,63 +54,64 @@ class WeaponAbstract(object):
         self.weapon_reson_level = weapon_reson_level
         self.weapon_detail: WavesWeaponResult = weapon_detail
 
-    def do_action(self, func_list: Union[List[str], str], attr: DamageAttribute):
+    def do_action(self, func_list: Union[List[str], str], attr: DamageAttribute, isGroup: bool = False):
         if isinstance(func_list, str):
             func_list = [func_list]
 
         for func_name in func_list:
             method = getattr(self, func_name, None)
             if callable(method):
-                method(attr)
+                if method(attr, isGroup):
+                    return
 
     def get_title(self):
         return f"{self.name}-{self.weapon_detail.get_resonLevel_name()}"
 
-    def damage(self, attr: DamageAttribute):
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
         pass
 
-    def attack_damage(self, attr: DamageAttribute):
+    def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成普攻伤害"""
         pass
 
-    def hit_damage(self, attr: DamageAttribute):
+    def hit_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成重击伤害"""
         pass
 
-    def skill_damage(self, attr: DamageAttribute):
+    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣技能伤害"""
         pass
 
-    def liberation_damage(self, attr: DamageAttribute):
+    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣解放伤害"""
         pass
 
-    def cast_attack(self, attr: DamageAttribute):
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
         """施放普攻"""
         pass
 
-    def cast_hit(self, attr: DamageAttribute):
+    def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
         """施放重击"""
         pass
 
-    def cast_skill(self, attr: DamageAttribute):
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣技能"""
         pass
 
-    def cast_liberation(self, attr: DamageAttribute):
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣解放"""
         pass
 
-    def cast_dodge_counter(self, attr: DamageAttribute):
+    def cast_dodge_counter(self, attr: DamageAttribute, isGroup: bool = False):
         """施放闪避反击"""
         pass
 
-    def cast_variation(self, attr: DamageAttribute):
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放变奏技能"""
         pass
 
-    def skill_create_healing(self, attr: DamageAttribute):
+    def skill_create_healing(self, attr: DamageAttribute, isGroup: bool = False):
         """共鸣技能造成治疗"""
         pass
 
@@ -119,62 +120,63 @@ class EchoAbstract(object):
     name = None
     id = None
 
-    def do_echo(self, func_list: Union[List[str], str], attr: DamageAttribute):
+    def do_echo(self, func_list: Union[List[str], str], attr: DamageAttribute, isGroup: bool = False):
         if isinstance(func_list, str):
             func_list = [func_list]
 
         for func_name in func_list:
             method = getattr(self, func_name, None)
             if callable(method):
-                method(attr)
+                if method(attr, isGroup):
+                    return
 
-    def damage(self, attr: DamageAttribute):
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
         pass
 
-    def attack_damage(self, attr: DamageAttribute):
+    def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成普攻伤害"""
-        self.damage(attr)
+        pass
 
-    def hit_damage(self, attr: DamageAttribute):
+    def hit_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成重击伤害"""
-        self.damage(attr)
+        pass
 
-    def skill_damage(self, attr: DamageAttribute):
+    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣技能伤害"""
-        self.damage(attr)
+        pass
 
-    def liberation_damage(self, attr: DamageAttribute):
+    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣解放伤害"""
-        self.damage(attr)
+        pass
 
-    def cast_attack(self, attr: DamageAttribute):
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
         """施放普攻"""
-        self.damage(attr)
+        pass
 
-    def cast_hit(self, attr: DamageAttribute):
+    def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
         """施放重击"""
-        self.damage(attr)
+        pass
 
-    def cast_skill(self, attr: DamageAttribute):
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣技能"""
-        self.damage(attr)
+        pass
 
-    def cast_liberation(self, attr: DamageAttribute):
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣解放"""
-        self.damage(attr)
+        pass
 
-    def cast_dodge_counter(self, attr: DamageAttribute):
+    def cast_dodge_counter(self, attr: DamageAttribute, isGroup: bool = False):
         """施放闪避反击"""
-        self.damage(attr)
+        pass
 
-    def cast_variation(self, attr: DamageAttribute):
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放变奏技能"""
-        self.damage(attr)
+        pass
 
-    def skill_create_healing(self, attr: DamageAttribute):
+    def skill_create_healing(self, attr: DamageAttribute, isGroup: bool = False):
         """共鸣技能造成治疗"""
-        self.damage(attr)
+        pass
 
 
 class CharAbstract(object):

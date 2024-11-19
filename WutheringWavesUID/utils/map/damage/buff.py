@@ -15,3 +15,19 @@ def sanhua_buff(attr, chain, resonLevel, isGroup, func_list):
     if char_clz:
         s = char_clz()
         s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup, func_list=func_list)
+
+
+def motefei_buff(attr, chain, resonLevel, isGroup, func_list):
+    # 莫特斐buff
+    char_clz = WavesCharRegister.find_class(1204)
+    if char_clz:
+        s = char_clz()
+        s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup, func_list=func_list)
+
+
+def weilinai_buff(attr, chain, resonLevel, isGroup, func_list):
+    # 维里奈buff
+    char_clz = WavesCharRegister.find_class(1503)
+    if char_clz:
+        s = char_clz()
+        s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup, func_list=func_list)

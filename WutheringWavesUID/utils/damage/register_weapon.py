@@ -31,6 +31,23 @@ class Weapon_21010016(WeaponAbstract):
     type = 1
     name = "苍鳞千嶂"
 
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成伤害"""
+        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
+        title = self.get_title()
+        msg = f"每次施放变奏技能或共鸣解放时，自身重击伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成共鸣解放伤害"""
+        self.damage(attr, isGroup)
+        return True
+
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放变奏技能"""
+        self.damage(attr, isGroup)
+        return True
+
 
 class Weapon_21010023(WeaponAbstract):
     id = 21010023
@@ -127,18 +144,13 @@ class Weapon_21020015(WeaponAbstract):
     type = 2
     name = "千古洑流"
 
-    def damage(self, attr: DamageAttribute):
-        """造成伤害"""
-        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
-        attr.add_atk_percent(calc_percent_expression(dmg))
-
-    def skill_damage(self, attr: DamageAttribute):
+    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣技能伤害"""
-        self.damage(attr)
-
-    def liberation_damage(self, attr: DamageAttribute):
-        """造成共鸣解放伤害"""
-        self.damage(attr)
+        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
 
 
 class Weapon_21020016(WeaponAbstract):
@@ -146,12 +158,13 @@ class Weapon_21020016(WeaponAbstract):
     type = 2
     name = "赫奕流明"
 
-    def skill_damage(self, attr: DamageAttribute):
+    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣技能伤害"""
         dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*14"
         title = self.get_title()
         msg = f"每层【灼羽】使共鸣技能伤害加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
 
 
 class Weapon_21020017(WeaponAbstract):
@@ -159,7 +172,7 @@ class Weapon_21020017(WeaponAbstract):
     type = 2
     name = "心之锚"
 
-    def damage(self, attr: DamageAttribute):
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
         dmg = f"{self.weapon_detail.param[3][self.weapon_reson_level - 1]}*{self.weapon_detail.param[5][self.weapon_reson_level - 1]}"
         attr.add_atk_percent(calc_percent_expression(dmg))
@@ -171,17 +184,20 @@ class Weapon_21020017(WeaponAbstract):
         msg = f"【凶猛】为10层时，攻击提升20%, 暴击率提升10%"
         attr.add_effect(title, msg)
 
-    def attack_damage(self, attr: DamageAttribute):
+    def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成普攻伤害"""
-        self.damage(attr)
+        self.damage(attr, isGroup)
+        return True
 
-    def skill_damage(self, attr: DamageAttribute):
+    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣技能伤害"""
-        self.damage(attr)
+        self.damage(attr, isGroup)
+        return True
 
-    def liberation_damage(self, attr: DamageAttribute):
+    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣解放伤害"""
-        self.damage(attr)
+        self.damage(attr, isGroup)
+        return True
 
 
 class Weapon_21020023(WeaponAbstract):
@@ -201,12 +217,13 @@ class Weapon_21020026(WeaponAbstract):
     type = 2
     name = "裁春"
 
-    def attack_damage(self, attr: DamageAttribute):
+    def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成普攻伤害"""
         dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[3][self.weapon_reson_level - 1]}+{self.weapon_detail.param[4][self.weapon_reson_level - 1]}"
         title = self.get_title()
         msg = f"普攻伤害加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
 
 
 class Weapon_21020034(WeaponAbstract):
@@ -279,6 +296,15 @@ class Weapon_21030015(WeaponAbstract):
     id = 21030015
     type = 3
     name = "停驻之烟"
+
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成伤害"""
+        if isGroup:
+            dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
+            title = self.get_title()
+            msg = f"施放延奏技能后，入场角色攻击提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+            return True
 
 
 class Weapon_21030023(WeaponAbstract):
@@ -490,7 +516,7 @@ class Weapon_21050036(WeaponAbstract):
     type = 5
     name = "星序协响"
 
-    def skill_create_healing(self, attr: DamageAttribute):
+    def skill_create_healing(self, attr: DamageAttribute, isGroup: bool = False):
         """共鸣技能造成治疗"""
         dmg = f"{self.weapon_detail.param[4][self.weapon_reson_level - 1]}"
         title = f"星序协响-{self.weapon_detail.get_resonLevel_name()}"

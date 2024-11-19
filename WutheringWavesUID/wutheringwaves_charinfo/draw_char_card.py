@@ -4,6 +4,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageEnhance
 
+from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
@@ -262,8 +263,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
 
     damage_calc = None
     if not isDraw:
-        for dd in damageDetail:
-            if dd.get('id') == int(damageId):
+        for dindex, dd in enumerate(damageDetail):
+            if dindex + 1 == int(damageId):
                 damage_calc = dd
                 break
         else:
@@ -450,9 +451,9 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
             damage_title = damage_temp['title']
             damageAttributeTemp = copy.deepcopy(damageAttribute)
             crit_damage, expected_damage = damage_temp['func'](damageAttributeTemp, role_detail)
-            # logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
-            # logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
-            # logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
+            logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
+            logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
+            logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
 
             damage_bar = damage_bar2.copy() if dindex % 2 == 0 else damage_bar1.copy()
             damage_bar_draw = ImageDraw.Draw(damage_bar)
