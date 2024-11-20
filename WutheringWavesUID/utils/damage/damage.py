@@ -177,7 +177,7 @@ class DamageAttribute:
         self.effect = []
 
         if self.enemy_resistance:
-            self.set_enemy_resistance(self.enemy_resistance, '敌人抗性', f'{self.enemy_resistance:.0%}')
+            self.add_enemy_resistance(self.enemy_resistance, '敌人抗性', f'{self.enemy_resistance:.0%}')
         self.add_effect('敌人防御', '1512')
 
     def __str__(self):
@@ -291,9 +291,11 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
-    def set_enemy_resistance(self, enemy_resistance: float, title='', msg=''):
+    def add_enemy_resistance(self, enemy_resistance: float, title='', msg=''):
         """增加敌人抗性百分比"""
-        self.enemy_resistance = enemy_resistance
+        self.enemy_resistance += enemy_resistance
+        if self.enemy_resistance <= 0:
+            self.enemy_resistance = 0
         self.add_effect(title, msg)
         return self
 
