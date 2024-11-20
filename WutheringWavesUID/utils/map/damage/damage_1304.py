@@ -184,7 +184,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     weilinai_buff(attr, 0, 1, isGroup, damage_func)
 
     # 折枝buff
-    zhezhi_buff(attr, 6, 5, isGroup, damage_func)
+    zhezhi_buff(attr, 0, 1, isGroup, damage_func)
 
     return calc_damage_1(attr, role, isGroup)
 
