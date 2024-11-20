@@ -189,14 +189,14 @@ class Weapon_21020017(WeaponAbstract):
 
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
-        dmg = f"{self.weapon_detail.param[3][self.weapon_reson_level - 1]}*{self.weapon_detail.param[5][self.weapon_reson_level - 1]}"
-        attr.add_atk_percent(calc_percent_expression(dmg))
+        dmg1 = f"{self.weapon_detail.param[3][self.weapon_reson_level - 1]}*{self.weapon_detail.param[5][self.weapon_reson_level - 1]}"
+        attr.add_atk_percent(calc_percent_expression(dmg1))
 
-        dmg = f"{self.weapon_detail.param[6][self.weapon_reson_level - 5]}*{self.weapon_detail.param[7][self.weapon_reson_level - 1]}"
-        attr.add_crit_rate(calc_percent_expression(dmg))
+        dmg2 = f"{self.weapon_detail.param[7][self.weapon_reson_level - 1]}"
+        attr.add_crit_rate(calc_percent_expression(dmg2))
 
         title = self.get_title()
-        msg = f"【凶猛】为10层时，攻击提升20%, 暴击率提升10%"
+        msg = f"【凶猛】为10层时，攻击提升{dmg1}, 暴击率提升{dmg2}"
         attr.add_effect(title, msg)
 
     def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
