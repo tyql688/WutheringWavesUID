@@ -164,7 +164,7 @@ class DamageAttribute:
         # 减防百分比
         self.defense_reduction = defense_reduction
         # 敌人抗性百分比
-        self.enemy_resistance = enemy_resistance
+        self.enemy_resistance = 0
         # 伤害加成百分比 -> DamageBonusPhantom
         self.dmg_bonus_phantom: DamageBonusPhantom = dmg_bonus_phantom
         # 声骸个数和名字 -> List[PhantomDetail]
@@ -176,8 +176,8 @@ class DamageAttribute:
         # 效果
         self.effect = []
 
-        if self.enemy_resistance:
-            self.add_enemy_resistance(self.enemy_resistance, '敌人抗性', f'{self.enemy_resistance:.0%}')
+        if enemy_resistance:
+            self.add_enemy_resistance(enemy_resistance, '敌人抗性', f'{self.enemy_resistance:.0%}')
         self.add_effect('敌人防御', '1512')
 
     def __str__(self):

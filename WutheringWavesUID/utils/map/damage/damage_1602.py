@@ -79,7 +79,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     满能缭乱伤害
     """
-    damage_func = ["hit_damage", "skill_damage"]
+    damage_func = ["hit_damage", "cast_skill"]
 
     role_id = role.role.roleId
     role_level = role.role.level
@@ -124,7 +124,7 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     绯红绽放
     """
-    damage_func = ["liberation_damage", "skill_damage"]
+    damage_func = ["liberation_damage", "cast_skill"]
 
     role_id = role.role.roleId
     role_level = role.role.level

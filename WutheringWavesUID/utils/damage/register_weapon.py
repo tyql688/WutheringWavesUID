@@ -167,6 +167,14 @@ class Weapon_21020015(WeaponAbstract):
         attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
         return True
 
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21020016(WeaponAbstract):
     id = 21020016

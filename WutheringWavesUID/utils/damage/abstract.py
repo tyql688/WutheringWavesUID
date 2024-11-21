@@ -136,47 +136,47 @@ class EchoAbstract(object):
 
     def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成普攻伤害"""
-        pass
+        return self.damage(attr, isGroup)
 
     def hit_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成重击伤害"""
-        pass
+        return self.damage(attr, isGroup)
 
     def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣技能伤害"""
-        pass
+        return self.damage(attr, isGroup)
 
     def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣解放伤害"""
-        pass
+        return self.damage(attr, isGroup)
 
     def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
         """施放普攻"""
-        pass
+        return self.damage(attr, isGroup)
 
     def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
         """施放重击"""
-        pass
+        return self.damage(attr, isGroup)
 
     def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣技能"""
-        pass
+        return self.damage(attr, isGroup)
 
     def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣解放"""
-        pass
+        return self.damage(attr, isGroup)
 
     def cast_dodge_counter(self, attr: DamageAttribute, isGroup: bool = False):
         """施放闪避反击"""
-        pass
+        return self.damage(attr, isGroup)
 
     def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放变奏技能"""
-        pass
+        return self.damage(attr, isGroup)
 
     def skill_create_healing(self, attr: DamageAttribute, isGroup: bool = False):
         """共鸣技能造成治疗"""
-        pass
+        return self.damage(attr, isGroup)
 
 
 class CharAbstract(object):
