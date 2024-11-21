@@ -1,5 +1,5 @@
 from .damage import DamageAttribute
-from .utils import CHAR_ATTR_SIERRA, CHAR_ATTR_SINKING, CHAR_ATTR_MOLTEN
+from .utils import CHAR_ATTR_SIERRA, CHAR_ATTR_SINKING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID
 from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
 
 
@@ -177,6 +177,22 @@ class Echo_390080003(EchoAbstract):
     id = 390080003
     name = "云闪之鳞"
 
+    # 终结一击命中后，自身导电伤害加成提升12.00%，共鸣解放伤害加成提升12.00%，持续15秒。
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.char_attr == CHAR_ATTR_VOID:
+            title = self.name
+            msg = '自身导电伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
+            return True
+
+    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成共鸣解放伤害"""
+        self.damage(attr, isGroup)
+        title = self.name
+        msg = '共鸣解放伤害加成提升12.00%'
+        attr.add_dmg_bonus(0.12, title, msg)
+        return True
+
 
 class Echo_390080005(EchoAbstract):
     id = 390080005
@@ -198,7 +214,7 @@ class Echo_390080007(EchoAbstract):
 
     def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成普攻伤害"""
-        self.damage(attr)
+        self.damage(attr, isGroup)
         title = self.name
         msg = '普攻伤害加成提升12.00%'
         attr.add_dmg_bonus(0.12, title, msg)
@@ -220,7 +236,7 @@ class Echo_391077024(EchoAbstract):
     name = "异相·磐石守卫"
 
 
-class Echo_391080003(EchoAbstract):
+class Echo_391080003(Echo_390080003):
     id = 391080003
     name = "异相·云闪之鳞"
 
@@ -233,6 +249,22 @@ class Echo_6000038(EchoAbstract):
 class Echo_6000039(EchoAbstract):
     id = 6000039
     name = "朔雷之鳞"
+
+    # 爪击命中后，自身导电伤害加成提升12.00%，重击伤害加成提升12.00%，持续15秒。
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.char_attr == CHAR_ATTR_VOID:
+            title = self.name
+            msg = '自身导电伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
+            return True
+
+    def hit_damage(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成重击伤害"""
+        self.damage(attr, isGroup)
+        title = self.name
+        msg = '重击伤害加成提升12.00%'
+        attr.add_dmg_bonus(0.12, title, msg)
+        return True
 
 
 class Echo_6000040(EchoAbstract):

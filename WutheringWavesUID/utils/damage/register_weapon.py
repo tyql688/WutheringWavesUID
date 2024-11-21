@@ -509,6 +509,32 @@ class Weapon_21050016(WeaponAbstract):
     type = 5
     name = "掣傀之手"
 
+    # 造成共鸣技能伤害时，自身攻击提升12%，可叠加2层，效果持续5秒。自身不在场时，该效果攻击额外提升12%。
+
+    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成共鸣技能伤害"""
+        dmg1 = f"{self.param(1)}*{self.param(2)}"
+        title = self.get_title()
+        msg = f"造成共鸣技能伤害时，自身攻击提升{dmg1}"
+        attr.add_atk_percent(calc_percent_expression(dmg1), title, msg)
+        if attr.sync_strike:
+            dmg2 = f"{self.param(4)}"
+            msg = f"自身不在场时，该效果攻击额外提升{dmg2}"
+            attr.add_atk_percent(calc_percent_expression(dmg2), title, msg)
+        return True
+
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        dmg1 = f"{self.param(1)}*{self.param(2)}"
+        title = self.get_title()
+        msg = f"造成共鸣技能伤害时，自身攻击提升{dmg1}"
+        attr.add_atk_percent(calc_percent_expression(dmg1), title, msg)
+        if attr.sync_strike:
+            dmg2 = f"{self.param(4)}"
+            msg = f"自身不在场时，该效果攻击额外提升{dmg2}"
+            attr.add_atk_percent(calc_percent_expression(dmg2), title, msg)
+        return True
+
 
 class Weapon_21050023(WeaponAbstract):
     id = 21050023

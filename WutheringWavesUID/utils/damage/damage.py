@@ -117,6 +117,7 @@ class DamageAttribute:
         ph_detail=None,
         echo_id=0,
         char_attr=None,
+        sync_strike=False
     ):
         """
         初始化 DamageAttribute 类的实例。
@@ -138,6 +139,7 @@ class DamageAttribute:
         :param ph_detail: 声骸个数和名字 -> List[PhantomDetail]
         :param echo_id: 声骸技能id
         :param char_attr: 角色属性 ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
+        :param sync_strike: 协同攻击
         """
         # 角色基础攻击力
         self.char_atk = char_atk
@@ -173,11 +175,13 @@ class DamageAttribute:
         self.echo_id = echo_id
         # 角色属性 ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
         self.char_attr = char_attr
+        # 协同攻击
+        self.sync_strike = sync_strike
         # 效果
         self.effect = []
 
         if enemy_resistance:
-            self.add_enemy_resistance(enemy_resistance, '敌人抗性', f'{self.enemy_resistance:.0%}')
+            self.add_enemy_resistance(enemy_resistance, '敌人抗性', f'{enemy_resistance:.0%}')
         self.add_effect('敌人防御', '1512')
 
     def __str__(self):
@@ -248,7 +252,7 @@ class DamageAttribute:
         return self
 
     def add_skill_ratio(self, skill_ratio: Union[str, float], title='', msg=''):
-        """增加技能倍率加成"""
+        """增加技能倍率加成 -> 技能伤害倍率提升"""
         if isinstance(skill_ratio, str):
             skill_ratio = calc_percent_expression(skill_ratio)
         self.skill_ratio += skill_ratio
@@ -317,6 +321,11 @@ class DamageAttribute:
     def set_echo_id(self, echo_id: int):
         """声骸技能的id"""
         self.echo_id = echo_id
+        return self
+
+    def set_sync_strike(self):
+        """协同攻击"""
+        self.sync_strike = True
         return self
 
     @property

@@ -67,6 +67,9 @@ class WeaponAbstract(object):
     def get_title(self):
         return f"{self.name}-{self.weapon_detail.get_resonLevel_name()}"
 
+    def param(self, param):
+        return self.weapon_detail.param[param][self.weapon_reson_level - 1]
+
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
         pass
