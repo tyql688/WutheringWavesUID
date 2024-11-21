@@ -6,7 +6,8 @@ from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...ascension.sonata import get_sonata_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage, check_if_ph_5, SONATA_SINKING
+from ...damage.utils import check_if_ph_5, SONATA_SINKING, skill_damage_calc, hit_damage, cast_skill, cast_hit, \
+    liberation_damage, cast_liberation
 
 
 def calc_damage(attr: DamageAttribute, role: RoleDetailData, damage_func, isGroup: bool = False):
@@ -44,7 +45,7 @@ def calc_damage(attr: DamageAttribute, role: RoleDetailData, damage_func, isGrou
         msg = "丹瑾攻击携带朱蚀之刻的目标时，造成的伤害额外提升20%。"
         attr.add_dmg_bonus(0.2, title, msg)
 
-    if chain_num >= 3 and 'liberation_damage' in damage_func:
+    if chain_num >= 3 and cast_liberation in damage_func:
         # 3命
         title = f"{role_name}-三命"
         msg = f"共鸣解放伤害加成提升30%。"
@@ -68,7 +69,7 @@ def calc_damage(attr: DamageAttribute, role: RoleDetailData, damage_func, isGrou
         msg = "施放重击缭乱时，队伍中的角色的攻击提升20%。"
         attr.add_atk_percent(0.2, title, msg)
 
-    echo_damage(attr, damage_func, isGroup)
+    echo_damage(attr, isGroup)
 
     weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
@@ -79,7 +80,8 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     满能缭乱伤害
     """
-    damage_func = ["hit_damage", "cast_skill"]
+    damage_func = [cast_skill, cast_hit]
+    attr.set_char_damage(hit_damage)
 
     role_id = role.role.roleId
     role_level = role.role.level
@@ -98,13 +100,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     skillLevel = role.get_skill_level("共鸣回路")
     # 技能倍率
     if "满能缭乱" in skill_type:
-        skill_multi = skill_damage(char_result.skillTrees, "7", "3", skillLevel)
+        skill_multi = skill_damage_calc(char_result.skillTrees, "7", "3", skillLevel)
         title = "满能缭乱伤害"
         msg = f"技能倍率{skill_multi}"
         attr.add_skill_multi(skill_multi, title, msg)
 
     if "满能纷落" in skill_type:
-        skill_multi = skill_damage(char_result.skillTrees, "7", "4", skillLevel)
+        skill_multi = skill_damage_calc(char_result.skillTrees, "7", "4", skillLevel)
         title = "满能纷落伤害"
         msg = f"技能倍率{skill_multi}"
         attr.add_skill_multi(skill_multi, title, msg)
@@ -124,7 +126,8 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     绯红绽放
     """
-    damage_func = ["liberation_damage", "cast_skill"]
+    damage_func = [cast_liberation, cast_skill]
+    attr.set_char_damage(liberation_damage)
 
     role_id = role.role.roleId
     role_level = role.role.level
@@ -142,12 +145,12 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 绯红绽放 技能倍率 = 连续攻击+绯刹爆发
     skillLevel = role.get_skill_level("共鸣解放")
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "3", "1", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "1", skillLevel)
     title = "连续攻击"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    skill_multi = skill_damage(char_result.skillTrees, "3", "2", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "2", skillLevel)
     title = "绯刹爆发"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)

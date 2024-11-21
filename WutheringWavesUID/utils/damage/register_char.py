@@ -1,7 +1,5 @@
-from typing import Union, List
-
 from .damage import DamageAttribute
-from .utils import CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING
+from .utils import CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING, attack_damage, skill_damage, hit_damage
 from ...utils.damage.abstract import CharAbstract, WavesCharRegister, WavesWeaponRegister
 
 
@@ -10,12 +8,7 @@ class Char_1102(CharAbstract):
     name = "散华"
     starLevel = 4
 
-    def do_buff(self,
-                attr: DamageAttribute,
-                chain: int = 6,
-                resonLevel: int = 1,
-                isGroup: bool = True,
-                func_list: Union[List[str], str] = None):
+    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
         """获得buff"""
         if chain >= 6:
             title = "散华-六命"
@@ -31,7 +24,7 @@ class Char_1102(CharAbstract):
         msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
         attr.add_dmg_bonus(0.12, title, msg)
 
-        if func_list and 'attack_damage' in func_list:
+        if attack_damage == attr.char_damage:
             title = "散华-延奏技能"
             msg = "下一位登场角色普攻伤害加深38%"
             attr.add_dmg_deepen(0.38, title, msg)
@@ -54,12 +47,7 @@ class Char_1105(CharAbstract):
     name = "折枝"
     starLevel = 5
 
-    def do_buff(self,
-                attr: DamageAttribute,
-                chain: int = 6,
-                resonLevel: int = 1,
-                isGroup: bool = True,
-                func_list: Union[List[str], str] = None):
+    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
         if chain >= 4:
             title = f"{self.name}-四命"
             msg = "折枝施放共鸣解放虚实境趣时，队伍中角色攻击提升20%"
@@ -79,7 +67,7 @@ class Char_1105(CharAbstract):
             msg = "下一位登场角色冷凝伤害加深20%"
             attr.add_dmg_bonus(0.2, title, msg)
 
-        if func_list and 'skill_damage' in func_list:
+        if skill_damage == attr.char_damage:
             title = f"{self.name}-延奏技能"
             msg = "下一位登场角色共鸣技能伤害加深25%"
             attr.add_dmg_deepen(0.25, title, msg)
@@ -108,12 +96,7 @@ class Char_1204(CharAbstract):
     name = "莫特斐"
     starLevel = 4
 
-    def do_buff(self,
-                attr: DamageAttribute,
-                chain: int = 6,
-                resonLevel: int = 1,
-                isGroup: bool = True,
-                func_list: Union[List[str], str] = None):
+    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
         """获得buff"""
         if chain >= 6:
             title = "莫特斐-六命"
@@ -129,7 +112,7 @@ class Char_1204(CharAbstract):
         msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
         attr.add_dmg_bonus(0.12, title, msg)
 
-        if func_list and 'hit_damage' in func_list:
+        if hit_damage == attr.char_damage:
             title = "莫特斐-延奏技能"
             msg = "下一位登场角色重击伤害加深38%"
             attr.add_dmg_deepen(0.38, title, msg)
@@ -222,12 +205,7 @@ class Char_1503(CharAbstract):
     name = "维里奈"
     starLevel = 5
 
-    def do_buff(self,
-                attr: DamageAttribute,
-                chain: int = 0,
-                resonLevel: int = 1,
-                isGroup: bool = True,
-                func_list: Union[List[str], str] = None):
+    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
         """获得buff"""
         title = "维里奈-固有技能-自然的献礼"
         msg = "队伍中的角色攻击提升20%"
@@ -262,12 +240,7 @@ class Char_1505(CharAbstract):
     name = "守岸人"
     starLevel = 5
 
-    def do_buff(self,
-                attr: DamageAttribute,
-                chain: int = 0,
-                resonLevel: int = 1,
-                isGroup: bool = True,
-                func_list: Union[List[str], str] = None):
+    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
         """获得buff"""
         if chain >= 2:
             title = "守岸人-二命"

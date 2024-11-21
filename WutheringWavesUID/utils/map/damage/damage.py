@@ -16,9 +16,9 @@ def weapon_damage(attr: DamageAttribute, weapon_data: WeaponData, damage_func: U
         w.do_action(damage_func, attr, isGroup)
 
 
-def echo_damage(attr: DamageAttribute, damage_func: Union[List[str], str], isGroup: bool):
+def echo_damage(attr: DamageAttribute, isGroup: bool):
     # 声骸计算
     echo_clz = WavesEchoRegister.find_class(attr.echo_id)
     if echo_clz:
         e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+        e.do_echo(attr, isGroup)

@@ -1,18 +1,20 @@
 # 今夕
 from .buff import weilinai_buff, zhezhi_buff
+from .damage import echo_damage, weapon_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...ascension.sonata import get_sonata_detail
-from ...damage.abstract import WavesEchoRegister, WavesWeaponRegister
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage, check_if_ph_5, SONATA_CELESTIAL
+from ...damage.utils import check_if_ph_5, SONATA_CELESTIAL, skill_damage_calc, skill_damage, cast_skill, \
+    liberation_damage, cast_liberation
 
 
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     """
     惊龙破空·炳星
     """
-    damage_func = ["skill_damage"]
+    damage_func = cast_skill
+    attr.set_char_damage(skill_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -23,13 +25,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 惊龙破空·炳星 技能倍率
     skillLevel = role.get_skill_level("共鸣回路")
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "7", "9", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "7", "9", skillLevel)
     title = "惊龙破空·炳星"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
     #
-    skill_multi = skill_damage(char_result.skillTrees, "7", "10", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "7", "10", skillLevel)
     dmg = f"{skill_multi}*50"
     title = "【韶光】增加倍率"
     msg = f"技能倍率{dmg}"
@@ -76,20 +78,10 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_effect(title, msg)
 
     # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+    echo_damage(attr, isGroup)
 
     # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -102,7 +94,8 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     移岁诛邪
     """
-    damage_func = ["liberation_damage"]
+    damage_func = cast_liberation
+    attr.set_char_damage(liberation_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -113,7 +106,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 移岁诛邪 技能倍率
     skillLevel = role.get_skill_level("共鸣解放")
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "3", "1", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "1", skillLevel)
     title = "移岁诛邪"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -152,20 +145,10 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_skill_ratio(1.2, title, msg)
 
     # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+    echo_damage(attr, isGroup)
 
     # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -178,13 +161,13 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     """
     0维/0折枝/惊龙破空·炳星
     """
-    damage_func = ["skill_damage"]
-
+    attr.set_char_damage(skill_damage)
+    
     # 维里奈buff
-    weilinai_buff(attr, 0, 1, isGroup, damage_func)
+    weilinai_buff(attr, 0, 1, isGroup)
 
     # 折枝buff
-    zhezhi_buff(attr, 0, 1, isGroup, damage_func)
+    zhezhi_buff(attr, 0, 1, isGroup)
 
     return calc_damage_1(attr, role, isGroup)
 

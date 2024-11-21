@@ -1,17 +1,18 @@
 # 吟霖
+from .damage import weapon_damage, echo_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...ascension.sonata import get_sonata_detail
-from ...damage.abstract import WavesEchoRegister, WavesWeaponRegister
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage, check_if_ph_5, SONATA_VOID
+from ...damage.utils import check_if_ph_5, SONATA_VOID, skill_damage_calc, skill_damage, cast_skill, liberation_damage
 
 
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     """
     审判之雷
     """
-    damage_func = ["cast_skill"]
+    damage_func = [cast_skill]
+    attr.set_char_damage(skill_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -22,7 +23,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 审判之雷 技能倍率
     skillLevel = role.get_skill_level("共鸣回路")
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "7", "20", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "7", "20", skillLevel)
     title = "审判之雷"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -63,20 +64,10 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_atk_percent(0.2, title, msg)
 
     # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+    echo_damage(attr, isGroup)
 
     # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -89,7 +80,8 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     破天雷灭击
     """
-    damage_func = ["cast_skill", "liberation_damage"]
+    damage_func = [cast_skill]
+    attr.set_char_damage(liberation_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -100,7 +92,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 审判之雷 技能倍率
     skillLevel = role.get_skill_level("共鸣解放")
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "3", "15", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "15", skillLevel)
     title = "破天雷灭击"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -142,20 +134,10 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_dmg_bonus(1, title, msg)
 
     # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+    echo_damage(attr, isGroup)
 
     # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"

@@ -111,7 +111,7 @@ def get_weapon_detail(
                 "name": name,
                 "value": f"{value}"
             }
-    logger.debug(result.sub_effect)
+
     return result
 
 

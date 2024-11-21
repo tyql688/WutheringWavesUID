@@ -1,18 +1,19 @@
 # 忌炎
 from .buff import motefei_buff, weilinai_buff
+from .damage import echo_damage, weapon_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...ascension.sonata import get_sonata_detail
-from ...damage.abstract import WavesEchoRegister, WavesWeaponRegister
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage, check_if_ph_5, SONATA_SIERRA
+from ...damage.utils import check_if_ph_5, SONATA_SIERRA, skill_damage_calc, hit_damage, cast_liberation, cast_hit
 
 
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     """
     破阵之枪第一段
     """
-    damage_func = ["liberation_damage", "hit_damage"]
+    damage_func = [cast_liberation, cast_hit]
+    attr.set_char_damage(hit_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -23,7 +24,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 破阵之枪第一段 技能倍率
     skillLevel = role.get_skill_level("共鸣解放")
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "3", "1", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "1", skillLevel)
     title = "破阵之枪第一段"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -80,20 +81,10 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_atk_percent(0.45, title, msg)
 
     # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+    echo_damage(attr, isGroup)
 
     # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -106,7 +97,8 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     重击·破阵之枪
     """
-    damage_func = ["liberation_damage", "hit_damage"]
+    damage_func = [cast_liberation, cast_hit]
+    attr.set_char_damage(hit_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -117,17 +109,17 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 破阵之枪第一段 技能倍率
     skillLevel = role.get_skill_level("共鸣解放")
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "3", "1", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "1", skillLevel)
     title = "破阵之枪第一段"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    skill_multi = skill_damage(char_result.skillTrees, "3", "2", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "2", skillLevel)
     title = "破阵之枪第二段"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    skill_multi = skill_damage(char_result.skillTrees, "3", "3", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "3", skillLevel)
     title = "破阵之枪第三段"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -184,20 +176,10 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_atk_percent(0.45, title, msg)
 
     # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+    echo_damage(attr, isGroup)
 
     # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -210,7 +192,8 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     苍躣八荒·后动
     """
-    damage_func = ["liberation_damage", "hit_damage"]
+    damage_func = [cast_liberation, cast_hit]
+    attr.set_char_damage(hit_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -221,7 +204,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 破阵之枪第一段 技能倍率
     skillLevel = role.get_skill_level("共鸣回路")
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "7", "1", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "7", "1", skillLevel)
     title = "苍躣八荒·后动"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -284,20 +267,10 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_skill_ratio(1.2 * 2, title, msg)
 
     # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+    echo_damage(attr, isGroup)
 
     # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -310,13 +283,13 @@ def calc_damage_5(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     """
     0维/6+1莫/重击·破阵之枪
     """
-    damage_func = ["liberation_damage", "hit_damage"]
-
+    attr.set_char_damage(hit_damage)
+    
     # 维里奈buff
-    weilinai_buff(attr, 0, 1, isGroup, damage_func)
+    weilinai_buff(attr, 0, 1, isGroup)
 
     # 莫特斐buff
-    motefei_buff(attr, 6, 1, isGroup, damage_func)
+    motefei_buff(attr, 6, 1, isGroup)
 
     return calc_damage_2(attr, role, isGroup)
 

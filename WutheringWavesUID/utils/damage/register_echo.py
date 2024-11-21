@@ -1,5 +1,6 @@
 from .damage import DamageAttribute
-from .utils import CHAR_ATTR_SIERRA, CHAR_ATTR_SINKING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID
+from .utils import CHAR_ATTR_SIERRA, CHAR_ATTR_SINKING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID, liberation_damage, \
+    attack_damage, hit_damage, skill_damage
 from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
 
 
@@ -183,15 +184,11 @@ class Echo_390080003(EchoAbstract):
             title = self.name
             msg = '自身导电伤害加成提升12.00%'
             attr.add_dmg_bonus(0.12, title, msg)
-            return True
 
-    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣解放伤害"""
-        self.damage(attr, isGroup)
-        title = self.name
-        msg = '共鸣解放伤害加成提升12.00%'
-        attr.add_dmg_bonus(0.12, title, msg)
-        return True
+        if attr.char_damage == liberation_damage:
+            title = self.name
+            msg = '共鸣解放伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
 
 
 class Echo_390080005(EchoAbstract):
@@ -210,15 +207,11 @@ class Echo_390080007(EchoAbstract):
             title = self.name
             msg = '自身热熔伤害加成提升12.00%'
             attr.add_dmg_bonus(0.12, title, msg)
-            return True
 
-    def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成普攻伤害"""
-        self.damage(attr, isGroup)
-        title = self.name
-        msg = '普攻伤害加成提升12.00%'
-        attr.add_dmg_bonus(0.12, title, msg)
-        return True
+        if attr.char_damage == attack_damage:
+            title = self.name
+            msg = '普攻伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
 
 
 class Echo_390180010(EchoAbstract):
@@ -256,15 +249,11 @@ class Echo_6000039(EchoAbstract):
             title = self.name
             msg = '自身导电伤害加成提升12.00%'
             attr.add_dmg_bonus(0.12, title, msg)
-            return True
 
-    def hit_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成重击伤害"""
-        self.damage(attr, isGroup)
-        title = self.name
-        msg = '重击伤害加成提升12.00%'
-        attr.add_dmg_bonus(0.12, title, msg)
-        return True
+        if attr.char_damage == hit_damage:
+            title = self.name
+            msg = '重击伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
 
 
 class Echo_6000040(EchoAbstract):
@@ -287,15 +276,11 @@ class Echo_6000042(EchoAbstract):
             title = self.name
             msg = '自身湮灭伤害加成提升12.00%'
             attr.add_dmg_bonus(0.12, title, msg)
-            return True
 
-    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣技能伤害"""
-        self.damage(attr, isGroup)
-        title = self.name
-        msg = '共鸣技能伤害加成提升12.00%'
-        attr.add_dmg_bonus(0.12, title, msg)
-        return True
+        if attr.char_damage == skill_damage:
+            title = self.name
+            msg = '共鸣技能伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
 
 
 class Echo_6000043(EchoAbstract):
@@ -308,15 +293,11 @@ class Echo_6000043(EchoAbstract):
             title = self.name
             msg = '气动伤害加成提升12.00%'
             attr.add_dmg_bonus(0.12, title, msg)
-            return True
 
-    def hit_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成重击伤害"""
-        self.damage(attr, isGroup)
-        title = self.name
-        msg = '重击伤害加成提升12.00%'
-        attr.add_dmg_bonus(0.12, title, msg)
-        return True
+        if attr.char_damage == hit_damage:
+            title = self.name
+            msg = '重击伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
 
 
 class Echo_6000044(EchoAbstract):
@@ -399,12 +380,11 @@ class Echo_6000059(EchoAbstract):
     name = "角"
 
     # 自身的共鸣技能伤害加成提升16.00%
-    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣技能伤害"""
-        title = self.name
-        msg = '共鸣技能伤害加成提升16.00%'
-        attr.add_dmg_bonus(0.16, title, msg)
-        return True
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.char_damage == skill_damage:
+            title = self.name
+            msg = '共鸣技能伤害加成提升16.00%'
+            attr.add_dmg_bonus(0.16, title, msg)
 
 
 class Echo_6000060(EchoAbstract):

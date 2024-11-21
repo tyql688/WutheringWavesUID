@@ -74,22 +74,6 @@ class WeaponAbstract(object):
         """造成伤害"""
         pass
 
-    def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成普攻伤害"""
-        pass
-
-    def hit_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成重击伤害"""
-        pass
-
-    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣技能伤害"""
-        pass
-
-    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣解放伤害"""
-        pass
-
     def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
         """施放普攻"""
         pass
@@ -123,63 +107,12 @@ class EchoAbstract(object):
     name = None
     id = None
 
-    def do_echo(self, func_list: Union[List[str], str], attr: DamageAttribute, isGroup: bool = False):
-        if isinstance(func_list, str):
-            func_list = [func_list]
-
-        for func_name in func_list:
-            method = getattr(self, func_name, None)
-            if callable(method):
-                if method(attr, isGroup):
-                    return
+    def do_echo(self, attr: DamageAttribute, isGroup: bool = False):
+        self.damage(attr, isGroup)
 
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
         pass
-
-    def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成普攻伤害"""
-        return self.damage(attr, isGroup)
-
-    def hit_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成重击伤害"""
-        return self.damage(attr, isGroup)
-
-    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣技能伤害"""
-        return self.damage(attr, isGroup)
-
-    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣解放伤害"""
-        return self.damage(attr, isGroup)
-
-    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
-        """施放普攻"""
-        return self.damage(attr, isGroup)
-
-    def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
-        """施放重击"""
-        return self.damage(attr, isGroup)
-
-    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
-        """施放共鸣技能"""
-        return self.damage(attr, isGroup)
-
-    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
-        """施放共鸣解放"""
-        return self.damage(attr, isGroup)
-
-    def cast_dodge_counter(self, attr: DamageAttribute, isGroup: bool = False):
-        """施放闪避反击"""
-        return self.damage(attr, isGroup)
-
-    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
-        """施放变奏技能"""
-        return self.damage(attr, isGroup)
-
-    def skill_create_healing(self, attr: DamageAttribute, isGroup: bool = False):
-        """共鸣技能造成治疗"""
-        return self.damage(attr, isGroup)
 
 
 class CharAbstract(object):
@@ -187,12 +120,7 @@ class CharAbstract(object):
     id = None
     starLevel = None
 
-    def do_buff(self,
-                attr: DamageAttribute,
-                chain: int = 0,
-                resonLevel: int = 1,
-                isGroup: bool = True,
-                func_list: Union[List[str], str] = None):
+    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
         """
         获得buff
 

@@ -1,4 +1,5 @@
 from .damage import DamageAttribute, calc_percent_expression
+from .utils import hit_damage, skill_damage, attack_damage
 from ..damage.abstract import WeaponAbstract, WavesWeaponRegister
 
 
@@ -31,22 +32,19 @@ class Weapon_21010016(WeaponAbstract):
     type = 1
     name = "苍鳞千嶂"
 
-    def damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成伤害"""
-        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
-        title = self.get_title()
-        msg = f"每次施放变奏技能或共鸣解放时，自身重击伤害加成提升{dmg}"
-        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣解放"""
+        if attr.char_damage == hit_damage:
+            if isGroup:
+                dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
+                title = self.get_title()
+                msg = f"施放变奏技能时，自身重击伤害加成提升{dmg}"
+                attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
-    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣解放伤害"""
-        self.damage(attr, isGroup)
-        return True
-
-    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
-        """施放变奏技能"""
-        self.damage(attr, isGroup)
-        return True
+            dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
+            title = self.get_title()
+            msg = f"施放共鸣解放时，自身重击伤害加成提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21010023(WeaponAbstract):
@@ -66,8 +64,11 @@ class Weapon_21010026(WeaponAbstract):
     type = 1
     name = "时和岁稔"
 
-    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣技能伤害"""
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_damage != skill_damage:
+            return
+
         if isGroup:
             # 施放变奏技能时，自身获得【岁蕴】，使共鸣技能伤害加成提升24%
             dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
@@ -159,14 +160,6 @@ class Weapon_21020015(WeaponAbstract):
     type = 2
     name = "千古洑流"
 
-    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣技能伤害"""
-        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
-        title = self.get_title()
-        msg = f"施放共鸣技能时，攻击提升{dmg}"
-        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
-        return True
-
     def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣技能"""
         dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
@@ -181,8 +174,11 @@ class Weapon_21020016(WeaponAbstract):
     type = 2
     name = "赫奕流明"
 
-    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """造成共鸣技能伤害"""
+        if attr.char_damage != skill_damage:
+            return
+
         dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*14"
         title = self.get_title()
         msg = f"每层【灼羽】使共鸣技能伤害加成提升{dmg}"
@@ -195,7 +191,7 @@ class Weapon_21020017(WeaponAbstract):
     type = 2
     name = "心之锚"
 
-    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+    def _damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
         dmg1 = f"{self.weapon_detail.param[3][self.weapon_reson_level - 1]}*{self.weapon_detail.param[5][self.weapon_reson_level - 1]}"
         attr.add_atk_percent(calc_percent_expression(dmg1))
@@ -207,19 +203,24 @@ class Weapon_21020017(WeaponAbstract):
         msg = f"【凶猛】为10层时，攻击提升{dmg1}, 暴击率提升{dmg2}"
         attr.add_effect(title, msg)
 
-    def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成普攻伤害"""
-        self.damage(attr, isGroup)
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放普攻"""
+        self._damage(attr, isGroup)
         return True
 
-    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣技能伤害"""
-        self.damage(attr, isGroup)
+    def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放重击"""
+        self._damage(attr, isGroup)
         return True
 
-    def liberation_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣解放伤害"""
-        self.damage(attr, isGroup)
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        self._damage(attr, isGroup)
+        return True
+
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣解放"""
+        self._damage(attr, isGroup)
         return True
 
 
@@ -240,8 +241,11 @@ class Weapon_21020026(WeaponAbstract):
     type = 2
     name = "裁春"
 
-    def attack_damage(self, attr: DamageAttribute, isGroup: bool = False):
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
         """造成普攻伤害"""
+        if attr.char_damage != attack_damage:
+            return
+
         dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[3][self.weapon_reson_level - 1]}+{self.weapon_detail.param[4][self.weapon_reson_level - 1]}"
         title = self.get_title()
         msg = f"普攻伤害加成提升{dmg}"
@@ -510,18 +514,6 @@ class Weapon_21050016(WeaponAbstract):
     name = "掣傀之手"
 
     # 造成共鸣技能伤害时，自身攻击提升12%，可叠加2层，效果持续5秒。自身不在场时，该效果攻击额外提升12%。
-
-    def skill_damage(self, attr: DamageAttribute, isGroup: bool = False):
-        """造成共鸣技能伤害"""
-        dmg1 = f"{self.param(1)}*{self.param(2)}"
-        title = self.get_title()
-        msg = f"造成共鸣技能伤害时，自身攻击提升{dmg1}"
-        attr.add_atk_percent(calc_percent_expression(dmg1), title, msg)
-        if attr.sync_strike:
-            dmg2 = f"{self.param(4)}"
-            msg = f"自身不在场时，该效果攻击额外提升{dmg2}"
-            attr.add_atk_percent(calc_percent_expression(dmg2), title, msg)
-        return True
 
     def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣技能"""

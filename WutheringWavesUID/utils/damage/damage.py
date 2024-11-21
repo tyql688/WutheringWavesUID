@@ -117,7 +117,8 @@ class DamageAttribute:
         ph_detail=None,
         echo_id=0,
         char_attr=None,
-        sync_strike=False
+        sync_strike=False,
+        char_damage=None,
     ):
         """
         初始化 DamageAttribute 类的实例。
@@ -175,6 +176,8 @@ class DamageAttribute:
         self.echo_id = echo_id
         # 角色属性 ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
         self.char_attr = char_attr
+        # 角色属性伤害  attack_damage,hit_damage,skill_damage,liberation_damage,heal_bonus
+        self.char_damage = char_damage
         # 协同攻击
         self.sync_strike = sync_strike
         # 效果
@@ -204,6 +207,8 @@ class DamageAttribute:
             f"  defense_reduction={self.defense_reduction}, \n"
             f"  enemy_resistance={self.enemy_resistance}, \n"
             f"  dmg_bonus_phantom={self.dmg_bonus_phantom}, \n"
+            f"  char_attr={self.char_attr}, \n"
+            f"  char_damage={self.char_damage}, \n"
             f"  ph_detail={ph_details_str}, \n"
             f"  effect={effect_str}\n"
             f")"
@@ -326,6 +331,11 @@ class DamageAttribute:
     def set_sync_strike(self):
         """协同攻击"""
         self.sync_strike = True
+        return self
+
+    def set_char_damage(self, char_damage):
+        """角色伤害"""
+        self.char_damage = char_damage
         return self
 
     @property

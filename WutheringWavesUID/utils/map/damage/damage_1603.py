@@ -1,17 +1,19 @@
 # 椿
 from .buff import sanhua_buff, shouanren_buff
+from .damage import echo_damage, weapon_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail
-from ...damage.abstract import WavesWeaponRegister, WavesEchoRegister
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage, check_if_ph_5, SONATA_SINKING
+from ...damage.utils import check_if_ph_5, SONATA_SINKING, skill_damage_calc, attack_damage, cast_attack, \
+    liberation_damage, cast_liberation
 
 
 def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     """
     一日花
     """
-    damage_func = "attack_damage"
+    damage_func = cast_attack
+    attr.set_char_damage(attack_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -23,7 +25,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 回路倍率 = 4
     skillLevel = role.skillList[4].level - 1
     # 技能倍率 回路技能树 "7"
-    skill_multi = skill_damage(char_result.skillTrees, "7", "1", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "7", "1", skillLevel)
     title = f"{role_name}-一日花技能倍率"
     msg = f"{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -69,20 +71,10 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_dmg_bonus(0.25, title, msg)
 
     # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+    echo_damage(attr, isGroup)
 
     # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -95,7 +87,8 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     芳华绽烬
     """
-    damage_func = "liberation_damage"
+    damage_func = cast_liberation
+    attr.set_char_damage(liberation_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -106,7 +99,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 芳华绽烬 技能倍率
     skillLevel = role.skillList[2].level - 1
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "3", "1", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "1", skillLevel)
     attr.add_skill_multi(skill_multi)
 
     for ph_detail in attr.ph_detail:
@@ -147,20 +140,10 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_dmg_bonus(0.25, title, msg)
 
     # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
+    echo_damage(attr, isGroup)
 
     # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -170,13 +153,12 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
 
 def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
-    damage_func = "attack_damage"
-
+    attr.set_char_damage(attack_damage)
     # 守岸人buff
-    shouanren_buff(attr, 0, 1, isGroup, damage_func)
+    shouanren_buff(attr, 0, 1, isGroup)
 
     # 散华buff
-    sanhua_buff(attr, 6, 1, isGroup, damage_func)
+    sanhua_buff(attr, 6, 1, isGroup)
 
     return calc_damage_0(attr, role, isGroup)
 

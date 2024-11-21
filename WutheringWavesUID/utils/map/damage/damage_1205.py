@@ -1,17 +1,60 @@
 # 长离
 from .buff import shouanren_buff, sanhua_buff
+from .damage import weapon_damage, echo_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
-from ...damage.abstract import WavesWeaponRegister, WavesEchoRegister
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage, SONATA_MOLTEN, check_if_ph_5
+from ...damage.utils import SONATA_MOLTEN, check_if_ph_5, skill_damage_calc, skill_damage, liberation_damage, \
+    cast_skill, hit_damage, cast_liberation
+
+
+def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False):
+    role_name = role.role.roleName
+    chain_num = role.get_chain_num()
+    if chain_num >= 1 and attr.char_damage in [skill_damage, hit_damage]:
+        # 1命
+        title = f"{role_name}-一命"
+        msg = f"施放共鸣技能赫羽三相或重击焚身以火, 伤害提升10%"
+        attr.add_dmg_bonus(0.1, title, msg)
+
+    if chain_num >= 2:
+        # 2命
+        title = f"{role_name}-二命"
+        msg = f"获得【离火】时，长离的暴击提升25%"
+        attr.add_crit_rate(0.25, title, msg)
+
+    if chain_num >= 3 and attr.char_damage in [liberation_damage]:
+        # 3命
+        title = f"{role_name}-三命"
+        msg = "共鸣解放离火照丹心造成的伤害提升80%。"
+        attr.add_dmg_bonus(0.8, title, msg)
+
+    if chain_num >= 4 and isGroup:
+        # 4命 变奏入场
+        title = f"{role_name}-四命"
+        msg = f"施放变奏技能后，队伍中的角色攻击提升20%"
+        attr.add_atk_percent(0.2, title, msg)
+
+    if chain_num >= 5 and attr.char_damage in [skill_damage]:
+        # 5命
+        title = f"{role_name}-五命"
+        msg = "重击焚身以火倍率提升50%，造成的伤害提升50%。"
+        attr.add_skill_ratio(0.5)
+        attr.add_dmg_bonus(0.5)
+        attr.add_effect(title, msg)
+
+    if chain_num >= 6:
+        # 6命
+        title = f"{role_name}-六命"
+        msg = "忽视目标40%防御"
+        attr.add_defense_reduction(0.4, title, msg)
 
 
 def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     """
     焚身以火
     """
-    damage_func = "skill_damage"
+    attr.set_char_damage(skill_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -22,7 +65,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 焚身以火 技能倍率
     skillLevel = role.skillList[4].level - 1
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "7", "1", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "7", "1", skillLevel)
     title = f"{role_name}-焚身以火"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -49,54 +92,12 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         # 共鸣技能伤害 ->  来自声骸
         attr.add_dmg_bonus(attr.dmg_bonus_phantom.skill_damage)
 
-    chain_num = role.get_chain_num()
-    if chain_num >= 1:
-        # 1命
-        title = f"{role_name}-一命"
-        msg = f"伤害提升10%"
-        attr.add_dmg_bonus(0.1, title, msg)
-
-    if chain_num >= 2:
-        # 2命
-        title = f"{role_name}-二命"
-        msg = f"获得【离火】时，长离的暴击提升25%"
-        attr.add_crit_rate(0.25, title, msg)
-
-    if chain_num >= 4 and isGroup:
-        # 4命 变奏入场
-        title = f"{role_name}-四命"
-        msg = f"施放变奏技能后，队伍中的角色攻击提升20%"
-        attr.add_atk_percent(0.2, title, msg)
-
-    if chain_num >= 5:
-        # 5命
-        title = f"{role_name}-五命"
-        msg = "重击焚身以火倍率提升50%，造成的伤害提升50%。"
-        attr.add_skill_ratio(0.5)
-        attr.add_dmg_bonus(0.5)
-        attr.add_effect(title, msg)
-
-    if chain_num >= 6:
-        # 6命
-        title = f"{role_name}-六命"
-        msg = "忽视目标40%防御"
-        attr.add_defense_reduction(0.4, title, msg)
-
-    # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
-
-    # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    # 命座计算
+    calc_chain(attr, role, isGroup)
+    # 声骸计算
+    echo_damage(attr, isGroup)
+    # 武器计算
+    weapon_damage(attr, role.weaponData, cast_skill, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -109,7 +110,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     离火照丹心
     """
-    damage_func = "liberation_damage"
+    attr.set_char_damage(liberation_damage)
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -120,7 +121,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 离火照丹心 技能倍率
     skillLevel = role.skillList[2].level - 1
     # 技能倍率
-    skill_multi = skill_damage(char_result.skillTrees, "3", "1", skillLevel)
+    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "1", skillLevel)
     title = f"{role_name}-离火照丹心技能倍率"
     msg = f"{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -147,46 +148,12 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         # 共鸣解放伤害 ->  来自声骸
         attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
 
-    chain_num = role.get_chain_num()
-    if chain_num >= 2:
-        # 2命
-        title = f"{role_name}-二命"
-        msg = f"获得【离火】时，长离的暴击提升25%"
-        attr.add_crit_rate(0.25, title, msg)
-
-    if chain_num >= 3:
-        # 3命
-        title = f"{role_name}-三命"
-        msg = "共鸣解放离火照丹心造成的伤害提升80%。"
-        attr.add_dmg_bonus(0.8, title, msg)
-
-    if chain_num >= 4 and isGroup:
-        # 4命
-        title = f"{role_name}-四命"
-        msg = f"施放变奏技能后，队伍中的角色攻击提升20%"
-        attr.add_atk_percent(0.2, title, msg)
-
-    if chain_num >= 6:
-        # 6命
-        title = f"{role_name}-六命"
-        msg = "忽视目标40%防御"
-        attr.add_defense_reduction(0.4, title, msg)
-
-    # 声骸技能
-    echo_clz = WavesEchoRegister.find_class(attr.echo_id)
-    if echo_clz:
-        e = echo_clz()
-        e.do_echo(damage_func, attr, isGroup)
-
-    # 武器谐振
-    weapon_clz = WavesWeaponRegister.find_class(role.weaponData.weapon.weaponId)
-    if weapon_clz:
-        weapon_data = role.weaponData
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
-        w.do_action(damage_func, attr, isGroup)
+    # 命座计算
+    calc_chain(attr, role, isGroup)
+    # 声骸计算
+    echo_damage(attr, isGroup)
+    # 武器计算
+    weapon_damage(attr, role.weaponData, cast_liberation, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -196,13 +163,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
 
 def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
-    damage_func = "skill_damage"
-
+    attr.set_char_damage(skill_damage)
+    
     # 守岸人buff
-    shouanren_buff(attr, 0, 1, isGroup, damage_func)
+    shouanren_buff(attr, 0, 1, isGroup)
 
     # 散华buff
-    sanhua_buff(attr, 6, 1, isGroup, damage_func)
+    sanhua_buff(attr, 6, 1, isGroup)
 
     return calc_damage_0(attr, role, isGroup)
 
