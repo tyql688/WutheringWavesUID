@@ -1,5 +1,5 @@
 from .damage import DamageAttribute, calc_percent_expression
-from .utils import hit_damage, skill_damage, attack_damage
+from .utils import hit_damage, skill_damage, attack_damage, liberation_damage
 from ..damage.abstract import WeaponAbstract, WavesWeaponRegister
 
 
@@ -423,6 +423,17 @@ class Weapon_21040016(WeaponAbstract):
     type = 4
     name = "诸方玄枢"
 
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣解放"""
+        if attr.char_damage != liberation_damage:
+            return
+
+        # 施放共鸣解放时，自身共鸣解放伤害加成提升48%，持续8秒；施放共鸣技能时，该效果延长5秒，最多可延长3次。
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放共鸣解放时，自身共鸣解放伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21040023(WeaponAbstract):
     id = 21040023
@@ -476,6 +487,16 @@ class Weapon_21040074(WeaponAbstract):
     id = 21040074
     type = 4
     name = "金掌"
+
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_damage != liberation_damage:
+            return
+        dmg = f"{self.param(0)}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，自身共鸣解放伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
 
 
 class Weapon_21040084(WeaponAbstract):

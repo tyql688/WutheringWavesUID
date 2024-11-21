@@ -89,6 +89,10 @@ def prepare_phantom(equipPhantomList):
                 temp_result[sonata_result.name]['num'] += 1
 
     for key, value in temp_result.items():
+        result['ph_detail'].append({
+            'ph_num': value['num'],
+            'ph_name': key,
+        })
         if value['num'] >= 2:
             name = value['result'].set['2']['effect']
             effect = value['result'].set['2']['param'][0]
@@ -99,10 +103,6 @@ def prepare_phantom(equipPhantomList):
             old = float(result[name].replace("%", ""))
             new = float(effect.replace("%", ""))
             result[name] = f"{old + new:.1f}%"
-        result['ph_detail'].append({
-            'ph_num': value['num'],
-            'ph_name': key,
-        })
 
     return result
 
