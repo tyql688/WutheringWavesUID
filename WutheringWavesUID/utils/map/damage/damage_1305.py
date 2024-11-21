@@ -133,8 +133,8 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 5:
         title = f"{role_name}-五命"
-        msg = "共鸣解放思维矩阵伤害倍率提升120%。"
-        attr.add_skill_ratio(1.2, title, msg)
+        msg = "共鸣解放思维矩阵伤害倍率提升100%。"
+        attr.add_skill_ratio(1, title, msg)
 
     # 声骸技能
     echo_damage(attr, isGroup)
