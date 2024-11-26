@@ -67,11 +67,8 @@ async def get_draw_list(ev: Event, uid: str) -> Union[str, bytes]:
                 continue
             if not _phantom.phantomProp:
                 continue
-            props = []
-            if _phantom.mainProps:
-                props.extend(_phantom.mainProps)
-            if _phantom.subProps:
-                props.extend(_phantom.subProps)
+            _phantom: EquipPhantom
+            props = _phantom.get_props()
             _score, _bg = calc_phantom_score(char_name, props, _phantom.cost, calc_temp)
             name_colors = []
             num_colors = []

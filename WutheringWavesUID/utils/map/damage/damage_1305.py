@@ -39,7 +39,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if role_breach >= 3:
+    if role_breach and role_breach >= 3:
         title = f"{role_name}-固有技能-睿知"
         msg = f"施放共鸣技能时，导电伤害加成提升5%*4"
         attr.add_dmg_bonus(0.20, title, msg)
@@ -112,7 +112,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if role_breach >= 3:
+    if role_breach and role_breach >= 3:
         title = f"{role_name}-固有技能-睿知"
         msg = f"施放共鸣技能时，导电伤害加成提升5%*4"
         attr.add_dmg_bonus(0.20, title, msg)

@@ -57,7 +57,7 @@ class DailyData(BaseModel):
 class Role(BaseModel):
     roleId: int
     level: int
-    breach: Optional[int]
+    breach: Optional[int] = None
     roleName: str
     roleIconUrl: Optional[str]
     rolePicUrl: Optional[str]
@@ -121,7 +121,7 @@ class Weapon(BaseModel):
 class WeaponData(BaseModel):
     weapon: Weapon
     level: int
-    breach: Optional[int]
+    breach: Optional[int] = None
     resonLevel: Optional[int]
 
 
@@ -156,8 +156,17 @@ class EquipPhantom(BaseModel):
     quality: int
     level: int
     fetterDetail: FetterDetail
-    mainProps: Optional[List[Props]]
+    mainProps: Optional[List[Props]] = None
     subProps: Optional[List[Props]] = None
+
+    def get_props(self):
+        props = []
+        if self.mainProps:
+            props.extend(self.mainProps)
+        if self.subProps:
+            props.extend(self.subProps)
+
+        return props
 
 
 class EquipPhantomData(BaseModel):

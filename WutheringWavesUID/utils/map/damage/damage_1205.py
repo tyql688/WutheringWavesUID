@@ -80,7 +80,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"使用共鸣技能时，热熔伤害提升30%"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if role_breach >= 3:
+    if role_breach and role_breach >= 3:
         # 固2(散势) 0.2
         title = f"{role_name}-固有技能-散势"
         msg = f"长离的热熔伤害加成提升20%，攻击造成伤害时忽视目标15%防御"
@@ -136,7 +136,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    if role_breach >= 3:
+    if role_breach and role_breach >= 3:
         # 固2(散势) 0.2
         title = f"{role_name}-固有技能-散势"
         msg = f"长离的热熔伤害加成提升20%，攻击造成伤害时忽视目标15%防御"
@@ -164,7 +164,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
 def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
     attr.set_char_damage(skill_damage)
-    
+
     # 守岸人buff
     shouanren_buff(attr, 0, 1, isGroup)
 

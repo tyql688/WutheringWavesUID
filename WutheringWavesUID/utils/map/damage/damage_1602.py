@@ -27,7 +27,7 @@ def calc_damage(attr: DamageAttribute, role: RoleDetailData, damage_func, isGrou
             attr.add_dmg_bonus(0.3, title, msg)
 
     chain_num = role.get_chain_num()
-    if role_breach >= 3:
+    if role_breach and role_breach >= 3:
         # 固有技能
         title = f"{role_name}-固有技能-盈溢"
         msg = "施放共鸣技能后，重击伤害提升30%。"

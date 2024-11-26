@@ -66,6 +66,8 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
         if not uid:
             return await bot.send('该命令需要带上正确的uid!\n')
         data = await WavesBind.insert_waves_uid(qid, ev.bot_id, uid, ev.group_id, lenth_limit=9)
+        if data == 0 or data == -2:
+            retcode = await WavesBind.switch_uid_by_game(qid, ev.bot_id, uid)
         return await send_diff_msg(
             bot,
             data,

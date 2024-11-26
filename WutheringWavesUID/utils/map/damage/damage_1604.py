@@ -43,7 +43,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if role_breach >= 3:
+    if role_breach and role_breach >= 3:
         # 固有技能
         title = f"{role_name}-固有技能-变格"
         msg = "处于暗涌状态时，湮灭伤害加成提升20%。"

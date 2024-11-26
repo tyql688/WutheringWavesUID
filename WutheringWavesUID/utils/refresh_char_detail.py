@@ -3,6 +3,7 @@ from typing import List, Union, Dict
 
 from msgspec import json as msgjson
 
+from gsuid_core.logger import logger
 from ..utils.api.model import RoleList
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_101
 from ..utils.hint import error_reply
@@ -55,8 +56,12 @@ async def refresh_char(uid: str, ck: str = '', waves_map: Dict = None) -> Union[
     succ, role_info = await waves_api.get_role_info(uid, ck)
     if not succ:
         return role_info
-
-    role_info = RoleList(**role_info)
+    try:
+        role_info = RoleList(**role_info)
+    except Exception as e:
+        logger.exception(f'{uid} 角色信息解析失败', e)
+        msg = f"鸣潮账号id: 【{uid}】获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮账号数据"
+        return msg
     for r in role_info.roleList:
         succ, role_detail_info = await waves_api.get_role_detail_info(r.roleId, uid, ck)
         if (not succ

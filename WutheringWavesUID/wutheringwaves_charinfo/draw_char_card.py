@@ -125,11 +125,7 @@ async def ph_card_draw(
             sh_bg = Image.open(TEXT_PATH / 'sh_bg.png')
             sh_temp.alpha_composite(sh_bg, dest=(0, 0))
             if _phantom and _phantom.phantomProp:
-                props = []
-                if _phantom.mainProps:
-                    props.extend(_phantom.mainProps)
-                if _phantom.subProps:
-                    props.extend(_phantom.subProps)
+                props = _phantom.get_props()
                 _score, _bg = calc_phantom_score(char_name, props, _phantom.cost, calc_temp)
 
                 phantom_score += _score

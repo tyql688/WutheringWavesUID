@@ -39,7 +39,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if role_breach >= 3:
+    if role_breach and role_breach >= 3:
         if isGroup:
             title = f"{role_name}-固有技能-垂天平澜"
             msg = f"施放变奏技能攻其不备后，忌炎的攻击提升10%"
@@ -134,7 +134,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if role_breach >= 3:
+    if role_breach and role_breach >= 3:
         if isGroup:
             title = f"{role_name}-固有技能-垂天平澜"
             msg = f"施放变奏技能攻其不备后，忌炎的攻击提升10%"
@@ -219,7 +219,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if role_breach >= 3:
+    if role_breach and role_breach >= 3:
         if isGroup:
             title = f"{role_name}-固有技能-垂天平澜"
             msg = f"施放变奏技能攻其不备后，忌炎的攻击提升10%"
@@ -284,7 +284,7 @@ def calc_damage_5(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     0维/6+1莫/重击·破阵之枪
     """
     attr.set_char_damage(hit_damage)
-    
+
     # 维里奈buff
     weilinai_buff(attr, 0, 1, isGroup)
 

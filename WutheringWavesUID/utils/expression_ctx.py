@@ -46,11 +46,7 @@ async def get_waves_char_rank(uid, all_role_detail):
             calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
             for i, _phantom in enumerate(equipPhantomList):
                 if _phantom and _phantom.phantomProp:
-                    props = []
-                    if _phantom.mainProps:
-                        props.extend(_phantom.mainProps)
-                    if _phantom.subProps:
-                        props.extend(_phantom.subProps)
+                    props = _phantom.get_props()
                     _score, _bg = calc_phantom_score(role_detail.role.roleName, props, _phantom.cost, calc_temp)
                     phantom_score += _score
 
@@ -76,11 +72,7 @@ def prepare_phantom(equipPhantomList):
         if _phantom and _phantom.phantomProp:
             if i == 0:
                 result['echo_id'] = _phantom.phantomProp.phantomId
-            props = []
-            if _phantom.mainProps:
-                props.extend(_phantom.mainProps)
-            if _phantom.subProps:
-                props.extend(_phantom.subProps)
+            props = _phantom.get_props()
             result = sum_phantom_value(result, props)
             sonata_result: WavesSonataResult = get_sonata_detail(_phantom.fetterDetail.name)
             if sonata_result.name not in temp_result:
