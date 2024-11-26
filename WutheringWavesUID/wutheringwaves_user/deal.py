@@ -39,7 +39,11 @@ async def add_cookie(ev: Event, ck: str):
     else:
         await WavesUser.insert_data(ev.user_id, ev.bot_id, cookie=ck, uid=data.roleId)
 
-    return 'CK添加成功！'
+    res = await WavesBind.insert_waves_uid(ev.user_id, ev.bot_id, data.roleId, ev.group_id, lenth_limit=9)
+    if res == 0 or res == -2:
+        await WavesBind.switch_uid_by_game(ev.user_id, ev.bot_id, data.roleId)
+
+    return f'[鸣潮]特征码: {data.roleId} \n恭喜CK添加成功！'
 
 
 async def delete_cookie(uid: str) -> str:
