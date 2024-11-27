@@ -1,12 +1,11 @@
 # 丹瑾
 from typing import Union, List
 
-from .damage import weapon_damage, echo_damage
+from .damage import weapon_damage, echo_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
-from ...ascension.sonata import get_sonata_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import check_if_ph_5, SONATA_SINKING, skill_damage_calc, hit_damage, cast_skill, cast_hit, \
+from ...damage.utils import skill_damage_calc, hit_damage, cast_skill, cast_hit, \
     liberation_damage, cast_liberation
 
 
@@ -19,12 +18,7 @@ def calc_damage(attr: DamageAttribute, role: RoleDetailData, damage_func, isGrou
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SINKING):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    phase_damage(attr, role, damage_func, isGroup)
 
     chain_num = role.get_chain_num()
     if role_breach and role_breach >= 3:

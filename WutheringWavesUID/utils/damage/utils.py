@@ -47,10 +47,6 @@ cast_variation = "cast_variation"
 skill_create_healing = "skill_create_healing"
 
 
-def check_if_ph_5(ph_name: str, ph_num: int, check_name: str):
-    return ph_name == check_name and ph_num == 5
-
-
 def skill_damage_calc(skillTree: Dict, skillTreeId: str, skillParamId: str, skillLevel: int) -> str:
     """
     获取技能伤害

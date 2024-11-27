@@ -1,10 +1,10 @@
 # 长离
 from .buff import shouanren_buff, sanhua_buff
-from .damage import weapon_damage, echo_damage
+from .damage import weapon_damage, echo_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...damage.damage import DamageAttribute
-from ...damage.utils import SONATA_MOLTEN, check_if_ph_5, skill_damage_calc, skill_damage, liberation_damage, \
+from ...damage.utils import skill_damage_calc, skill_damage, liberation_damage, \
     cast_skill, hit_damage, cast_liberation
 
 
@@ -73,12 +73,8 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_MOLTEN):
-            # 热熔声骸五件套
-            title = f"{role_name}-熔山裂谷"
-            msg = f"使用共鸣技能时，热熔伤害提升30%"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_skill]
+    phase_damage(attr, role, damage_func, isGroup)
 
     if role_breach and role_breach >= 3:
         # 固2(散势) 0.2
@@ -95,7 +91,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 声骸计算
     echo_damage(attr, isGroup)
     # 武器计算
-    weapon_damage(attr, role.weaponData, cast_skill, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"
@@ -124,12 +120,8 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     msg = f"{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    for ph_detail in attr.ph_detail:
-        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_MOLTEN):
-            # 热熔声骸五件套
-            title = f"{role_name}-熔山裂谷"
-            msg = f"使用共鸣技能时，热熔伤害提升30%"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_skill, cast_liberation]
+    phase_damage(attr, role, damage_func, isGroup)
 
     # 设置角色等级
     attr.set_character_level(role_level)
@@ -149,7 +141,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 声骸计算
     echo_damage(attr, isGroup)
     # 武器计算
-    weapon_damage(attr, role.weaponData, cast_liberation, isGroup)
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
     # 暴击伤害
     crit_damage = f"{attr.calculate_crit_damage():,.0f}"

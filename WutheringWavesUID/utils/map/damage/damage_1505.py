@@ -1,11 +1,9 @@
 # 守岸人
-from .damage import echo_damage, weapon_damage
+from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail
-from ...ascension.sonata import get_sonata_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import cast_skill, skill_damage_calc, heal_bonus, cast_variation, liberation_damage, check_if_ph_5, \
-    SONATA_CELESTIAL
+from ...damage.utils import cast_skill, skill_damage_calc, heal_bonus, cast_variation, liberation_damage
 
 
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
@@ -89,7 +87,6 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
 
 def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
-    damage_func = [cast_variation]
     attr.set_char_damage(liberation_damage)
     attr.set_char_template('temp_life')
 
@@ -107,12 +104,8 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    for ph_detail in attr.ph_detail:
-        if isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_CELESTIAL):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_variation]
+    phase_damage(attr, role, damage_func, isGroup)
 
     # 设置角色等级
     attr.set_character_level(role_level)

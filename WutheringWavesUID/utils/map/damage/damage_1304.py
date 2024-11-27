@@ -1,11 +1,10 @@
 # 今夕
 from .buff import weilinai_buff, zhezhi_buff
-from .damage import echo_damage, weapon_damage
+from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
-from ...ascension.sonata import get_sonata_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import check_if_ph_5, SONATA_CELESTIAL, skill_damage_calc, skill_damage, cast_skill, \
+from ...damage.utils import skill_damage_calc, skill_damage, cast_skill, \
     liberation_damage, cast_liberation
 
 
@@ -40,12 +39,8 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_CELESTIAL):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_skill]
+    phase_damage(attr, role, damage_func, isGroup)
 
     attr.set_phantom_dmg_bonus()
 
@@ -93,7 +88,6 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     移岁诛邪
     """
-    damage_func = cast_liberation
     attr.set_char_damage(liberation_damage)
 
     role_name = role.role.roleName
@@ -113,12 +107,8 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_CELESTIAL):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_liberation]
+    phase_damage(attr, role, damage_func, isGroup)
 
     attr.set_phantom_dmg_bonus()
 

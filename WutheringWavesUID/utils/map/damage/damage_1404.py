@@ -1,18 +1,16 @@
 # 忌炎
 from .buff import motefei_buff, weilinai_buff
-from .damage import echo_damage, weapon_damage
+from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
-from ...ascension.sonata import get_sonata_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import check_if_ph_5, SONATA_SIERRA, skill_damage_calc, hit_damage, cast_liberation, cast_hit
+from ...damage.utils import skill_damage_calc, hit_damage, cast_liberation, cast_hit
 
 
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     """
     破阵之枪第一段
     """
-    damage_func = [cast_liberation, cast_hit]
     attr.set_char_damage(hit_damage)
 
     role_name = role.role.roleName
@@ -32,12 +30,8 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SIERRA):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_liberation, cast_hit]
+    phase_damage(attr, role, damage_func, isGroup)
 
     if role_breach and role_breach >= 3:
         if isGroup:
@@ -96,7 +90,6 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     重击·破阵之枪
     """
-    damage_func = [cast_liberation, cast_hit]
     attr.set_char_damage(hit_damage)
 
     role_name = role.role.roleName
@@ -126,12 +119,8 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SIERRA):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_liberation, cast_hit]
+    phase_damage(attr, role, damage_func, isGroup)
 
     if role_breach and role_breach >= 3:
         if isGroup:
@@ -190,7 +179,6 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     苍躣八荒·后动
     """
-    damage_func = [cast_liberation, cast_hit]
     attr.set_char_damage(hit_damage)
 
     role_name = role.role.roleName
@@ -210,12 +198,8 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SIERRA):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_liberation, cast_hit]
+    phase_damage(attr, role, damage_func, isGroup)
 
     if role_breach and role_breach >= 3:
         if isGroup:

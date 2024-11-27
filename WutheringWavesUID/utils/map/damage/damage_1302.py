@@ -1,17 +1,16 @@
 # 吟霖
-from .damage import weapon_damage, echo_damage
+from .damage import weapon_damage, echo_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
-from ...ascension.sonata import get_sonata_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import check_if_ph_5, SONATA_VOID, skill_damage_calc, skill_damage, cast_skill, liberation_damage
+from ...damage.utils import skill_damage_calc, skill_damage, cast_skill, liberation_damage, \
+    cast_hit, cast_liberation
 
 
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     """
     审判之雷
     """
-    damage_func = [cast_skill]
     attr.set_char_damage(skill_damage)
 
     role_name = role.role.roleName
@@ -34,12 +33,8 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置协同攻击
     attr.set_sync_strike()
 
-    for ph_detail in attr.ph_detail:
-        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_VOID):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_skill, cast_hit]
+    phase_damage(attr, role, damage_func, isGroup)
 
     if role_breach and role_breach >= 3:
         title = f"{role_name}-固有技能-浸渍痛楚"
@@ -79,7 +74,6 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     破天雷灭击
     """
-    damage_func = [cast_skill]
     attr.set_char_damage(liberation_damage)
 
     role_name = role.role.roleName
@@ -99,12 +93,8 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_VOID):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_skill, cast_hit, cast_liberation]
+    phase_damage(attr, role, damage_func, isGroup)
 
     if role_breach and role_breach >= 3:
         title = f"{role_name}-固有技能-浸渍痛楚"

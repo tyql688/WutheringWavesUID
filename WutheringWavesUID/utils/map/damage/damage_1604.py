@@ -1,18 +1,17 @@
 # 暗主
 
-from .damage import echo_damage, weapon_damage
+from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
-from ...ascension.sonata import get_sonata_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import check_if_ph_5, SONATA_SINKING, skill_damage_calc, liberation_damage, cast_liberation
+from ...damage.utils import skill_damage_calc, liberation_damage, cast_liberation, \
+    cast_attack
 
 
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     """
     临渊死寂
     """
-    damage_func = [cast_liberation]
     attr.set_char_damage(liberation_damage)
 
     role_name = role.role.roleName
@@ -34,12 +33,8 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SINKING):
-            # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_attack, cast_liberation]
+    phase_damage(attr, role, damage_func, isGroup)
 
     if role_breach and role_breach >= 3:
         # 固有技能

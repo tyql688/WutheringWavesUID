@@ -1,10 +1,10 @@
 # 椿
 from .buff import sanhua_buff, shouanren_buff
-from .damage import echo_damage, weapon_damage
+from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import check_if_ph_5, SONATA_SINKING, skill_damage_calc, attack_damage, cast_attack, \
+from ...damage.utils import skill_damage_calc, attack_damage, cast_attack, \
     liberation_damage, cast_liberation
 
 
@@ -12,7 +12,6 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     一日花
     """
-    damage_func = cast_attack
     attr.set_char_damage(attack_damage)
 
     role_name = role.role.roleName
@@ -33,12 +32,8 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    for ph_detail in attr.ph_detail:
-        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SINKING):
-            # 湮灭声骸五件套
-            title = f"{role_name}-沉日劫明"
-            msg = f"湮灭伤害提升7.5%，该效果可叠加四层"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = cast_attack
+    phase_damage(attr, role, damage_func, isGroup)
 
     attr.set_phantom_dmg_bonus()
 
@@ -85,7 +80,6 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     芳华绽烬
     """
-    damage_func = cast_liberation
     attr.set_char_damage(liberation_damage)
 
     role_name = role.role.roleName
@@ -100,12 +94,8 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     skill_multi = skill_damage_calc(char_result.skillTrees, "3", "1", skillLevel)
     attr.add_skill_multi(skill_multi)
 
-    for ph_detail in attr.ph_detail:
-        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SINKING):
-            # 湮灭声骸五件套
-            title = f"{role_name}-沉日劫明"
-            msg = f"湮灭伤害提升7.5%，该效果可叠加四层"
-            attr.add_dmg_bonus(0.3, title, msg)
+    damage_func = [cast_attack, cast_liberation]
+    phase_damage(attr, role, damage_func, isGroup)
 
     # 设置角色等级
     attr.set_character_level(role_level)
