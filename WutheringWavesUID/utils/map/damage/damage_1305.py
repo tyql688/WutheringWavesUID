@@ -44,8 +44,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = f"施放共鸣技能时，导电伤害加成提升5%*4"
         attr.add_dmg_bonus(0.20, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.liberation_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
     if chain_num >= 2:
@@ -117,8 +116,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = f"施放共鸣技能时，导电伤害加成提升5%*4"
         attr.add_dmg_bonus(0.20, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.liberation_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
     if chain_num >= 2:

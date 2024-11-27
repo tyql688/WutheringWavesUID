@@ -49,8 +49,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = f"攻击命中目标时，忌炎的暴击伤害提升12%"
         attr.add_crit_dmg(0.12, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.hit_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.hit_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
 
@@ -144,8 +143,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = f"攻击命中目标时，忌炎的暴击伤害提升12%"
         attr.add_crit_dmg(0.12, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.hit_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.hit_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
 
@@ -229,8 +227,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = f"攻击命中目标时，忌炎的暴击伤害提升12%"
         attr.add_crit_dmg(0.12, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.hit_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.hit_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
 

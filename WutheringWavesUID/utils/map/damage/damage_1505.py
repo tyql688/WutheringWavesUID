@@ -11,6 +11,7 @@ from ...damage.utils import cast_skill, skill_damage_calc, heal_bonus, cast_vari
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     damage_func = [cast_skill]
     attr.set_char_damage(heal_bonus)
+    attr.set_char_template('temp_life')
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -29,8 +30,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.heal_bonus:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.heal_bonus)
+    attr.set_phantom_dmg_bonus(needShuxing=False)
 
     chain_num = role.get_chain_num()
     if chain_num >= 4:
@@ -51,6 +51,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
     damage_func = [cast_skill]
     attr.set_char_damage(heal_bonus)
+    attr.set_char_template('temp_life')
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -69,8 +70,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.heal_bonus:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.heal_bonus)
+    attr.set_phantom_dmg_bonus(needShuxing=False)
 
     chain_num = role.get_chain_num()
     if chain_num >= 4:
@@ -91,6 +91,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
     damage_func = [cast_variation]
     attr.set_char_damage(liberation_damage)
+    attr.set_char_template('temp_life')
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -126,8 +127,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     msg = "队伍中的角色全伤害加深15%"
     attr.add_dmg_deepen(0.15, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.liberation_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
     if chain_num >= 6:

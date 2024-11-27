@@ -29,9 +29,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.liberation_damage:
-        # 来自声骸
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
+    attr.set_phantom_dmg_bonus()
 
     # 设置角色等级
     attr.set_character_level(role_level)

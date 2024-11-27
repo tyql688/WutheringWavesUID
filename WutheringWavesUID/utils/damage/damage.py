@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Literal
 
 from ...utils.damage.utils import parse_healing_skill_multi
 
@@ -61,6 +61,7 @@ class DamageBonusPhantom:
         skill_damage=0,
         liberation_damage=0,
         heal_bonus=0,
+        shuxing_bonus=0,
     ):
         """
         初始化 DamageBonusPhantom 类的实例。
@@ -70,12 +71,14 @@ class DamageBonusPhantom:
         :param skill_damage: 共鸣技能伤害加成
         :param liberation_damage: 共鸣解放伤害加成
         :param heal_bonus: 治疗效果加成
+        :param shuxing_bonus: 属性伤害加成
         """
         self.attack_damage = attack_damage
         self.hit_damage = hit_damage
         self.skill_damage = skill_damage
         self.liberation_damage = liberation_damage
         self.heal_bonus = heal_bonus
+        self.shuxing_bonus = shuxing_bonus
 
     def __str__(self):
         return (
@@ -85,6 +88,7 @@ class DamageBonusPhantom:
             f"    skill_damage={self.skill_damage}, \n"
             f"    liberation_damage={self.liberation_damage}, \n"
             f"    heal_bonus={self.heal_bonus}\n"
+            f"    shuxing_bonus={self.shuxing_bonus}\n"
             f")"
         )
 
@@ -96,12 +100,14 @@ class DamageBonusPhantom:
         res.skill_damage = d.get('skill_damage', 0)
         res.liberation_damage = d.get('liberation_damage', 0)
         res.heal_bonus = d.get('heal_bonus', 0)
+        res.shuxing_bonus = d.get('shuxing_bonus', 0)
         return res
 
 
 class DamageAttribute:
     def __init__(
         self,
+        char_template: Literal["temp_atk", "temp_life", "temp_def"] = "temp_atk",
         char_atk=0,
         char_life=0,
         char_def=0,
@@ -132,6 +138,7 @@ class DamageAttribute:
         """
         初始化 DamageAttribute 类的实例。
 
+        :param char_template: 角色模版 ["temp_atk", "temp_life", "temp_def"]
         :param char_atk: 基础攻击力 (角色基础攻击力
         :param char_life: 基础生命值 (角色基础生命值
         :param char_def: 基础防御力 (角色基础防御力
@@ -157,6 +164,7 @@ class DamageAttribute:
         :param char_attr: 角色属性 ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
         :param sync_strike: 协同攻击
         """
+        self.char_template = char_template
         # 角色基础攻击力
         self.char_atk = char_atk
         # 角色基础生命值
@@ -221,6 +229,7 @@ class DamageAttribute:
         effect_str = '\n'.join(str(e) for e in self.effect)
         return (
             f"\nDamageAttribute(\n"
+            f"  角色模版={self.char_template}, \n"
             f"  角色基础攻击力={self.char_atk}, \n"
             f"  角色基础生命值={self.char_life}, \n"
             f"  角色基础防御力={self.char_def}, \n"
@@ -258,6 +267,10 @@ class DamageAttribute:
         if effect is None:
             return
         self.effect.append(effect)
+
+    def set_char_template(self, char_template: Literal["temp_atk", "temp_life", "temp_def"]):
+        self.char_template = char_template
+        return self
 
     def set_char_attr(self, char_attr: str):
         self.char_attr = char_attr
@@ -424,6 +437,17 @@ class DamageAttribute:
     def set_char_damage(self, char_damage):
         """角色伤害"""
         self.char_damage = char_damage
+        return self
+
+    def set_phantom_dmg_bonus(self, needPhantom=True, needShuxing=True):
+        if not self.dmg_bonus_phantom:
+            return self
+        if needPhantom:
+            value = getattr(self.dmg_bonus_phantom, self.char_damage)
+            self.add_dmg_bonus(value)
+        if needShuxing:
+            value = self.dmg_bonus_phantom.shuxing_bonus
+            self.add_dmg_bonus(value)
         return self
 
     @property

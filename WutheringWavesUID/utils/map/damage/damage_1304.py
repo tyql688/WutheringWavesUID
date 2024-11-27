@@ -47,8 +47,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.skill_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.skill_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
 
@@ -121,8 +120,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.liberation_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
 
@@ -162,7 +160,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     0维/0折枝/惊龙破空·炳星
     """
     attr.set_char_damage(skill_damage)
-    
+
     # 维里奈buff
     weilinai_buff(attr, 0, 1, isGroup)
 

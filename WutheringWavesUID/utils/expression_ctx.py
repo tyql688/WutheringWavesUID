@@ -246,7 +246,7 @@ def enhance_summation_card_value(role_id, role_level, role_breach, role_attr,
         result.get(shuxing, "0%"),
         card_sort_map.get(shuxing, "0%"),
         card_sort_map.get("属性伤害加成", "0%"))
-    card_sort_map['dmg_bonus'] = percent_to_float(card_sort_map[shuxing])
+    card_sort_map['shuxing_bonus'] = percent_to_float(card_sort_map[shuxing])
     card_sort_map['char_attr'] = role_attr
 
     if "属性伤害加成" in card_sort_map:
@@ -297,7 +297,7 @@ def card_sort_map_to_attribute(card_sort_map: Dict):
     attr.add_def_percent(card_sort_map['def_percent'])
     attr.add_crit_rate(card_sort_map['crit_rate'])
     attr.add_crit_dmg(card_sort_map['crit_dmg'])
-    attr.add_dmg_bonus(card_sort_map['dmg_bonus'])
+    # attr.add_dmg_bonus(card_sort_map['dmg_bonus'])
     attr.set_dmg_bonus_phantom(card_sort_map)
     attr.set_echo_id(card_sort_map['echo_id'])
     attr.set_char_attr(card_sort_map['char_attr'])

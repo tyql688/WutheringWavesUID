@@ -111,8 +111,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = f"技能倍率{skill_multi}"
         attr.add_skill_multi(skill_multi, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.hit_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.hit_damage)
+    attr.set_phantom_dmg_bonus()
 
     calc_damage(attr, role, damage_func, isGroup)
     # 暴击伤害
@@ -155,8 +154,7 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.liberation_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
+    attr.set_phantom_dmg_bonus()
 
     calc_damage(attr, role, damage_func, isGroup)
 

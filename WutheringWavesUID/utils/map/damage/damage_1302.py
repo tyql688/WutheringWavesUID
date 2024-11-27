@@ -46,8 +46,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = f"使用共鸣技能磁殛咆哮后，暴击提升15%"
         attr.add_crit_rate(0.15, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.skill_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.skill_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
 
@@ -116,8 +115,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = f"共鸣技能召雷磁爆命中带有缚罪标记的目标，触发该效果时攻击提升10%"
         attr.add_atk_percent(0.1, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.liberation_damage:
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
 

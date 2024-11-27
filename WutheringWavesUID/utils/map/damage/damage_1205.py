@@ -88,9 +88,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_defense_reduction(0.15)
         attr.add_effect(title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.skill_damage:
-        # 共鸣技能伤害 ->  来自声骸
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.skill_damage)
+    attr.set_phantom_dmg_bonus()
 
     # 命座计算
     calc_chain(attr, role, isGroup)
@@ -144,9 +142,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_defense_reduction(0.15)
         attr.add_effect(title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.liberation_damage:
-        # 共鸣解放伤害 ->  来自声骸
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
+    attr.set_phantom_dmg_bonus()
 
     # 命座计算
     calc_chain(attr, role, isGroup)

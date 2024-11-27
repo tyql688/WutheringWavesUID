@@ -40,9 +40,7 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
             msg = f"湮灭伤害提升7.5%，该效果可叠加四层"
             attr.add_dmg_bonus(0.3, title, msg)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.attack_damage:
-        # 普攻伤害加成 -> 来自声骸
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.attack_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
     if chain_num >= 1 and isGroup:
@@ -112,9 +110,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    if attr.dmg_bonus_phantom and attr.dmg_bonus_phantom.liberation_damage:
-        # 共鸣解放伤害 ->  来自声骸
-        attr.add_dmg_bonus(attr.dmg_bonus_phantom.liberation_damage)
+    attr.set_phantom_dmg_bonus()
 
     chain_num = role.get_chain_num()
     if chain_num >= 1 and isGroup:
