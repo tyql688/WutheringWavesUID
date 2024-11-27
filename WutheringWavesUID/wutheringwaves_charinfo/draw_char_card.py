@@ -454,8 +454,11 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
             damage_bar = damage_bar2.copy() if dindex % 2 == 0 else damage_bar1.copy()
             damage_bar_draw = ImageDraw.Draw(damage_bar)
             damage_bar_draw.text((400, 50), f'{damage_title}', 'white', waves_font_24, 'rm')
-            damage_bar_draw.text((700, 50), f'{crit_damage}', 'white', waves_font_24, 'mm')
-            damage_bar_draw.text((1000, 50), f'{expected_damage}', 'white', waves_font_24, 'mm')
+            if crit_damage and expected_damage:
+                damage_bar_draw.text((700, 50), f'{crit_damage}', 'white', waves_font_24, 'mm')
+                damage_bar_draw.text((1000, 50), f'{expected_damage}', 'white', waves_font_24, 'mm')
+            else:
+                damage_bar_draw.text((850, 50), f'{expected_damage}', 'white', waves_font_24, 'mm')
             img.alpha_composite(damage_bar, dest=(0, 2600 + ph_sum_value + jineng_len + (dindex + 1) * 60))
 
     banner1 = Image.open(TEXT_PATH / 'banner4.png')
@@ -532,8 +535,11 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
         damage_bar_draw = ImageDraw.Draw(damage_bar)
         damage_title = damage_calc['title']
         damage_bar_draw.text((400, 50), f'{damage_title}', 'white', waves_font_24, 'rm')
-        damage_bar_draw.text((700, 50), f'{crit_damage}', 'white', waves_font_24, 'mm')
-        damage_bar_draw.text((1000, 50), f'{expected_damage}', 'white', waves_font_24, 'mm')
+        if crit_damage and expected_damage:
+            damage_bar_draw.text((700, 50), f'{crit_damage}', 'white', waves_font_24, 'mm')
+            damage_bar_draw.text((1000, 50), f'{expected_damage}', 'white', waves_font_24, 'mm')
+        else:
+            damage_bar_draw.text((850, 50), f'{expected_damage}', 'white', waves_font_24, 'mm')
         damage_img.alpha_composite(damage_bar, dest=(0, 70))
 
         damage_title_bg = damage_bar1.copy()

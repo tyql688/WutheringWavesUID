@@ -391,6 +391,12 @@ class Echo_6000060(EchoAbstract):
     id = 6000060
     name = "无归的谬误"
 
+    # 自身共鸣效率提升10%，全队角色攻击提升10%
+    # def damage(self, attr: DamageAttribute, isGroup: bool = False):
+    #     title = self.name
+    #     msg = '全队角色攻击提升10%'
+    #     attr.add_atk_percent(0.1, title, msg)
+
 
 class Echo_6000145(EchoAbstract):
     id = 6000145

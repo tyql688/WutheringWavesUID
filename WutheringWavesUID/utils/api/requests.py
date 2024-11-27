@@ -129,6 +129,10 @@ class WavesApi:
             if not succ:
                 await WavesUser.mark_invalid(user.cookie, '无效')
                 continue
+            succ, _ = await self.refresh_query_data(uid, user.cookie)
+            if not succ:
+                logger.info(f'get_waves_random_cookie {user.uid} 获取失败')
+                continue
             ck_list.append(user.cookie)
             break
 
@@ -181,6 +185,14 @@ class WavesApi:
         header.update({'token': token})
         data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId}
         raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
+        return await _check_response(raw_data, roleId)
+
+    async def refresh_query_data(self, roleId: str, token: str, serverId: str = None) -> (bool, Union[Dict, str]):
+        """刷新数据"""
+        header = copy.deepcopy(await get_headers(token))
+        header.update({'token': token})
+        data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId}
+        raw_data = await self._waves_request(QUERY_USERID_URL, "POST", header, data=data)
         return await _check_response(raw_data, roleId)
 
     async def refresh_data_for_platform(

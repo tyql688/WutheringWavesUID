@@ -1,5 +1,7 @@
 from typing import Dict, List, Union
 
+from ...utils.damage.utils import parse_healing_skill_multi
+
 
 class WavesEffect(object):
     def __init__(self, element_msg: str, element_value: any):
@@ -101,10 +103,17 @@ class DamageAttribute:
     def __init__(
         self,
         char_atk=0,
+        char_life=0,
+        char_def=0,
         weapon_atk=0,
         atk_percent=0,
+        life_percent=0,
+        def_percent=0,
         atk_flat=0,
+        life_flat=0,
+        def_flat=0,
         skill_multi=0,
+        healing_skill_multi='0+0%',
         skill_ratio=0,
         dmg_bonus=0,
         dmg_deepen=0,
@@ -124,9 +133,15 @@ class DamageAttribute:
         初始化 DamageAttribute 类的实例。
 
         :param char_atk: 基础攻击力 (角色基础攻击力
+        :param char_life: 基础生命值 (角色基础生命值
+        :param char_def: 基础防御力 (角色基础防御力
         :param weapon_atk: 基础攻击力 (武器基础攻击力
         :param atk_percent: 攻击力加成百分比 (例如 0.5 表示 50%)
+        :param life_percent: 生命值加成百分比 (例如 0.5 表示 50%)
+        :param def_percent: 防御力加成百分比 (例如 0.5 表示 50%)
         :param atk_flat: 固定攻击数值加成 (声骸固定攻击)
+        :param life_flat: 固定生命数值加成 (声骸固定生命)
+        :param def_flat: 固定防御数值加成 (声骸固定防御)
         :param skill_multi: 技能倍率
         :param skill_ratio: 技能倍率加成 (如命座 椿2命 = 1.2）
         :param dmg_bonus: 伤害加成百分比(热熔伤害加成+技能伤害加成）
@@ -144,14 +159,28 @@ class DamageAttribute:
         """
         # 角色基础攻击力
         self.char_atk = char_atk
+        # 角色基础生命值
+        self.char_life = char_life
+        # 角色基础防御力
+        self.char_def = char_def
         # 武器基础攻击力
         self.weapon_atk = weapon_atk
         # 攻击力加成百分比
         self.atk_percent = atk_percent
+        # 生命加成百分比
+        self.life_percent = life_percent
+        # 防御力加成百分比
+        self.def_percent = def_percent
         # 固定攻击数值加成
         self.atk_flat = atk_flat
+        # 固定生命数值加成
+        self.life_flat = life_flat
+        # 固定攻击数值加成
+        self.def_flat = def_flat
         # 技能倍率
         self.skill_multi = skill_multi
+        # 奶量技能倍率
+        self.healing_skill_multi = healing_skill_multi
         # 技能倍率加成 (如命座 椿2命 = 1.2）
         self.skill_ratio = skill_ratio
         # 伤害加成百分比
@@ -192,25 +221,35 @@ class DamageAttribute:
         effect_str = '\n'.join(str(e) for e in self.effect)
         return (
             f"\nDamageAttribute(\n"
-            f"  char_atk={self.char_atk}, \n"
-            f"  weapon_atk={self.weapon_atk}, \n"
-            f"  effect_attack={self.effect_attack}, \n"
-            f"  atk_percent={self.atk_percent}, \n"
-            f"  atk_flat={self.atk_flat}, \n"
-            f"  skill_multi={self.skill_multi}, \n"
-            f"  skill_ratio={self.skill_ratio}, \n"
-            f"  dmg_bonus={self.dmg_bonus}, \n"
-            f"  dmg_deepen={self.dmg_deepen}, \n"
-            f"  crit_rate={self.crit_rate}, \n"
-            f"  crit_dmg={self.crit_dmg}, \n"
-            f"  character_level={self.character_level}, \n"
-            f"  defense_reduction={self.defense_reduction}, \n"
-            f"  enemy_resistance={self.enemy_resistance}, \n"
-            f"  dmg_bonus_phantom={self.dmg_bonus_phantom}, \n"
-            f"  char_attr={self.char_attr}, \n"
-            f"  char_damage={self.char_damage}, \n"
-            f"  ph_detail={ph_details_str}, \n"
-            f"  effect={effect_str}\n"
+            f"  角色基础攻击力={self.char_atk}, \n"
+            f"  角色基础生命值={self.char_life}, \n"
+            f"  角色基础防御力={self.char_def}, \n"
+            f"  武器基础攻击力={self.weapon_atk}, \n"
+            f"  有效攻击力={self.effect_attack}, \n"
+            f"  有效生命值={self.effect_life}, \n"
+            f"  有效防御力={self.effect_def}, \n"
+            f"  攻击力加成百分比={self.atk_percent}, \n"
+            f"  生命值加成百分比={self.life_percent}, \n"
+            f"  防御力加成百分比={self.def_percent}, \n"
+            f"  声骸固定攻击数值={self.atk_flat}, \n"
+            f"  声骸固定生命数值={self.life_flat}, \n"
+            f"  声骸固定防御数值={self.def_flat}, \n"
+            f"  技能倍率={self.skill_multi}, \n"
+            f"  技能倍率加成={self.skill_ratio}, \n"
+            f"  奶量技能倍率={self.healing_skill_multi}, \n"
+            f"  伤害加成百分比={self.dmg_bonus}, \n"
+            f"  伤害加深百分比={self.dmg_deepen}, \n"
+            f"  暴击率={self.crit_rate}, \n"
+            f"  暴击伤害={self.crit_dmg}, \n"
+            f"  角色等级={self.character_level}, \n"
+            f"  减防百分比={self.defense_reduction}, \n"
+            f"  减防乘区={self.defense_ratio}, \n"
+            f"  敌人抗性百分比={self.enemy_resistance}, \n"
+            f"  声骸的加成百分比={self.dmg_bonus_phantom}, \n"
+            f"  角色属性={self.char_attr}, \n"
+            f"  角色属性伤害={self.char_damage}, \n"
+            f"  声骸={ph_details_str}, \n"
+            f"  效果={effect_str}\n"
             f")"
         )
 
@@ -230,6 +269,18 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
+    def set_char_life(self, char_life: float, title='', msg=''):
+        """设置角色基础生命值"""
+        self.char_life = char_life
+        self.add_effect(title, msg)
+        return self
+
+    def set_char_def(self, char_def: float, title='', msg=''):
+        """设置角色基础防御力"""
+        self.char_def = char_def
+        self.add_effect(title, msg)
+        return self
+
     def set_weapon_atk(self, weapon_atk: float, title='', msg=''):
         """设置武器基础攻击力"""
         self.weapon_atk = weapon_atk
@@ -242,9 +293,33 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
+    def add_life_percent(self, life_percent: float, title='', msg=''):
+        """增加生命百分比"""
+        self.life_percent += life_percent
+        self.add_effect(title, msg)
+        return self
+
+    def add_def_percent(self, def_percent: float, title='', msg=''):
+        """增加防御力百分比"""
+        self.def_percent += def_percent
+        self.add_effect(title, msg)
+        return self
+
     def set_atk_flat(self, atk_flat: float, title='', msg=''):
         """设置固定攻击数值"""
         self.atk_flat = atk_flat
+        self.add_effect(title, msg)
+        return self
+
+    def set_life_flat(self, life_flat: float, title='', msg=''):
+        """设置固定生命数值"""
+        self.life_flat = life_flat
+        self.add_effect(title, msg)
+        return self
+
+    def set_def_flat(self, def_flat: float, title='', msg=''):
+        """设置固定防御数值"""
+        self.def_flat = def_flat
         self.add_effect(title, msg)
         return self
 
@@ -253,6 +328,19 @@ class DamageAttribute:
         if isinstance(skill_multi, str):
             skill_multi = calc_percent_expression(skill_multi)
         self.skill_multi += skill_multi
+        self.add_effect(title, msg)
+        return self
+
+    def add_healing_skill_multi(self, healing_skill_multi: Union[str, float], title='', msg=''):
+        """增加奶的技能倍率"""
+        value1, percent1 = parse_healing_skill_multi(self.healing_skill_multi)
+        value2, percent2 = parse_healing_skill_multi(healing_skill_multi)
+
+        # 计算总和
+        total_value = value1 + value2
+        total_percent = percent1 + percent2
+
+        self.healing_skill_multi = f"{total_value}+{total_percent}%"
         self.add_effect(title, msg)
         return self
 
@@ -353,6 +441,24 @@ class DamageAttribute:
         return self.base_atk * (1 + self.atk_percent) + self.atk_flat
 
     @property
+    def effect_life(self):
+        """
+        计算有效生命。
+
+        :return: 计算有效生命
+        """
+        return self.char_life * (1 + self.life_percent) + self.life_flat
+
+    @property
+    def effect_def(self):
+        """
+        计算有效防御。
+
+        :return: 计算有效防御
+        """
+        return self.char_def * (1 + self.def_percent) + self.def_flat
+
+    @property
     def defense_ratio(self):
         """
         计算敌人的防御减伤比。
@@ -364,17 +470,19 @@ class DamageAttribute:
         return (800 + 8 * self.character_level) / (
             800 + 8 * self.character_level + enemy_defense * (1 - self.defense_reduction))
 
-    def calculate_crit_damage(self):
+    def calculate_crit_damage(self, effect_value=None):
         """
         计算暴击伤害。
 
         :return: 暴击伤害值
         """
+        if not effect_value:
+            effect_value = self.effect_attack
         # 计算暴击伤害
-        return self.effect_attack * self.skill_multi * (1 + self.skill_ratio) * (1 + self.dmg_bonus) * (
+        return effect_value * self.skill_multi * (1 + self.skill_ratio) * (1 + self.dmg_bonus) * (
             1 + self.dmg_deepen) * (1 - self.enemy_resistance) * self.defense_ratio * self.crit_dmg
 
-    def calculate_expected_damage(self):
+    def calculate_expected_damage(self, effect_value=None):
         """
         计算期望伤害。
 
@@ -383,6 +491,16 @@ class DamageAttribute:
         if self.crit_rate > 1:
             return self.calculate_crit_damage()
 
-        return self.effect_attack * self.skill_multi * (1 + self.skill_ratio) * (1 + self.dmg_bonus) * (
+        if not effect_value:
+            effect_value = self.effect_attack
+
+        return effect_value * self.skill_multi * (1 + self.skill_ratio) * (1 + self.dmg_bonus) * (
             1 + self.dmg_deepen) * (1 - self.enemy_resistance) * self.defense_ratio * (
             self.crit_rate * (self.crit_dmg - 1) + 1)
+
+    def calculate_healing(self, effect_value):
+        """
+        计算治疗量。
+        """
+        flat, percent = parse_healing_skill_multi(self.healing_skill_multi)
+        return effect_value * (percent * 0.01) * (1 + self.dmg_bonus) + flat * (1 + self.dmg_bonus)

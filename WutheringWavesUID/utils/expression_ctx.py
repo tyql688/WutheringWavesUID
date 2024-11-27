@@ -140,6 +140,8 @@ def enhance_summation_phantom_value(role_id, role_level, role_breach,
     # 武器基础攻击
     _weapon_atk = weapon_result.stats[0]['value']
     result["atk_flat"] = float(result.get("攻击", "0"))
+    result["life_flat"] = float(result.get("生命", "0"))
+    result["def_flat"] = float(result.get("防御", "0"))
 
     base_atk = float(_atk) + float(_weapon_atk)
     per_atk = percent_to_float(result.get("攻击%", "0%"))
@@ -149,11 +151,13 @@ def enhance_summation_phantom_value(role_id, role_level, role_breach,
 
     base_life = float(_life)
     per_life = percent_to_float(result.get("生命%", "0%"))
+    result['life_percent'] = per_life
     new_life = int(base_life * per_life) + int(result.get("生命", "0"))
     result["生命"] = f"{new_life}"
 
     base_def = float(_def)
     per_def = percent_to_float(result.get("防御%", "0%"))
+    result['def_percent'] = per_def
     new_def = int(base_def * per_def) + int(result.get("防御", "0"))
     result["防御"] = f"{new_def}"
 
@@ -213,13 +217,15 @@ def enhance_summation_card_value(role_id, role_level, role_breach, role_attr,
 
     base_life = float(_life)
     per_life = percent_to_float(card_sort_map['生命'])
-    card_sort_map['life_percent'] = per_life
+    card_sort_map['life_percent'] = per_life + result.get('life_percent', 0)
+    card_sort_map['life_flat'] = float(result.get("life_flat", 0))
     card_sort_map["生命"] = sum_numbers(_life, result.get("生命", 0), round(base_life * per_life))
     card_sort_map['生命'] = f"{card_sort_map['生命'].split('.')[0]}"
 
     base_def = float(_def)
     per_def = percent_to_float(card_sort_map['防御'])
-    card_sort_map['def_percent'] = per_def
+    card_sort_map['def_percent'] = per_def + result.get('def_percent', 0)
+    card_sort_map['def_flat'] = float(result.get("def_flat", 0))
     card_sort_map["防御"] = sum_numbers(_def, result.get("防御", 0), round(base_def * per_def))
     card_sort_map['防御'] = f"{card_sort_map['防御'].split('.')[0]}"
 
@@ -280,9 +286,15 @@ def enhance_summation_card_value(role_id, role_level, role_breach, role_attr,
 def card_sort_map_to_attribute(card_sort_map: Dict):
     attr = DamageAttribute()
     attr.set_char_atk(card_sort_map['char_atk'])
+    attr.set_char_life(card_sort_map['char_life'])
+    attr.set_char_def(card_sort_map['char_def'])
     attr.set_weapon_atk(card_sort_map['weapon_atk'])
     attr.set_atk_flat(card_sort_map['atk_flat'])
+    attr.set_life_flat(card_sort_map['life_flat'])
+    attr.set_def_flat(card_sort_map['def_flat'])
     attr.add_atk_percent(card_sort_map['atk_percent'])
+    attr.add_life_percent(card_sort_map['life_percent'])
+    attr.add_def_percent(card_sort_map['def_percent'])
     attr.add_crit_rate(card_sort_map['crit_rate'])
     attr.add_crit_dmg(card_sort_map['crit_dmg'])
     attr.add_dmg_bonus(card_sort_map['dmg_bonus'])

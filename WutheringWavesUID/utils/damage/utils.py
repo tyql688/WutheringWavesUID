@@ -1,3 +1,4 @@
+import re
 from typing import Dict
 
 SONATA_FREEZING = "凝夜白霜"
@@ -60,3 +61,15 @@ def skill_damage_calc(skillTree: Dict, skillTreeId: str, skillParamId: str, skil
     :return: 技能伤害
     """
     return skillTree[skillTreeId]["skill"]["level"][skillParamId]["param"][0][skillLevel]
+
+
+def parse_healing_skill_multi(temp):
+    """
+    解析 "1313+5.97%"
+    """
+    match = re.match(r'([0-9.]+)(\+([0-9.]+)%?)', temp)
+    if match:
+        value = float(match.group(1))  # 获取数字部分
+        percent = float(match.group(3))  # 获取百分比部分
+        return value, percent
+    return 0, 0
