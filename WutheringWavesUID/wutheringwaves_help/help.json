@@ -171,6 +171,14 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "群伤害排行",
+        "desc": "群伤害排行",
+        "eg": "长离排行",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
