@@ -58,6 +58,7 @@ avatar_mask = Image.open(TEXT_PATH / 'avatar_mask.png')
 weapon_icon_bg_3 = Image.open(TEXT_PATH / 'weapon_icon_bg_3.png')
 weapon_icon_bg_4 = Image.open(TEXT_PATH / 'weapon_icon_bg_4.png')
 weapon_icon_bg_5 = Image.open(TEXT_PATH / 'weapon_icon_bg_5.png')
+promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
 
 
 class RankInfo(BaseModel):
@@ -245,8 +246,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
 
         weapon_breach = get_breach(weaponData.breach, weaponData.level)
         for i in range(0, weapon_breach):
-            promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
-            weapon_bg_temp.alpha_composite(promote_icon, dest=(200 + 40 * i, 100))
+            weapon_bg_temp.alpha_composite(promote_icon.copy(), dest=(200 + 40 * i, 100))
 
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
@@ -316,7 +316,8 @@ async def get_avatar(
         pic_temp = crop_center_img(pic, 120, 120)
 
         img = Image.new('RGBA', (180, 180))
-        mask_pic_temp = avatar_mask.resize((120, 120))
+        avatar_mask_temp = avatar_mask.copy()
+        mask_pic_temp = avatar_mask_temp.resize((120, 120))
         img.paste(pic_temp, (0, -5), mask_pic_temp)
     else:
         pic = await get_square_avatar(char_id)
@@ -325,8 +326,9 @@ async def get_avatar(
         pic_temp.paste(pic.resize((160, 160)), (10, 10))
         pic_temp = pic_temp.resize((160, 160))
 
-        mask_pic_temp = Image.new('RGBA', avatar_mask.size)
-        mask_pic_temp.paste(avatar_mask, (-20, -45), avatar_mask)
+        avatar_mask_temp = avatar_mask.copy()
+        mask_pic_temp = Image.new('RGBA', avatar_mask_temp.size)
+        mask_pic_temp.paste(avatar_mask_temp, (-20, -45), avatar_mask_temp)
         mask_pic_temp = mask_pic_temp.resize((160, 160))
 
         img = Image.new('RGBA', (180, 180))
@@ -340,8 +342,8 @@ def get_weapon_icon_bg(star: int = 3) -> Image.Image:
         star = 3
 
     if star == 3:
-        return weapon_icon_bg_3
+        return weapon_icon_bg_3.copy()
     elif star == 4:
-        return weapon_icon_bg_4
+        return weapon_icon_bg_4.copy()
     else:
-        return weapon_icon_bg_5
+        return weapon_icon_bg_5.copy()
