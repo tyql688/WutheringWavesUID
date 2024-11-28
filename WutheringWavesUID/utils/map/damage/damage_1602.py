@@ -165,7 +165,7 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_1(attr, role, skill_type="满能缭乱"),
     },
     {
-        "title": "丹心昭瑾",
+        "title": "满z半z尾刀",
         "func": lambda attr, role: calc_damage_1(attr, role, skill_type=["满能缭乱", "满能纷落"]),
     },
     {

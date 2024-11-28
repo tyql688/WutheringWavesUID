@@ -20,7 +20,8 @@ from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_va
 from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_16, waves_font_40, waves_font_30, \
     waves_font_24, waves_font_20, waves_font_44
 from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_GOLD, \
-    get_square_weapon, CHAIN_COLOR, get_attribute, get_small_logo, get_role_pile
+    get_square_weapon, CHAIN_COLOR, get_attribute, get_small_logo, get_role_pile, WAVES_ECHO_MAP, get_attribute_effect, \
+    change_color
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..wutheringwaves_config import PREFIX
 
@@ -72,6 +73,7 @@ class RankInfo(BaseModel):
     score_bg: str  # 评分背景
     expected_damage: str  # 期望伤害
     expected_damage_int: int  # 期望伤害
+    sonata_name: str  # 合鸣效果
 
 
 async def find_role_detail(uid: str, char_id: Union[int, List[int]]) -> Optional[RoleDetailData]:
@@ -157,6 +159,11 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
 
             crit_damage, expected_damage = rankDetail['func'](damageAttribute, role_detail)
 
+            sonata_name = ''
+            for ph in phantom_sum_value.get('ph_detail', []):
+                if ph['ph_num'] == 5:
+                    sonata_name = ph['ph_name']
+
             rankInfo = RankInfo(**{
                 'roleDetail': role_detail,
                 'qid': user.user_id,
@@ -167,7 +174,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
                 'score': round(phantom_score, 2),
                 'score_bg': phantom_bg,
                 'expected_damage': expected_damage,
-                'expected_damage_int': int(expected_damage.replace(',', ''))
+                'expected_damage_int': int(expected_damage.replace(',', '')),
+                'sonata_name': sonata_name,
             })
             rankInfoList.append(rankInfo)
 
@@ -220,9 +228,21 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
         # 评分
         if rank.score > 0.0:
             score_bg = Image.open(TEXT_PATH / f'score_{rank.score_bg}.png')
-            bar_bg.alpha_composite(score_bg, (330, 2))
-            bar_star_draw.text((478, 45), f'{rank.score.__round__(1)}', 'white', waves_font_34, 'mm')
-            bar_star_draw.text((478, 75), f'声骸分数', SPECIAL_GOLD, waves_font_16, 'mm')
+            bar_bg.alpha_composite(score_bg, (320, 2))
+            bar_star_draw.text((466, 45), f'{rank.score.__round__(1)}', 'white', waves_font_34, 'mm')
+            bar_star_draw.text((466, 75), f'声骸分数', SPECIAL_GOLD, waves_font_16, 'mm')
+
+        # 合鸣效果
+        if rank.sonata_name:
+            effect_image = await get_attribute_effect(rank.sonata_name)
+            effect_image = effect_image.resize((60, 60))
+            sonata_color = WAVES_ECHO_MAP.get(rank.sonata_name, (0, 0, 0))
+            effect_image = await change_color(effect_image, sonata_color)
+            bar_bg.alpha_composite(effect_image, (525, 15))
+            sonata_name = rank.sonata_name
+        else:
+            sonata_name = '合鸣效果'
+        bar_star_draw.text((558, 75), f'{sonata_name}', 'white', waves_font_16, 'mm')
 
         # 武器
         weapon_bg_temp = Image.new('RGBA', (600, 300))
@@ -234,7 +254,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
         weapon_icon_bg.paste(weapon_icon, (10, 20), weapon_icon)
 
         weapon_bg_temp_draw = ImageDraw.Draw(weapon_bg_temp)
-        weapon_bg_temp_draw.text((200, 30), f'{weaponData.weapon.weaponName}', SPECIAL_GOLD, waves_font_40, 'lm')
+        weapon_bg_temp_draw.text((200, 30), f'{weaponData.weapon.weaponName[:5]}', SPECIAL_GOLD, waves_font_40, 'lm')
         weapon_bg_temp_draw.text((203, 75), f'Lv.{weaponData.level}/90', 'white', waves_font_30, 'lm')
 
         _x = 220 + 43 * len(weaponData.weapon.weaponName)
@@ -250,7 +270,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
 
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
-        bar_bg.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(550, 25))
+        bar_bg.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(580, 25))
 
         # 伤害
         bar_star_draw.text((870, 45), f'{rank.expected_damage}', SPECIAL_GOLD, waves_font_34, 'mm')
@@ -292,8 +312,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
     title_draw.text((200, 335), f'{avg_score}', 'white', waves_font_44, 'mm')
     title_draw.text((200, 375), f'平均声骸分数', SPECIAL_GOLD, waves_font_20, 'mm')
 
-    title_draw.text((380, 335), f'{avg_damage}', 'white', waves_font_44, 'mm')
-    title_draw.text((380, 375), f'平均伤害', SPECIAL_GOLD, waves_font_20, 'mm')
+    title_draw.text((390, 335), f'{avg_damage}', 'white', waves_font_44, 'mm')
+    title_draw.text((390, 375), f'平均伤害', SPECIAL_GOLD, waves_font_20, 'mm')
 
     if char_id in special_char_name:
         char_name = special_char_name[char_id]
