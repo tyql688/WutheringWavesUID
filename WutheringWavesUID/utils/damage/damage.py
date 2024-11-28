@@ -134,6 +134,7 @@ class DamageAttribute:
         char_attr=None,
         sync_strike=False,
         char_damage=None,
+        enemy_level=90,
     ):
         """
         初始化 DamageAttribute 类的实例。
@@ -164,6 +165,7 @@ class DamageAttribute:
         :param char_attr: 角色属性 ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
         :param sync_strike: 协同攻击
         """
+        # 角色模版 ["temp_atk", "temp_life", "temp_def"]
         self.char_template = char_template
         # 角色基础攻击力
         self.char_atk = char_atk
@@ -219,10 +221,12 @@ class DamageAttribute:
         self.sync_strike = sync_strike
         # 效果
         self.effect = []
+        # 敌人等级
+        self.enemy_level = 0
 
         if enemy_resistance:
             self.add_enemy_resistance(enemy_resistance, '敌人抗性', f'{enemy_resistance:.0%}')
-        self.add_effect('敌人防御', '1512')
+        self.set_enemy_level(enemy_level)
 
     def __str__(self):
         ph_details_str = '\n'.join(str(ph) for ph in self.ph_detail)
@@ -251,6 +255,7 @@ class DamageAttribute:
             f"  暴击率={self.crit_rate}, \n"
             f"  暴击伤害={self.crit_dmg}, \n"
             f"  角色等级={self.character_level}, \n"
+            f"  敌人等级={self.enemy_level}, \n"
             f"  减防百分比={self.defense_reduction}, \n"
             f"  减防乘区={self.defense_ratio}, \n"
             f"  敌人抗性百分比={self.enemy_resistance}, \n"
@@ -267,6 +272,20 @@ class DamageAttribute:
         if effect is None:
             return
         self.effect.append(effect)
+
+    def set_enemy_level(self, enemy_level: int):
+        self.enemy_level = enemy_level
+
+        title = "敌人等级"
+        msg = f"{enemy_level}级"
+        for effect in self.effect:
+            if effect.element_msg == title:
+                effect.element_value = msg
+                break
+        else:
+            self.add_effect(title, msg)
+
+        return self
 
     def set_char_template(self, char_template: Literal["temp_atk", "temp_life", "temp_def"]):
         self.char_template = char_template
@@ -489,7 +508,8 @@ class DamageAttribute:
 
         :return: 防御减伤比
         """
-        enemy_defense = 1512
+        # enemy_defense = 1512
+        enemy_defense = self.enemy_level * 8 + 792
         # 计算公式为 (800 + 8 * 等级) / (800 + 8 * 等级 + 敌人防御 * (1 - 减防))
         return (800 + 8 * self.character_level) / (
             800 + 8 * self.character_level + enemy_defense * (1 - self.defense_reduction))

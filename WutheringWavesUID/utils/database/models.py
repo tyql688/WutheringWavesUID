@@ -2,7 +2,7 @@ from typing import Optional, Any, Type, List
 
 from sqlalchemy import and_, or_, null
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import Field, select
+from sqlmodel import Field, select, col
 
 from gsuid_core.utils.database.base_models import Bind, User, T_User, with_session, Push, T_Bind
 from gsuid_core.utils.database.startup import exec_list
@@ -19,6 +19,17 @@ exec_list.extend(
 
 class WavesBind(Bind, table=True):
     uid: Optional[str] = Field(default=None, title='鸣潮UID')
+
+    @classmethod
+    @with_session
+    async def get_group_all_uid(
+        cls: Type[T_Bind], session: AsyncSession, group_id: str
+    ):
+        '''根据传入`group_id`获取该群号下所有绑定`uid`列表'''
+        result = await session.scalars(
+            select(cls).where(col(cls.group_id).contains(group_id))
+        )
+        return result.all()
 
     @classmethod
     async def insert_waves_uid(

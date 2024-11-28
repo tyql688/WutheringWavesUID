@@ -173,3 +173,5 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_4(attr, role),
     },
 ]
+
+rank = damage_detail[1]

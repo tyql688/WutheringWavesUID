@@ -1,5 +1,5 @@
 import re
-from typing import Dict
+from typing import Dict, Literal
 
 SONATA_FREEZING = "凝夜白霜"
 SONATA_MOLTEN = "熔山裂谷"
@@ -45,6 +45,17 @@ cast_dodge_counter = "cast_dodge_counter"
 cast_variation = "cast_variation"
 # 共鸣技能造成治疗
 skill_create_healing = "skill_create_healing"
+
+# 定义一个类型别名
+SkillType = Literal["常态攻击", "共鸣技能", "共鸣解放", "变奏技能", "共鸣回路"]
+
+SkillTreeMap = {
+    "常态攻击": "1",
+    "共鸣技能": "2",
+    "共鸣解放": "3",
+    "变奏技能": "6",
+    "共鸣回路": "7",
+}
 
 
 def skill_damage_calc(skillTree: Dict, skillTreeId: str, skillParamId: str, skillLevel: int) -> str:

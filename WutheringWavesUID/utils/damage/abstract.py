@@ -34,6 +34,10 @@ class DamageDetailRegister(WavesRegister):
     _id_cls_map = {}
 
 
+class DamageRankRegister(WavesRegister):
+    _id_cls_map = {}
+
+
 class WeaponAbstract(object):
     id = None
     type = None

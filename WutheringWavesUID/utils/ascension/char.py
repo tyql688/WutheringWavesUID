@@ -98,3 +98,10 @@ def get_char_detail(
                     result.fixed_skill[name] = sum_percentages(skill_info['param'][0], result.fixed_skill[name])
 
     return result
+
+
+def get_char_detail2(role) -> Union[WavesCharResult, None]:
+    role_id = role.role.roleId
+    role_level = role.role.level
+    role_breach = role.role.breach
+    return get_char_detail(role_id, role_level, role_breach)
