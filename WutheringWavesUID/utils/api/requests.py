@@ -125,13 +125,9 @@ class WavesApi:
         for user in user_list:
             if not await WavesUser.cookie_validate(user.uid):
                 continue
-            succ, _ = await self.refresh_data(user.uid, user.cookie)
+            succ, _ = await self.refresh_data(uid, user.cookie)
             if not succ:
                 await WavesUser.mark_invalid(user.cookie, '无效')
-                continue
-            succ, _ = await self.refresh_query_data(uid, user.cookie)
-            if not succ:
-                logger.info(f'get_waves_random_cookie {user.uid} 获取失败')
                 continue
             ck_list.append(user.cookie)
             break
