@@ -10,18 +10,20 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
 from ..utils import hint
-from ..utils.api.model import RoleDetailData, AccountBaseInfo, WeaponData
+from ..utils.api.model import RoleDetailData, WeaponData, AccountBaseInfo
 from ..utils.ascension.weapon import get_weapon_detail, WavesWeaponResult, get_breach
-from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color, get_calc_map
+from ..utils.calculate import calc_phantom_score, get_total_score_bg, get_valid_color, get_calc_map, calc_phantom_entry, \
+    get_max_score
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.damage.abstract import DamageDetailRegister
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value, enhance_summation_card_value, \
     card_sort_map_to_attribute
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
-    waves_font_24, waves_font_28, waves_font_26, waves_font_42, waves_font_16
+    waves_font_24, waves_font_28, waves_font_26, waves_font_42, waves_font_16, waves_font_18, waves_font_36
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
-    get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow, get_square_avatar
+    get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow, get_square_avatar, \
+    WAVES_MOONLIT, WAVES_FREEZING
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_fetter_img, get_skill_img
 from ..utils.waves_api import waves_api
@@ -74,6 +76,25 @@ card_sort_name = [
     ("暴击伤害", '0.0%'),
     ("属性伤害加成", '0.0%'),
     ("治疗效果加成", '0.0%')
+]
+
+weight_list = [
+    "属性,C4主词条权重,C3主词条权重,C1主词条权重,副词条权重",
+    "生命",
+    "生命%",
+    "攻击",
+    "攻击%",
+    "防御",
+    "防御%",
+    "共鸣效率",
+    "暴击",
+    "暴击伤害",
+    "属性伤害加成",
+    "治疗效果加成",
+    "普攻伤害加成",
+    "重击伤害加成",
+    "共鸣技能伤害加成",
+    "共鸣解放伤害加成"
 ]
 
 damage_bar1 = Image.open(TEXT_PATH / 'damage_bar1.png')
@@ -241,50 +262,15 @@ async def ph_card_draw(
     return phantom_sum_value
 
 
-async def draw_char_detail_img(ev: Event, uid: str, char: str, waves_id: Optional[str] = None):
-    char, damageId = parse_text_and_number(char)
-
-    char_id = char_name_to_char_id(char)
-    if not char_id:
-        return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
-    char_name = alias_to_char_name(char)
-
-    damageDetail = DamageDetailRegister.find_class(char_id)
-    ph_sum_value = 250
-    jineng_len = 180
-    dd_len = 0
-    isDraw = False if damageId and damageDetail else True
-    echo_list = 1400 if isDraw else 140
-    if damageDetail and isDraw:
-        dd_len = 60 + (len(damageDetail) + 1) * 60
-
-    damage_calc = None
-    if not isDraw:
-        for dindex, dd in enumerate(damageDetail):
-            if dindex + 1 == int(damageId):
-                damage_calc = dd
-                break
-        else:
-            return f'[鸣潮] 角色【{char_name}】未找到该伤害类型[{damageId}], 请先检查输入是否正确！\n'
-    else:
-        if damageId and not damageDetail:
-            return f'[鸣潮] 角色【{char_name}】暂不支持伤害计算！\n'
-
-    ck = await waves_api.get_ck(uid)
-    if not ck:
-        return hint.error_reply(WAVES_CODE_102)
+async def get_role_need(ev, char_id, ck, uid, char_name, waves_id=None):
     if waves_id:
-        succ, account_info = await waves_api.get_base_info(waves_id, ck)
-        if not succ:
-            return account_info
-        account_info = AccountBaseInfo(**account_info)
         succ, role_detail_info = await waves_api.get_role_detail_info(char_id, waves_id, ck)
         if (not succ
             or 'role' not in role_detail_info
             or role_detail_info['role'] is None
             or 'level' not in role_detail_info
             or role_detail_info['level'] is None):
-            return f'[鸣潮] 特征码[{waves_id}] \n无法获取【{char_name}】角色信息，请在库街区展示此角色！\n'
+            return None, f'[鸣潮] 特征码[{waves_id}] \n无法获取【{char_name}】角色信息，请在库街区展示此角色！\n'
         if role_detail_info['phantomData']['cost'] == 0:
             role_detail_info['phantomData']['equipPhantomList'] = None
 
@@ -292,23 +278,18 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, waves_id: Optiona
 
         avatar = await draw_char_with_ring(char_id)
     else:
-        # 账户数据
-        succ, account_info = await waves_api.get_base_info(uid, ck)
-        if not succ:
-            return account_info
-        account_info = AccountBaseInfo(**account_info)
-
         all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
 
         if all_role_detail is None or char_name not in all_role_detail:
-            return f'[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n'
+            return None, f'[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n'
 
         role_detail: RoleDetailData = all_role_detail[char_name]
         avatar = await draw_pic_with_ring(ev)
 
-    # 创建背景
-    img = get_waves_bg(1200, 1250 + echo_list + ph_sum_value + jineng_len + dd_len, 'bg3')
+    return avatar, role_detail
 
+
+async def draw_fixed_img(img, avatar, account_info, role_detail):
     # 头像部分
     avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
 
@@ -366,7 +347,56 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, waves_id: Optiona
     img.paste(role_pile_image, (25, 170), char_mask)
     img.paste(char_fg, (25, 170), char_fg)
 
-    # 右侧属性-技能
+
+async def draw_char_detail_img(ev: Event, uid: str, char: str, waves_id: Optional[str] = None):
+    char, damageId = parse_text_and_number(char)
+
+    char_id = char_name_to_char_id(char)
+    if not char_id:
+        return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
+    char_name = alias_to_char_name(char)
+
+    damageDetail = DamageDetailRegister.find_class(char_id)
+    ph_sum_value = 250
+    jineng_len = 180
+    dd_len = 0
+    isDraw = False if damageId and damageDetail else True
+    echo_list = 1400 if isDraw else 140
+    if damageDetail and isDraw:
+        dd_len = 60 + (len(damageDetail) + 1) * 60
+
+    damage_calc = None
+    if not isDraw:
+        for dindex, dd in enumerate(damageDetail):
+            if dindex + 1 == int(damageId):
+                damage_calc = dd
+                break
+        else:
+            return f'[鸣潮] 角色【{char_name}】未找到该伤害类型[{damageId}], 请先检查输入是否正确！\n'
+    else:
+        if damageId and not damageDetail:
+            return f'[鸣潮] 角色【{char_name}】暂不支持伤害计算！\n'
+
+    ck = await waves_api.get_ck(uid)
+    if not ck:
+        return hint.error_reply(WAVES_CODE_102)
+    # 账户数据
+    if waves_id:
+        uid = waves_id
+    succ, account_info = await waves_api.get_base_info(uid, ck)
+    if not succ:
+        return account_info
+    account_info = AccountBaseInfo(**account_info)
+    # 获取数据
+    avatar, role_detail = await get_role_need(ev, char_id, ck, uid, char_name, waves_id)
+    if isinstance(role_detail, str):
+        return role_detail
+    # 创建背景
+    img = get_waves_bg(1200, 1250 + echo_list + ph_sum_value + jineng_len + dd_len, 'bg3')
+    # 固定位置
+    await draw_fixed_img(img, avatar, account_info, role_detail)
+
+    # 右侧属性
     right_image_temp = Image.new('RGBA', (600, 1100))
 
     # 武器banner
@@ -584,6 +614,286 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, waves_id: Optiona
     img = add_footer(img)
     img = await convert_img(img)
     return img
+
+
+async def draw_char_score_img(ev: Event, uid: str, char: str, waves_id: Optional[str] = None):
+    char, damageId = parse_text_and_number(char)
+
+    char_id = char_name_to_char_id(char)
+    if not char_id:
+        return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
+    char_name = alias_to_char_name(char)
+    ck = await waves_api.get_ck(uid)
+    if not ck:
+        return hint.error_reply(WAVES_CODE_102)
+
+    # 账户数据
+    if waves_id:
+        uid = waves_id
+    succ, account_info = await waves_api.get_base_info(uid, ck)
+    if not succ:
+        return account_info
+    account_info = AccountBaseInfo(**account_info)
+    # 获取数据
+    avatar, role_detail = await get_role_need(ev, char_id, ck, uid, char_name, waves_id)
+    if isinstance(role_detail, str):
+        return role_detail
+
+    # 创建背景
+    img = get_waves_bg(1200, 3300, 'bg3')
+    # 固定位置
+    await draw_fixed_img(img, avatar, account_info, role_detail)
+
+    # 声骸属性
+    char_id = role_detail.role.roleId
+    char_name = role_detail.role.roleName
+    weaponData = role_detail.weaponData
+
+    phantom_temp = Image.new('RGBA', (1200, 1380))
+    right_image_temp = Image.new('RGBA', (600, 1100))
+    introduce_temp = Image.new('RGBA', (1500, 800), (0, 0, 0, 0))
+
+    ph_0 = Image.open(TEXT_PATH / 'ph_0.png')
+    ph_1 = Image.open(TEXT_PATH / 'ph_1.png')
+    phantom_sum_value = {}
+    if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
+        totalCost = role_detail.phantomData.cost
+        equipPhantomList = role_detail.phantomData.equipPhantomList
+        phantom_score = 0
+
+        phantom_sum_value = prepare_phantom(equipPhantomList)
+        phantom_sum_value = enhance_summation_phantom_value(
+            char_id, role_detail.role.level, role_detail.role.breach,
+            weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
+            phantom_sum_value)
+        calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
+        for i, _phantom in enumerate(equipPhantomList):
+            sh_temp = Image.new('RGBA', (600, 1100))
+            sh_temp_draw = ImageDraw.Draw(sh_temp)
+            sh_bg = Image.open(TEXT_PATH / 'sh_bg.png')
+            sh_temp.alpha_composite(sh_bg, dest=(0, 0))
+            if _phantom and _phantom.phantomProp:
+                props = _phantom.get_props()
+                _score, _bg = calc_phantom_score(char_name, props, _phantom.cost, calc_temp)
+
+                phantom_score += _score
+                sh_title = Image.open(TEXT_PATH / f'sh_title_{_bg}.png')
+
+                sh_temp.alpha_composite(sh_title, dest=(0, 0))
+
+                phantom_icon = await get_phantom_img(_phantom.phantomProp.phantomId, _phantom.phantomProp.iconUrl)
+                fetter_icon = await get_fetter_img(_phantom.fetterDetail.name, _phantom.fetterDetail.iconUrl)
+                phantom_icon.alpha_composite(fetter_icon, dest=(210, 0))
+                phantom_icon = phantom_icon.resize((100, 100))
+                sh_temp.alpha_composite(phantom_icon, dest=(20, 20))
+                phantomName = _phantom.phantomProp.name.replace("·", " ").replace("（", " ").replace("）", "")
+                sh_temp_draw.text((130, 40), f'{phantomName}', SPECIAL_GOLD, waves_font_28, 'lm')
+
+                # 声骸等级背景
+                ph_level_img = Image.new('RGBA', (84, 30), (255, 255, 255, 0))
+                ph_level_img_draw = ImageDraw.Draw(ph_level_img)
+                ph_level_img_draw.rounded_rectangle([0, 0, 84, 30], radius=8, fill=(0, 0, 0, int(0.8 * 255)))
+                ph_level_img_draw.text((8, 13), f'Lv.{_phantom.level}', 'white', waves_font_24, 'lm')
+                sh_temp.alpha_composite(ph_level_img, (128, 58))
+
+                # 声骸分数背景
+                ph_score_img = Image.new('RGBA', (92, 30), (255, 255, 255, 0))
+                ph_score_img_draw = ImageDraw.Draw(ph_score_img)
+                ph_score_img_draw.rounded_rectangle([0, 0, 92, 30], radius=8, fill=(186, 55, 42, int(0.8 * 255)))
+                ph_score_img_draw.text((5, 13), f'{_score}分', 'white', waves_font_24, 'lm')
+                sh_temp.alpha_composite(ph_score_img, (228, 58))
+
+                for index in range(0, _phantom.cost):
+                    promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
+                    promote_icon = promote_icon.resize((30, 30))
+                    sh_temp.alpha_composite(promote_icon, dest=(128 + 30 * index, 90))
+
+                for index, _prop in enumerate(props):
+                    oset = 55
+                    prop_img = await get_attribute_prop(_prop.attributeName)
+                    prop_img = prop_img.resize((40, 40))
+                    # sh_temp.alpha_composite(prop_img, (15, 167 + index * oset))
+                    sh_temp_draw = ImageDraw.Draw(sh_temp)
+                    name_color = 'white'
+                    num_color = 'white'
+                    if index > 1:
+                        name_color, num_color = get_valid_color(_prop.attributeName, _prop.attributeValue, calc_temp)
+                    sh_temp_draw.text((15, 187 + index * oset), f'{_prop.attributeName[:6]}', name_color, waves_font_24,
+                                      'lm')
+                    sh_temp_draw.text((273, 187 + index * oset), f'{_prop.attributeValue}', num_color, waves_font_24,
+                                      'rm')
+
+                    score, final_score = calc_phantom_entry(index, _prop, _phantom.cost, calc_temp)
+                    score_color = WAVES_MOONLIT
+                    if final_score > 0:
+                        score_color = WAVES_FREEZING
+                    sh_temp_draw.text((343, 191 + index * oset), f'{final_score}分', score_color, waves_font_18,
+                                      'rm')
+
+                max_score, _ = get_max_score(_phantom.cost, calc_temp)
+                sh_temp_draw.text((343, 191 + 7 * 55),
+                                  f'C{_phantom.cost}最高分(未对齐):{max_score}分',
+                                  SPECIAL_GOLD,
+                                  waves_font_18,
+                                  'rm')
+
+                phantom_temp.alpha_composite(
+                    sh_temp,
+                    dest=(30 + ((i + 1) % 3) * 385, 120 + ((i + 1) // 3) * 630))
+
+        if phantom_score > 0:
+            _bg = get_total_score_bg(char_name, phantom_score, calc_temp)
+            sh_score_bg_c = Image.open(TEXT_PATH / f'sh_score_bg_{_bg}.png')
+            score_temp = Image.new('RGBA', sh_score_bg_c.size)
+            score_temp.alpha_composite(sh_score_bg_c)
+            sh_score_c = Image.open(TEXT_PATH / f'sh_score_{_bg}.png')
+            score_temp.alpha_composite(sh_score_c)
+            score_temp_draw = ImageDraw.Draw(score_temp)
+
+            score_temp_draw.text((180, 260), f'声骸评级', GREY, waves_font_40, 'mm')
+            score_temp_draw.text((180, 380), f'{phantom_score:.2f}分', 'white', waves_font_40, 'mm')
+            score_temp_draw.text((180, 440), f'声骸评分', GREY, waves_font_40, 'mm')
+        else:
+            abs_bg = Image.open(TEXT_PATH / f'abs.png')
+            score_temp = Image.new('RGBA', abs_bg.size)
+            score_temp.alpha_composite(abs_bg)
+            score_temp_draw = ImageDraw.Draw(score_temp)
+            score_temp_draw.text((180, 130), f'暂无', 'white', waves_font_40, 'mm')
+            score_temp_draw.text((180, 380), f'- 分', 'white', waves_font_40, 'mm')
+
+        phantom_temp.alpha_composite(score_temp, dest=(30, 120))
+
+        shuxing = f"{role_detail.role.attributeName}伤害加成"
+        for mi, m in enumerate(ph_sort_name):
+            for ni, name_default in enumerate(m):
+                name, default_value = name_default
+                if name == "属性伤害加成":
+                    value = phantom_sum_value.get(shuxing, default_value)
+                    prop_img = await get_attribute_prop(shuxing)
+                    name_color, _ = get_valid_color(shuxing, value, calc_temp)
+                    name = shuxing
+                else:
+                    value = phantom_sum_value.get(name, default_value)
+                    prop_img = await get_attribute_prop(name)
+                    name_color, _ = get_valid_color(name, value, calc_temp)
+                prop_img = prop_img.resize((40, 40))
+                ph_bg = ph_0.copy() if ni % 2 == 0 else ph_1.copy()
+                ph_bg.alpha_composite(prop_img, (20, 32))
+                ph_bg_draw = ImageDraw.Draw(ph_bg)
+
+                ph_bg_draw.text((70, 50), f'{name[:6]}', name_color, waves_font_24,
+                                'lm')
+                ph_bg_draw.text((350, 50), f'{value}', name_color, waves_font_24,
+                                'rm')
+
+                right_image_temp.alpha_composite(ph_bg.resize((500, 125)), (0, (ni + mi * 4) * 70))
+
+        ph_tips = ph_1.copy()
+        ph_tips_draw = ImageDraw.Draw(ph_tips)
+        ph_tips_draw.text((20, 50), f'[提示]评分模板', 'white', waves_font_24, 'lm')
+        ph_tips_draw.text((350, 50), f'{calc_temp["name"]}', (255, 255, 0), waves_font_24, 'rm')
+        phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 45))
+
+        # 简介数据
+        weight_list_temp = weight_list.copy()
+        entry_type_list = weight_list_temp[0].split(',')[1:]
+        main_props = calc_temp['main_props']
+        sub_pros = calc_temp['sub_props']
+        skill_weight = calc_temp['skill_weight']
+        for i, entry in enumerate(weight_list_temp[1:], start=1):
+            entry_list = []
+            if entry == "属性伤害加成":
+                entry_list.append(f"{shuxing}")
+            elif '%' in entry:
+                entry_list.append(entry.replace('%', '百分比'))
+            else:
+                entry_list.append(entry)
+            for entry_type in entry_type_list:
+                if '主词条权重' in entry_type:
+                    cost = re.search(r'C(\d+)主词条权重', entry_type).group(1)
+                    pros_temp = main_props.get(str(cost))
+                else:
+                    pros_temp = sub_pros
+
+                if entry == "普攻伤害加成":
+                    value = pros_temp.get("技能伤害加成", 0) * skill_weight[0]
+                elif entry == "重击伤害加成":
+                    value = pros_temp.get("技能伤害加成", 0) * skill_weight[1]
+                elif entry == "共鸣技能伤害加成":
+                    value = pros_temp.get("技能伤害加成", 0) * skill_weight[2]
+                elif entry == "共鸣解放伤害加成":
+                    value = pros_temp.get("技能伤害加成", 0) * skill_weight[3]
+                else:
+                    value = pros_temp.get(entry, 0)
+
+                if value == 0:
+                    value = '-'
+                else:
+                    value = f'{value:.3f}'
+                entry_list.append(value)
+            weight_list_temp[i] = ','.join(entry_list)
+
+        await draw_weight(introduce_temp, role_detail.role.roleName, weight_list_temp, calc_temp)
+
+    char_bg = Image.open(TEXT_PATH / 'char.png')
+    img.paste(char_bg, (1100, 220), char_bg)
+    img.paste(phantom_temp, (0, 1050), phantom_temp)
+    img.paste(right_image_temp, (605, 225), right_image_temp)
+    img.alpha_composite(introduce_temp, (0, 2400))
+
+    img = add_footer(img)
+    img = await convert_img(img)
+    return img
+
+
+async def draw_weight(image, role_name, weight_list_temp, calc_temp):
+    draw = ImageDraw.Draw(image)
+    draw.rectangle([10, 10, 1490, 790], fill=(0, 0, 0, int(0.7 * 255)))
+
+    # 设置表格参数
+    cell_width = 230
+    cell_height = 40
+    start_x, start_y = 25, 80
+
+    # 绘制表格
+    for i, row in enumerate(weight_list_temp):
+        for j, cell in enumerate(row.split(',')):
+            x = start_x + j * cell_width
+            y = start_y + i * cell_height
+
+            # 绘制单元格背景
+            if i == 0:  # 标题行
+                draw.rectangle([x, y, x + cell_width, y + cell_height], fill=(0, 0, 0, 90))
+            elif i % 2 == 1:  # 奇数行
+                draw.rectangle([x, y, x + cell_width, y + cell_height], fill=(255, 255, 255, 30))
+            else:  # 偶数行
+                draw.rectangle([x, y, x + cell_width, y + cell_height], fill=(0, 0, 0, 90))
+
+            # 绘制文字
+            font = waves_font_24 if i == 0 else waves_font_20
+            left, top, right, bottom = font.getbbox(cell)
+            text_width = right - left
+            text_height = bottom - top
+            text_x = x + (cell_width - text_width) / 2
+            text_y = y + (cell_height - text_height) / 2
+
+            if i == 0:
+                color = 'white'
+            else:
+                if j == 0:
+                    name_color, _ = get_valid_color(cell, '', calc_temp)
+                    color = name_color
+                else:
+                    color = 'white'
+            draw.text((text_x, text_y), cell, font=font, fill=color)
+
+    # 添加标题
+    title = f"#{role_name}词条权重表"
+    draw.text((start_x, 20), title, font=waves_font_36, fill=SPECIAL_GOLD)
+
+    # 添加其他
+    text = f"词条得分：词条数值 * 当前词条权重 / 声骸未对齐最高分 * 对齐分数(50)"
+    draw.text((start_x, 750), text, font=waves_font_24, fill='white')
 
 
 async def draw_pic_with_ring(ev: Event):

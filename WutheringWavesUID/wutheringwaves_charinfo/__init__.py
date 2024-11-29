@@ -4,7 +4,7 @@ from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from .draw_char_card import draw_char_detail_img
+from .draw_char_card import draw_char_detail_img, draw_char_score_img
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
@@ -80,6 +80,35 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         return
 
     im = await draw_char_detail_img(ev, uid, char, waves_id)
+    at_sender = False
+    if isinstance(im, str) and ev.group_id:
+        at_sender = True
+    return await bot.send(im, at_sender)
+
+
+@waves_new_char_detail.on_regex(rf'{PREFIX}(\d+)?[\u4e00-\u9fa5]+(?:权重)', block=True)
+async def send_char_detail_msg2(bot: Bot, ev: Event):
+    match = re.search(
+        rf'{PREFIX}(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?:权重)',
+        ev.raw_text
+    )
+    if not match:
+        return
+    ev.regex_dict = match.groupdict()
+    waves_id = ev.regex_dict.get("waves_id")
+    char = ev.regex_dict.get("char")
+
+    if waves_id and len(waves_id) != 9:
+        return
+
+    user_id = ev.at if ev.at else ev.user_id
+    uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
+    if not uid:
+        return await bot.send(error_reply(WAVES_CODE_103))
+    if not char:
+        return
+
+    im = await draw_char_score_img(ev, uid, char, waves_id)
     at_sender = False
     if isinstance(im, str) and ev.group_id:
         at_sender = True

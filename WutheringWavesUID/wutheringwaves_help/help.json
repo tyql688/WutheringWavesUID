@@ -165,6 +165,14 @@
         "need_admin": false
       },
       {
+        "name": "角色权重",
+        "desc": "角色权重",
+        "eg": "椿权重",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "查询探索度",
         "desc": "查询探索度",
         "eg": "探索度",
