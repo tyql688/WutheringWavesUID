@@ -7,7 +7,6 @@ from PIL import Image, ImageDraw
 from pydantic import BaseModel
 
 from gsuid_core.bot import Bot
-from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
@@ -23,7 +22,7 @@ from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_1
     waves_font_24, waves_font_20, waves_font_44
 from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_GOLD, \
     get_square_weapon, CHAIN_COLOR, get_attribute, get_role_pile, WAVES_ECHO_MAP, get_attribute_effect, \
-    change_color
+    change_color, GREY
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..wutheringwaves_config import PREFIX
 
@@ -103,8 +102,6 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
         if not role_detail.phantomData or not role_detail.phantomData.equipPhantomList:
             continue
 
-        logger.info(f'get_rank_info_for_user {role_detail.role.roleId}')
-
         equipPhantomList = role_detail.phantomData.equipPhantomList
         weaponData = role_detail.weaponData
         phantom_sum_value = prepare_phantom(equipPhantomList)
@@ -138,7 +135,10 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
         )
         damageAttribute = card_sort_map_to_attribute(card_map)
 
-        crit_damage, expected_damage = rankDetail['func'](damageAttribute, role_detail)
+        if rankDetail:
+            crit_damage, expected_damage = rankDetail['func'](damageAttribute, role_detail)
+        else:
+            expected_damage = '0'
 
         sonata_name = ''
         for ph in phantom_sum_value.get('ph_detail', []):
@@ -179,7 +179,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
     char_name = alias_to_char_name(char)
 
     rankDetail = DamageRankRegister.find_class(char_id)
-    if not rankDetail:
+    if not rankDetail and rank_type == "伤害":
         return f'[鸣潮] 角色【{char_name}排行】暂未适配伤害计算，请等待作者更新！'
 
     if char_id in special_char:
@@ -200,12 +200,15 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
     except Exception as _:
         pass
 
-    damage_title = rankDetail['title']
+    damage_title = (rankDetail and rankDetail['title']) or "无"
     rankInfoList = await get_all_rank_info(users, char_id, find_char_id, rankDetail)
     if len(rankInfoList) == 0:
         return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
 
-    rankInfoList.sort(key=lambda i: (i.expected_damage_int, i.score, i.level, i.chain), reverse=True)
+    if rank_type == "评分":
+        rankInfoList.sort(key=lambda i: (i.score, i.expected_damage_int, i.level, i.chain), reverse=True)
+    else:
+        rankInfoList.sort(key=lambda i: (i.expected_damage_int, i.score, i.level, i.chain), reverse=True)
 
     rankInfoList = rankInfoList[:20]
     totalNum = len(rankInfoList)
@@ -303,8 +306,11 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
         bar_bg.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(580, 25))
 
         # 伤害
-        bar_star_draw.text((870, 45), f'{rank.expected_damage}', SPECIAL_GOLD, waves_font_34, 'mm')
-        bar_star_draw.text((870, 75), f'{damage_title}', 'white', waves_font_16, 'mm')
+        if damage_title == "无":
+            bar_star_draw.text((870, 55), f'等待更新(:', GREY, waves_font_34, 'mm')
+        else:
+            bar_star_draw.text((870, 45), f'{rank.expected_damage}', SPECIAL_GOLD, waves_font_34, 'mm')
+            bar_star_draw.text((870, 75), f'{damage_title}', 'white', waves_font_16, 'mm')
 
         # 排名
         info_block = Image.new("RGBA", (50, 50), color=(255, 255, 255, 0))
@@ -341,8 +347,9 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
     title_draw.text((200, 335), f'{avg_score}', 'white', waves_font_44, 'mm')
     title_draw.text((200, 375), f'平均声骸分数', SPECIAL_GOLD, waves_font_20, 'mm')
 
-    title_draw.text((390, 335), f'{avg_damage}', 'white', waves_font_44, 'mm')
-    title_draw.text((390, 375), f'平均伤害', SPECIAL_GOLD, waves_font_20, 'mm')
+    if damage_title != "无":
+        title_draw.text((390, 335), f'{avg_damage}', 'white', waves_font_44, 'mm')
+        title_draw.text((390, 375), f'平均伤害', SPECIAL_GOLD, waves_font_20, 'mm')
 
     if char_id in special_char_name:
         char_name = special_char_name[char_id]

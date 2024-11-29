@@ -187,6 +187,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "群评分排行",
+        "desc": "群评分排行",
+        "eg": "长离评分排行",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
