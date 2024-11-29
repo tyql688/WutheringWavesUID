@@ -22,7 +22,7 @@ async def _check_response(res: Dict, roleId=None) -> (bool, Union[Dict, str]):
             return True, res['data']
 
         if res.get('msg') and res.get('msg') == '请求成功':
-            msg = f"\n鸣潮账号id: 【{roleId}】未绑定库街区!!!\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮账号数据"
+            msg = f"\n鸣潮账号id: 【{roleId}】未绑定库街区!!!\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮账号数据\n"
             return False, error_reply(WAVES_CODE_109, msg)
 
         if res.get('msg'):

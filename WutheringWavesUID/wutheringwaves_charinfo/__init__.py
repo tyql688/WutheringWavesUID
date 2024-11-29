@@ -51,17 +51,21 @@ async def send_char_detail_msg(bot: Bot, ev: Event):
     return await bot.send(im)
 
 
-@waves_new_char_detail.on_regex(f'{PREFIX}[\u4e00-\u9fa5]+(?:面板|伤害\d+)', block=True)
+@waves_new_char_detail.on_regex(rf'{PREFIX}(\d+)?[\u4e00-\u9fa5]+(?:面板|伤害\d+)', block=True)
 async def send_char_detail_msg2(bot: Bot, ev: Event):
     match = re.search(
-        f'{PREFIX}(?P<char>[\u4e00-\u9fa5]+)(?:面板|伤害(?P<damage>\d+))',
+        rf'{PREFIX}(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?:面板|伤害(?P<damage>\d+))',
         ev.raw_text
     )
     if not match:
         return
     ev.regex_dict = match.groupdict()
+    waves_id = ev.regex_dict.get("waves_id")
     char = ev.regex_dict.get("char")
     damage = ev.regex_dict.get("damage")
+
+    if waves_id and len(waves_id) != 9:
+        return
 
     if damage:
         char = f'{char}{damage}'
@@ -75,5 +79,8 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
     if not char:
         return
 
-    im = await draw_char_detail_img(ev, uid, char)
-    return await bot.send(im)
+    im = await draw_char_detail_img(ev, uid, char, waves_id)
+    at_sender = False
+    if isinstance(im, str) and ev.group_id:
+        at_sender = True
+    return await bot.send(im, at_sender)

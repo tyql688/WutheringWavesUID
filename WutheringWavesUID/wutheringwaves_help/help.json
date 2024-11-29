@@ -157,6 +157,14 @@
         "need_admin": false
       },
       {
+        "name": "窥视(:",
+        "desc": "窥视面板",
+        "eg": "uid椿面板",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "查询探索度",
         "desc": "查询探索度",
         "eg": "探索度",

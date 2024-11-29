@@ -1,6 +1,7 @@
 import copy
 import re
 from pathlib import Path
+from typing import Optional
 
 from PIL import Image, ImageDraw, ImageEnhance
 
@@ -20,7 +21,7 @@ from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_va
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_50, waves_font_40, waves_font_20, \
     waves_font_24, waves_font_28, waves_font_26, waves_font_42, waves_font_16
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
-    get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow
+    get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow, get_square_avatar
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_fetter_img, get_skill_img
 from ..utils.waves_api import waves_api
@@ -240,12 +241,12 @@ async def ph_card_draw(
     return phantom_sum_value
 
 
-async def draw_char_detail_img(ev: Event, uid: str, char: str):
+async def draw_char_detail_img(ev: Event, uid: str, char: str, waves_id: Optional[str] = None):
     char, damageId = parse_text_and_number(char)
 
     char_id = char_name_to_char_id(char)
     if not char_id:
-        return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！'
+        return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
     char_name = alias_to_char_name(char)
 
     damageDetail = DamageDetailRegister.find_class(char_id)
@@ -264,32 +265,51 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
                 damage_calc = dd
                 break
         else:
-            return f'[鸣潮] 角色【{char_name}】未找到该伤害类型[{damageId}], 请先检查输入是否正确！'
+            return f'[鸣潮] 角色【{char_name}】未找到该伤害类型[{damageId}], 请先检查输入是否正确！\n'
     else:
         if damageId and not damageDetail:
-            return f'[鸣潮] 角色【{char_name}】暂不支持伤害计算！'
+            return f'[鸣潮] 角色【{char_name}】暂不支持伤害计算！\n'
 
     ck = await waves_api.get_ck(uid)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
-    # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info
-    account_info = AccountBaseInfo(**account_info)
+    if waves_id:
+        succ, account_info = await waves_api.get_base_info(waves_id, ck)
+        if not succ:
+            return account_info
+        account_info = AccountBaseInfo(**account_info)
+        succ, role_detail_info = await waves_api.get_role_detail_info(char_id, waves_id, ck)
+        if (not succ
+            or 'role' not in role_detail_info
+            or role_detail_info['role'] is None
+            or 'level' not in role_detail_info
+            or role_detail_info['level'] is None):
+            return f'[鸣潮] 特征码[{waves_id}] \n无法获取【{char_name}】角色信息，请在库街区展示此角色！\n'
+        if role_detail_info['phantomData']['cost'] == 0:
+            role_detail_info['phantomData']['equipPhantomList'] = None
 
-    all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
+        role_detail = RoleDetailData(**role_detail_info)
 
-    if all_role_detail is None or char_name not in all_role_detail:
-        return f'[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!'
+        avatar = await draw_char_with_ring(char_id)
+    else:
+        # 账户数据
+        succ, account_info = await waves_api.get_base_info(uid, ck)
+        if not succ:
+            return account_info
+        account_info = AccountBaseInfo(**account_info)
 
-    role_detail: RoleDetailData = all_role_detail[char_name]
+        all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
+
+        if all_role_detail is None or char_name not in all_role_detail:
+            return f'[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n'
+
+        role_detail: RoleDetailData = all_role_detail[char_name]
+        avatar = await draw_pic_with_ring(ev)
 
     # 创建背景
     img = get_waves_bg(1200, 1250 + echo_list + ph_sum_value + jineng_len + dd_len, 'bg3')
 
     # 头像部分
-    avatar = await draw_pic_with_ring(ev)
     avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
 
     img.paste(avatar, (45, 20), avatar)
@@ -568,6 +588,18 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str):
 
 async def draw_pic_with_ring(ev: Event):
     pic = await get_event_avatar(ev)
+
+    mask_pic = Image.open(TEXT_PATH / 'avatar_mask.png')
+    img = Image.new('RGBA', (180, 180))
+    mask = mask_pic.resize((160, 160))
+    resize_pic = crop_center_img(pic, 160, 160)
+    img.paste(resize_pic, (20, 20), mask)
+
+    return img
+
+
+async def draw_char_with_ring(char_id):
+    pic = await get_square_avatar(char_id)
 
     mask_pic = Image.open(TEXT_PATH / 'avatar_mask.png')
     img = Image.new('RGBA', (180, 180))
