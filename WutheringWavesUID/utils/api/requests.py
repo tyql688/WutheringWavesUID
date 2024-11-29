@@ -125,7 +125,7 @@ class WavesApi:
         for user in user_list:
             if not await WavesUser.cookie_validate(user.uid):
                 continue
-            succ, _ = await self.refresh_data(uid, user.cookie)
+            succ, _ = await self.refresh_data(user.uid, user.cookie)
             if not succ:
                 await WavesUser.mark_invalid(user.cookie, '无效')
                 continue
