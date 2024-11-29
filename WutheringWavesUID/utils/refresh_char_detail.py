@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from typing import List, Union, Dict
 
@@ -62,8 +63,15 @@ async def refresh_char(uid: str, ck: str = '', waves_map: Dict = None) -> Union[
         logger.exception(f'{uid} 角色信息解析失败', e)
         msg = f"鸣潮账号id: 【{uid}】获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮账号数据"
         return msg
-    for r in role_info.roleList:
-        succ, role_detail_info = await waves_api.get_role_detail_info(r.roleId, uid, ck)
+
+    # 改为异步处理
+    tasks = [
+        waves_api.get_role_detail_info(r.roleId, uid, ck) for r in role_info.roleList
+    ]
+    results = await asyncio.gather(*tasks)
+
+    # 处理返回的数据
+    for succ, role_detail_info in results:
         if (not succ
             or 'role' not in role_detail_info
             or role_detail_info['role'] is None
