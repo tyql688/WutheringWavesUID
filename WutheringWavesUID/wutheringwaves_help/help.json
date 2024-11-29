@@ -3,33 +3,41 @@
     "desc": "在执行查询之前请绑定账号",
     "data": [
       {
-        "name": "绑定UID",
-        "desc": "绑定自己的账户",
-        "eg": "绑定UID123456",
+        "name": "绑定特征码",
+        "desc": "绑定特征码",
+        "eg": "绑定123456",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
       },
       {
-        "name": "切换UID",
+        "name": "切换特征码",
         "desc": "切换绑定的账户",
-        "eg": "切换UID123456",
+        "eg": "切换123456",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
       },
       {
-        "name": "删除UID",
-        "desc": "解除绑定",
-        "eg": "删除UID123456",
+        "name": "删除特征码",
+        "desc": "删除特征码",
+        "eg": "删除123456",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
       },
       {
-        "name": "查看UID",
+        "name": "查看特征码列表",
+        "desc": "查看特征码列表",
+        "eg": "查看",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "删除全部特征码",
         "desc": "查看绑定的UID列表",
-        "eg": "查看UID",
+        "eg": "删除全部特征码",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -40,7 +48,7 @@
     "desc": "在执行查询之前请库街区登录",
     "data": [
       {
-        "name": "登录页登录",
+        "name": "推荐->登录页登录",
         "desc": "登录页登录",
         "eg": "登录",
         "need_ck": false,
@@ -48,33 +56,25 @@
         "need_admin": false
       },
       {
-        "name": "手机号登录(私聊",
-        "desc": "手机号+验证码登录",
-        "eg": "登录 13333333333,114114",
+        "name": "添加token",
+        "desc": "绑定自己的库街区添加token",
+        "eg": "添加token xxxxxxy",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
       },
       {
-        "name": "添加CK(私聊",
-        "desc": "绑定自己的库街区CK",
-        "eg": "添加CK xxxxxxy",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "删除CK",
+        "name": "删除token",
         "desc": "删除当前的库街区CK",
-        "eg": "删除CK 123456",
+        "eg": "删除token 123456",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
       },
       {
-        "name": "获取CK(私聊",
-        "desc": "获取账号下的所有库街区CK",
-        "eg": "获取CK",
+        "name": "获取已绑定的token",
+        "desc": "获取已绑定的token",
+        "eg": "获取token",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false

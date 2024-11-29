@@ -67,7 +67,7 @@ async def page_login(bot: Bot, ev: Event):
     if is_local:
         token = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(8))
         await bot.send(
-            f"{game_title} \n请复制地址到浏览器打开：\n{url}/waves/i/{token}\n您的id为【{ev.user_id}】\n登录地址10分钟内有效",
+            f"{game_title} \n请复制地址到浏览器打开：\n{url}/waves/i/{token}\n您的id为【{ev.user_id}】\n登录地址10分钟内有效\n",
             at_sender=at_sender)
         # 手机登录
         data = {"mobile": -1, "code": -1, "user_id": ev.user_id}
@@ -95,7 +95,7 @@ async def page_login(bot: Bot, ev: Event):
                 token = ""
                 logger.error(e)
             if not token:
-                return await bot.send("登录服务请求失败! 请稍后再试", at_sender=at_sender)
+                return await bot.send("登录服务请求失败! 请稍后再试\n", at_sender=at_sender)
             else:
                 await bot.send(
                     f"{game_title} \n请复制地址到浏览器打开：\n{url}/waves/i/{token}\n您的id为【{ev.user_id}】\n登录地址10分钟内有效",
@@ -108,11 +108,12 @@ async def page_login(bot: Bot, ev: Event):
                         if data.get("ck"):
                             waves_user = await add_cookie(ev, data['ck'])
                             if waves_user:
-                                return await bot.send(f"{game_title} 鸣潮id:{waves_user.uid}登录成功!",
-                                                      at_sender=at_sender)
+                                return await bot.send(
+                                    f"[鸣潮] 特征码[{waves_user.uid}]登录成功! \n使用【{PREFIX}查看】查看已绑定的特征码\n使用【{PREFIX}开启自动签到】开启游戏内每天的自动签到功能\n使用【{PREFIX}刷新面板】更新角色面板\n更新角色面板后可以使用【{PREFIX}暗主排行】查询暗主排行\n",
+                                    at_sender=at_sender)
                             else:
                                 await bot.send(
-                                    f"{game_title} 账号登录失败\n\n 验证码错误，请重新输入", at_sender=at_sender)
+                                    f"{game_title} 账号登录失败\n\n 验证码错误，请重新输入\n", at_sender=at_sender)
 
                     await asyncio.sleep(1)
 
@@ -127,7 +128,7 @@ async def code_login(bot: Bot, ev: Event, text: str):
             raise ValueError("Invalid phone number")
     except ValueError as _:
         return await bot.send(
-            f"{game_title} 手机号+验证码登录失败\n\n请参照以下格式:\n{PREFIX}登录 手机号,验证码", at_sender=at_sender)
+            f"{game_title} 手机号+验证码登录失败\n\n请参照以下格式:\n{PREFIX}登录 手机号,验证码\n", at_sender=at_sender)
 
     result = await kuro_api.login(phone_number, code)
     if not isinstance(result, dict) or result.get('code') != 200 or result.get('data') is None:
@@ -135,9 +136,9 @@ async def code_login(bot: Bot, ev: Event, text: str):
     token = result.get('data', {}).get("token", '')
     waves_user = await add_cookie(ev, token)
     if waves_user:
-        return await bot.send(f"{game_title} 鸣潮id:{waves_user.uid}登录成功!", at_sender=at_sender)
+        return await bot.send(f"{game_title} 鸣潮特征码:[{waves_user.uid}]登录成功!\n", at_sender=at_sender)
     else:
-        return await bot.send(f"{game_title} 账号登录失败\n\n请参照以下格式:\n{PREFIX}登录 手机号,验证码",
+        return await bot.send(f"{game_title} 账号登录失败\n\n请参照以下格式:\n{PREFIX}登录 手机号,验证码\n",
                               at_sender=at_sender)
 
 

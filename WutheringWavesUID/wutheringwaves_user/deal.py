@@ -7,6 +7,7 @@ from ..utils.api.model import KuroRoleInfo
 from ..utils.database.models import WavesUser, WavesBind
 from ..utils.error_reply import WAVES_CODE_101, ERROR_CODE, WAVES_CODE_103
 from ..utils.waves_api import waves_api
+from ..wutheringwaves_config import PREFIX
 
 
 async def add_cookie(ev: Event, ck: str):
@@ -43,14 +44,24 @@ async def add_cookie(ev: Event, ck: str):
     if res == 0 or res == -2:
         await WavesBind.switch_uid_by_game(ev.user_id, ev.bot_id, data.roleId)
 
-    return f'[鸣潮]特征码: {data.roleId} \n恭喜CK添加成功！'
+    return f'[鸣潮] 特征码[{data.roleId}]绑定Token成功!\n使用【{PREFIX}查看】查看已绑定的特征码\n使用【{PREFIX}开启自动签到】开启游戏内每天的自动签到功能\n使用【{PREFIX}刷新面板】更新角色面板\n更新角色面板后可以使用【{PREFIX}暗主排行】查询暗主排行\n'
 
 
-async def delete_cookie(uid: str) -> str:
-    if await WavesUser.delete_row(uid=uid):
-        return '删除成功!'
-    else:
-        return '删除失败...不存在该UID的CK...'
+async def delete_cookie(ev: Event, uid: str) -> str:
+    user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, 'uid', uid)
+    if not user or not user.cookie:
+        return f'[鸣潮] 特征码[{uid}]的token删除失败!\n❌不存在该特征码的token!\n'
+
+    await WavesUser.update_data_by_data(
+        select_data={
+            'user_id': ev.user_id,
+            'bot_id': ev.bot_id,
+            'uid': uid
+        },
+        update_data={
+            'cookie': ''
+        })
+    return f'[鸣潮] 特征码[{uid}]的token删除成功!\n'
 
 
 async def get_cookie(bot: Bot, ev: Event) -> Union[List[str], str]:
@@ -67,6 +78,6 @@ async def get_cookie(bot: Bot, ev: Event) -> Union[List[str], str]:
         msg.append(ck)
 
     if not msg:
-        return '您当前未绑定ck或者ck已全部失效'
+        return '您当前未绑定token或者token已全部失效\n'
 
     return msg

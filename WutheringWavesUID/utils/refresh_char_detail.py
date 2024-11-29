@@ -61,7 +61,7 @@ async def refresh_char(uid: str, ck: str = '', waves_map: Dict = None) -> Union[
         role_info = RoleList(**role_info)
     except Exception as e:
         logger.exception(f'{uid} 角色信息解析失败', e)
-        msg = f"鸣潮账号id: 【{uid}】获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮账号数据"
+        msg = f"鸣潮特征码[{uid}]获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据"
         return msg
 
     # 改为异步处理

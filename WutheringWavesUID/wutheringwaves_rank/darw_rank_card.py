@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw
 from pydantic import BaseModel
 
 from gsuid_core.bot import Bot
+from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
@@ -88,7 +89,7 @@ async def find_role_detail(uid: str, char_id: Union[int, List[int]]) -> Optional
     return next((role for role in role_details if str(role.role.roleId) in char_id), None)
 
 
-async def get_rank_info_for_user(user: WavesBind, find_char_id, rankDetail):
+async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDetail):
     rankInfoList = []
     if not user.uid:
         return rankInfoList
@@ -102,11 +103,13 @@ async def get_rank_info_for_user(user: WavesBind, find_char_id, rankDetail):
         if not role_detail.phantomData or not role_detail.phantomData.equipPhantomList:
             continue
 
+        logger.info(f'get_rank_info_for_user {role_detail.role.roleId}')
+
         equipPhantomList = role_detail.phantomData.equipPhantomList
         weaponData = role_detail.weaponData
         phantom_sum_value = prepare_phantom(equipPhantomList)
         phantom_sum_value = enhance_summation_phantom_value(
-            find_char_id, role_detail.role.level, role_detail.role.breach,
+            char_id, role_detail.role.level, role_detail.role.breach,
             weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
             phantom_sum_value)
 
@@ -127,7 +130,7 @@ async def get_rank_info_for_user(user: WavesBind, find_char_id, rankDetail):
         # 面板
         temp_card_sort_map = copy.deepcopy(card_sort_map)
         card_map = enhance_summation_card_value(
-            find_char_id, role_detail.role.level, role_detail.role.breach,
+            char_id, role_detail.role.level, role_detail.role.breach,
             role_detail.role.attributeName,
             weaponData.weapon.weaponId, weaponData.level, weaponData.breach,
             weaponData.resonLevel,
@@ -160,8 +163,8 @@ async def get_rank_info_for_user(user: WavesBind, find_char_id, rankDetail):
     return rankInfoList
 
 
-async def get_all_rank_info(users: List[WavesBind], find_char_id, rankDetail):
-    tasks = [get_rank_info_for_user(user, find_char_id, rankDetail) for user in users]
+async def get_all_rank_info(users: List[WavesBind], char_id, find_char_id, rankDetail):
+    tasks = [get_rank_info_for_user(user, char_id, find_char_id, rankDetail) for user in users]
     results = await asyncio.gather(*tasks)
 
     # Flatten the results list
@@ -198,7 +201,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
         pass
 
     damage_title = rankDetail['title']
-    rankInfoList = await get_all_rank_info(users, find_char_id, rankDetail)
+    rankInfoList = await get_all_rank_info(users, char_id, find_char_id, rankDetail)
     if len(rankInfoList) == 0:
         return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
 

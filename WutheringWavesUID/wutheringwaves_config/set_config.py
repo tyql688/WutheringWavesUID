@@ -19,7 +19,7 @@ async def set_waves_user_value(ev: Event, func: str, uid: str, value: str):
     if func in WAVES_USER_MAP:
         status = WAVES_USER_MAP[func]
     else:
-        return '该配置项不存在!'
+        return '该配置项不存在!\n'
     logger.info('[设置{}] uid:{} value: {}'.format(func, uid, value))
     if (
         await WavesUser.update_data_by_data(
@@ -34,16 +34,16 @@ async def set_waves_user_value(ev: Event, func: str, uid: str, value: str):
         )
         == 0
     ):
-        return f'设置成功!\n特征码:{uid}\n当前{func}:{value}'
+        return f'设置成功!\n特征码[{uid}]\n当前{func}:{value}\n'
     else:
-        return '设置失败!\n请检查参数是否正确!'
+        return '设置失败!\n请检查参数是否正确!\n'
 
 
 async def set_push_value(bot_id: str, func: str, uid: str, value: int):
     if func in PUSH_MAP:
         status = PUSH_MAP[func]
     else:
-        return '该配置项不存在!'
+        return '该配置项不存在!\n'
     logger.info('[设置推送阈值]func: {}, value: {}'.format(status, value))
     if (
         await WavesPush.update_data_by_uid(
@@ -51,9 +51,9 @@ async def set_push_value(bot_id: str, func: str, uid: str, value: int):
         )
         == 0
     ):
-        return f'设置成功!\n当前{func}推送阈值:{value}'
+        return f'设置成功!\n当前{func}推送阈值:{value}\n'
     else:
-        return '设置失败!\n请检查参数是否正确!'
+        return '设置失败!\n请检查参数是否正确!\n'
 
 
 async def set_config_func(ev: Event, uid: str = "0"):
@@ -86,4 +86,4 @@ async def set_config_func(ev: Event, uid: str = "0"):
         succeed_msg = "关闭!"
     else:
         succeed_msg = f"开启至群{option}"
-    return f"{config_name}已{succeed_msg}"
+    return f"{config_name}已{succeed_msg}\n"
