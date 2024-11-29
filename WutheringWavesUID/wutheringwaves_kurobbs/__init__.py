@@ -4,10 +4,11 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.boardcast.send_msg import send_board_cast_msg
-from .main import do_task, auto_bbs_task
+from .main import do_task, auto_bbs_task, do_sign_task
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 waves_bbs = SV(f'waves库街区任务')
+sv_waves_sign = SV('鸣潮库街区签到+社区签到', priority=10)
 waves_bbs_all = SV('鸣潮库街区签到配置', pm=1)
 SIGN_TIME = WutheringWavesConfig.get_config('BBSSignTime').data
 IS_REPORT = WutheringWavesConfig.get_config('PrivateSignReport').data
@@ -47,3 +48,9 @@ async def waves_auto_bbs_task():
         if not IS_REPORT:
             result['private_msg_dict'] = {}
         await send_board_cast_msg(result)
+
+
+@sv_waves_sign.on_fullmatch(f'{PREFIX}签到', block=True)
+async def get_sign_func(bot: Bot, ev: Event):
+    msg = await do_sign_task(bot, ev)
+    return await bot.send(msg)

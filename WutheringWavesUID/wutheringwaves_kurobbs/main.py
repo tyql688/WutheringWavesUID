@@ -14,8 +14,9 @@ from gsuid_core.segment import MessageSegment
 from gsuid_core.utils.boardcast.models import BoardCastMsg, BoardCastMsgDict
 from gsuid_core.utils.image.convert import convert_img
 from ..utils.api.api import MAIN_URL
+from ..utils.api.model import DailyData
 from ..utils.database.models import WavesUser, WavesBind
-from ..utils.error_reply import WAVES_CODE_999, ERROR_CODE, WAVES_CODE_102
+from ..utils.error_reply import WAVES_CODE_999, ERROR_CODE, WAVES_CODE_102, WAVES_CODE_101
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_20, waves_font_16
 from ..utils.util import generate_random_string
 from ..utils.waves_api import waves_api
@@ -535,3 +536,85 @@ async def auto_bbs_task():
 
     logger.info(result)
     return result
+
+
+async def do_sign_task(bot: Bot, ev: Event):
+    uid_list = await WavesBind.get_uid_list_by_game(ev.user_id, ev.bot_id)
+    if uid_list is None:
+        return ERROR_CODE[WAVES_CODE_102]
+    # 进行校验UID是否绑定CK
+    valid_ck_list = []
+
+    expire_uid = []
+    for uid in uid_list:
+        ck = await waves_api.get_self_waves_ck(uid)
+        if not ck:
+            continue
+        succ, _ = await waves_api.refresh_data(uid, ck)
+        if not succ:
+            expire_uid.append(uid)
+            continue
+
+        valid_ck_list.append((uid, ck))
+
+    form_result = {}
+    for uid, token in valid_ck_list:
+        res = await do_single_task(uid, token)
+        if res:
+            form_result[uid] = res[uid]
+
+        res = await sign_in2(uid, token)
+        if res:
+            if not isinstance(form_result[uid], dict):
+                form_result[uid] = {}
+            form_result[uid]['游戏签到'] = res
+
+    msg_list = []
+    for uid, temp in form_result.items():
+        msg_list.append(f'账号 {uid} 签到结果')
+        msg_list.append('')
+        if '游戏签到' in temp:
+            msg_list.append(f'------: 游戏签到 :------')
+            msg_list.append(f'[游戏签到] {temp["游戏签到"]}')
+            temp.pop('游戏签到')
+            msg_list.append('')
+
+        if len(temp) == 0:
+            continue
+        msg_list.append(f'------: 社区签到 :------')
+        for title, value in temp.items():
+            if value == 0:
+                value = '今日已完成！'
+            msg_list.append(f'[{title}] {value}')
+
+        msg_list.append('====================')
+
+    for uid in expire_uid:
+        msg_list.append(f'失效特征码: {uid}')
+
+    return '\n'.join(msg_list)
+
+
+async def sign_in2(uid: str, ck: str) -> str:
+    succ, daily_info = await waves_api.get_daily_info(ck)
+    if not succ:
+        # 检查ck
+        return f'{ERROR_CODE[WAVES_CODE_101]}'
+
+    daily_info = DailyData(**daily_info)
+    if daily_info.hasSignIn:
+        # 已经签到
+        logger.debug(f'UID{uid} 该用户今日已签到,跳过...')
+        return f'今日已签到！请勿重复签到！'
+
+    sign_in_res = await waves_api.sign_in(daily_info.roleId, ck)
+    if isinstance(sign_in_res, dict):
+        if sign_in_res.get('code') == 200 and sign_in_res.get('data'):
+            # 签到成功
+            return f'签到成功！'
+        elif sign_in_res.get('code') == 1511:
+            # 已经签到
+            logger.debug(f'UID{uid} 该用户今日已签到,跳过...')
+            return f'今日已签到！请勿重复签到！'
+    # 签到失败
+    return f'签到失败！'
