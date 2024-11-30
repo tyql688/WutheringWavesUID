@@ -366,26 +366,34 @@ async def auto_sign_task():
         _user_list: List[WavesUser] = await WavesUser.get_waves_all_user2()
         bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list = await process_all_users(_user_list)
 
+    bbs_success = 0
+    bbs_fail = 0
     if WutheringWavesConfig.get_config('SchedSignin').data:
         logger.info('[鸣潮] [定时签到] 开始执行!')
-        result = await daily_sign_action(sign_expiregid2uid, sign_user_list)
+        result, num = await daily_sign_action(sign_expiregid2uid, sign_user_list)
         if not IS_REPORT:
             result['private_msg_dict'] = {}
         await send_board_cast_msg(result)
+        bbs_success = num['success_num']
+        bbs_fail = num['failed_num']
 
+    sign_success = 0
+    sign_fail = 0
     if WutheringWavesConfig.get_config('BBSSchedSignin').data:
         logger.info('[鸣潮] [定时社区签到] 开始执行!')
-        result = await auto_bbs_task_action(bbs_expiregid2uid, bbs_user_list)
+        result, num = await auto_bbs_task_action(bbs_expiregid2uid, bbs_user_list)
         if not IS_REPORT:
             result['private_msg_dict'] = {}
         await send_board_cast_msg(result)
+        sign_success = num['success_num']
+        sign_fail = num['failed_num']
 
     try:
         config_masters = core_config.get_config('masters')
         if SigninMaster and len(config_masters) > 0:
             for bot_id in gss.active_bot:
                 await gss.active_bot[bot_id].target_send(
-                    f'[鸣潮]自动任务\n今日成功游戏签到 {len(sign_user_list)} 个账号\n今日社区签到 {len(bbs_user_list)} 个账号',
+                    f'[鸣潮]自动任务\n今日成功游戏签到 {sign_success} 个账号\n今日社区签到 {bbs_success} 个账号',
                     'direct',
                     config_masters[0],
                     'onebot',
@@ -489,9 +497,13 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
             }
         )
 
+    failed_num = 0
+    success_num = 0
     for gid in group_msgs:
         success = group_msgs[gid]['success']
         faild = group_msgs[gid]['failed']
+        success_num += int(success)
+        failed_num += int(faild)
         title = f'✅[鸣潮]今日社区签到任务已完成！\n📝本群共签到成功{success}人，共签到失败{faild}人, Token过期{len(expiregid2uid.get(gid, []))}人'
         messages = [MessageSegment.text(title)]
         if group_msgs[gid]['push_message']:
@@ -507,8 +519,13 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
         'group_msg_dict': group_msg_dict,
     }
 
+    num = {
+        'failed_num': failed_num,
+        'success_num': success_num
+    }
+
     logger.info(result)
-    return result
+    return result, num
 
 
 async def single_daily_sign(
@@ -596,9 +613,13 @@ async def daily_sign_action(expiregid2uid, user_list):
             }
         )
 
+    success_num = 0
+    failed_num = 0
     for gid in group_msgs:
         success = group_msgs[gid]['success']
         faild = group_msgs[gid]['failed']
+        failed_num += int(faild)
+        success_num += int(success)
         title = f'✅[鸣潮]今日自动签到已完成！\n📝本群共签到成功{success}人，共签到失败{faild}人, Token过期{len(expiregid2uid.get(gid, []))}人'
         messages = [MessageSegment.text(title)]
         if group_msgs[gid]['push_message']:
@@ -614,8 +635,13 @@ async def daily_sign_action(expiregid2uid, user_list):
         'group_msg_dict': group_msg_dict,
     }
 
+    num = {
+        'failed_num': failed_num,
+        'success_num': success_num
+    }
+
     logger.info(result)
-    return result
+    return result, num
 
 
 async def do_sign_task(bot: Bot, ev: Event):
