@@ -459,9 +459,9 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
                 private_msgs,
                 group_msgs,
             ))
-        if len(tasks) >= 1:
+        if len(tasks) >= 50:
             await asyncio.gather(*tasks)
-            delay = 1 + random.randint(1, 2)
+            delay = 5 + random.randint(1, 3)
             logger.info(
                 f'[鸣潮] [社区签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
             )
@@ -567,10 +567,10 @@ async def daily_sign_action(expiregid2uid, user_list):
                 group_msgs,
             )
         )
-        if len(tasks) >= 1:
+        if len(tasks) >= 50:
             await asyncio.gather(*tasks)
-            delay = 1 + random.randint(1, 2)
-            logger.debug(
+            delay = 5 + random.randint(1, 3)
+            logger.info(
                 f'[鸣潮] [签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
             )
             tasks.clear()
