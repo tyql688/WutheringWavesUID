@@ -99,7 +99,7 @@ class WavesApi:
             return
 
         if not await WavesUser.cookie_validate(uid):
-            return
+            return ''
 
         succ, _ = await self.refresh_data(uid, cookie)
         if not succ:

@@ -30,11 +30,6 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '开启后每晚00:10将开始自动签到任务',
         True,
     ),
-    'BBSSignTime': GsListStrConfig(
-        '库街区每日任务时间设置',
-        '库街区每日任务时间设置（时，分）',
-        ['0', '20'],
-    ),
     'BBSSchedSignin': GsBoolConfig(
         '定时库街区每日任务',
         '开启后每晚00:20将开始自动库街区每日任务',
@@ -43,6 +38,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     'PrivateSignReport': GsBoolConfig(
         '签到私聊报告',
         '关闭后将不再给任何人推送当天签到任务完成情况',
+        False,
+    ),
+    'SigninMaster': GsBoolConfig(
+        '全部开启签到',
+        '开启后自动帮登录的人签到',
         False,
     ),
     "CrazyNotice": GsBoolConfig(

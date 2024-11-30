@@ -4,22 +4,23 @@ import json as j
 import random
 from typing import Literal, Optional, Union, Dict, Any, List
 
-from PIL import Image, ImageDraw
 from aiohttp import FormData, ClientSession, TCPConnector, ContentTypeError
 
 from gsuid_core.bot import Bot
+from gsuid_core.config import core_config
+from gsuid_core.gss import gss
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.segment import MessageSegment
 from gsuid_core.utils.boardcast.models import BoardCastMsg, BoardCastMsgDict
-from gsuid_core.utils.image.convert import convert_img
+from gsuid_core.utils.boardcast.send_msg import send_board_cast_msg
 from ..utils.api.api import MAIN_URL
 from ..utils.api.model import DailyData
 from ..utils.database.models import WavesUser, WavesBind
 from ..utils.error_reply import WAVES_CODE_999, ERROR_CODE, WAVES_CODE_102, WAVES_CODE_101
-from ..utils.fonts.waves_fonts import waves_font_30, waves_font_20, waves_font_16
 from ..utils.util import generate_random_string
 from ..utils.waves_api import waves_api
+from ..wutheringwaves_config import WutheringWavesConfig
 
 GET_GOLD_URL = f'{MAIN_URL}/encourage/gold/getTotalGold'
 GET_TASK_URL = f'{MAIN_URL}/encourage/level/getTaskProcess'
@@ -28,6 +29,9 @@ LIKE_URL = f'{MAIN_URL}/forum/like'
 SIGN_IN_URL = f'{MAIN_URL}/user/signIn'
 POST_DETAIL_URL = f'{MAIN_URL}/forum/getPostDetail'
 SHARE_URL = f'{MAIN_URL}/encourage/level/shareTask'
+
+SigninMaster = WutheringWavesConfig.get_config('SigninMaster').data
+IS_REPORT = WutheringWavesConfig.get_config('PrivateSignReport').data
 
 
 async def get_headers_h5():
@@ -170,7 +174,7 @@ bbs_api = KuroBBS()
 
 
 async def do_sign_in(taskData, uid, token, form_result):
-    key = '签到'
+    key = '用户签到'
     form_result[uid][key] = -1
     if taskData['completeTimes'] == taskData['needActionTimes']:
         form_result[uid][key] = taskData['needActionTimes'] - taskData['completeTimes']
@@ -187,7 +191,7 @@ async def do_sign_in(taskData, uid, token, form_result):
 
 
 async def do_detail(taskData, uid, token, form_result, post_list):
-    key = '浏览'
+    key = '浏览帖子'
     form_result[uid][key] = -1
     if taskData['completeTimes'] == taskData['needActionTimes']:
         form_result[uid][key] = taskData['needActionTimes'] - taskData['completeTimes']
@@ -200,7 +204,7 @@ async def do_detail(taskData, uid, token, form_result, post_list):
             if post_detail_res.get('code') == 200:
                 detail_succ += 1
                 # 浏览成功
-                form_result[uid]['浏览'] = detail_succ
+                form_result[uid][key] = detail_succ
         if detail_succ >= taskData['needActionTimes'] - taskData['completeTimes']:
             return
 
@@ -208,7 +212,7 @@ async def do_detail(taskData, uid, token, form_result, post_list):
 
 
 async def do_like(taskData, uid, token, form_result, post_list):
-    key = '点赞'
+    key = '点赞帖子'
     form_result[uid][key] = -1
     if taskData['completeTimes'] == taskData['needActionTimes']:
         form_result[uid][key] = taskData['needActionTimes'] - taskData['completeTimes']
@@ -230,7 +234,7 @@ async def do_like(taskData, uid, token, form_result, post_list):
 
 
 async def do_share(taskData, uid, token, form_result):
-    key = '分享'
+    key = '分享帖子'
     form_result[uid][key] = -1
     if taskData['completeTimes'] == taskData['needActionTimes']:
         form_result[uid][key] = taskData['needActionTimes'] - taskData['completeTimes']
@@ -245,36 +249,6 @@ async def do_share(taskData, uid, token, form_result):
             return
 
     logger.exception(f'[鸣潮][社区签到]分享失败 uid: {uid}')
-
-
-async def do_task(bot: Bot, ev: Event):
-    uid_list = await WavesBind.get_uid_list_by_game(ev.user_id, ev.bot_id)
-    if uid_list is None:
-        return ERROR_CODE[WAVES_CODE_102]
-    # 进行校验UID是否绑定CK
-    valid_ck_list = []
-    for uid in uid_list:
-        ck = await waves_api.get_self_waves_ck(uid)
-        if not ck:
-            continue
-        succ, _ = await waves_api.refresh_data(uid, ck)
-        if not succ:
-            continue
-
-        valid_ck_list.append((uid, ck))
-
-    if len(valid_ck_list) == 0:
-        return ERROR_CODE[WAVES_CODE_102]
-
-    form_result = {}
-    for uid, token in valid_ck_list:
-        res = await do_single_task(uid, token)
-        if res:
-            form_result[uid] = res[uid]
-
-    card_img = await draw_task(form_result)
-    card_img = await convert_img(card_img)
-    return card_img
 
 
 async def do_single_task(uid, token):
@@ -308,7 +282,7 @@ async def do_single_task(uid, token):
 
     form_result = {
         uid: {
-            '签到': '', '浏览': '', '点赞': '', '分享': '', '库洛币': ''
+            '用户签到': '', '浏览帖子': '', '点赞帖子': '', '分享帖子': '', '库洛币': ''
         }}
     # 获取到任务列表
     for i in task_res['data']['dailyTask']:
@@ -329,94 +303,6 @@ async def do_single_task(uid, token):
     return form_result
 
 
-async def draw_task(user_data):
-    # 设置基本参数
-    base_width = 900
-    min_height = 100
-    cell_height = 60
-    header_height = 100
-    footer_height = 100
-    row_margin = 10
-
-    title_font = waves_font_30
-    header_font = waves_font_20
-    content_font = waves_font_16
-
-    # 计算所需的图片高度
-    num_rows = len(user_data)
-    table_height = (cell_height + row_margin) * num_rows
-    height = max(min_height, header_height + table_height + footer_height)
-
-    # 创建图片对象
-    image = Image.new('RGB', (base_width, height), (240, 248, 255))
-    draw = ImageDraw.Draw(image)
-
-    # 创建渐变背景
-    for y in range(height):
-        r = int(240 + (255 - 240) * (y / height))
-        g = int(248 + (255 - 248) * (y / height))
-        b = 255
-        for x in range(base_width):
-            draw.point((x, y), fill=(r, g, b))
-
-    # 绘制标题
-    title = "库街区签到任务"
-    title_bbox = draw.textbbox((0, 0), title, font=title_font)
-    title_width = title_bbox[2] - title_bbox[0]
-    title_height = title_bbox[3] - title_bbox[1]
-    draw.text(((base_width - title_width) / 2, 30), title, font=title_font, fill=(0, 0, 128))
-
-    # 定义表格参数
-    table_top = header_height
-    col_widths = [180, 120, 120, 120, 120, 120]
-    headers = ['特征码', '签到', '浏览', '点赞', '分享', '库洛币']
-
-    # 绘制表头
-    x = 60
-    for i, header in enumerate(headers):
-        draw.rounded_rectangle([x, table_top, x + col_widths[i], table_top + cell_height],
-                               radius=10, fill=(230, 230, 250), outline=(0, 0, 128))
-        text_bbox = draw.textbbox((0, 0), header, font=header_font)
-        text_width = text_bbox[2] - text_bbox[0]
-        text_height = text_bbox[3] - text_bbox[1]
-        draw.text((x + (col_widths[i] - text_width) / 2, table_top + (cell_height - text_height) / 2),
-                  header, font=header_font, fill=(0, 0, 128))
-        x += col_widths[i]
-
-    # 绘制数据行
-    for row, (user_id, data) in enumerate(user_data.items()):
-        y = table_top + (cell_height + row_margin) * (row + 1)
-        x = 60
-        for col, key in enumerate(headers):
-            draw.rounded_rectangle([x, y, x + col_widths[col], y + cell_height],
-                                   radius=10, fill=(255, 255, 255), outline=(200, 200, 200))
-            if col == 0:
-                text = user_id
-            else:
-                text = str(data.get(key, ''))
-
-            if key in ['签到', '浏览', '点赞', '分享']:
-                if data[key] == 0:
-                    text = '已完成'
-                    fill_color = (255, 255, 224)
-                elif data[key] == -1:
-                    text = '失败'
-                    fill_color = (255, 182, 193)
-                else:
-                    fill_color = (144, 238, 144)
-                draw.rounded_rectangle([x + 2, y + 2, x + col_widths[col] - 2, y + cell_height - 2],
-                                       radius=8, fill=fill_color)
-
-            text_bbox = draw.textbbox((0, 0), text, font=content_font)
-            text_width = text_bbox[2] - text_bbox[0]
-            text_height = text_bbox[3] - text_bbox[1]
-            draw.text((x + (col_widths[col] - text_width) / 2, y + (cell_height - text_height) / 2),
-                      text, font=content_font, fill=(0, 0, 0))
-            x += col_widths[col]
-
-    return image
-
-
 async def single_task(
     bot_id: str,
     uid: str,
@@ -433,11 +319,21 @@ async def single_task(
     msg.append(f'特征码: {uid}')
     for i, r in im[str(uid)].items():
         if r == 0:
-            r = '已完成'
+            r = '今日已完成！'
         elif r == -1:
             r = '失败'
         else:
-            r = f'{r}' if i == '库洛币' else f'成功{r}次'
+            if i == '用户签到':
+                r = "签到成功"
+            elif i == '浏览帖子':
+                r = f'浏览帖子成功 {r} 次'
+            elif i == '点赞帖子':
+                r = f'点赞帖子成功 {r} 次'
+            elif i == '分享帖子':
+                r = f'分享帖子成功'
+            elif i == '库洛币':
+                r = f' 当前为{r}'
+
         msg.append(f'{i}: {r}')
 
     im = '\n'.join(msg)
@@ -459,23 +355,98 @@ async def single_task(
             group_msgs[gid]['success'] += 1
 
 
-async def auto_bbs_task():
+async def auto_sign_task():
+    bbs_expiregid2uid = {}
+    sign_expiregid2uid = {}
+    bbs_user_list = []
+    sign_user_list = []
+    if WutheringWavesConfig.get_config('BBSSchedSignin').data or WutheringWavesConfig.get_config('SchedSignin').data:
+        _user_list: List[WavesUser] = await WavesUser.get_waves_all_user2()
+        bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list = await process_all_users(_user_list)
+
+    if WutheringWavesConfig.get_config('SchedSignin').data:
+        logger.info('[鸣潮] [定时签到] 开始执行!')
+        result = await daily_sign_action(sign_expiregid2uid, sign_user_list)
+        if not IS_REPORT:
+            result['private_msg_dict'] = {}
+        await send_board_cast_msg(result)
+
+    if WutheringWavesConfig.get_config('BBSSchedSignin').data:
+        logger.info('[鸣潮] [定时社区签到] 开始执行!')
+        result = await auto_bbs_task_action(bbs_expiregid2uid, bbs_user_list)
+        if not IS_REPORT:
+            result['private_msg_dict'] = {}
+        await send_board_cast_msg(result)
+
+    try:
+        config_masters = core_config.get_config('masters')
+        if SigninMaster and len(config_masters) > 0:
+            for bot_id in gss.active_bot:
+                await gss.active_bot[bot_id].target_send(
+                    f'[鸣潮]自动任务\n今日成功游戏签到 {len(sign_user_list)} 个账号\n今日社区签到 {len(bbs_user_list)} 个账号',
+                    'direct',
+                    config_masters[0],
+                    'onebot',
+                    '',
+                    '',
+                )
+    except Exception as e:
+        logger.warning(f'[鸣潮]私聊推送社区签到结果失败!错误信息:{e}')
+
+
+async def process_user(user, bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list):
+    _uid = user.user_id
+    if not _uid:
+        return
+    # 异步调用 refresh_data
+    succ, _ = await waves_api.refresh_data(user.uid, user.cookie)
+    if not succ:
+        # 如果刷新数据失败，更新 expiregid2uid
+        if user.bbs_sign_switch != 'off':
+            bbs_expiregid2uid.setdefault(user.bbs_sign_switch, []).append(user.user_id)
+        if user.sign_switch != 'off':
+            sign_expiregid2uid.setdefault(user.sign_switch, []).append(user.user_id)
+        return
+
+    if SigninMaster:
+        # 如果 SigninMaster 为 True，添加到 user_list 中
+        bbs_user_list.append(user)
+        sign_user_list.append(user)
+        return
+
+    if user.bbs_sign_switch != 'off':
+        # 如果 bbs_sign_switch 不为 'off'，添加到 user_list 中
+        bbs_user_list.append(user)
+
+    if user.sign_switch != 'off':
+        # 如果 sign_switch 不为 'off'，添加到 user_list 中
+        sign_user_list.append(user)
+
+
+async def process_all_users(_user_list):
+    bbs_expiregid2uid = {}
+    sign_expiregid2uid = {}
+    bbs_user_list = []
+    sign_user_list = []
+
+    # 创建异步任务列表
+    tasks = [
+        process_user(user, bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list)
+        for user in _user_list
+    ]
+
+    # 使用 asyncio.gather 并发执行所有任务
+    await asyncio.gather(*tasks)
+
+    return bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list
+
+
+async def auto_bbs_task_action(expiregid2uid, user_list):
     tasks = []
     private_msgs = {}
     group_msgs = {}
-    _user_list: List[WavesUser] = await WavesUser.get_waves_all_user()
-
-    user_list: List[WavesUser] = []
-    for user in _user_list:
-        _uid = user.user_id
-        _switch = user.bbs_sign_switch
-        if _switch != 'off' and not user.status and _uid:
-            user_list.append(user)
 
     for user in user_list:
-        succ, _ = await waves_api.refresh_data(user.uid, user.cookie)
-        if not succ:
-            continue
         tasks.append(
             single_task(
                 user.bot_id,
@@ -486,9 +457,9 @@ async def auto_bbs_task():
                 private_msgs,
                 group_msgs,
             ))
-        if len(tasks) >= 1:
+        if len(tasks) >= 20:
             await asyncio.gather(*tasks)
-            delay = 5 + random.randint(1, 5)
+            delay = 1 + random.randint(3, 5)
             logger.info(
                 f'[鸣潮] [社区签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
             )
@@ -519,7 +490,112 @@ async def auto_bbs_task():
     for gid in group_msgs:
         success = group_msgs[gid]['success']
         faild = group_msgs[gid]['failed']
-        title = f'✅[鸣潮]今日社区签到任务已完成！\n📝本群共签到成功{success}人，共签到失败{faild}人。'
+        title = f'✅[鸣潮]今日社区签到任务已完成！\n📝本群共签到成功{success}人，共签到失败{faild}人, Token过期{len(expiregid2uid.get(gid, []))}人'
+        messages = [MessageSegment.text(title)]
+        if group_msgs[gid]['push_message']:
+            messages.append(MessageSegment.text('\n'))
+            messages.extend(group_msgs[gid]['push_message'])
+        group_msg_dict[gid] = {
+            'bot_id': group_msgs[gid]['bot_id'],
+            'messages': messages,
+        }
+
+    result: BoardCastMsgDict = {
+        'private_msg_dict': private_msg_dict,
+        'group_msg_dict': group_msg_dict,
+    }
+
+    logger.info(result)
+    return result
+
+
+async def single_daily_sign(
+    bot_id: str,
+    uid: str,
+    gid: str,
+    qid: str,
+    ck: str,
+    private_msgs: Dict,
+    group_msgs: Dict,
+):
+    im = await sign_in(uid, ck)
+    if gid == 'on':
+        if qid not in private_msgs:
+            private_msgs[qid] = []
+        private_msgs[qid].append(
+            {'bot_id': bot_id, 'uid': uid, 'msg': [MessageSegment.text(im)]}
+        )
+    else:
+        # 向群消息推送列表添加这个群
+        if gid not in group_msgs:
+            group_msgs[gid] = {
+                'bot_id': bot_id,
+                'success': 0,
+                'failed': 0,
+                'push_message': '',
+            }
+        if im.startswith(('签到失败', '网络有点忙', 'OK', 'ok')):
+            group_msgs[gid]['failed'] += 1
+            group_msgs[gid]['push_message'].extend(
+                [
+                    MessageSegment.text('\n'),
+                    MessageSegment.at(qid),
+                    MessageSegment.text(im),
+                ]
+            )
+        else:
+            group_msgs[gid]['success'] += 1
+
+
+async def daily_sign_action(expiregid2uid, user_list):
+    tasks = []
+    private_msgs = {}
+    group_msgs = {}
+    for user in user_list:
+        tasks.append(
+            single_daily_sign(
+                user.bot_id,
+                user.uid,
+                user.sign_switch,
+                user.user_id,
+                user.cookie,
+                private_msgs,
+                group_msgs,
+            )
+        )
+        if len(tasks) >= 20:
+            await asyncio.gather(*tasks)
+            delay = 1 + random.randint(3, 5)
+            logger.debug(
+                f'[鸣潮] [签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
+            )
+            tasks.clear()
+            await asyncio.sleep(delay)
+    await asyncio.gather(*tasks)
+    tasks.clear()
+
+    # 转为广播消息
+    private_msg_dict: Dict[str, List[BoardCastMsg]] = {}
+    group_msg_dict: Dict[str, BoardCastMsg] = {}
+    for qid in private_msgs:
+        msgs = []
+        for i in private_msgs[qid]:
+            msgs.extend(i['msg'])
+
+        if qid not in private_msg_dict:
+            private_msg_dict[qid] = []
+
+        private_msg_dict[qid].append(
+            {
+                'bot_id': private_msgs[qid][0]['bot_id'],
+                'messages': msgs,
+            }
+        )
+
+    for gid in group_msgs:
+        success = group_msgs[gid]['success']
+        faild = group_msgs[gid]['failed']
+        title = f'✅[鸣潮]今日自动签到已完成！\n📝本群共签到成功{success}人，共签到失败{faild}人, Token过期{len(expiregid2uid.get(gid, []))}人'
         messages = [MessageSegment.text(title)]
         if group_msgs[gid]['push_message']:
             messages.append(MessageSegment.text('\n'))
@@ -549,6 +625,8 @@ async def do_sign_task(bot: Bot, ev: Event):
     for uid in uid_list:
         ck = await waves_api.get_self_waves_ck(uid)
         if not ck:
+            if ck == '':
+                expire_uid.append(uid)
             continue
         succ, _ = await waves_api.refresh_data(uid, ck)
         if not succ:
@@ -563,7 +641,7 @@ async def do_sign_task(bot: Bot, ev: Event):
         if res:
             form_result[uid] = res[uid]
 
-        res = await sign_in2(uid, token)
+        res = await sign_in(uid, token)
         if res:
             if not isinstance(form_result[uid], dict):
                 form_result[uid] = {}
@@ -574,20 +652,33 @@ async def do_sign_task(bot: Bot, ev: Event):
         msg_list.append(f'账号 {uid} 签到结果')
         msg_list.append('')
         if '游戏签到' in temp:
-            msg_list.append(f'------: 游戏签到 :------')
+            msg_list.append(f'======= 游戏签到 =======')
             msg_list.append(f'[游戏签到] {temp["游戏签到"]}')
             temp.pop('游戏签到')
             msg_list.append('')
 
+        msg_list.append('游戏签到已完成！')
         if len(temp) == 0:
             continue
-        msg_list.append(f'------: 社区签到 :------')
+        msg_list.append(f'======= 社区签到 =======')
         for title, value in temp.items():
             if value == 0:
                 value = '今日已完成！'
+            elif title == '用户签到':
+                value = "签到成功"
+            elif title == '浏览帖子':
+                value = f'浏览帖子成功 {value} 次'
+            elif title == '点赞帖子':
+                value = f'点赞帖子成功 {value} 次'
+            elif title == '分享帖子':
+                value = f'分享帖子成功'
+            elif title == '库洛币':
+                value = f' 当前为{value}'
+
             msg_list.append(f'[{title}] {value}')
 
-        msg_list.append('====================')
+        msg_list.append('社区任务已完成！')
+        msg_list.append('-----------------------------')
 
     for uid in expire_uid:
         msg_list.append(f'失效特征码: {uid}')
@@ -595,7 +686,7 @@ async def do_sign_task(bot: Bot, ev: Event):
     return '\n'.join(msg_list)
 
 
-async def sign_in2(uid: str, ck: str) -> str:
+async def sign_in(uid: str, ck: str) -> str:
     succ, daily_info = await waves_api.get_daily_info(ck)
     if not succ:
         # 检查ck

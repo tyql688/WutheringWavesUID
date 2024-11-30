@@ -71,6 +71,12 @@ async def set_config_func(ev: Event, uid: str = "0"):
             bot_id=ev.bot_id,
             **{f"{SIGN_MAP[config_name]}_switch": option, },
         )
+        if config_name == "自动签到" and option != "off":
+            await WavesUser.update_data_by_uid(
+                uid=uid,
+                bot_id=ev.bot_id,
+                **{f"{SIGN_MAP['自动社区签到']}_switch": option, },
+            )
     elif config_name.replace('推送', '') in PUSH_MAP:
         await WavesPush.update_data_by_uid(
             uid=uid,

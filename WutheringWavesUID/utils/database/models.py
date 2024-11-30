@@ -188,6 +188,24 @@ class WavesUser(User, table=True):
         return data
 
     @classmethod
+    @with_session
+    async def get_waves_all_user2(
+        cls: Type[T_User],
+        session: AsyncSession
+    ) -> List[T_User]:
+        """
+        获取有token的玩家。
+        """
+        sql = select(cls).where(
+            and_(
+                cls.cookie != null(), cls.cookie != '', cls.user_id != null(), cls.user_id != ''
+            )
+        )
+        result = await session.execute(sql)
+        data = result.scalars().all()
+        return data
+
+    @classmethod
     async def get_all_push_user_list(cls: Type[T_User]) -> List[T_User]:
         data = await cls.get_waves_all_user()
         return [user for user in data if user.push_switch != 'off']
