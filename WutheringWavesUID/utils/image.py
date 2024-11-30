@@ -24,6 +24,7 @@ RED = (255, 0, 0)
 BLUE = (1, 183, 255)
 GOLD = (224, 202, 146)
 SPECIAL_GOLD = (234, 183, 4)
+AMBER = (204, 140, 0)
 
 # 冷凝-凝夜白霜
 WAVES_FREEZING = (53, 152, 219)
@@ -62,7 +63,7 @@ CHAIN_COLOR = {
     2: WAVES_FREEZING,
     3: WAVES_SIERRA,
     4: WAVES_VOID,
-    5: WAVES_MOONLIT,
+    5: AMBER,
     6: WAVES_MOLTEN,
 }
 
