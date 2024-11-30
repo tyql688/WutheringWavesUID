@@ -71,4 +71,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '所有查询使用自己的ck',
         False,
     ),
+    'BotRank': GsBoolConfig(
+        'bot排行',
+        'bot排行',
+        False,
+    ),
 }

@@ -172,7 +172,7 @@ async def get_all_rank_info(users: List[WavesBind], char_id, find_char_id, rankD
     return rankInfoList
 
 
-async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
+async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: bool):
     char_id = char_name_to_char_id(char)
     if not char_id:
         return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！'
@@ -188,7 +188,10 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
         find_char_id = char_id
 
     # 获取群里的所有拥有该角色人的数据
-    users = await WavesBind.get_group_all_uid(ev.group_id)
+    if is_bot:
+        users = await WavesBind.get_all_data()
+    else:
+        users = await WavesBind.get_group_all_uid(ev.group_id)
     if not users:
         return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
 
@@ -353,7 +356,12 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str):
 
     if char_id in special_char_name:
         char_name = special_char_name[char_id]
-    title_draw.text((140, 260), f'{char_name}排行', 'black', waves_font_44, 'lm')
+
+    if is_bot:
+        title_name = f'{char_name}bot排行'
+    else:
+        title_name = f'{char_name}群排行'
+    title_draw.text((140, 260), f'{title_name}', 'black', waves_font_44, 'lm')
 
     img_temp = Image.new('RGBA', char_mask.size)
     img_temp.paste(title, (0, 0), char_mask.copy())
