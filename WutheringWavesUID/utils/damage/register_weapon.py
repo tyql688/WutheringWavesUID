@@ -433,6 +433,7 @@ class Weapon_21040016(WeaponAbstract):
         title = self.get_title()
         msg = f"施放共鸣解放时，自身共鸣解放伤害加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
 
 
 class Weapon_21040023(WeaponAbstract):
@@ -528,6 +529,18 @@ class Weapon_21050015(WeaponAbstract):
     type = 5
     name = "漪澜浮录"
 
+    # 造成普攻伤害时，普攻伤害加成提升3.2%，可叠加5层
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放普攻"""
+        if attr.char_damage != attack_damage:
+            return
+
+        dmg = f"{self.param(1)}*{self.param(2)}"
+        title = self.get_title()
+        msg = f"造成普攻伤害时，普攻伤害加成提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21050016(WeaponAbstract):
     id = 21050016
@@ -620,6 +633,15 @@ class Weapon_21050074(WeaponAbstract):
     id = 21050074
     type = 5
     name = "清音"
+
+    # 施放共鸣解放时，自身攻击提升15%，持续15秒。
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣解放"""
+        dmg = f"{self.param(0)}"
+        title = self.get_title()
+        msg = f"施放共鸣解放时，自身攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
 
 
 class Weapon_21050084(WeaponAbstract):
