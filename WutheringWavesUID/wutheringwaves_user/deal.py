@@ -6,6 +6,7 @@ from ..utils import hint
 from ..utils.api.model import KuroRoleInfo
 from ..utils.database.models import WavesUser, WavesBind
 from ..utils.error_reply import WAVES_CODE_101, ERROR_CODE, WAVES_CODE_103
+from ..utils.refresh_char_detail import refresh_char
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 
@@ -43,6 +44,8 @@ async def add_cookie(ev: Event, ck: str):
     res = await WavesBind.insert_waves_uid(ev.user_id, ev.bot_id, data.roleId, ev.group_id, lenth_limit=9)
     if res == 0 or res == -2:
         await WavesBind.switch_uid_by_game(ev.user_id, ev.bot_id, data.roleId)
+
+    await refresh_char(data.roleId, ck)
 
     return f'[鸣潮] 特征码[{data.roleId}]绑定Token成功!\n使用【{PREFIX}查看】查看已绑定的特征码\n使用【{PREFIX}开启自动签到】开启游戏内每天的自动签到功能\n使用【{PREFIX}刷新面板】更新角色面板\n更新角色面板后可以使用【{PREFIX}暗主排行】查询暗主排行\n'
 

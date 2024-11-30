@@ -21,6 +21,7 @@ from ..utils.database.models import WavesUser, WavesBind
 from ..utils.fonts.waves_fonts import waves_font_40, waves_font_25
 from ..utils.image import get_waves_bg, add_footer
 from ..utils.kuro_api import kuro_api
+from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.RESOURCE_PATH import waves_templates
 from ..utils.util import get_public_ip
 from ..wutheringwaves_config import WutheringWavesConfig, PREFIX
@@ -177,6 +178,7 @@ async def add_cookie(ev, token) -> Union[WavesUser, None]:
             data = await WavesBind.insert_waves_uid(ev.user_id, ev.bot_id, user.uid, ev.group_id, lenth_limit=9)
             if data == 0 or data == -2:
                 await WavesBind.switch_uid_by_game(ev.user_id, ev.bot_id, user.uid)
+            await refresh_char(user.uid, token)
         return user
     return None
 
