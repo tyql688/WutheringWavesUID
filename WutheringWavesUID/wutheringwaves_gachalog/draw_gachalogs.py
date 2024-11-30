@@ -53,20 +53,24 @@ def get_level_from_list(ast: int, lst: List) -> int:
 
 
 async def draw_card_help():
-    card_img = get_waves_bg(850, 330)
-    card_draw = ImageDraw.Draw(card_img)
+    android = '安卓手机获取链接方式\n\n1.打开游戏抽卡界面\n2.关闭网络或打开飞行模式\n3.点开换取记录\n4.长按左上角区域，全选，复制'
+    ios = '苹果手机获取方式\n\n1.使用Stream抓包（详细教程网上搜索）\n2.关键字搜索:[game2]的请求\n3.点击“请求”\n4点击最下方的"查看JSON"，全选，复制\n\n国服域名：[gmserver-api.aki-game2.com]\n国际服域名：[gmserver-api.aki-game2.net]'
+    pc = 'PC获取方式\n\n1.打开游戏抽卡界面，点开换取记录\n2.在鸣潮安装的目录下进入目录："Wuthering Waves\Wuthering Waves Game\Client\Saved\Logs"\n3.找到文件"Client.log"并用记事本打开\n4.搜索关键字：aki-gm-resources.aki-game\n5.复制一整行链接'
 
-    card_draw.text((20, 50), "抽卡帮助（私聊", "white", waves_font_40, 'lm')
     text = [
-        '1. http格式: ww导入抽卡链接 https://......record_id=5e4d436ea1',
-        '2. json格式: ww导入抽卡链接 {"recordId":"5e4d436ea1"}',
-        '3. 手动格式: ww导入抽卡链接 recordId=5e4d436ea1',
-        '4. 直接格式: ww导入抽卡链接 5e4d436ea1'
+        '如何导入抽卡记录',
+        '',
+        f'使用命令【{PREFIX}导入抽卡链接 + 你复制的内容】即可开始进行抽卡分析',
+        '',
+        f'抽卡链接具有有效期，请在有效期内尽快导入'
     ]
-    for i, t in enumerate(text):
-        card_draw.text((20, 100 + i * 50), t, "white", waves_font_25, 'lm')
-    card_img = add_footer(card_img, 600, 20)
-    return await convert_img(card_img)
+    msg = [
+        android,
+        ios,
+        pc,
+        '\n'.join(text)
+    ]
+    return msg
 
 
 async def draw_card(uid: int, ev: Event):
