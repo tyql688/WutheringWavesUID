@@ -343,6 +343,8 @@ async def single_task(
         private_msgs[qid].append(
             {'bot_id': bot_id, 'uid': uid, 'msg': [MessageSegment.text(im)]}
         )
+    elif gid == 'off':
+        pass
     else:
         # 向群消息推送列表添加这个群
         if gid not in group_msgs:
@@ -350,7 +352,7 @@ async def single_task(
                 'bot_id': bot_id,
                 'success': 0,
                 'failed': 0,
-                'push_message': '',
+                'push_message': [],
             }
             group_msgs[gid]['success'] += 1
 
@@ -457,9 +459,9 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
                 private_msgs,
                 group_msgs,
             ))
-        if len(tasks) >= 20:
+        if len(tasks) >= 1:
             await asyncio.gather(*tasks)
-            delay = 1 + random.randint(3, 5)
+            delay = 1 + random.randint(1, 2)
             logger.info(
                 f'[鸣潮] [社区签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
             )
@@ -525,6 +527,8 @@ async def single_daily_sign(
         private_msgs[qid].append(
             {'bot_id': bot_id, 'uid': uid, 'msg': [MessageSegment.text(im)]}
         )
+    if gid == 'off':
+        pass
     else:
         # 向群消息推送列表添加这个群
         if gid not in group_msgs:
@@ -532,7 +536,7 @@ async def single_daily_sign(
                 'bot_id': bot_id,
                 'success': 0,
                 'failed': 0,
-                'push_message': '',
+                'push_message': [],
             }
         if im.startswith(('签到失败', '网络有点忙', 'OK', 'ok')):
             group_msgs[gid]['failed'] += 1
@@ -563,9 +567,9 @@ async def daily_sign_action(expiregid2uid, user_list):
                 group_msgs,
             )
         )
-        if len(tasks) >= 20:
+        if len(tasks) >= 1:
             await asyncio.gather(*tasks)
-            delay = 1 + random.randint(3, 5)
+            delay = 1 + random.randint(1, 2)
             logger.debug(
                 f'[鸣潮] [签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
             )
