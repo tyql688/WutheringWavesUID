@@ -44,7 +44,7 @@ def get_refresh_role_img():
 
 
 async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: str):
-    ck = await waves_api.get_ck(uid)
+    self_ck, ck = await waves_api.get_ck_result(uid)
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 账户数据
@@ -78,6 +78,25 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     role_len = len(role_detail_list)
     # 刷新个数
     role_update = len(waves_map['refresh_update'])
+    if role_update == 0:
+        at_sender = True if ev.group_id else False
+        if self_ck:
+            msg = [
+                '[鸣潮]当前暂无数据更新',
+                '游戏内更换声骸后，数据同步到库街区有[5分钟]延迟，请耐心等待',
+                ''
+            ]
+        else:
+            msg = [
+                '[鸣潮]您当前仅绑定鸣潮特征码且当前暂无数据更新',
+                '游戏内更换声骸后，数据同步到库街区有[5分钟]延迟',
+                '',
+                '解决办法',
+                f'1.在库街区点开鸣潮数据卡片，确认库街区数据已刷新，再发送命令【{PREFIX}刷新面板】进行数据同步',
+                f'2.使用命令【{PREFIX}登录】后，直接同步库街区数据，不必手动操作[解决办法1]',
+                ''
+            ]
+        await bot.send('\n'.join(msg), at_sender=at_sender)
     role_high = role_len // 6 + (0 if role_len % 6 == 0 else 1)
     img = get_waves_bg(2000, 470 + 50 + role_high * 330, 'bg3')
     img.alpha_composite(get_refresh_role_img(), (0, 0))
