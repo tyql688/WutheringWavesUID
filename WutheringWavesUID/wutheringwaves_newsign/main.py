@@ -354,6 +354,7 @@ async def single_task(
                 'failed': 0,
                 'push_message': [],
             }
+        else:
             group_msgs[gid]['success'] += 1
 
 
@@ -366,27 +367,27 @@ async def auto_sign_task():
         _user_list: List[WavesUser] = await WavesUser.get_waves_all_user2()
         bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list = await process_all_users(_user_list)
 
-    bbs_success = 0
-    bbs_fail = 0
+    sign_success = 0
+    sign_fail = 0
     if WutheringWavesConfig.get_config('SchedSignin').data:
         logger.info('[鸣潮] [定时签到] 开始执行!')
         result, num = await daily_sign_action(sign_expiregid2uid, sign_user_list)
         if not IS_REPORT:
             result['private_msg_dict'] = {}
         await send_board_cast_msg(result)
-        bbs_success = num['success_num']
-        bbs_fail = num['failed_num']
+        sign_success = num['success_num']
+        sign_fail = num['failed_num']
 
-    sign_success = 0
-    sign_fail = 0
+    bbs_success = 0
+    bbs_fail = 0
     if WutheringWavesConfig.get_config('BBSSchedSignin').data:
         logger.info('[鸣潮] [定时社区签到] 开始执行!')
         result, num = await auto_bbs_task_action(bbs_expiregid2uid, bbs_user_list)
         if not IS_REPORT:
             result['private_msg_dict'] = {}
         await send_board_cast_msg(result)
-        sign_success = num['success_num']
-        sign_fail = num['failed_num']
+        bbs_success = num['success_num']
+        bbs_fail = num['failed_num']
 
     try:
         config_masters = core_config.get_config('masters')
@@ -664,6 +665,9 @@ async def do_sign_task(bot: Bot, ev: Event):
             continue
 
         valid_ck_list.append((uid, ck))
+
+    if len(valid_ck_list) == 0:
+        return ERROR_CODE[WAVES_CODE_102]
 
     form_result = {}
     for uid, token in valid_ck_list:
