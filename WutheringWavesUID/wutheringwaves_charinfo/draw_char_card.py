@@ -640,7 +640,7 @@ async def draw_char_score_img(ev: Event, uid: str, char: str, waves_id: Optional
         return role_detail
 
     # 创建背景
-    img = get_waves_bg(1200, 3300, 'bg3')
+    img = get_waves_bg(1200, 3380, 'bg3')
     # 固定位置
     await draw_fixed_img(img, avatar, account_info, role_detail)
 
@@ -651,7 +651,7 @@ async def draw_char_score_img(ev: Event, uid: str, char: str, waves_id: Optional
 
     phantom_temp = Image.new('RGBA', (1200, 1380))
     right_image_temp = Image.new('RGBA', (600, 1100))
-    introduce_temp = Image.new('RGBA', (1500, 800), (0, 0, 0, 0))
+    introduce_temp = Image.new('RGBA', (1500, 880), (0, 0, 0, 0))
 
     ph_0 = Image.open(TEXT_PATH / 'ph_0.png')
     ph_1 = Image.open(TEXT_PATH / 'ph_1.png')
@@ -848,7 +848,7 @@ async def draw_char_score_img(ev: Event, uid: str, char: str, waves_id: Optional
 
 async def draw_weight(image, role_name, weight_list_temp, calc_temp):
     draw = ImageDraw.Draw(image)
-    draw.rectangle([10, 10, 1490, 790], fill=(0, 0, 0, int(0.7 * 255)))
+    draw.rectangle([10, 10, 1490, 870], fill=(0, 0, 0, int(0.7 * 255)))
 
     # 设置表格参数
     cell_width = 230
@@ -894,6 +894,11 @@ async def draw_weight(image, role_name, weight_list_temp, calc_temp):
     # 添加其他
     text = f"词条得分：词条数值 * 当前词条权重 / 声骸未对齐最高分 * 对齐分数(50)"
     draw.text((start_x, 750), text, font=waves_font_24, fill='white')
+    s = calc_temp['total_grade']
+    text = f"声骸评分标准：SSS≥{s[-1] * 250:.2f}分/ SS≥{s[-2] * 250:.2f}分／S≥{s[-3] * 250:.2f}分 / A≥{s[-4] * 250:.2f}分 / B≥{s[-5] * 250:.2f}分 / C"
+    draw.text((start_x, 800), text, font=waves_font_24, fill='white')
+    text = f"当前角色评分标准仅供参考与娱乐，不代表任何官方或权威的评价。"
+    draw.text((start_x, 850), text, font=waves_font_24, fill='white')
 
 
 async def draw_pic_with_ring(ev: Event):
