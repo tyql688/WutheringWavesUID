@@ -22,7 +22,7 @@ from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_1
     waves_font_24, waves_font_20, waves_font_44
 from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_GOLD, \
     get_square_weapon, CHAIN_COLOR, get_attribute, get_role_pile, WAVES_ECHO_MAP, get_attribute_effect, \
-    change_color, GREY
+    change_color, GREY, RED
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..wutheringwaves_config import PREFIX
 
@@ -53,6 +53,7 @@ card_sort_map = {
     '共鸣技能伤害加成': '0.0%',
     '共鸣解放伤害加成': '0.0%'
 }
+rank_length = 20  # 排行长度
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 TITLE_I = Image.open(TEXT_PATH / 'title.png')
 TITLE_II = Image.open(TEXT_PATH / 'title2.png')
@@ -68,7 +69,7 @@ logo_img = Image.open(TEXT_PATH / f'logo_small_2.png')
 class RankInfo(BaseModel):
     roleDetail: RoleDetailData  # 角色明细
     qid: str  # qq id
-    uid: int  # uid
+    uid: str  # uid
     level: int  # 角色等级
     chain: int  # 命座
     chainName: str  # 命座
@@ -195,10 +196,11 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     if not users:
         return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
 
+    self_uid = None
     try:
-        uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
-        if uid:
-            role_detail: RoleDetailData = await find_role_detail(uid, find_char_id)
+        self_uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
+        if self_uid:
+            role_detail: RoleDetailData = await find_role_detail(self_uid, find_char_id)
             char_id = str(role_detail.role.roleId)
     except Exception as _:
         pass
@@ -213,9 +215,15 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     else:
         rankInfoList.sort(key=lambda i: (i.expected_damage_int, i.score, i.level, i.chain), reverse=True)
 
-    rankInfoList = rankInfoList[:20]
-    totalNum = len(rankInfoList)
+    rankId, rankInfo = next(
+        ((rankId, rankInfo) for rankId, rankInfo in enumerate(rankInfoList, start=1) if rankInfo.uid == self_uid),
+        (None, None))
 
+    rankInfoList = rankInfoList[:rank_length]
+    if rankId is not None and rankId > rank_length:
+        rankInfoList.append(rankInfo)
+
+    totalNum = len(rankInfoList)
     title_h = 500
     bar_star_h = 110
     h = title_h + totalNum * bar_star_h + 80
@@ -238,9 +246,6 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         bar_star_draw = ImageDraw.Draw(bar_bg)
         # role_avatar = await get_avatar(ev, rank.qid, role_detail.role.roleId)
         bar_bg.paste(role_avatar, (100, 0), role_avatar)
-
-        # uid
-        bar_star_draw.text((210, 75), f"{rank.uid}", 'white', waves_font_20, 'lm')
 
         role_attribute = await get_attribute(role_detail.role.attributeName, is_simple=True)
         role_attribute = role_attribute.resize((40, 40)).convert('RGBA')
@@ -327,7 +332,17 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
             rank_color = (185, 106, 217)
         info_block_draw.rounded_rectangle([0, 0, 50, 50], radius=8, fill=rank_color + (int(0.9 * 255),))
 
-        info_block_draw.text((24, 24), f'{index + 1}', 'white', waves_font_34, 'mm')
+        rank_id = index + 1
+        if rank_id > rank_length:
+            rank_id = rankId
+        info_block_draw.text((24, 24), f'{rank_id}', 'white', waves_font_34, 'mm')
+
+        # uid
+        uid_color = 'white'
+        if rankId == rank_id:
+            uid_color = RED
+        bar_star_draw.text((210, 75), f"{rank.uid}", uid_color, waves_font_20, 'lm')
+
         bar_bg.alpha_composite(info_block, (40, 30))
 
         # 贴到背景

@@ -1,7 +1,6 @@
 import re
 
 from gsuid_core.bot import Bot
-from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from .darw_rank_card import draw_rank_img
@@ -22,7 +21,6 @@ async def send_rank_card(bot: Bot, ev: Event):
     ev.regex_dict = match.groupdict()
     char = match.group('char')
     is_bot = match.group('is_bot') == 'bot'
-    logger.debug(f"[GsCore] 角色排行{is_bot}")
 
     if not WutheringWavesConfig.get_config('BotRank').data:
         is_bot = False
