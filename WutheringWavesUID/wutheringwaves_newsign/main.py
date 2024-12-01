@@ -311,6 +311,7 @@ async def single_task(
     ck: str,
     private_msgs: Dict,
     group_msgs: Dict,
+    all_msgs: Dict,
 ):
     im = await do_single_task(uid, ck)
     if not im:
@@ -343,8 +344,9 @@ async def single_task(
         private_msgs[qid].append(
             {'bot_id': bot_id, 'uid': uid, 'msg': [MessageSegment.text(im)]}
         )
+        all_msgs['success'] += 1
     elif gid == 'off':
-        pass
+        all_msgs['success'] += 1
     else:
         # 向群消息推送列表添加这个群
         if gid not in group_msgs:
@@ -354,8 +356,9 @@ async def single_task(
                 'failed': 0,
                 'push_message': [],
             }
-        else:
-            group_msgs[gid]['success'] += 1
+
+        group_msgs[gid]['success'] += 1
+        all_msgs['success'] += 1
 
 
 async def auto_sign_task():
@@ -456,6 +459,7 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
     tasks = []
     private_msgs = {}
     group_msgs = {}
+    all_msgs = {'failed': 0, 'success': 0}
 
     for user in user_list:
         tasks.append(
@@ -467,6 +471,7 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
                 user.cookie,
                 private_msgs,
                 group_msgs,
+                all_msgs,
             ))
         if len(tasks) >= 50:
             await asyncio.gather(*tasks)
@@ -521,8 +526,10 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
     }
 
     num = {
-        'failed_num': failed_num,
-        'success_num': success_num
+        'failed_num': all_msgs['failed'],
+        'success_num': all_msgs['success'],
+        'push_success_num': success_num,
+        'push_failed_num': failed_num,
     }
 
     logger.info(result)
@@ -537,6 +544,7 @@ async def single_daily_sign(
     ck: str,
     private_msgs: Dict,
     group_msgs: Dict,
+    all_msgs: Dict,
 ):
     im = await sign_in(uid, ck)
     if gid == 'on':
@@ -545,8 +553,9 @@ async def single_daily_sign(
         private_msgs[qid].append(
             {'bot_id': bot_id, 'uid': uid, 'msg': [MessageSegment.text(im)]}
         )
-    if gid == 'off':
-        pass
+        all_msgs['success'] += 1
+    elif gid == 'off':
+        all_msgs['success'] += 1
     else:
         # 向群消息推送列表添加这个群
         if gid not in group_msgs:
@@ -567,12 +576,14 @@ async def single_daily_sign(
             )
         else:
             group_msgs[gid]['success'] += 1
+            all_msgs['success'] += 1
 
 
 async def daily_sign_action(expiregid2uid, user_list):
     tasks = []
     private_msgs = {}
     group_msgs = {}
+    all_msgs = {'failed': 0, 'success': 0}
     for user in user_list:
         tasks.append(
             single_daily_sign(
@@ -583,6 +594,7 @@ async def daily_sign_action(expiregid2uid, user_list):
                 user.cookie,
                 private_msgs,
                 group_msgs,
+                all_msgs,
             )
         )
         if len(tasks) >= 50:
@@ -637,8 +649,10 @@ async def daily_sign_action(expiregid2uid, user_list):
     }
 
     num = {
-        'failed_num': failed_num,
-        'success_num': success_num
+        'failed_num': all_msgs['failed'],
+        'success_num': all_msgs['success'],
+        'push_success_num': success_num,
+        'push_failed_num': failed_num,
     }
 
     logger.info(result)
