@@ -321,8 +321,6 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
             bar_star_draw.text((870, 75), f'{damage_title}', 'white', waves_font_16, 'mm')
 
         # 排名
-        info_block = Image.new("RGBA", (50, 50), color=(255, 255, 255, 0))
-        info_block_draw = ImageDraw.Draw(info_block)
         rank_color = (54, 54, 54)
         if index == 0:
             rank_color = (255, 0, 0)
@@ -330,20 +328,31 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
             rank_color = (255, 180, 0)
         elif index == 2:
             rank_color = (185, 106, 217)
-        info_block_draw.rounded_rectangle([0, 0, 50, 50], radius=8, fill=rank_color + (int(0.9 * 255),))
+
+        def draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30)):
+            info_rank = Image.new("RGBA", size, color=(255, 255, 255, 0))
+            rank_draw = ImageDraw.Draw(info_rank)
+            rank_draw.rounded_rectangle([0, 0, size[0], size[1]], radius=8, fill=rank_color + (int(0.9 * 255),))
+            rank_draw.text(draw, f'{rank_id}', 'white', waves_font_34, 'mm')
+            bar_bg.alpha_composite(info_rank, dest)
 
         rank_id = index + 1
         if rank_id > rank_length:
             rank_id = rankId
-        info_block_draw.text((24, 24), f'{rank_id}', 'white', waves_font_34, 'mm')
+
+        if rank_id > 999:
+            rank_id = '999+'
+            draw_rank_id(rank_id, size=(100, 50), draw=(50, 24), dest=(10, 30))
+        elif rank_id > 99:
+            draw_rank_id(rank_id, size=(75, 50), draw=(37, 24), dest=(25, 30))
+        else:
+            draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30))
 
         # uid
         uid_color = 'white'
         if rankId == rank_id:
             uid_color = RED
         bar_star_draw.text((210, 75), f"{rank.uid}", uid_color, waves_font_20, 'lm')
-
-        bar_bg.alpha_composite(info_block, (40, 30))
 
         # 贴到背景
         card_img.paste(bar_bg, (0, title_h + index * bar_star_h), bar_bg)
