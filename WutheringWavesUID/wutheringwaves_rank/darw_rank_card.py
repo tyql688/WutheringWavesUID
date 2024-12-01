@@ -341,8 +341,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
             rank_id = rankId
 
         if rank_id > 999:
-            rank_id = '999+'
-            draw_rank_id(rank_id, size=(100, 50), draw=(50, 24), dest=(10, 30))
+            draw_rank_id("999+", size=(100, 50), draw=(50, 24), dest=(10, 30))
         elif rank_id > 99:
             draw_rank_id(rank_id, size=(75, 50), draw=(37, 24), dest=(25, 30))
         else:
@@ -357,8 +356,12 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         # 贴到背景
         card_img.paste(bar_bg, (0, title_h + index * bar_star_h), bar_bg)
 
-        total_score += rank.score
-        total_damage += rank.expected_damage_int
+        if rank_id <= rank_length:
+            total_score += rank.score
+            total_damage += rank.expected_damage_int
+
+    if rankId and rankId > rank_length:
+        totalNum -= 1
 
     avg_score = f"{total_score / totalNum:.1f}" if totalNum != 0 else "0"
     avg_damage = f"{total_damage / totalNum:,.0f}" if totalNum != 0 else "0"
