@@ -8,7 +8,7 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import AccountBaseInfo, RoleDetailData
-from ..utils.database.models import WavesBind
+from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.expression_ctx import get_waves_char_rank, WavesCharRank
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_40, \
@@ -82,20 +82,32 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
         at_sender = True if ev.group_id else False
         if self_ck:
             msg = [
-                '[鸣潮]当前暂无数据更新',
-                '游戏内更换声骸后，数据同步到库街区有[5分钟]延迟，请耐心等待',
+                '[鸣潮]',
+                '>当前暂无数据更新',
+                '>游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟，请耐心等待',
                 ''
             ]
         else:
-            msg = [
-                '[鸣潮]您当前仅绑定鸣潮特征码且当前暂无数据更新',
-                '游戏内更换声骸后，数据同步到库街区有[5分钟]延迟',
-                '',
-                '解决办法',
-                f'1.在库街区点开鸣潮数据卡片，确认库街区数据已刷新，再发送命令【{PREFIX}刷新面板】进行数据同步',
-                f'2.使用命令【{PREFIX}登录】后，直接同步库街区数据，不必手动操作[解决办法1]',
-                ''
-            ]
+            cookie = await WavesUser.get_user_cookie_by_uid(uid)
+            if cookie:
+                msg = [
+                    '[鸣潮]',
+                    '>您当前登录状态已失效',
+                    f'>使用命令【{PREFIX}登录】重新登录',
+                    '>游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟，请耐心等待',
+                    '',
+                ]
+            else:
+                msg = [
+                    '[鸣潮]',
+                    '>您当前为仅绑定鸣潮特征码且当前暂无数据更新',
+                    '>游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟',
+                    f'>请确认库街区[鸣潮]数据更新后再进行【{PREFIX}刷新面板】',
+                    '',
+                    '自动同步（推荐）',
+                    f'>使用命令【{PREFIX}登录】后，直接同步库街区数据，不必手动确认',
+                    ''
+                ]
         await bot.send('\n'.join(msg), at_sender=at_sender)
     role_high = role_len // 6 + (0 if role_len % 6 == 0 else 1)
     img = get_waves_bg(2000, 470 + 50 + role_high * 330, 'bg3')

@@ -109,8 +109,20 @@ async def page_login(bot: Bot, ev: Event):
                         if data.get("ck"):
                             waves_user = await add_cookie(ev, data['ck'])
                             if waves_user:
+                                msg = [
+                                    f'[鸣潮] 特征码[{waves_user.uid}]登录成功! ',
+                                    f'当前账号已进入托管状态，请勿登录相似程序，导致token失效',
+                                    '',
+                                    f'>使用【{PREFIX}获取token】获取已绑定token列表（建议私聊使用',
+                                    f'>使用【{PREFIX}查看】查看已绑定的特征码',
+                                    f'>使用【{PREFIX}开启自动签到】开启游戏内每天的自动签到功能',
+                                    f'>使用【{PREFIX}刷新面板】更新角色面板',
+                                    f'>更新角色面板后可以使用【{PREFIX}暗主排行】查询暗主排行',
+                                    ''
+                                ]
+
                                 return await bot.send(
-                                    f"[鸣潮] 特征码[{waves_user.uid}]登录成功! \n使用【{PREFIX}查看】查看已绑定的特征码\n使用【{PREFIX}开启自动签到】开启游戏内每天的自动签到功能\n使用【{PREFIX}刷新面板】更新角色面板\n更新角色面板后可以使用【{PREFIX}暗主排行】查询暗主排行\n",
+                                    '\n'.join(msg),
                                     at_sender=at_sender)
                             else:
                                 await bot.send(
