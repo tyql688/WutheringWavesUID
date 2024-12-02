@@ -1,6 +1,6 @@
 from .damage import DamageAttribute
 from .utils import CHAR_ATTR_SIERRA, CHAR_ATTR_SINKING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID, liberation_damage, \
-    attack_damage, hit_damage, skill_damage
+    attack_damage, hit_damage, skill_damage, CHAR_ATTR_CELESTIAL
 from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
 
 
@@ -309,6 +309,18 @@ class Echo_6000045(EchoAbstract):
     id = 6000045
     name = "哀声鸷"
 
+    # 自身衍射伤害加成提升12.00%，共鸣解放伤害加成提升12.00%
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.char_attr == CHAR_ATTR_CELESTIAL:
+            title = self.name
+            msg = '衍射伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
+
+        if attr.char_damage == liberation_damage:
+            title = self.name
+            msg = '共鸣解放伤害加成提升12.00%'
+            attr.add_dmg_bonus(0.12, title, msg)
+
 
 class Echo_6000046(EchoAbstract):
     id = 6000046
@@ -398,7 +410,7 @@ class Echo_6000060(EchoAbstract):
     #     attr.add_atk_percent(0.1, title, msg)
 
 
-class Echo_6000145(EchoAbstract):
+class Echo_6000145(Echo_6000045):
     id = 6000145
     name = "异相·哀声鸷"
 
