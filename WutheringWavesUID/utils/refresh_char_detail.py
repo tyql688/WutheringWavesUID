@@ -5,6 +5,7 @@ from typing import List, Union, Dict
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
+from .simple_async_cache_card import card_cache
 from ..utils.api.model import RoleList
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_101
 from ..utils.hint import error_reply
@@ -39,8 +40,12 @@ async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
 
         old_data[role_id] = item
 
+    save_data = list(old_data.values())
+    # 保存缓存
+    await card_cache.set(uid, save_data)
+    
     with Path.open(path, "wb") as file:
-        file.write(msgjson.format(msgjson.encode(list(old_data.values()))))
+        file.write(msgjson.format(msgjson.encode(save_data)))
 
     if waves_map:
         waves_map['refresh_update'] = refresh_update

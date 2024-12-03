@@ -1,9 +1,17 @@
+import asyncio
+import json
+from pathlib import Path
+
+import aiofiles
+
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from ..utils import hakush_api
+from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.resource.download_all_resource import download_all_resource
+from ..utils.simple_async_cache_card import AsyncCache, card_cache
 from ..wutheringwaves_config import PREFIX
 
 sv_download_config = SV('下载资源', pm=2)
@@ -29,3 +37,42 @@ async def startup():
         '[鸣潮][资源文件下载] 正在检查与下载缺失的资源文件，可能需要较长时间，请稍等'
     )
     logger.info(f'[鸣潮][资源文件下载] {await download_all_resource()}')
+    logger.info(f'[鸣潮][加载用户面板缓存] 数量: {await load_all_card()}')
+
+
+async def load_player_data(file_path: Path, cache: AsyncCache):
+    """
+    加载单个 rawData.json 文件并存入缓存。
+
+    :param file_path: 文件路径。
+    :param cache: 异步缓存对象。
+    """
+    try:
+        uid = file_path.parent.name  # UID 是父目录的名称
+        async with aiofiles.open(file_path, mode='r', encoding='utf-8') as f:
+            raw_data = await f.read()
+        data = json.loads(raw_data)
+        await cache.set(uid, data)
+    except Exception as e:
+        logger.exception(f"Failed to load {file_path}: {e}")
+
+
+async def load_all_players(player_path: Path, cache: AsyncCache):
+    """
+    加载指定目录下所有 rawData.json 文件到缓存。
+
+    :param player_path: 玩家数据根目录。
+    :param cache: 异步缓存对象。
+    """
+    # 找到所有 rawData.json 文件
+    file_paths = list(player_path.glob("*/rawData.json"))
+
+    # 使用 asyncio.gather 并行加载文件
+    tasks = [load_player_data(file_path, cache) for file_path in file_paths]
+    await asyncio.gather(*tasks)
+
+
+async def load_all_card():
+    # 并行加载所有玩家数据
+    await load_all_players(PLAYER_PATH, card_cache)
+    return await card_cache.size()

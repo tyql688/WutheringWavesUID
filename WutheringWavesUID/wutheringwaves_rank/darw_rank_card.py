@@ -24,6 +24,7 @@ from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_G
     get_square_weapon, CHAIN_COLOR, get_attribute, get_role_pile, WAVES_ECHO_MAP, get_attribute_effect, \
     change_color, GREY, RED
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
+from ..utils.simple_async_cache_card import card_cache
 from ..wutheringwaves_config import PREFIX
 
 special_char = {
@@ -89,12 +90,24 @@ async def find_role_detail(uid: str, char_id: Union[int, List[int]]) -> Optional
     return next((role for role in role_details if str(role.role.roleId) in char_id), None)
 
 
+async def find_role_detail_cache(uid: str, char_id: Union[int, List[int]]) -> Optional[RoleDetailData]:
+    role_details = await card_cache.get(uid)
+    if role_details is None:
+        return None
+    role_details = iter(RoleDetailData(**r) for r in role_details)
+    if role_details is None:
+        return None
+
+    # 使用生成器来进行过滤
+    return next((role for role in role_details if str(role.role.roleId) in char_id), None)
+
+
 async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDetail):
     rankInfoList = []
     if not user.uid:
         return rankInfoList
 
-    tasks = [find_role_detail(uid, find_char_id) for uid in user.uid.split('_')]
+    tasks = [find_role_detail_cache(uid, find_char_id) for uid in user.uid.split('_')]
     role_details = await asyncio.gather(*tasks)
 
     for uid, role_detail in zip(user.uid.split('_'), role_details):
