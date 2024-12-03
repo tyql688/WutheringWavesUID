@@ -348,7 +348,7 @@ async def draw_fixed_img(img, avatar, account_info, role_detail):
     img.paste(char_fg, (25, 170), char_fg)
 
 
-async def draw_char_detail_img(ev: Event, uid: str, char: str, waves_id: Optional[str] = None):
+async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id: Optional[str] = None):
     char, damageId = parse_text_and_number(char)
 
     char_id = char_name_to_char_id(char)
@@ -377,7 +377,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, waves_id: Optiona
         if damageId and not damageDetail:
             return f'[鸣潮] 角色【{char_name}】暂不支持伤害计算！\n'
 
-    ck = await waves_api.get_ck(uid)
+    ck = await waves_api.get_ck(uid, user_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
     # 账户数据
@@ -616,14 +616,14 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, waves_id: Optiona
     return img
 
 
-async def draw_char_score_img(ev: Event, uid: str, char: str, waves_id: Optional[str] = None):
+async def draw_char_score_img(ev: Event, uid: str, char: str, user_id: str, waves_id: Optional[str] = None):
     char, damageId = parse_text_and_number(char)
 
     char_id = char_name_to_char_id(char)
     if not char_id:
         return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
     char_name = alias_to_char_name(char)
-    ck = await waves_api.get_ck(uid)
+    ck = await waves_api.get_ck(uid, user_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
 

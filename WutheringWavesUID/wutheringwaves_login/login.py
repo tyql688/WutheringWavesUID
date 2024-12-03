@@ -190,7 +190,7 @@ async def add_cookie(ev, token) -> Union[WavesUser, None]:
             data = await WavesBind.insert_waves_uid(ev.user_id, ev.bot_id, user.uid, ev.group_id, lenth_limit=9)
             if data == 0 or data == -2:
                 await WavesBind.switch_uid_by_game(ev.user_id, ev.bot_id, user.uid)
-            await refresh_char(user.uid, token)
+            await refresh_char(user.uid, ev.user_id, token)
         return user
     return None
 

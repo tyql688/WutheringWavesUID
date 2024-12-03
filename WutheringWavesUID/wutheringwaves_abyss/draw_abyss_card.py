@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union, Optional
+from typing import Union
 
 from PIL import Image, ImageDraw
 
@@ -53,10 +53,9 @@ async def get_abyss_data(uid: str, ck: str, is_self_ck: bool):
 async def draw_abyss_img(
     ev: Event,
     uid: str,
-    floor: Optional[int] = None,
-    schedule_type: str = '1',
+    user_id: str
 ) -> Union[bytes, str]:
-    is_self_ck, ck = await waves_api.get_ck_result(uid)
+    is_self_ck, ck = await waves_api.get_ck_result(uid, user_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
 

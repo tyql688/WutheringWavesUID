@@ -41,7 +41,7 @@ async def send_waves_del_ck_msg(bot: Bot, ev: Event):
     f'{PREFIX}获取Token', f'{PREFIX}获取token', f'{PREFIX}获取TOKEN'
 ),
     block=True)
-async def send_waves_del_ck_msg(bot: Bot, ev: Event):
+async def send_waves_get_ck_msg(bot: Bot, ev: Event):
     await bot.send(await get_cookie(bot, ev))
 
 

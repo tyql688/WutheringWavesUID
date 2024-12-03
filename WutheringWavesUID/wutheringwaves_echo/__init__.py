@@ -29,5 +29,5 @@ async def send_echo_list_msg(bot: Bot, ev: Event):
     await WavesBind.insert_waves_uid(user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9)
 
     #
-    im = await get_draw_list(ev, uid)
+    im = await get_draw_list(ev, uid, user_id)
     return await bot.send(im)

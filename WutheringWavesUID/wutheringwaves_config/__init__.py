@@ -22,7 +22,7 @@ async def open_switch_func(bot: Bot, ev: Event):
         return await bot.send(f"您还未绑定鸣潮特征码, 请使用【{PREFIX}绑定uid】完成绑定！", at_sender)
 
     from ..utils.waves_api import waves_api
-    ck = await waves_api.get_self_waves_ck(uid)
+    ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
     if not ck:
         from ..utils.error_reply import WAVES_CODE_102, ERROR_CODE
         return await bot.send(
@@ -53,7 +53,7 @@ async def send_config_ev(bot: Bot, ev: Event):
         im = await set_push_value(ev.bot_id, func, uid, int(value))
     elif '体力背景' in ev.text:
         from ..utils.waves_api import waves_api
-        ck = await waves_api.get_self_waves_ck(uid)
+        ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
         if not ck:
             from ..utils.error_reply import WAVES_CODE_102, ERROR_CODE
             return await bot.send(

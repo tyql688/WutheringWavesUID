@@ -80,21 +80,21 @@ class WavesApi:
         else:
             return SERVER_ID
 
-    async def get_ck_result(self, uid) -> (bool, str):
-        ck = await self.get_self_waves_ck(uid)
+    async def get_ck_result(self, uid, user_id) -> (bool, str):
+        ck = await self.get_self_waves_ck(uid, user_id)
         if ck:
             return True, ck
-        ck = await self.get_ck(uid)
+        ck = await self.get_ck(uid, user_id)
         return False, ck
 
-    async def get_ck(self, uid: str, mode: Literal['OWNER', 'RANDOM'] = 'RANDOM') -> Optional[str]:
+    async def get_ck(self, uid: str, user_id, mode: Literal['OWNER', 'RANDOM'] = 'RANDOM') -> Optional[str]:
         if mode == 'RANDOM':
-            return await self.get_waves_random_cookie(uid)
+            return await self.get_waves_random_cookie(uid, user_id)
         else:
-            return await self.get_self_waves_ck(uid)
+            return await self.get_self_waves_ck(uid, user_id)
 
-    async def get_self_waves_ck(self, uid: str) -> Optional[str]:
-        cookie = await WavesUser.get_user_cookie_by_uid(uid)
+    async def get_self_waves_ck(self, uid: str, user_id) -> Optional[str]:
+        cookie = await WavesUser.select_cookie(user_id, uid)
         if not cookie:
             return
 
@@ -109,9 +109,9 @@ class WavesApi:
 
         return cookie
 
-    async def get_waves_random_cookie(self, uid: str) -> Optional[str]:
+    async def get_waves_random_cookie(self, uid: str, user_id: str) -> Optional[str]:
         # 有绑定自己CK 并且该CK有效的前提下，优先使用自己CK
-        ck = await self.get_self_waves_ck(uid)
+        ck = await self.get_self_waves_ck(uid, user_id)
         if ck:
             return ck
 

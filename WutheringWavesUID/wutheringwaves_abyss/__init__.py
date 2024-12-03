@@ -38,7 +38,7 @@ async def send_waves_abyss_info(bot: Bot, ev: Event):
         return await bot.send(error_reply(WAVES_CODE_103))
     await bot.logger.info(f'[鸣潮查询深渊信息]user_id:{user_id} uid: {uid}')
 
-    im = await draw_abyss_img(ev, uid)
+    im = await draw_abyss_img(ev, uid, user_id)
     if isinstance(im, str):
         at_sender = True if ev.group_id else False
         return await bot.send(im, at_sender)
@@ -64,5 +64,5 @@ async def send_waves_challenge_info(bot: Bot, ev: Event):
         return await bot.send(error_reply(WAVES_CODE_103))
     await bot.logger.info(f'[鸣潮查询全息战略信息]user_id:{user_id} uid: {uid}')
 
-    im = await draw_challenge_img(ev, uid)
+    im = await draw_challenge_img(ev, uid, user_id)
     return await bot.send(im)

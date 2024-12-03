@@ -4,7 +4,7 @@ from sqlalchemy import and_, or_, null
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Field, select, col
 
-from gsuid_core.utils.database.base_models import Bind, User, T_User, with_session, Push, T_Bind
+from gsuid_core.utils.database.base_models import Bind, User, T_User, with_session, Push, T_Bind, T_BaseModel
 from gsuid_core.utils.database.startup import exec_list
 from gsuid_core.webconsole.mount_app import PageSchema, GsAdminModel, site
 
@@ -144,6 +144,21 @@ class WavesUser(User, table=True):
     platform: str = Field(default="", title='ck平台')
     stamina_bg_value: str = Field(default="", title='体力背景')
     bbs_sign_switch: str = Field(default='off', title='自动社区签到')
+
+    @classmethod
+    @with_session
+    async def select_cookie(
+        cls: Type[T_BaseModel],
+        session: AsyncSession,
+        user_id: str,
+        uid: str,
+    ) -> str:
+        sql = select(cls).where(
+            cls.user_id == user_id, cls.uid == uid
+        )
+        result = await session.execute(sql)
+        data = result.scalars().all()
+        return data[0].cookie if data else None
 
     @classmethod
     @with_session

@@ -24,5 +24,5 @@ async def send_card_info(bot: Bot, ev: Event):
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))
 
-    msg = await draw_explore_img(ev, uid)
+    msg = await draw_explore_img(ev, uid, user_id)
     return await bot.send(msg)

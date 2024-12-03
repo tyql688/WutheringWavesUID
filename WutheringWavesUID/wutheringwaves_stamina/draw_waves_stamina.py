@@ -42,7 +42,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
         # 进行校验UID是否绑定CK
         valid_daily_list = []
         for uid in uid_list:
-            ck = await waves_api.get_self_waves_ck(uid)
+            ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
             if not ck:
                 continue
             succ, _ = await waves_api.refresh_data(uid, ck)

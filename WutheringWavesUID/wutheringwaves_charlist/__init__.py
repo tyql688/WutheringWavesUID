@@ -31,5 +31,5 @@ async def send_char_list_msg(bot: Bot, ev: Event):
     # 更新groupid
     await WavesBind.insert_waves_uid(user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9)
 
-    im = await draw_char_list_img(uid, ev)
+    im = await draw_char_list_img(uid, ev, user_id)
     return await bot.send(im)

@@ -43,7 +43,7 @@ async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
     save_data = list(old_data.values())
     # 保存缓存
     await card_cache.set(uid, save_data)
-    
+
     with Path.open(path, "wb") as file:
         file.write(msgjson.format(msgjson.encode(save_data)))
 
@@ -52,10 +52,10 @@ async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
         waves_map['refresh_unchanged'] = refresh_unchanged
 
 
-async def refresh_char(uid: str, ck: str = '', waves_map: Dict = None) -> Union[str, List]:
+async def refresh_char(uid: str, user_id, ck: str = '', waves_map: Dict = None) -> Union[str, List]:
     waves_datas = []
     if not ck:
-        ck = await waves_api.get_ck(uid)
+        ck = await waves_api.get_ck(uid, user_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 共鸣者信息

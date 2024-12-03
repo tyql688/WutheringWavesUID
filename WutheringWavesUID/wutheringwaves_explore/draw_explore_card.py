@@ -52,8 +52,8 @@ def get_progress_color(progress):
     return result
 
 
-async def draw_explore_img(ev: Event, uid: str):
-    ck = await waves_api.get_ck(uid)
+async def draw_explore_img(ev: Event, uid: str, user_id: str):
+    ck = await waves_api.get_ck(uid, user_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
     # 账户数据

@@ -24,8 +24,9 @@ TEXT_PATH = Path(__file__).parent / 'texture2d'
 async def draw_challenge_img(
     ev: Event,
     uid: str,
+    user_id: str
 ) -> Union[bytes, str]:
-    is_self_ck, ck = await waves_api.get_ck_result(uid)
+    is_self_ck, ck = await waves_api.get_ck_result(uid, user_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
 

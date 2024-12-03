@@ -35,8 +35,8 @@ class WavesEchoRank(BaseModel):
     phantom: EquipPhantom  # 声骸
 
 
-async def get_draw_list(ev: Event, uid: str) -> Union[str, bytes]:
-    ck = await waves_api.get_ck(uid)
+async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
+    ck = await waves_api.get_ck(uid, user_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
         # 账户数据

@@ -670,7 +670,7 @@ async def do_sign_task(bot: Bot, ev: Event):
 
     expire_uid = []
     for uid in uid_list:
-        ck = await waves_api.get_self_waves_ck(uid)
+        ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
         if not ck:
             if ck == '':
                 expire_uid.append(uid)

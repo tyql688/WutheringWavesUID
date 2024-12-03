@@ -20,7 +20,7 @@ async def send_role_info(bot: Bot, ev: Event):
     if not uid:
         return await bot.send(BIND_UID_HINT)
 
-    ck = await waves_api.get_ck(uid)
+    ck = await waves_api.get_ck(uid, user_id)
     if not ck:
         return await bot.send(BIND_UID_HINT)
 

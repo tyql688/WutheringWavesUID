@@ -44,7 +44,7 @@ def get_refresh_role_img():
 
 
 async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: str):
-    self_ck, ck = await waves_api.get_ck_result(uid)
+    self_ck, ck = await waves_api.get_ck_result(uid, user_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 账户数据
@@ -64,7 +64,7 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
         'refresh_update': {},
         'refresh_unchanged': {}
     }
-    waves_datas = await refresh_char(uid, ck, waves_map)
+    waves_datas = await refresh_char(uid, user_id, ck, waves_map=waves_map)
     if isinstance(waves_datas, str):
         return waves_datas
 
