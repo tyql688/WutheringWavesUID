@@ -1,6 +1,6 @@
 from .damage import DamageAttribute
 from .utils import CHAR_ATTR_SIERRA, CHAR_ATTR_SINKING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID, liberation_damage, \
-    attack_damage, hit_damage, skill_damage, CHAR_ATTR_CELESTIAL
+    attack_damage, hit_damage, skill_damage, CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING
 from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
 
 
@@ -304,6 +304,18 @@ class Echo_6000044(EchoAbstract):
     id = 6000044
     name = "辉萤军势"
 
+    # 每次冲击使自身冷凝伤害加成提升4.00%，共鸣技能伤害加成提升4.00%，最多3层
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.char_attr == CHAR_ATTR_FREEZING:
+            title = self.name
+            msg = '冷凝伤害加成提升4.00%*3'
+            attr.add_dmg_bonus(0.12, title, msg)
+
+        if attr.char_damage == skill_damage:
+            title = self.name
+            msg = '共鸣技能伤害加成提升4.00%*3'
+            attr.add_dmg_bonus(0.12, title, msg)
+
 
 class Echo_6000045(EchoAbstract):
     id = 6000045
@@ -335,6 +347,12 @@ class Echo_6000047(EchoAbstract):
 class Echo_6000048(EchoAbstract):
     id = 6000048
     name = "聚械机偶"
+
+    # 施放声骸技能后，自身攻击提升12.00%
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        title = self.name
+        msg = '自身攻击提升12.00%'
+        attr.add_atk_percent(0.12, title, msg)
 
 
 class Echo_6000049(EchoAbstract):
