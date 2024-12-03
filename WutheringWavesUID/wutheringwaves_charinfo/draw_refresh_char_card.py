@@ -88,7 +88,7 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
                 ''
             ]
         else:
-            cookie = await WavesUser.get_user_cookie_by_uid(uid)
+            cookie = await WavesUser.select_cookie(user_id, uid)
             if cookie:
                 msg = [
                     '[鸣潮]',
