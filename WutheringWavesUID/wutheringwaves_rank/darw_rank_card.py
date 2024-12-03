@@ -14,6 +14,7 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
 from ..utils.api.model import RoleDetailData, WeaponData
 from ..utils.ascension.char import get_breach
+from ..utils.cache import TimedCache
 from ..utils.calculate import get_calc_map, calc_phantom_score, get_total_score_bg
 from ..utils.char_info_utils import get_all_role_detail_info_list
 from ..utils.damage.abstract import DamageRankRegister
@@ -67,6 +68,7 @@ weapon_icon_bg_5 = Image.open(TEXT_PATH / 'weapon_icon_bg_5.png')
 promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
 char_mask = Image.open(TEXT_PATH / 'char_mask.png')
 logo_img = Image.open(TEXT_PATH / f'logo_small_2.png')
+pic_cache = TimedCache(86400, 200)
 
 
 class RankInfo(BaseModel):
@@ -213,7 +215,6 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     if not users:
         return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
 
-    logger.info(f'[get_rank_info_for_user] query row: {time.time() - start_time}')
     self_uid = None
     try:
         self_uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
@@ -228,13 +229,10 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     if len(rankInfoList) == 0:
         return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
 
-    logger.info(f'[get_rank_info_for_user] card row: {time.time() - start_time}')
     if rank_type == "评分":
         rankInfoList.sort(key=lambda i: (i.score, i.expected_damage_int, i.level, i.chain), reverse=True)
     else:
         rankInfoList.sort(key=lambda i: (i.expected_damage_int, i.score, i.level, i.chain), reverse=True)
-
-    logger.info(f'[get_rank_info_for_user] sort: {time.time() - start_time}')
 
     rankId, rankInfo = next(
         ((rankId, rankInfo) for rankId, rankInfo in enumerate(rankInfoList, start=1) if rankInfo.uid == self_uid),
@@ -243,8 +241,6 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     rankInfoList = rankInfoList[:rank_length]
     if rankId is not None and rankId > rank_length:
         rankInfoList.append(rankInfo)
-
-    logger.info(f'[get_rank_info_for_user] query self: {time.time() - start_time}')
 
     totalNum = len(rankInfoList)
     title_h = 500
@@ -260,8 +256,6 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         get_avatar(ev, rank.qid, rank.roleDetail.role.roleId) for rank in rankInfoList
     ]
     results = await asyncio.gather(*tasks)
-
-    logger.info(f'[get_rank_info_for_user] get_avatar: {time.time() - start_time}')
 
     for index, temp in enumerate(zip(rankInfoList, results)):
         rank, role_avatar = temp
@@ -429,7 +423,10 @@ async def get_avatar(
     ev: Event, qid: Optional[Union[int, str]], char_id: Union[int, str],
 ) -> Image.Image:
     if ev.bot_id == 'onebot':
-        pic = await get_qq_avatar(qid)
+        pic = pic_cache.get(qid)
+        if not pic:
+            pic = await get_qq_avatar(qid)
+            pic_cache.set(qid, pic)
         pic_temp = crop_center_img(pic, 120, 120)
 
         img = Image.new('RGBA', (180, 180))
