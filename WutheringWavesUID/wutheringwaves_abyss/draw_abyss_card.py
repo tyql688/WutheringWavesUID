@@ -14,12 +14,20 @@ from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_2
 from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, add_footer, GOLD, GREY, get_square_avatar
 from ..utils.waves_api import waves_api
+from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 
-ABYSS_ERROR_MESSAGE_NO_DATA = "当前暂无深渊数据"
-ABYSS_ERROR_MESSAGE_NO_UNLOCK = "深渊暂未解锁"
-ABYSS_ERROR_MESSAGE_NO_DEEP = "当前暂无深境区深渊数据"
+ABYSS_ERROR_MESSAGE_NO_DATA = "当前暂无深渊数据\n"
+ABYSS_ERROR_MESSAGE_NO_UNLOCK = "深渊暂未解锁\n"
+ABYSS_ERROR_MESSAGE_NO_DEEP = "当前暂无深境区深渊数据\n"
+no_login_msg = [
+    '[鸣潮]',
+    '>您当前为仅绑定鸣潮特征码',
+    f'>请使用命令【{PREFIX}登录】后查询详细深渊数据',
+    ''
+]
+ABYSS_ERROR_MESSAGE_LOGIN = '\n'.join(no_login_msg)
 
 
 async def get_abyss_data(uid: str, ck: str, is_self_ck: bool):
@@ -30,6 +38,8 @@ async def get_abyss_data(uid: str, ck: str, is_self_ck: bool):
 
     if abyss_data.get('code') == 200:
         if not abyss_data.get('data') or not abyss_data['data'].get("isUnlock", False):
+            if not is_self_ck:
+                return ABYSS_ERROR_MESSAGE_LOGIN
             return ABYSS_ERROR_MESSAGE_NO_DATA
         else:
             return AbyssChallenge(**abyss_data['data'])
@@ -55,13 +65,14 @@ async def draw_abyss_img(
     #     return game_info
     # game_info = KuroRoleInfo(**game_info)
 
+    command = ev.command
     text = ev.text.strip()
     difficultyName = "深境区"
-    if "超载" in text:
+    if "超载" in text or "超载" in command:
         difficultyName = '超载区'
-    elif "稳定" in text:
+    elif "稳定" in text or "稳定" in command:
         difficultyName = '稳定区'
-    elif "实验" in text:
+    elif "实验" in text or "实验" in command:
         difficultyName = '实验区'
 
     # 账户数据
@@ -189,6 +200,8 @@ async def draw_abyss_img(
                 yset += 141
         break
     else:
+        if not is_self_ck:
+            return ABYSS_ERROR_MESSAGE_LOGIN
         return ABYSS_ERROR_MESSAGE_NO_DATA
 
     card_img.paste(frame, (0, 0), frame)

@@ -20,6 +20,12 @@ sv_waves_challenge = SV('waves查询全息')
         f'{PREFIX}深渊',
         f'{PREFIX}逆境深塔',
         f'{PREFIX}深塔',
+        f'{PREFIX}超载',
+        f'{PREFIX}超载区',
+        f'{PREFIX}稳定',
+        f'{PREFIX}稳定区',
+        f'{PREFIX}实验',
+        f'{PREFIX}实验区',
     ),
     block=True,
 )
@@ -33,7 +39,11 @@ async def send_waves_abyss_info(bot: Bot, ev: Event):
     await bot.logger.info(f'[鸣潮查询深渊信息]user_id:{user_id} uid: {uid}')
 
     im = await draw_abyss_img(ev, uid)
-    return await bot.send(im)
+    if isinstance(im, str):
+        at_sender = True if ev.group_id else False
+        return await bot.send(im, at_sender)
+    else:
+        return await bot.send(im)
 
 
 @sv_waves_challenge.on_command(

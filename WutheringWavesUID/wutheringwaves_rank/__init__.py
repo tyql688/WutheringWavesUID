@@ -9,11 +9,11 @@ from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 sv_waves_rank_list = SV(f'{PREFIX}角色排行')
 
 
-@sv_waves_rank_list.on_regex(f'{PREFIX}[\u4e00-\u9fa5]+(bot)?排行', block=True)
+@sv_waves_rank_list.on_regex(f'{PREFIX}[\u4e00-\u9fa5]+(bot)?(?:排行|排名)', block=True)
 async def send_rank_card(bot: Bot, ev: Event):
     # 正则表达式
     match = re.search(
-        rf'{PREFIX}(?P<char>[\u4e00-\u9fa5]+)(?P<is_bot>bot)?排行',
+        rf'{PREFIX}(?P<char>[\u4e00-\u9fa5]+)(?P<is_bot>bot)?(?:排行|排名)',
         ev.raw_text
     )
     if not match:
