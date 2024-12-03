@@ -27,7 +27,7 @@ from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_G
     get_square_weapon, CHAIN_COLOR, get_attribute, get_role_pile, WAVES_ECHO_MAP, get_attribute_effect, \
     change_color, GREY, RED
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
-from ..utils.simple_async_cache_card import card_cache, user_bind_cache
+from ..utils.simple_async_cache_card import card_cache
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 special_char = {
@@ -209,7 +209,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     logger.info(f'[get_rank_info_for_user] start: {start_time}')
     # 获取群里的所有拥有该角色人的数据
     if is_bot:
-        users = (await user_bind_cache.get_all()).values()
+        # users = (await user_bind_cache.get_all()).values()
+        users = await WavesBind.get_all_data()
     else:
         users = await WavesBind.get_group_all_uid(ev.group_id)
     if not users:

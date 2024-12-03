@@ -39,7 +39,7 @@ async def startup():
     )
     logger.info(f'[鸣潮][资源文件下载] {await download_all_resource()}')
     logger.info(f'[鸣潮][加载用户面板缓存] 数量: {await load_all_card()}')
-    logger.info(f'[鸣潮][加载用户绑定缓存] 数量: {await load_user_bind()}')
+    # logger.info(f'[鸣潮][加载用户绑定缓存] 数量: {await load_user_bind()}')
 
 
 async def load_player_data(file_path: Path, cache: AsyncCache):
