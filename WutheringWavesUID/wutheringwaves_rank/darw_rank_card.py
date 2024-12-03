@@ -28,7 +28,7 @@ from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_G
     change_color, GREY, RED
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..utils.simple_async_cache_card import card_cache, user_bind_cache
-from ..wutheringwaves_config import PREFIX
+from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 special_char = {
     "1501": ["1501", "1502"],  # 光主
@@ -423,8 +423,12 @@ async def get_avatar(
     ev: Event, qid: Optional[Union[int, str]], char_id: Union[int, str],
 ) -> Image.Image:
     if ev.bot_id == 'onebot':
-        pic = pic_cache.get(qid)
-        if not pic:
+        if WutheringWavesConfig.get_config('QQPicCache').data:
+            pic = pic_cache.get(qid)
+            if not pic:
+                pic = await get_qq_avatar(qid)
+                pic_cache.set(qid, pic)
+        else:
             pic = await get_qq_avatar(qid)
             pic_cache.set(qid, pic)
         pic_temp = crop_center_img(pic, 120, 120)

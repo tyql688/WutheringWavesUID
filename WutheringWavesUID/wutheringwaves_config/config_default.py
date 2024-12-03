@@ -76,4 +76,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         'bot排行',
         False,
     ),
+    'QQPicCache': GsBoolConfig(
+        '排行榜qq头像缓存开关',
+        '排行榜qq头像缓存开关',
+        False,
+    ),
 }
