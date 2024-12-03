@@ -379,15 +379,7 @@
       {
         "name": "全部重新签到",
         "desc": "全部重新签到所有人",
-        "eg": "全部重签",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": true
-      },
-      {
-        "name": "全部重新库街区签到",
-        "desc": "全部重新库街区签到所有人",
-        "eg": "att",
+        "eg": "全部签到",
         "need_ck": false,
         "need_sk": false,
         "need_admin": true

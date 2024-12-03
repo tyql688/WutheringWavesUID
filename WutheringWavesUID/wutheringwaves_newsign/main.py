@@ -393,19 +393,21 @@ async def auto_sign_task():
         bbs_fail = num['failed_num']
 
     try:
+        msg = f'[鸣潮]自动任务\n今日成功游戏签到 {sign_success} 个账号\n今日社区签到 {bbs_success} 个账号'
         config_masters = core_config.get_config('masters')
         if SigninMaster and len(config_masters) > 0:
             for bot_id in gss.active_bot:
                 await gss.active_bot[bot_id].target_send(
-                    f'[鸣潮]自动任务\n今日成功游戏签到 {sign_success} 个账号\n今日社区签到 {bbs_success} 个账号',
+                    msg,
                     'direct',
                     config_masters[0],
                     'onebot',
                     '',
                     '',
                 )
+            logger.info(f'[鸣潮]推送主人签到结果: {msg}')
     except Exception as e:
-        logger.warning(f'[鸣潮]私聊推送社区签到结果失败!错误信息:{e}')
+        logger.warning(f'[鸣潮]私聊推送主人结果失败!错误信息: {e}')
 
 
 async def process_user(user, bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list):
@@ -531,7 +533,7 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
         'push_success_num': success_num,
         'push_failed_num': failed_num,
     }
-
+    logger.info(f'自动社区签到结果: {num}')
     logger.info(result)
     return result, num
 
@@ -654,7 +656,7 @@ async def daily_sign_action(expiregid2uid, user_list):
         'push_success_num': success_num,
         'push_failed_num': failed_num,
     }
-
+    logger.info(f'自动游戏签到结果: {num}')
     logger.info(result)
     return result, num
 
