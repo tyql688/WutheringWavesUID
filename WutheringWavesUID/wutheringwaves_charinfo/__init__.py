@@ -79,7 +79,7 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
     if not char:
         return
 
-    im = await draw_char_detail_img(ev, uid, char, waves_id)
+    im = await draw_char_detail_img(ev, uid, char, user_id, waves_id)
     at_sender = False
     if isinstance(im, str) and ev.group_id:
         at_sender = True

@@ -25,6 +25,7 @@ from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_wea
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow, get_square_avatar, \
     WAVES_MOONLIT, WAVES_FREEZING
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
+from ..utils.resource.constant import SPECIAL_CHAR
 from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_fetter_img, get_skill_img
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
@@ -264,19 +265,27 @@ async def ph_card_draw(
 
 async def get_role_need(ev, char_id, ck, uid, char_name, waves_id=None):
     if waves_id:
-        succ, role_detail_info = await waves_api.get_role_detail_info(char_id, waves_id, ck)
-        if (not succ
-            or 'role' not in role_detail_info
-            or role_detail_info['role'] is None
-            or 'level' not in role_detail_info
-            or role_detail_info['level'] is None):
+        query_list = [char_id]
+        if char_id in SPECIAL_CHAR:
+            query_list = SPECIAL_CHAR.copy()
+
+        for char_id in query_list:
+            succ, role_detail_info = await waves_api.get_role_detail_info(char_id, waves_id, ck)
+            if (not succ
+                or 'role' not in role_detail_info
+                or role_detail_info['role'] is None
+                or 'level' not in role_detail_info
+                or role_detail_info['level'] is None):
+                continue
+            if role_detail_info['phantomData']['cost'] == 0:
+                role_detail_info['phantomData']['equipPhantomList'] = None
+
+            role_detail = RoleDetailData(**role_detail_info)
+
+            avatar = await draw_char_with_ring(char_id)
+            break
+        else:
             return None, f'[鸣潮] 特征码[{waves_id}] \n无法获取【{char_name}】角色信息，请在库街区展示此角色！\n'
-        if role_detail_info['phantomData']['cost'] == 0:
-            role_detail_info['phantomData']['equipPhantomList'] = None
-
-        role_detail = RoleDetailData(**role_detail_info)
-
-        avatar = await draw_char_with_ring(char_id)
     else:
         all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
 

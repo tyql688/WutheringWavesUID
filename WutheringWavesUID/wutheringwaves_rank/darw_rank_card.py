@@ -27,21 +27,9 @@ from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_G
     get_square_weapon, CHAIN_COLOR, get_attribute, get_role_pile, WAVES_ECHO_MAP, get_attribute_effect, \
     change_color, GREY, RED
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
+from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.simple_async_cache_card import card_cache
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
-
-special_char = {
-    "1501": ["1501", "1502"],  # 光主
-    "1502": ["1501", "1502"],
-    "1604": ["1604", "1605"],  # 暗主
-    "1605": ["1604", "1605"],
-}
-special_char_name = {
-    "1501": "光主",
-    "1502": "光主",
-    "1604": "暗主",
-    "1605": "暗主",
-}
 
 card_sort_map = {
     '生命': '0',
@@ -200,8 +188,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     if not rankDetail and rank_type == "伤害":
         return f'[鸣潮] 角色【{char_name}排行】暂未适配伤害计算，请等待作者更新！'
 
-    if char_id in special_char:
-        find_char_id = special_char[char_id]
+    if char_id in SPECIAL_CHAR:
+        find_char_id = SPECIAL_CHAR[char_id]
     else:
         find_char_id = char_id
 
@@ -401,8 +389,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         title_draw.text((390, 335), f'{avg_damage}', 'white', waves_font_44, 'mm')
         title_draw.text((390, 375), f'平均伤害', SPECIAL_GOLD, waves_font_20, 'mm')
 
-    if char_id in special_char_name:
-        char_name = special_char_name[char_id]
+    if char_id in SPECIAL_CHAR_NAME:
+        char_name = SPECIAL_CHAR_NAME[char_id]
 
     if is_bot:
         title_name = f'{char_name}bot排行'
