@@ -72,8 +72,8 @@
         "need_admin": false
       },
       {
-        "name": "获取已绑定的token",
-        "desc": "获取已绑定的token",
+        "name": "获取绑定的token",
+        "desc": "获取绑定的token",
         "eg": "获取token",
         "need_ck": true,
         "need_sk": false,
@@ -85,6 +85,70 @@
     "desc": "在执行查询之前请绑定账号",
     "data": [
       {
+        "name": "鸣潮面板更新",
+        "desc": "鸣潮面板更新",
+        "eg": "刷新面板",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "练度统计",
+        "desc": "查询练度统计一览",
+        "eg": "练度统计",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "基本信息卡片",
+        "desc": "查询基本信息",
+        "eg": "卡片",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "查询声骸列表",
+        "desc": "查询声骸列表",
+        "eg": "声骸列表",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "查询角色面板",
+        "desc": "查询角色面板",
+        "eg": "椿面板",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "查询角色伤害",
+        "desc": "查询角色伤害",
+        "eg": "椿伤害3",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "查询角色权重",
+        "desc": "查询角色权重",
+        "eg": "椿权重",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "窥视(:",
+        "desc": "窥视面板",
+        "eg": "uid椿面板",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "体力",
         "desc": "获取自己的每日状态",
         "eg": "mr",
@@ -93,13 +157,18 @@
         "need_admin": false
       },
       {
-        "name": "查询",
-        "desc": "查询基本信息",
-        "eg": "查询",
+        "name": "查询探索度",
+        "desc": "查询探索度",
+        "eg": "探索度",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
-      },
+      }
+    ]
+  },
+  "深渊查询": {
+    "desc": "深渊数据查询",
+    "data": [
       {
         "name": "深渊",
         "desc": "查询深渊",
@@ -123,71 +192,12 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
-      },
-      {
-        "name": "练度统计",
-        "desc": "查询练度统计一览",
-        "eg": "练度统计",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "鸣潮面板更新",
-        "desc": "鸣潮面板更新",
-        "eg": "刷新面板",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "查询角色面板",
-        "desc": "查询角色面板",
-        "eg": "椿面板",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "查询角色伤害",
-        "desc": "查询角色伤害",
-        "eg": "椿伤害3",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "窥视(:",
-        "desc": "窥视面板",
-        "eg": "uid椿面板",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "角色权重",
-        "desc": "角色权重",
-        "eg": "椿权重",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "查询探索度",
-        "desc": "查询探索度",
-        "eg": "探索度",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "查询声骸列表",
-        "desc": "查询声骸列表",
-        "eg": "声骸列表",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
+      }
+    ]
+  },
+  "排行查询": {
+    "desc": "排行查询",
+    "data": [
       {
         "name": "群伤害排行",
         "desc": "群伤害排行",
@@ -221,14 +231,6 @@
         "name": "导入抽卡链接",
         "desc": "导入抽卡链接",
         "eg": "导入抽卡链接 https://...record_id=5e4d436ea1",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "刷新抽卡记录",
-        "desc": "需要导入抽卡链接",
-        "eg": "刷新抽卡记录",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false

@@ -1,15 +1,15 @@
-from typing import Dict
 from pathlib import Path
+from typing import Dict
 
 import aiofiles
 from PIL import Image
 from msgspec import json as msgjson
-from gsuid_core.help.model import PluginHelp
-from gsuid_core.help.draw_new_plugin_help import get_new_help
 
+from gsuid_core.help.draw_new_plugin_help import get_new_help
+from gsuid_core.help.model import PluginHelp
 from ..utils.image import get_footer
-from ..wutheringwaves_config import PREFIX
 from ..version import WutheringWavesUID_version
+from ..wutheringwaves_config import PREFIX
 
 ICON = Path(__file__).parent.parent.parent / 'ICON.png'
 HELP_DATA = Path(__file__).parent / 'help.json'
@@ -38,4 +38,5 @@ async def get_help():
         icon_path=ICON_PATH,
         footer=get_footer(),
         enable_cache=True,
+        column=4,
     )
