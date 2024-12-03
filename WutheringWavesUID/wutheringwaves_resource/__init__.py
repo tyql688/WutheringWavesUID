@@ -9,9 +9,10 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from ..utils import hakush_api
+from ..utils.database.models import WavesBind
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.resource.download_all_resource import download_all_resource
-from ..utils.simple_async_cache_card import AsyncCache, card_cache
+from ..utils.simple_async_cache_card import AsyncCache, card_cache, user_bind_cache
 from ..wutheringwaves_config import PREFIX
 
 sv_download_config = SV('下载资源', pm=2)
@@ -38,6 +39,7 @@ async def startup():
     )
     logger.info(f'[鸣潮][资源文件下载] {await download_all_resource()}')
     logger.info(f'[鸣潮][加载用户面板缓存] 数量: {await load_all_card()}')
+    logger.info(f'[鸣潮][加载用户绑定缓存] 数量: {await load_user_bind()}')
 
 
 async def load_player_data(file_path: Path, cache: AsyncCache):
@@ -76,3 +78,9 @@ async def load_all_card():
     # 并行加载所有玩家数据
     await load_all_players(PLAYER_PATH, card_cache)
     return await card_cache.size()
+
+
+async def load_user_bind():
+    users = await WavesBind.get_all_data()
+    await user_bind_cache.set_all({user.user_id: user for user in users})
+    return await user_bind_cache.size()

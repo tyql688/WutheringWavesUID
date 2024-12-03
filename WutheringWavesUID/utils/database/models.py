@@ -7,6 +7,7 @@ from sqlmodel import Field, select, col
 from gsuid_core.utils.database.base_models import Bind, User, T_User, with_session, Push, T_Bind
 from gsuid_core.utils.database.startup import exec_list
 from gsuid_core.webconsole.mount_app import PageSchema, GsAdminModel, site
+from ...utils.simple_async_cache_card import user_bind_cache
 
 exec_list.extend(
     [
@@ -95,13 +96,18 @@ class WavesBind(Bind, table=True):
 
         # 第一次绑定
         if not await cls.bind_exists(user_id, bot_id):
-            return await cls.insert_data(
+            code = await cls.insert_data(
                 user_id=user_id,
                 bot_id=bot_id,
                 **{'uid': uid, 'group_id': group_id},
             )
+            result = await cls.select_data(user_id, bot_id)
+            await user_bind_cache.set(user_id, result)
+            return code
 
         result = await cls.select_data(user_id, bot_id)
+        await user_bind_cache.set(user_id, result)
+        print(f"绑定数据 更新成功 {await user_bind_cache.size()}")
 
         uid_list = result.uid.split('_') if result and result.uid else []
         uid_list = [i for i in uid_list if i] if uid_list else []

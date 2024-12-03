@@ -1,5 +1,6 @@
 import asyncio
 import copy
+import time
 from pathlib import Path
 from typing import Optional, Union, List
 
@@ -7,6 +8,7 @@ from PIL import Image, ImageDraw
 from pydantic import BaseModel
 
 from gsuid_core.bot import Bot
+from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
@@ -24,7 +26,7 @@ from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_G
     get_square_weapon, CHAIN_COLOR, get_attribute, get_role_pile, WAVES_ECHO_MAP, get_attribute_effect, \
     change_color, GREY, RED
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
-from ..utils.simple_async_cache_card import card_cache
+from ..utils.simple_async_cache_card import card_cache, user_bind_cache
 from ..wutheringwaves_config import PREFIX
 
 special_char = {
@@ -201,14 +203,17 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     else:
         find_char_id = char_id
 
+    start_time = time.time()
+    logger.info(f'[get_rank_info_for_user] start: {start_time}')
     # 获取群里的所有拥有该角色人的数据
     if is_bot:
-        users = await WavesBind.get_all_data()
+        users = (await user_bind_cache.get_all()).values()
     else:
         users = await WavesBind.get_group_all_uid(ev.group_id)
     if not users:
         return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
 
+    logger.info(f'[get_rank_info_for_user] query row: {time.time() - start_time}')
     self_uid = None
     try:
         self_uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
@@ -223,10 +228,13 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     if len(rankInfoList) == 0:
         return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
 
+    logger.info(f'[get_rank_info_for_user] card row: {time.time() - start_time}')
     if rank_type == "评分":
         rankInfoList.sort(key=lambda i: (i.score, i.expected_damage_int, i.level, i.chain), reverse=True)
     else:
         rankInfoList.sort(key=lambda i: (i.expected_damage_int, i.score, i.level, i.chain), reverse=True)
+
+    logger.info(f'[get_rank_info_for_user] sort: {time.time() - start_time}')
 
     rankId, rankInfo = next(
         ((rankId, rankInfo) for rankId, rankInfo in enumerate(rankInfoList, start=1) if rankInfo.uid == self_uid),
@@ -235,6 +243,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     rankInfoList = rankInfoList[:rank_length]
     if rankId is not None and rankId > rank_length:
         rankInfoList.append(rankInfo)
+
+    logger.info(f'[get_rank_info_for_user] query self: {time.time() - start_time}')
 
     totalNum = len(rankInfoList)
     title_h = 500
@@ -250,6 +260,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         get_avatar(ev, rank.qid, rank.roleDetail.role.roleId) for rank in rankInfoList
     ]
     results = await asyncio.gather(*tasks)
+
+    logger.info(f'[get_rank_info_for_user] get_avatar: {time.time() - start_time}')
 
     for index, temp in enumerate(zip(rankInfoList, results)):
         rank, role_avatar = temp
@@ -408,6 +420,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     card_img.alpha_composite(img_temp, (0, 0))
     card_img = add_footer(card_img)
     card_img = await convert_img(card_img)
+
+    logger.info(f'[get_rank_info_for_user] end: {time.time() - start_time}')
     return card_img
 
 
