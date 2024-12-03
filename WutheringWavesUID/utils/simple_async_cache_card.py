@@ -2,7 +2,7 @@
 import asyncio
 from typing import Dict, Optional
 
-from WutheringWavesUID.utils.api.model import RoleDetailData
+from ..utils.api.model import RoleDetailData
 
 
 class AsyncCache:
