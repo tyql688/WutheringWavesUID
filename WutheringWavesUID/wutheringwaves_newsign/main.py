@@ -446,7 +446,7 @@ async def process_all_users(_user_list: List):
     sign_user_list = []
 
     # 定义每个批次的大小
-    batch_size = 50
+    batch_size = 20
     semaphore = asyncio.Semaphore(batch_size)
     batches = [_user_list[i:i + batch_size] for i in range(0, len(_user_list), batch_size)]
 
@@ -459,7 +459,7 @@ async def process_all_users(_user_list: List):
     for batch in batches:
         tasks = [process_user_with_semaphore(user) for user in batch]
         await asyncio.gather(*tasks)
-        delay = 5 + random.randint(1, 3)
+        delay = 1 + random.randint(1, 3)
         logger.info(
             f'[鸣潮] [签到任务] 正在处理token验证批次[{flag}]，共{len(tasks)}个用户, 等待{delay}秒进行下一次token验证'
         )
@@ -487,9 +487,9 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
                 group_msgs,
                 all_msgs,
             ))
-        if len(tasks) >= 50:
+        if len(tasks) >= 20:
             await asyncio.gather(*tasks)
-            delay = 5 + random.randint(1, 3)
+            delay = 2 + random.randint(1, 3)
             logger.info(
                 f'[鸣潮] [社区签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
             )
@@ -611,9 +611,9 @@ async def daily_sign_action(expiregid2uid, user_list):
                 all_msgs,
             )
         )
-        if len(tasks) >= 50:
+        if len(tasks) >= 20:
             await asyncio.gather(*tasks)
-            delay = 5 + random.randint(1, 3)
+            delay = 2 + random.randint(1, 3)
             logger.info(
                 f'[鸣潮] [签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
             )
