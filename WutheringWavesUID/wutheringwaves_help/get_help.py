@@ -1,9 +1,8 @@
+import json
 from pathlib import Path
 from typing import Dict
 
-import aiofiles
 from PIL import Image
-from msgspec import json as msgjson
 
 from gsuid_core.help.draw_new_plugin_help import get_new_help
 from gsuid_core.help.model import PluginHelp
@@ -17,9 +16,13 @@ ICON_PATH = Path(__file__).parent / 'icon_path'
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 
 
-async def get_help_data() -> Dict[str, PluginHelp]:
-    async with aiofiles.open(HELP_DATA, 'rb') as file:
-        return msgjson.decode(await file.read(), type=Dict[str, PluginHelp])
+def get_help_data() -> Dict[str, PluginHelp]:
+    # 读取文件内容
+    with open(HELP_DATA, 'r', encoding='utf-8') as file:
+        return json.load(file)
+
+
+plugin_help = get_help_data()
 
 
 async def get_help(pm: int):
@@ -27,7 +30,7 @@ async def get_help(pm: int):
         plugin_name='WutheringWavesUID',
         plugin_info={f'v{WutheringWavesUID_version}': ''},
         plugin_icon=Image.open(ICON),
-        plugin_help=await get_help_data(),
+        plugin_help=plugin_help,
         plugin_prefix=PREFIX,
         help_mode='dark',
         banner_bg=Image.open(TEXT_PATH / 'banner_bg.jpg'),
