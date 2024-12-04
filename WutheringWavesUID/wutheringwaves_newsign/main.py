@@ -439,20 +439,32 @@ async def process_user(user, bbs_expiregid2uid, sign_expiregid2uid, bbs_user_lis
         sign_user_list.append(user)
 
 
-async def process_all_users(_user_list):
+async def process_all_users(_user_list: List):
     bbs_expiregid2uid = {}
     sign_expiregid2uid = {}
     bbs_user_list = []
     sign_user_list = []
 
-    # 创建异步任务列表
-    tasks = [
-        process_user(user, bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list)
-        for user in _user_list
-    ]
+    # 定义每个批次的大小
+    batch_size = 50
+    semaphore = asyncio.Semaphore(batch_size)
+    batches = [_user_list[i:i + batch_size] for i in range(0, len(_user_list), batch_size)]
 
-    # 使用 asyncio.gather 并发执行所有任务
-    await asyncio.gather(*tasks)
+    async def process_user_with_semaphore(user):
+        async with semaphore:
+            await process_user(user, bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list)
+
+    # 对每个批次创建异步任务列表并执行
+    flag = 1
+    for batch in batches:
+        tasks = [process_user_with_semaphore(user) for user in batch]
+        await asyncio.gather(*tasks)
+        delay = 5 + random.randint(1, 3)
+        logger.info(
+            f'[鸣潮] [签到任务] 正在处理token验证批次[{flag}]，共{len(tasks)}个用户, 等待{delay}秒进行下一次token验证'
+        )
+        flag += 1
+        await asyncio.sleep(delay)
 
     return bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list
 
