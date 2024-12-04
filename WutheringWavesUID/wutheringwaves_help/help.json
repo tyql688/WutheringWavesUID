@@ -367,8 +367,31 @@
       }
     ]
   },
-  "管理员功能": {
-    "desc": "管理员功能",
+  "群管理员功能": {
+    "pm": 3,
+    "desc": "群管理员功能",
+    "data": [
+      {
+        "name": "订阅鸣潮公告",
+        "desc": "订阅鸣潮公告",
+        "eg": "订阅公告",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "取消订阅鸣潮公告",
+        "desc": "取消订阅鸣潮公告",
+        "eg": "取消订阅公告",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      }
+    ]
+  },
+  "bot主人功能": {
+    "pm": 1,
+    "desc": "bot主人功能",
     "data": [
       {
         "name": "登录帮助",
@@ -398,22 +421,6 @@
         "name": "补充Hakush资源",
         "desc": "补充Hakush资源",
         "eg": "补充资源",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": true
-      },
-      {
-        "name": "订阅鸣潮公告",
-        "desc": "订阅鸣潮公告",
-        "eg": "订阅公告",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": true
-      },
-      {
-        "name": "取消订阅鸣潮公告",
-        "desc": "取消订阅鸣潮公告",
-        "eg": "取消订阅公告",
         "need_ck": false,
         "need_sk": false,
         "need_admin": true

@@ -22,7 +22,7 @@ async def get_help_data() -> Dict[str, PluginHelp]:
         return msgjson.decode(await file.read(), type=Dict[str, PluginHelp])
 
 
-async def get_help():
+async def get_help(pm: int):
     return await get_new_help(
         plugin_name='WutheringWavesUID',
         plugin_info={f'v{WutheringWavesUID_version}': ''},
@@ -37,6 +37,7 @@ async def get_help():
         item_bg=Image.open(TEXT_PATH / 'item.png'),
         icon_path=ICON_PATH,
         footer=get_footer(),
-        enable_cache=True,
+        enable_cache=False,
         column=4,
+        pm=pm,
     )

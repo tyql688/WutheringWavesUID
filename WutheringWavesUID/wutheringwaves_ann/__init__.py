@@ -13,7 +13,7 @@ from .main import ann
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 sv_ann = SV('鸣潮公告')
-sv_ann_sub = SV('鸣潮公告订阅', pm=2)
+sv_ann_sub = SV('订阅鸣潮公告', pm=3)
 
 
 @sv_ann.on_command(f'{PREFIX}公告')

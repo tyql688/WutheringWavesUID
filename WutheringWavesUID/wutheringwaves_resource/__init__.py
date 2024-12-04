@@ -15,7 +15,7 @@ from ..utils.resource.download_all_resource import download_all_resource
 from ..utils.simple_async_cache_card import AsyncCache, card_cache, user_bind_cache
 from ..wutheringwaves_config import PREFIX
 
-sv_download_config = SV('下载资源', pm=2)
+sv_download_config = SV('资源下载', pm=1)
 
 
 @sv_download_config.on_fullmatch((f'{PREFIX}下载全部资源', f'{PREFIX}补充资源'))
