@@ -84,7 +84,7 @@ async def page_login(bot: Bot, ev: Event):
                     break
                 await asyncio.sleep(1)
 
-        return await code_login(bot, ev, text)
+        return await code_login(bot, ev, text, True)
     else:
         auth = {"bot_id": ev.bot_id, "user_id": ev.user_id}
         async with httpx.AsyncClient() as client:
@@ -99,7 +99,7 @@ async def page_login(bot: Bot, ev: Event):
                 return await bot.send("登录服务请求失败! 请稍后再试\n", at_sender=at_sender)
             else:
                 await bot.send(
-                    f"{game_title} \n请复制地址到浏览器打开：\n{url}/waves/i/{token}\n您的id为【{ev.user_id}】\n登录地址10分钟内有效",
+                    f"{game_title} \n请复制地址到浏览器打开：\n{url}/waves/i/{token}\n您的id为【{ev.user_id}】\n登录地址10分钟内有效\n",
                     at_sender=at_sender)
             async with timeout(600):
                 while True:
@@ -131,7 +131,7 @@ async def page_login(bot: Bot, ev: Event):
                     await asyncio.sleep(1)
 
 
-async def code_login(bot: Bot, ev: Event, text: str):
+async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
     at_sender = True if ev.group_id else False
     game_title = "[鸣潮]"
     # 手机+验证码
@@ -149,8 +149,26 @@ async def code_login(bot: Bot, ev: Event, text: str):
     token = result.get('data', {}).get("token", '')
     waves_user = await add_cookie(ev, token)
     if waves_user:
+        if isPage:
+            msg = [
+                f'[鸣潮] 特征码[{waves_user.uid}]登录成功! ',
+                f'当前账号已进入托管状态，请勿登录相似程序，导致token失效',
+                '',
+                f'>使用【{PREFIX}获取token】获取已绑定token列表（建议私聊使用',
+                f'>使用【{PREFIX}查看】查看已绑定的特征码',
+                f'>使用【{PREFIX}开启自动签到】开启游戏内每天的自动签到功能',
+                f'>使用【{PREFIX}刷新面板】更新角色面板',
+                f'>更新角色面板后可以使用【{PREFIX}暗主排行】查询暗主排行',
+                ''
+            ]
+            return await bot.send(
+                '\n'.join(msg),
+                at_sender=at_sender)
         return await bot.send(f"{game_title} 鸣潮特征码:[{waves_user.uid}]登录成功!\n", at_sender=at_sender)
     else:
+        if isPage:
+            await bot.send(
+                f"[鸣潮] 账号登录失败\n\n验证码失效\n请重新输入命令【{PREFIX}登录】进行登录\n", at_sender=at_sender)
         return await bot.send(f"{game_title} 账号登录失败\n\n请参照以下格式:\n{PREFIX}登录 手机号,验证码\n",
                               at_sender=at_sender)
 

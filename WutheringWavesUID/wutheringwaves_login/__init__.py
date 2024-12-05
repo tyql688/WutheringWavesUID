@@ -30,7 +30,8 @@ async def get_resp_msg(bot: Bot, ev: Event):
     if "," in text:
         return await code_login(bot, ev, text)
 
-    return await bot.send(f"{game_title} 账号登录失败")
+    at_sender = True if ev.group_id else False
+    return await bot.send(f"{game_title} 账号登录失败\n请重新输入命令【{PREFIX}登录】进行登录\n", at_sender=at_sender)
 
 
 @sv_kuro_login_help.on_fullmatch(f"{PREFIX}登录帮助", block=True)
