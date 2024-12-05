@@ -18,7 +18,7 @@ from ..utils.cache import TimedCache
 from ..utils.calculate import get_calc_map, calc_phantom_score, get_total_score_bg
 from ..utils.char_info_utils import get_all_role_detail_info_list
 from ..utils.damage.abstract import DamageRankRegister
-from ..utils.database.models import WavesBind
+from ..utils.database.models import WavesBind, WavesUser
 from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value, enhance_summation_card_value, \
     card_sort_map_to_attribute
 from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_16, waves_font_40, waves_font_30, \
@@ -94,7 +94,7 @@ async def find_role_detail_cache(uid: str, char_id: Union[int, List[int]]) -> Op
     return next((role for role in role_details if str(role.role.roleId) in char_id), None)
 
 
-async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDetail):
+async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDetail, wavesTokenUsersMap):
     rankInfoList = []
     if not user.uid:
         return rankInfoList
@@ -103,6 +103,8 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
     role_details = await asyncio.gather(*tasks)
 
     for uid, role_detail in zip(user.uid.split('_'), role_details):
+        if WutheringWavesConfig.get_config('RankUseToken').data and (user.user_id, uid,) not in wavesTokenUsersMap:
+            continue
         if not role_detail:
             continue
         if not role_detail.phantomData or not role_detail.phantomData.equipPhantomList:
@@ -170,7 +172,11 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
 
 
 async def get_all_rank_info(users: List[WavesBind], char_id, find_char_id, rankDetail):
-    tasks = [get_rank_info_for_user(user, char_id, find_char_id, rankDetail) for user in users]
+    wavesTokenUsersMap = {}
+    if WutheringWavesConfig.get_config('RankUseToken').data:
+        wavesTokenUsers = await WavesUser.get_waves_all_user()
+        wavesTokenUsersMap = {(w.user_id, w.uid): w.cookie for w in wavesTokenUsers}
+    tasks = [get_rank_info_for_user(user, char_id, find_char_id, rankDetail, wavesTokenUsersMap) for user in users]
     results = await asyncio.gather(*tasks)
 
     # Flatten the results list
@@ -181,12 +187,12 @@ async def get_all_rank_info(users: List[WavesBind], char_id, find_char_id, rankD
 async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: bool):
     char_id = char_name_to_char_id(char)
     if not char_id:
-        return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！'
+        return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
     char_name = alias_to_char_name(char)
 
     rankDetail = DamageRankRegister.find_class(char_id)
     if not rankDetail and rank_type == "伤害":
-        return f'[鸣潮] 角色【{char_name}排行】暂未适配伤害计算，请等待作者更新！'
+        return f'[鸣潮] 角色【{char_name}排行】暂未适配伤害计算，请等待作者更新！\n'
 
     if char_id in SPECIAL_CHAR:
         find_char_id = SPECIAL_CHAR[char_id]
@@ -202,7 +208,16 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     else:
         users = await WavesBind.get_group_all_uid(ev.group_id)
     if not users:
-        return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
+        msg = []
+        if is_bot:
+            msg.append(f'[鸣潮] bot内暂无【{char}】面板')
+        else:
+            msg.append(f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板')
+        msg.append(f'请使用【{PREFIX}刷新面板】后再使用此功能！')
+        if WutheringWavesConfig.get_config('RankUseToken').data:
+            msg.append(f'当前排行开启了登录验证，请使用命令【{PREFIX}登录】登录后此功能！')
+        msg.append('')
+        return '\n'.join(msg)
 
     self_uid = None
     try:
@@ -216,7 +231,16 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     damage_title = (rankDetail and rankDetail['title']) or "无"
     rankInfoList = await get_all_rank_info(users, char_id, find_char_id, rankDetail)
     if len(rankInfoList) == 0:
-        return f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板\n请使用【{PREFIX}刷新面板】后再使用此功能！'
+        msg = []
+        if is_bot:
+            msg.append(f'[鸣潮] bot内暂无【{char}】面板')
+        else:
+            msg.append(f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板')
+        msg.append(f'请使用【{PREFIX}刷新面板】后再使用此功能！')
+        if WutheringWavesConfig.get_config('RankUseToken').data:
+            msg.append(f'当前排行开启了登录验证，请使用命令【{PREFIX}登录】登录后此功能！')
+        msg.append('')
+        return '\n'.join(msg)
 
     if rank_type == "评分":
         rankInfoList.sort(key=lambda i: (i.score, i.expected_damage_int, i.level, i.chain), reverse=True)
@@ -236,6 +260,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     bar_star_h = 110
     h = title_h + totalNum * bar_star_h + 80
     card_img = get_waves_bg(1050, h, 'bg3')
+    card_img_draw = ImageDraw.Draw(card_img)
 
     bar = Image.open(TEXT_PATH / 'bar.png')
     total_score = 0
@@ -393,10 +418,28 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         char_name = SPECIAL_CHAR_NAME[char_id]
 
     if is_bot:
-        title_name = f'{char_name}bot排行'
+        title_name = f'{char_name}{rank_type}bot排行'
     else:
-        title_name = f'{char_name}群排行'
-    title_draw.text((140, 260), f'{title_name}', 'black', waves_font_44, 'lm')
+        title_name = f'{char_name}{rank_type}群排行'
+    title_draw.text((140, 265), f'{title_name}', 'black', waves_font_30, 'lm')
+
+    # 备注
+    rank_row_title = "入榜条件"
+    if is_bot:
+        rank_row = f"1.使用命令【{PREFIX}刷新面板】刷新过面板"
+    else:
+        rank_row = f"1.本群内使用命令【{PREFIX}刷新面板】刷新过面板"
+    title_draw.text((20, 420), f'{rank_row_title}', SPECIAL_GOLD, waves_font_16, 'lm')
+    title_draw.text((90, 420), f'{rank_row}', GREY, waves_font_16, 'lm')
+    if WutheringWavesConfig.get_config('RankUseToken').data:
+        rank_row = f"2.使用命令【{PREFIX}登录】登录过的用户"
+        title_draw.text((90, 438), f'{rank_row}', GREY, waves_font_16, 'lm')
+
+    if rank_type == "伤害":
+        temp_notes = f"排行标准：以期望伤害（计算暴击率的伤害，不代表实际伤害) 为排序的排名"
+    else:
+        temp_notes = f"排行标准：以声骸分数（声骸评分高，不代表实际伤害高) 为排序的排名"
+    card_img_draw.text((450, 500), f'{temp_notes}', SPECIAL_GOLD, waves_font_16, 'lm')
 
     img_temp = Image.new('RGBA', char_mask.size)
     img_temp.paste(title, (0, 0), char_mask.copy())

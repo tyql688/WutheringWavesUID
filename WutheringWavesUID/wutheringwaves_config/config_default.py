@@ -81,4 +81,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '排行榜qq头像缓存开关',
         False,
     ),
+    'RankUseToken': GsBoolConfig(
+        '有token才能进排行',
+        '有token才能进排行',
+        False,
+    ),
 }

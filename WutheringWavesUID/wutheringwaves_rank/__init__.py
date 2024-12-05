@@ -37,4 +37,8 @@ async def send_rank_card(bot: Bot, ev: Event):
     char = char.replace('伤害', '').replace('评分', '')
 
     im = await draw_rank_img(bot, ev, char, rank_type, is_bot)
+
+    if isinstance(im, str):
+        at_sender = True if ev.group_id else False
+        return await bot.send(im, at_sender)
     return await bot.send(im)
