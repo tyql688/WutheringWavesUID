@@ -149,6 +149,14 @@
         "need_admin": false
       },
       {
+        "name": "面板PK",
+        "desc": "面板PK",
+        "eg": "椿面板pk@其他人",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "体力",
         "desc": "获取自己的每日状态",
         "eg": "mr",

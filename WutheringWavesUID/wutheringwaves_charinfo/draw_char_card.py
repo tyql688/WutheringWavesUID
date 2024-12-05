@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageEnhance
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
+from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img, get_qq_avatar
 from ..utils import hint
 from ..utils.api.model import RoleDetailData, WeaponData, AccountBaseInfo
 from ..utils.ascension.weapon import get_weapon_detail, WavesWeaponResult, get_breach
@@ -263,7 +263,7 @@ async def ph_card_draw(
     return phantom_sum_value
 
 
-async def get_role_need(ev, char_id, ck, uid, char_name, waves_id=None):
+async def get_role_need(ev, char_id, ck, uid, char_name, waves_id=None, is_force_avatar=False):
     if waves_id:
         query_list = [char_id]
         if char_id in SPECIAL_CHAR:
@@ -293,7 +293,7 @@ async def get_role_need(ev, char_id, ck, uid, char_name, waves_id=None):
             return None, f'[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n'
 
         role_detail: RoleDetailData = all_role_detail[char_name]
-        avatar = await draw_pic_with_ring(ev)
+        avatar = await draw_pic_with_ring(ev, is_force_avatar)
 
     return avatar, role_detail
 
@@ -357,7 +357,8 @@ async def draw_fixed_img(img, avatar, account_info, role_detail):
     img.paste(char_fg, (25, 170), char_fg)
 
 
-async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id: Optional[str] = None):
+async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id: Optional[str] = None,
+                               need_convert_img=True, is_force_avatar=False):
     char, damageId = parse_text_and_number(char)
 
     char_id = char_name_to_char_id(char)
@@ -397,7 +398,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id
         return account_info
     account_info = AccountBaseInfo(**account_info)
     # 获取数据
-    avatar, role_detail = await get_role_need(ev, char_id, ck, uid, char_name, waves_id)
+    avatar, role_detail = await get_role_need(ev, char_id, ck, uid, char_name, waves_id, is_force_avatar)
     if isinstance(role_detail, str):
         return role_detail
     # 创建背景
@@ -621,7 +622,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id
         img = new_img
 
     img = add_footer(img)
-    img = await convert_img(img)
+    if need_convert_img:
+        img = await convert_img(img)
     return img
 
 
@@ -910,8 +912,11 @@ async def draw_weight(image, role_name, weight_list_temp, calc_temp):
     draw.text((start_x, 850), text, font=waves_font_24, fill='white')
 
 
-async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev)
+async def draw_pic_with_ring(ev: Event, is_force_avatar=False):
+    if not is_force_avatar:
+        pic = await get_event_avatar(ev)
+    else:
+        pic = await get_qq_avatar(ev.user_id)
 
     mask_pic = Image.open(TEXT_PATH / 'avatar_mask.png')
     img = Image.new('RGBA', (180, 180))
