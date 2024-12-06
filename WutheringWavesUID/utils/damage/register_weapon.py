@@ -417,6 +417,26 @@ class Weapon_21040015(WeaponAbstract):
     type = 4
     name = "擎渊怒涛"
 
+    # 造成共鸣技能伤害时，普攻伤害加成提升10%，持续8秒。造成普攻伤害时，共鸣技能伤害加成提升10%，持续8秒。
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_damage != attack_damage:
+            return
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"造成共鸣技能伤害时，普攻伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成普攻伤害"""
+        if attr.char_damage != skill_damage:
+            return
+
+        dmg = f"{self.param(3)}"
+        title = self.get_title()
+        msg = f"造成普攻伤害时，共鸣技能伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21040016(WeaponAbstract):
     id = 21040016

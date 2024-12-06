@@ -4,7 +4,7 @@ from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
 from ...damage.utils import skill_damage_calc, SkillType, SkillTreeMap, cast_skill, cast_liberation, cast_hit, \
-    liberation_damage, skill_damage
+    liberation_damage, skill_damage, cast_attack
 
 
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
@@ -115,7 +115,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     attr.add_skill_multi(skill_multi, title, msg)
 
     # 设置角色施放技能
-    damage_func = [cast_skill, cast_hit]
+    damage_func = [cast_skill, cast_attack, cast_hit]
     phase_damage(attr, role, damage_func, isGroup)
 
     # 设置角色等级
