@@ -309,7 +309,7 @@ async def draw_wiki_char(raw_data: Dict, query_role_type: str):
     # 角色统计信息
     role_statistic_pic = await parse_role_statistic_content(char_statistics['tabs'][-1]['content'])
 
-    card_img = get_waves_bg(1000, 2180, 'bg2')
+    card_img = get_waves_bg(1000, 2210, 'bg2')
 
     if query_role_type == "天赋":
         # 技能
@@ -447,27 +447,18 @@ async def parse_mz_content(content):
     draw.rectangle([20, 20, 980, 1530], fill=(0, 0, 0, int(0.3 * 255)))
 
     for index, _data in enumerate(data):
-        mz_bg = Image.open(TEXT_PATH / 'mz_bg.png')
-        mz_bg_temp = Image.new('RGBA', mz_bg.size)
-        chain = Image.open(BytesIO((await sget(_data['url'])).content)).convert('RGBA')
-        chain = await change_white_color(chain)
-        chain = chain.resize((100, 100))
-        mz_bg.paste(chain, (95, 75), chain)
-        mz_bg_temp.alpha_composite(mz_bg, dest=(0, 0))
-        image.alpha_composite(mz_bg_temp, (0, index * 250))
+        # mz_bg = Image.open(TEXT_PATH / 'mz_bg.png')
+        # mz_bg_temp = Image.new('RGBA', mz_bg.size)
+        # chain = Image.open(BytesIO((await sget(_data['url'])).content)).convert('RGBA')
+        # chain = await change_white_color(chain)
+        # chain = chain.resize((100, 100))
+        # mz_bg.paste(chain, (95, 75), chain)
+        # mz_bg_temp.alpha_composite(mz_bg, dest=(0, 0))
+        # image.alpha_composite(mz_bg_temp, (0, index * 300))
 
-        draw.text((250, 80 + index * 250), _data['name'], fill=SPECIAL_GOLD, font=waves_font_40, anchor='lm')
-        # draw_text_by_line(
-        #     image,
-        #     (250, 150 + index * 250),
-        #     _data['effect'],
-        #     waves_font_24,
-        #     "white",
-        #     550,
-        #     False
-        # )
+        draw.text((40, 80 + index * 250), _data['name'], fill=SPECIAL_GOLD, font=waves_font_40, anchor='lm')
         draw_text(_data['effect'], waves_font_origin, image=image, padding=(0, 0),
-                  init_padding=(250, 150 + index * 250), max_line_width=950, column_spacing=0)
+                  init_padding=(40, 130 + index * 250), max_line_width=950, column_spacing=0)
     return image
 
 
