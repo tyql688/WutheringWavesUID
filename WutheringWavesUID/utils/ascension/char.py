@@ -105,3 +105,7 @@ def get_char_detail2(role) -> Union[WavesCharResult, None]:
     role_level = role.role.level
     role_breach = role.role.breach
     return get_char_detail(role_id, role_level, role_breach)
+
+
+def get_char_id(char_name):
+    return next((_id for _id, value in char_id_data.items() if value['name'] == char_name), None)

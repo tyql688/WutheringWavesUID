@@ -54,10 +54,11 @@ async def send_char_detail_msg(bot: Bot, ev: Event):
     return await bot.send(im)
 
 
-@waves_new_char_detail.on_regex(rf'{PREFIX}(\d+)?[\u4e00-\u9fa5]+(?:面板|伤害\d+)(?:pk|对比|PK|比|比较)?', block=True)
+@waves_new_char_detail.on_regex(rf'^{PREFIX}(\d+)?[\u4e00-\u9fa5]+(?:面板|伤害(\d+)?)(?:pk|对比|PK|比|比较)?$',
+                                block=True)
 async def send_char_detail_msg2(bot: Bot, ev: Event):
     match = re.search(
-        rf'{PREFIX}(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?:面板|伤害(?P<damage>\d+))(?P<is_pk>pk|对比|PK|比|比较)?',
+        rf'{PREFIX}(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?P<query_type>面板|伤害(?P<damage>(\d+)?))(?P<is_pk>pk|对比|PK|比|比较)?',
         ev.raw_text
     )
     if not match:
@@ -66,16 +67,20 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
     waves_id = ev.regex_dict.get("waves_id")
     char = ev.regex_dict.get("char")
     damage = ev.regex_dict.get("damage")
+    query_type = ev.regex_dict.get("query_type")
     is_pk = ev.regex_dict.get("is_pk") is not None
 
     if waves_id and len(waves_id) != 9:
         return
 
+    if "伤害" in query_type and not damage:
+        damage = '1'
+
     if damage:
         char = f'{char}{damage}'
     if not char:
         return
-    logger.debug(f'[鸣潮] [角色面板] CHAR: {char}')
+    logger.debug(f'[鸣潮] [角色面板] CHAR: {char} {ev.regex_dict}')
 
     at_sender = True if ev.group_id else False
     if is_pk:
@@ -126,7 +131,7 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         return await bot.send(im)
 
 
-@waves_new_char_detail.on_regex(rf'{PREFIX}(\d+)?[\u4e00-\u9fa5]+(?:权重)', block=True)
+@waves_new_char_detail.on_regex(rf'^{PREFIX}(\d+)?[\u4e00-\u9fa5]+(?:权重)$', block=True)
 async def send_char_detail_msg2(bot: Bot, ev: Event):
     match = re.search(
         rf'{PREFIX}(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?:权重)',

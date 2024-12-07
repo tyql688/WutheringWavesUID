@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 from pathlib import Path
 from typing import List, Union
@@ -66,14 +67,22 @@ async def send_waves_wiki(bot: Bot, ev: Event):
         await bot.send(img)
 
 
-@sv_waves_guide.on_prefix((f'{PREFIX}角色攻略', f'{PREFIX}刷新角色攻略'))
+@sv_waves_guide.on_regex(rf'^{PREFIX}[\u4e00-\u9fa5]+攻略$', block=True)
 async def send_role_guide_pic(bot: Bot, ev: Event):
-    is_force = True if '刷新' in ev.command else False
+    match = re.search(
+        rf'{PREFIX}(?P<char>[\u4e00-\u9fa5]+)攻略',
+        ev.raw_text
+    )
+    if not match:
+        return
+    ev.regex_dict = match.groupdict()
 
-    char_name = ev.text.strip(' ')
+    char_name = ev.regex_dict.get("char")
     char_id = char_name_to_char_id(char_name)
+    at_sender = True if ev.group_id else False
     if not char_id:
-        return f'[鸣潮] 角色名{char_name}无法找到, 可能暂未适配, 请先检查输入是否正确！'
+        msg = f'[鸣潮] 角色名【{char_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
+        return await bot.send(msg, at_sender)
 
     name = alias_to_char_name(char_name)
     if name == '漂泊者':
@@ -86,34 +95,35 @@ async def send_role_guide_pic(bot: Bot, ev: Event):
         for i in config.options:
             if i == 'all':
                 continue
-            name_dir = GUIDE_CONFIG_MAP[i][0] / name
+            name_path = GUIDE_CONFIG_MAP[i][0] / f'{name}.jpg'
             auth_id = GUIDE_CONFIG_MAP[i][1]
             source_type = GUIDE_CONFIG_MAP[i][2]
-            zip_list.append((i, name_dir, auth_id, source_type))
+            zip_list.append((i, name_path, auth_id, source_type))
     else:
         if config.data in GUIDE_CONFIG_MAP:
-            name_dir = GUIDE_CONFIG_MAP[config.data][0] / name
+            name_path = GUIDE_CONFIG_MAP[config.data][0] / f'{name}.jpg'
             auth_id = GUIDE_CONFIG_MAP[config.data][1]
             source_type = GUIDE_CONFIG_MAP[config.data][2]
-            zip_list.append((config.data, name_dir, auth_id, source_type))
+            zip_list.append((config.data, name_path, auth_id, source_type))
 
     if not zip_list:
-        return f'[鸣潮] 角色名{char_name}无法找到角色攻略图提供方, 请检查配置！'
+        msg = f'[鸣潮] 角色名{char_name}无法找到角色攻略图提供方, 请检查配置！\n'
+        return await bot.send(msg, at_sender)
 
     imgs = []
-    for auth_name, name_dir, auth_id, source_type in zip_list:
-        if is_force or not name_dir.exists() or len(os.listdir(name_dir)) == 0:
-            await download_guide_pic(auth_id, name, name_dir, is_force, source_type)
+    for auth_name, name_path, auth_id, source_type in zip_list:
+        # if is_force or not name_dir.exists() or len(os.listdir(name_dir)) == 0:
+        #     await download_guide_pic(auth_id, name, name_dir, is_force, source_type)
+        imgs.extend(await process_images_new(auth_name, name_path))
 
-        imgs.extend(await process_images(auth_name, name_dir))
+    if len(imgs) == 0:
+        msg = f'[鸣潮] 角色名【{char_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
+        return await bot.send(msg, at_sender)
 
-    await send_images_based_on_config(config, imgs, bot)
+    return await send_images_based_on_config(config, imgs, bot)
 
 
 async def send_images_based_on_config(config, imgs: list, bot: Bot):
-    if not imgs:
-        return await bot.send('[鸣潮] 该角色攻略不存在, 请检查输入角色是否正确！')
-
     # 处理发送逻辑
     if config.data == 'all':
         await bot.send(imgs)
@@ -121,6 +131,18 @@ async def send_images_based_on_config(config, imgs: list, bot: Bot):
         await bot.send(imgs[1])
     else:
         await bot.send(imgs)
+
+
+async def process_images_new(auth_name: str, _dir: Path):
+    imgs = []
+    try:
+        img = await convert_img(_dir)
+        imgs.append(img)
+    except Exception as e:
+        logger.warning(f"攻略图片读取失败 {_dir}: {e}")
+    if len(imgs) > 0:
+        imgs.insert(0, f'攻略作者：{auth_name}')
+    return imgs
 
 
 async def process_images(auth_name: str, _dir: Path):

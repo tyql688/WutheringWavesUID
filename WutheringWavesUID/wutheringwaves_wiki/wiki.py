@@ -1,16 +1,15 @@
-import copy
 from io import BytesIO
 from pathlib import Path
 from typing import Dict, Union, List
 
-import httpx
 from PIL import Image, ImageDraw
 from bs4 import BeautifulSoup
 
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 from gsuid_core.utils.image.utils import sget
-from ..utils.api.api import WIKI_DETAIL_URL, WIKI_ENTRY_DETAIL_URL, WIKI_CATALOGUE_MAP
+from ..utils.api.api import WIKI_CATALOGUE_MAP
+from ..utils.api.requests import Wiki
 from ..utils.ascension.weapon import get_weapon_star
 from ..utils.fonts.waves_fonts import waves_font_70, waves_font_30, waves_font_24, waves_font_40, waves_font_origin
 from ..utils.image import get_waves_bg, add_footer, GOLD, GREY, SPECIAL_GOLD, get_weapon_type, get_crop_waves_bg, \
@@ -24,49 +23,12 @@ QUERY_ROLE_TYPE = {
 }
 
 
-class Wiki:
-    _HEADER = {
-        "source": "h5",
-        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        'wiki_type': '9'
-    }
-
-    async def _get_wiki_catalogue(self, catalogueId: str):
-        headers = copy.deepcopy(self._HEADER)
-        data = {'catalogueId': catalogueId, 'limit': 1000}
-        async with httpx.AsyncClient(timeout=None) as client:
-            res = await client.post(WIKI_DETAIL_URL, headers=headers, data=data, timeout=10)
-            return res.json()
-
-    async def _get_entry_id(self, name: str, catalogueId: str):
-        catalogue_data = await self._get_wiki_catalogue(catalogueId)
-        if catalogue_data['code'] != 200:
-            return
-        char_record = next((i for i in catalogue_data['data']['results']['records'] if i['name'] == name), None)
-        # logger.debug(f'【鸣潮WIKI】 名字:【{name}】: {char_record}')
-        if not char_record:
-            return
-
-        return char_record['entryId']
-
-    async def get_entry_detail(self, name: str, catalogueId: str):
-        entry_id = await self._get_entry_id(name, catalogueId)
-        if not entry_id:
-            return
-
-        headers = copy.deepcopy(self._HEADER)
-        data = {'id': entry_id}
-        async with httpx.AsyncClient(timeout=None) as client:
-            res = await client.post(WIKI_ENTRY_DETAIL_URL, headers=headers, data=data, timeout=10)
-            return res.json()
-
-
 async def draw_wiki_detail(query_type: str, name: str, query_role_type: str = None):
     noi = f"[鸣潮] 暂无【{name}】对应{query_type}wiki"
     if query_type not in WIKI_CATALOGUE_MAP:
         return noi
 
-    res = await Wiki().get_entry_detail(name, WIKI_CATALOGUE_MAP[query_type])
+    res = await Wiki().get_entry_detail_by_name(name, WIKI_CATALOGUE_MAP[query_type])
     if not res:
         return noi
 

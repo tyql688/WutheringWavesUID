@@ -4,6 +4,7 @@ import random
 from datetime import datetime
 from typing import Any, Dict, Union, Literal, Optional
 
+import httpx
 from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 
 from gsuid_core.logger import logger
@@ -408,3 +409,53 @@ class KuroLogin:
                     raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
                 logger.debug(f'url:{url} raw_data:{raw_data}')
                 return raw_data
+
+
+class Wiki:
+    _HEADER = {
+        "source": "h5",
+        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        'wiki_type': '9'
+    }
+
+    async def get_wiki_home(self):
+        headers = copy.deepcopy(self._HEADER)
+        async with httpx.AsyncClient(timeout=None) as client:
+            res = await client.post(WIKI_HOME_URL, headers=headers, timeout=10)
+            return res.json()
+
+    async def get_wiki_catalogue(self, catalogueId: str):
+        headers = copy.deepcopy(self._HEADER)
+        data = {'catalogueId': catalogueId, 'limit': 1000}
+        async with httpx.AsyncClient(timeout=None) as client:
+            res = await client.post(WIKI_DETAIL_URL, headers=headers, data=data, timeout=10)
+            return res.json()
+
+    async def get_entry_id(self, name: str, catalogueId: str):
+        catalogue_data = await self.get_wiki_catalogue(catalogueId)
+        if catalogue_data['code'] != 200:
+            return
+        char_record = next((i for i in catalogue_data['data']['results']['records'] if i['name'] == name), None)
+        # logger.debug(f'【鸣潮WIKI】 名字:【{name}】: {char_record}')
+        if not char_record:
+            return
+
+        return char_record['entryId']
+
+    async def get_entry_detail_by_name(self, name: str, catalogueId: str):
+        entry_id = await self.get_entry_id(name, catalogueId)
+        if not entry_id:
+            return
+
+        headers = copy.deepcopy(self._HEADER)
+        data = {'id': entry_id}
+        async with httpx.AsyncClient(timeout=None) as client:
+            res = await client.post(WIKI_ENTRY_DETAIL_URL, headers=headers, data=data, timeout=10)
+            return res.json()
+
+    async def get_entry_detail(self, entry_id: str):
+        headers = copy.deepcopy(self._HEADER)
+        data = {'id': entry_id}
+        async with httpx.AsyncClient(timeout=None) as client:
+            res = await client.post(WIKI_ENTRY_DETAIL_URL, headers=headers, data=data, timeout=10)
+            return res.json()

@@ -26,7 +26,7 @@ ROLE_DETAIL_SKILL_PATH = ROLE_DETAIL_PATH / 'skill'
 ROLE_DETAIL_CHAINS_PATH = ROLE_DETAIL_PATH / 'chains'
 
 # 攻略
-GUIDE_PATH = MAIN_PATH / 'guide'
+GUIDE_PATH = MAIN_PATH / 'guide_new'
 # 小沐XMu 攻略库
 XMU_GUIDE_PATH = GUIDE_PATH / 'XMu'
 # Moealkyne 攻略库
