@@ -267,7 +267,7 @@
       {
         "name": "角色共鸣链",
         "desc": "角色共鸣链",
-        "eg": "角色共鸣链安可",
+        "eg": "安可共鸣链",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -275,7 +275,7 @@
       {
         "name": "角色技能",
         "desc": "角色技能",
-        "eg": "角色技能维里奈",
+        "eg": "维里奈技能",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -283,7 +283,7 @@
       {
         "name": "武器介绍",
         "desc": "武器介绍",
-        "eg": "武器介绍琼枝冰绡",
+        "eg": "椿专武介绍",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -291,7 +291,7 @@
       {
         "name": "声骸介绍",
         "desc": "声骸介绍",
-        "eg": "声骸介绍角",
+        "eg": "角介绍",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
