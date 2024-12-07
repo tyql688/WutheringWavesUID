@@ -394,6 +394,22 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": true
+      },
+      {
+        "name": "排行条件-无限制",
+        "desc": "设置群排行为无限制",
+        "eg": "设置群排行1",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "排行条件-登录",
+        "desc": "设置群排行为登录",
+        "eg": "设置群排行2",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
       }
     ]
   },

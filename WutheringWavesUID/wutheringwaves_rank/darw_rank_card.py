@@ -94,7 +94,8 @@ async def find_role_detail_cache(uid: str, char_id: Union[int, List[int]]) -> Op
     return next((role for role in role_details if str(role.role.roleId) in char_id), None)
 
 
-async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDetail, wavesTokenUsersMap):
+async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDetail, tokenLimitFlag,
+                                 wavesTokenUsersMap):
     rankInfoList = []
     if not user.uid:
         return rankInfoList
@@ -103,7 +104,7 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
     role_details = await asyncio.gather(*tasks)
 
     for uid, role_detail in zip(user.uid.split('_'), role_details):
-        if WutheringWavesConfig.get_config('RankUseToken').data and (user.user_id, uid,) not in wavesTokenUsersMap:
+        if tokenLimitFlag and (user.user_id, uid,) not in wavesTokenUsersMap:
             continue
         if not role_detail:
             continue
@@ -171,17 +172,36 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
     return rankInfoList
 
 
-async def get_all_rank_info(users: List[WavesBind], char_id, find_char_id, rankDetail):
-    wavesTokenUsersMap = {}
-    if WutheringWavesConfig.get_config('RankUseToken').data:
-        wavesTokenUsers = await WavesUser.get_waves_all_user()
-        wavesTokenUsersMap = {(w.user_id, w.uid): w.cookie for w in wavesTokenUsers}
-    tasks = [get_rank_info_for_user(user, char_id, find_char_id, rankDetail, wavesTokenUsersMap) for user in users]
+async def get_all_rank_info(users: List[WavesBind], char_id, find_char_id, rankDetail, tokenLimitFlag,
+                            wavesTokenUsersMap):
+    tasks = [get_rank_info_for_user(user, char_id, find_char_id, rankDetail, tokenLimitFlag, wavesTokenUsersMap) for
+             user in users]
     results = await asyncio.gather(*tasks)
 
     # Flatten the results list
     rankInfoList = [rank_info for result in results for rank_info in result]
     return rankInfoList
+
+
+async def get_waves_token_condition(ev, is_bot):
+    wavesTokenUsersMap = {}
+    flag = False
+
+    # 群组 不限制token
+    WavesRankUseTokenGroup = WutheringWavesConfig.get_config('WavesRankNoLimitGroup').data
+    if not is_bot and WavesRankUseTokenGroup and ev.group_id in WavesRankUseTokenGroup:
+        return flag, wavesTokenUsersMap
+
+    # 群组 自定义的
+    WavesRankUseTokenGroup = WutheringWavesConfig.get_config('WavesRankUseTokenGroup').data
+    # 全局 主人定义的
+    RankUseToken = WutheringWavesConfig.get_config('RankUseToken').data
+    if (WavesRankUseTokenGroup and ev.group_id in WavesRankUseTokenGroup) or RankUseToken:
+        wavesTokenUsers = await WavesUser.get_waves_all_user()
+        wavesTokenUsersMap = {(w.user_id, w.uid): w.cookie for w in wavesTokenUsers}
+        flag = True
+
+    return flag, wavesTokenUsersMap
 
 
 async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: bool):
@@ -207,6 +227,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         users = await WavesBind.get_all_data()
     else:
         users = await WavesBind.get_group_all_uid(ev.group_id)
+
+    tokenLimitFlag, wavesTokenUsersMap = await get_waves_token_condition(ev, is_bot)
     if not users:
         msg = []
         if is_bot:
@@ -214,7 +236,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         else:
             msg.append(f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板')
         msg.append(f'请使用【{PREFIX}刷新面板】后再使用此功能！')
-        if WutheringWavesConfig.get_config('RankUseToken').data:
+        if tokenLimitFlag:
             msg.append(f'当前排行开启了登录验证，请使用命令【{PREFIX}登录】登录后此功能！')
         msg.append('')
         return '\n'.join(msg)
@@ -229,7 +251,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         pass
 
     damage_title = (rankDetail and rankDetail['title']) or "无"
-    rankInfoList = await get_all_rank_info(users, char_id, find_char_id, rankDetail)
+    rankInfoList = await get_all_rank_info(users, char_id, find_char_id, rankDetail, tokenLimitFlag, wavesTokenUsersMap)
     if len(rankInfoList) == 0:
         msg = []
         if is_bot:
@@ -237,7 +259,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         else:
             msg.append(f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板')
         msg.append(f'请使用【{PREFIX}刷新面板】后再使用此功能！')
-        if WutheringWavesConfig.get_config('RankUseToken').data:
+        if tokenLimitFlag:
             msg.append(f'当前排行开启了登录验证，请使用命令【{PREFIX}登录】登录后此功能！')
         msg.append('')
         return '\n'.join(msg)
@@ -431,7 +453,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         rank_row = f"1.本群内使用命令【{PREFIX}刷新面板】刷新过面板"
     title_draw.text((20, 420), f'{rank_row_title}', SPECIAL_GOLD, waves_font_16, 'lm')
     title_draw.text((90, 420), f'{rank_row}', GREY, waves_font_16, 'lm')
-    if WutheringWavesConfig.get_config('RankUseToken').data:
+    if tokenLimitFlag:
         rank_row = f"2.使用命令【{PREFIX}登录】登录过的用户"
         title_draw.text((90, 438), f'{rank_row}', GREY, waves_font_16, 'lm')
 

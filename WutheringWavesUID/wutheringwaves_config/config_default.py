@@ -15,6 +15,16 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '鸣潮公告推送ID列表',
         [],
     ),
+    'WavesRankUseTokenGroup': GsListStrConfig(
+        '有token才能进排行，群管理可设置',
+        '有token才能进排行，群管理可设置',
+        [],
+    ),
+    'WavesRankNoLimitGroup': GsListStrConfig(
+        '无限制进排行，群管理可设置',
+        '无限制进排行，群管理可设置',
+        [],
+    ),
     'WavesPrefix': GsStrConfig(
         '插件命令前缀（确认无冲突再修改）',
         '用于设置WutheringWavesUID前缀的配置',
