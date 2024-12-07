@@ -1,6 +1,6 @@
 from typing import Optional, Any, Type, List
 
-from sqlalchemy import and_, or_, null
+from sqlalchemy import and_, or_, null, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Field, select, col
 
@@ -228,6 +228,38 @@ class WavesUser(User, table=True):
     async def get_all_push_user_list(cls: Type[T_User]) -> List[T_User]:
         data = await cls.get_waves_all_user()
         return [user for user in data if user.push_switch != 'off']
+
+    @classmethod
+    @with_session
+    async def delete_all_invalid_cookie(
+        cls, session: AsyncSession
+    ):
+        '''删除所有无效缓存
+        '''
+        # 先查数量
+        sql = select(cls).where(
+            and_(
+                or_(
+                    cls.status == '无效',
+                    cls.cookie == ''
+                )
+            )
+        )
+        result = await session.execute(sql)
+        query = result.scalars().all()
+        if len(query) == 0:
+            return 0
+
+        sql = delete(cls).where(
+            and_(
+                or_(
+                    cls.status == '无效',
+                    cls.cookie == ''
+                )
+            )
+        )
+        await session.execute(sql)
+        return len(query)
 
 
 class WavesPush(Push, table=True):

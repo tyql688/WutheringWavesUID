@@ -1,8 +1,12 @@
+from gsuid_core.aps import scheduler
 from gsuid_core.bot import Bot
+from gsuid_core.config import core_config
+from gsuid_core.gss import gss
+from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from .deal import add_cookie, delete_cookie, get_cookie
-from ..utils.database.models import WavesBind
+from ..utils.database.models import WavesBind, WavesUser
 from ..utils.message import send_diff_msg
 from ..utils.waves_prefix import PREFIX
 
@@ -10,6 +14,7 @@ waves_bind_uid = SV('鸣潮绑定特征码', priority=10)
 waves_add_ck = SV('鸣潮添加token', priority=5)
 waves_del_ck = SV('鸣潮删除token', priority=5)
 waves_get_ck = SV('waves获取ck', area='DIRECT')
+waves_del_all_invalid_ck = SV('鸣潮删除无效token', priority=1, pm=1)
 
 
 @waves_add_ck.on_prefix((
@@ -43,6 +48,35 @@ async def send_waves_del_ck_msg(bot: Bot, ev: Event):
     block=True)
 async def send_waves_get_ck_msg(bot: Bot, ev: Event):
     await bot.send(await get_cookie(bot, ev))
+
+
+@waves_del_all_invalid_ck.on_fullmatch((
+    f'{PREFIX}删除无效token'
+),
+    block=True)
+async def delete_all_invalid_cookie(bot: Bot, ev: Event):
+    at_sender = True if ev.group_id else False
+    del_len = await WavesUser.delete_all_invalid_cookie()
+    await bot.send(f'[鸣潮] 已删除无效token【{del_len}】个\n', at_sender)
+
+
+@scheduler.scheduled_job('cron', hour=23, minute=30)
+async def auto_delete_all_invalid_cookie():
+    del_len = await WavesUser.delete_all_invalid_cookie()
+    msg = f'[鸣潮] 删除无效token【{del_len}】个'
+    config_masters = core_config.get_config('masters')
+    if not config_masters:
+        return
+    for bot_id in gss.active_bot:
+        await gss.active_bot[bot_id].target_send(
+            msg,
+            'direct',
+            config_masters[0],
+            'onebot',
+            '',
+            '',
+        )
+    logger.info(f'[鸣潮]推送主人删除无效token结果: {msg}')
 
 
 @waves_bind_uid.on_command(

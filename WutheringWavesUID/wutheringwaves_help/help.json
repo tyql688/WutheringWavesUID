@@ -432,6 +432,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": true
+      },
+      {
+        "name": "删除无效token",
+        "desc": "删除无效token",
+        "eg": "删除无效token",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
       }
     ]
   }
