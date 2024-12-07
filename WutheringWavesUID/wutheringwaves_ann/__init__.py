@@ -46,7 +46,7 @@ async def unsub_ann_(bot: Bot, ev: Event):
     await bot.send(unsub_ann(bot.bot_id, ev.group_id))
 
 
-@scheduler.scheduled_job('cron', minute=10)
+@scheduler.scheduled_job('cron', minute='*/30')
 async def check_waves_ann():
     await check_waves_ann_state()
 
