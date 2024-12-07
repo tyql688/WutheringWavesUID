@@ -35,7 +35,7 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
             await bot.send('请于30s内给出正确的抽卡记录链接', at_sender)
             async with timeout(30):
                 while True:
-                    resp = await bot.receive_mutiply_resp()
+                    resp = await bot.receive_resp(timeout=30)
                     if resp is not None:
                         raw = resp.text
                         break
