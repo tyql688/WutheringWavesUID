@@ -34,7 +34,7 @@ async def send_daily_info_pic(bot: Bot, ev: Event):
     return await bot.send(await draw_stamina_img(bot, ev))
 
 
-@scheduler.scheduled_job('cron', minute='*/30')
+@scheduler.scheduled_job('cron', minute='*/10')
 async def waves_daily_info_notice_job():
     result = await get_notice_list()
     logger.debug(f"鸣潮推送开始：{result}")
