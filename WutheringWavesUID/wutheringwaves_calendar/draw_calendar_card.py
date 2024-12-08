@@ -5,7 +5,6 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
@@ -63,12 +62,9 @@ async def draw_calendar_img(ev: Event, uid: str):
     for side_module in side_modules:
         if side_module['title'] == '角色唤取活动':
             gacha_char_list = await draw_calendar_gacha(side_module, '角色')
-            logger.info(f'{gacha_char_list}')
 
         elif side_module['title'] == '武器活动唤取':
             gacha_weapon_list = await draw_calendar_gacha(side_module, '武器')
-
-            logger.info(f'{gacha_weapon_list}')
 
         elif side_module['title'] == '版本活动':
             side_module['content'].insert(0, tower_node(now))
@@ -216,6 +212,7 @@ async def draw_calendar_gacha(side_module, gacha_type):
                 else:
                     id = get_weapon_id(name)
                     pic = await get_square_weapon(id)
+                    pic = pic.resize((180, 180))
                 res['nodes'].append({
                     'name': name,
                     'id': id,
@@ -233,8 +230,6 @@ async def draw_banner(wiki_home, img):
         if '版本' in banner['describe']:
             banner_bg = banner['url']
             break
-
-    logger.info(f'banner_bg: {banner_bg}')
 
     banner_bg = Image.open(BytesIO((await sget(banner_bg)).content)).convert(
         'RGBA'
