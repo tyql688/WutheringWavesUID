@@ -171,6 +171,14 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "日历",
+        "desc": "日历",
+        "eg": "日历",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
