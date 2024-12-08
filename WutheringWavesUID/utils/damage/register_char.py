@@ -1,5 +1,6 @@
 from .damage import DamageAttribute
-from .utils import CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING, attack_damage, skill_damage, hit_damage
+from .utils import CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING, attack_damage, skill_damage, hit_damage, CHAR_ATTR_MOLTEN, \
+    liberation_damage
 from ...utils.damage.abstract import CharAbstract, WavesCharRegister, WavesWeaponRegister
 
 
@@ -132,6 +133,23 @@ class Char_1205(CharAbstract):
     id = 1205
     name = "长离"
     starLevel = 5
+
+    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+        """获得buff"""
+        if chain >= 4:
+            title = "长离-四命"
+            msg = "施放变奏技能后，队伍中的角色攻击提升20%"
+            attr.add_atk_percent(0.2, title, msg)
+
+        if attr.char_attr == CHAR_ATTR_MOLTEN:
+            title = "长离-延奏技能"
+            msg = "下一位登场角色热熔伤害加深20%"
+            attr.add_dmg_deepen(0.2, title, msg)
+
+        if liberation_damage == attr.char_damage:
+            title = "长离-延奏技能"
+            msg = "下一位登场角色共鸣解放伤害加深25%"
+            attr.add_dmg_deepen(0.25, title, msg)
 
 
 class Char_1301(CharAbstract):
