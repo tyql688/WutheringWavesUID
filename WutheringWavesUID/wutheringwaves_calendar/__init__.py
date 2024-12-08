@@ -13,7 +13,7 @@ sv_waves_calendar = SV('个人日历')
 @sv_waves_calendar.on_fullmatch(
     (f'{PREFIX}个人日历', f'{PREFIX}日历'), block=True
 )
-async def send_calendar_pic(bot: Bot, ev: Event):
+async def send_waves_calendar_pic(bot: Bot, ev: Event):
     at_sender = True if ev.group_id else False
     user_id = ev.at if ev.at else ev.user_id
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
