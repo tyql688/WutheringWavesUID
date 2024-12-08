@@ -59,6 +59,11 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = f"施放共鸣解放时，下次重击爆裂伤害提升120%"
         attr.add_dmg_bonus(1.2, title, msg)
 
+    if chain_num >= 6:
+        title = f"{role_name}-六命"
+        msg = f"引爆【冰棱】或【冰川】后，队伍中的角色攻击提升10%*2"
+        attr.add_atk_percent(0.1, title, msg)
+
     # 声骸
     echo_damage(attr, isGroup)
 
@@ -122,6 +127,11 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         title = f"{role_name}-三命"
         msg = f"散华攻击生命低于70%的目标时，造成的伤害提升35%。"
         attr.add_dmg_bonus(0.35, title, msg)
+
+    if chain_num >= 6:
+        title = f"{role_name}-六命"
+        msg = f"引爆【冰棱】或【冰川】后，队伍中的角色攻击提升10%*2"
+        attr.add_atk_percent(0.2, title, msg)
 
     # 声骸
     echo_damage(attr, isGroup)
@@ -196,6 +206,11 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = "冰绽的暴击伤害提升100%。"
         attr.add_crit_dmg(1, title, msg)
 
+    if chain_num >= 6:
+        title = f"{role_name}-六命"
+        msg = f"引爆【冰棱】或【冰川】后，队伍中的角色攻击提升10%*2"
+        attr.add_atk_percent(0.2, title, msg)
+
     # 声骸
     echo_damage(attr, isGroup)
 
@@ -254,6 +269,11 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         title = f"{role_name}-三命"
         msg = f"散华攻击生命低于70%的目标时，造成的伤害提升35%。"
         attr.add_dmg_bonus(0.35, title, msg)
+
+    if chain_num >= 6:
+        title = f"{role_name}-六命"
+        msg = f"引爆【冰棱】或【冰川】后，队伍中的角色攻击提升10%*2"
+        attr.add_atk_percent(0.2, title, msg)
 
     # 声骸
     echo_damage(attr, isGroup)
@@ -327,6 +347,11 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         title = f"{role_name}-五命"
         msg = "冰绽的暴击伤害提升100%。"
         attr.add_crit_dmg(1, title, msg)
+
+    if chain_num >= 6:
+        title = f"{role_name}-六命"
+        msg = f"引爆【冰棱】或【冰川】后，队伍中的角色攻击提升10%*2"
+        attr.add_atk_percent(0.2, title, msg)
 
     # 声骸
     echo_damage(attr, isGroup)

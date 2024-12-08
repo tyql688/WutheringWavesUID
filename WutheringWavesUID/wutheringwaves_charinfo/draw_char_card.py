@@ -577,9 +577,13 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id
     img.alpha_composite(skill_bar, dest=(0, 1150))
 
     if damage_calc and damageDetail and role_detail.phantomData and role_detail.phantomData.equipPhantomList:
+        damage_title = damage_calc['title']
         damageAttribute = card_sort_map_to_attribute(card_map)
         damageAttributeTemp = copy.deepcopy(damageAttribute)
         crit_damage, expected_damage = damage_calc['func'](damageAttributeTemp, role_detail)
+        logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
+        logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
+        logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
 
         damage_high = 100 + (len(damageAttributeTemp.effect) + 3) * 60
         damage_img = Image.new('RGBA', (1200, damage_high))
