@@ -7,7 +7,7 @@ from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
 from ..wutheringwaves_config import PREFIX
 
-sv_waves_calendar = SV('个人日历')
+sv_waves_calendar = SV('waves日历')
 
 
 @sv_waves_calendar.on_fullmatch(
