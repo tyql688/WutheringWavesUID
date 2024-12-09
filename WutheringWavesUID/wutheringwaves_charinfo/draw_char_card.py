@@ -361,27 +361,43 @@ async def draw_fixed_img(img, avatar, account_info, role_detail):
 
 def resize_and_center_image(image, output_size=(560, 1000), background_color=(255, 255, 255, 0), is_custom=False):
     """
-    将任意大小的图片调整为固定尺寸 (560x1000)，并保持居中。
+    根据输入的图片，调整其尺寸以尽量填充目标尺寸，并保持居中。
+    若宽度过长或高度过长，会根据图片的比例自动调整，以保持居中并尽量维持固定尺寸（560x1000）。
 
-    :param image_path: 原始图片路径
+    :param image: 原始图片对象
     :param output_size: 输出图片大小 (宽度, 高度)
     :param background_color: 填充背景的颜色 (默认为透明)
-    :param is_custom: 是否为自定义面板
+    :param is_custom: 是否为自定义面板，决定是否需要调整图片
     :return: 调整后的图片对象
     """
+    # 如果不需要自定义调整，直接返回原图
     if not is_custom:
         return image
-    # 缩放图片，保持宽高比
-    image.thumbnail(output_size)
 
-    # 创建目标尺寸的空白背景图像
+    image = image.copy()
+
+    # 获取原始图片的宽度和高度
+    img_width, img_height = image.size
+    target_width, target_height = output_size
+
+    # 如果图片的宽度大于高度，则根据宽度缩放图片
+    if img_width > img_height:
+        scale_factor = target_width / img_width
+        new_width = target_width
+        new_height = int(img_height * scale_factor)
+    else:
+        scale_factor = target_height / img_height
+        new_width = int(img_width * scale_factor)
+        new_height = target_height
+
+    image = image.resize((new_width, new_height))
+
     result_image = Image.new("RGBA", output_size, background_color)
 
     # 计算粘贴位置，居中对齐
-    paste_x = (output_size[0] - image.size[0]) // 2
-    paste_y = (output_size[1] - image.size[1]) // 2
+    paste_x = (target_width - new_width) // 2
+    paste_y = (target_height - new_height) // 2
 
-    # 将缩放后的图片粘贴到背景上
     result_image.paste(image, (paste_x, paste_y), image)
 
     return result_image
