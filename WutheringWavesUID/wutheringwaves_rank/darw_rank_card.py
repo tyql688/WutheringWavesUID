@@ -24,8 +24,8 @@ from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_va
 from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_16, waves_font_40, waves_font_30, \
     waves_font_24, waves_font_20, waves_font_44
 from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_GOLD, \
-    get_square_weapon, CHAIN_COLOR, get_attribute, get_role_pile, WAVES_ECHO_MAP, get_attribute_effect, \
-    change_color, GREY, RED
+    get_square_weapon, CHAIN_COLOR, get_attribute, WAVES_ECHO_MAP, get_attribute_effect, \
+    change_color, GREY, RED, get_role_pile_old
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.simple_async_cache_card import card_cache
@@ -427,7 +427,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     title.alpha_composite(logo_img.copy(), dest=(50, 65))
 
     # 人物bg
-    pile = await get_role_pile(char_id)
+    pile = await get_role_pile_old(char_id)
     title.paste(pile, (450, -120), pile)
     title_draw.text((200, 335), f'{avg_score}', 'white', waves_font_44, 'mm')
     title_draw.text((200, 375), f'平均声骸分数', SPECIAL_GOLD, waves_font_20, 'mm')

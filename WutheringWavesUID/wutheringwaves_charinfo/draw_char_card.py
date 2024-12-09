@@ -326,7 +326,7 @@ async def draw_fixed_img(img, avatar, account_info, role_detail):
         img.paste(title_bar, (200, 15), title_bar)
 
     # 左侧pile部分
-    role_pile = await get_role_pile(role_detail.role.roleId, True)
+    is_custom, role_pile = await get_role_pile(role_detail.role.roleId, True)
     char_mask = Image.open(TEXT_PATH / 'char_mask.png')
     char_fg = Image.open(TEXT_PATH / 'char_fg.png')
 
@@ -353,21 +353,24 @@ async def draw_fixed_img(img, avatar, account_info, role_detail):
 
     role_pile_image = Image.new('RGBA', (560, 1000))
 
-    role_pile = resize_and_center_image(role_pile)
+    role_pile = resize_and_center_image(role_pile, is_custom=is_custom)
     role_pile_image.paste(role_pile, ((560 - role_pile.size[0]) // 2, (1000 - role_pile.size[1]) // 2), role_pile)
     img.paste(role_pile_image, (25, 170), char_mask)
     img.paste(char_fg, (25, 170), char_fg)
 
 
-def resize_and_center_image(image, output_size=(560, 1000), background_color=(255, 255, 255, 0)):
+def resize_and_center_image(image, output_size=(560, 1000), background_color=(255, 255, 255, 0), is_custom=False):
     """
     将任意大小的图片调整为固定尺寸 (560x1000)，并保持居中。
 
     :param image_path: 原始图片路径
     :param output_size: 输出图片大小 (宽度, 高度)
     :param background_color: 填充背景的颜色 (默认为透明)
+    :param is_custom: 是否为自定义面板
     :return: 调整后的图片对象
     """
+    if not is_custom:
+        return image
     # 缩放图片，保持宽高比
     image.thumbnail(output_size)
 
