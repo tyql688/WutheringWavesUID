@@ -261,6 +261,43 @@
       }
     ]
   },
+  "面板图帮助": {
+    "desc": "面板图帮助",
+    "data": [
+      {
+        "name": "上传角色面板图",
+        "desc": "上传角色面板图",
+        "eg": "上传椿面板图",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "面板图列表",
+        "desc": "面板图列表",
+        "eg": "椿面板图列表",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "删除面板图",
+        "desc": "删除面板图",
+        "eg": "删除椿面板图123",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "删除全部面板图",
+        "desc": "删除全部面板图",
+        "eg": "删除全部椿面板图",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
   "WIKI": {
     "desc": "获取游戏信息&攻略",
     "data": [

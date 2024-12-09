@@ -8,6 +8,7 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.image.convert import convert_img
 from .draw_char_card import draw_char_detail_img, draw_char_score_img
+from .upload_card import upload_custom_card, get_custom_card_list, delete_custom_card, delete_all_custom_card
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
@@ -16,6 +17,10 @@ from ..utils.waves_prefix import PREFIX
 waves_new_get_char_info = SV('waves新获取面板', priority=3)
 waves_new_char_detail = SV(f'waves新角色面板', priority=4)
 waves_char_detail = SV(f'waves角色面板', priority=5)
+waves_upload_char = SV(f'waves上传面板图', priority=5, pm=1)
+waves_char_card_list = SV(f'waves面板图列表', priority=5, pm=1)
+waves_delete_char_card = SV(f'waves删除面板图', priority=5, pm=1)
+waves_delete_all_card = SV(f'waves删除全部面板图', priority=5, pm=1)
 
 
 @waves_new_get_char_info.on_fullmatch(
@@ -158,3 +163,56 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
     if isinstance(im, str) and ev.group_id:
         at_sender = True
     return await bot.send(im, at_sender)
+
+
+@waves_upload_char.on_regex(rf'^{PREFIX}上传[\u4e00-\u9fa5]+面板图$', block=True)
+async def upload_char_img(bot: Bot, ev: Event):
+    match = re.search(
+        rf'{PREFIX}上传(?P<char>[\u4e00-\u9fa5]+)面板图',
+        ev.raw_text
+    )
+    if not match:
+        return
+    ev.regex_dict = match.groupdict()
+    char = ev.regex_dict.get("char")
+    await upload_custom_card(bot, ev, char)
+
+
+@waves_char_card_list.on_regex(rf'^{PREFIX}[\u4e00-\u9fa5]+面板图列表$', block=True)
+async def get_char_card_list(bot: Bot, ev: Event):
+    match = re.search(
+        rf'{PREFIX}(?P<char>[\u4e00-\u9fa5]+)面板图列表',
+        ev.raw_text
+    )
+    if not match:
+        return
+    ev.regex_dict = match.groupdict()
+    char = ev.regex_dict.get("char")
+    await get_custom_card_list(bot, ev, char)
+
+
+@waves_delete_char_card.on_regex(rf'^{PREFIX}删除[\u4e00-\u9fa5]+面板图[a-zA-Z0-9]+$', block=True)
+async def delete_char_card(bot: Bot, ev: Event):
+    match = re.search(
+        rf'{PREFIX}删除(?P<char>[\u4e00-\u9fa5]+)面板图(?P<hash_id>[a-zA-Z0-9]+)',
+        ev.raw_text
+    )
+    if not match:
+        return
+    ev.regex_dict = match.groupdict()
+    char = ev.regex_dict.get("char")
+    hash_id = ev.regex_dict.get("hash_id")
+    await delete_custom_card(bot, ev, char, hash_id)
+
+
+@waves_delete_all_card.on_regex(rf'^{PREFIX}删除全部[\u4e00-\u9fa5]+面板图$', block=True)
+async def delete_all_char_card(bot: Bot, ev: Event):
+    match = re.search(
+        rf'{PREFIX}删除全部(?P<char>[\u4e00-\u9fa5]+)面板图',
+        ev.raw_text
+    )
+    if not match:
+        return
+    ev.regex_dict = match.groupdict()
+    char = ev.regex_dict.get("char")
+    await delete_all_custom_card(bot, ev, char)

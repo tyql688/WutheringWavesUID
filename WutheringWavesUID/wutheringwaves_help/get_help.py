@@ -40,7 +40,7 @@ async def get_help(pm: int):
         item_bg=Image.open(TEXT_PATH / 'item.png'),
         icon_path=ICON_PATH,
         footer=get_footer(),
-        enable_cache=False,
+        enable_cache=True,
         column=4,
         pm=pm,
     )

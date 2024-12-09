@@ -6,6 +6,7 @@ from typing import Union, Literal, Optional, Tuple
 
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 
+from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
 from gsuid_core.utils.image.utils import sget
@@ -13,7 +14,7 @@ from .name_convert import char_name_to_char_id
 from ..utils.resource.RESOURCE_PATH import (
     AVATAR_PATH,
     WEAPON_PATH,
-    ROLE_PILE_PATH,
+    ROLE_PILE_PATH, CUSTOM_CARD_PATH,
 )
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -79,7 +80,15 @@ async def get_random_waves_role_pile(name: str = None):
     return Image.open(f'{ROLE_PILE_PATH}/{path}').convert('RGBA')
 
 
-async def get_role_pile(resource_id: Union[int, str]) -> Image.Image:
+async def get_role_pile(resource_id: Union[int, str], custom: bool = False) -> Image.Image:
+    if custom:
+        custom_dir = f'{CUSTOM_CARD_PATH}/{resource_id}'
+        if os.path.isdir(custom_dir):
+            logger.info(f'使用自定义角色头像: {resource_id}')
+            path = random.choice(os.listdir(custom_dir))
+            if path:
+                return Image.open(f'{custom_dir}/{path}').convert('RGBA')
+
     name = f"role_pile_{resource_id}.png"
     path = ROLE_PILE_PATH / name
     if path.exists():

@@ -43,6 +43,9 @@ GUIDE_CONFIG_MAP = {
     '結星': (JIEXING_GUIDE_PATH, 10015697, 'kuro')
 }
 
+# 自定义背景图
+CUSTOM_CARD_PATH = MAIN_PATH / 'custom_role_pile'
+
 
 def init_dir():
     for i in [
@@ -62,6 +65,7 @@ def init_dir():
         MOEALKYNE_GUIDE_PATH,
         JINLINGZI_GUIDE_PATH,
         JIEXING_GUIDE_PATH,
+        CUSTOM_CARD_PATH,
     ]:
         i.mkdir(parents=True, exist_ok=True)
 
