@@ -1,4 +1,5 @@
 # 炽霞
+from .buff import shouanren_buff, changli_buff
 from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
@@ -143,6 +144,17 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
+def calc_damage_10(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+    attr.set_char_damage(liberation_damage)
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 长离buff
+    changli_buff(attr, 0, 1, isGroup)
+
+    return calc_damage_2(attr, role, isGroup)
+
+
 damage_detail = [
     {
         "title": "共鸣技能·轰轰伤害",
@@ -151,7 +163,11 @@ damage_detail = [
     {
         "title": "炽烈焰火伤害",
         "func": lambda attr, role: calc_damage_2(attr, role),
+    },
+    {
+        "title": "0+1守/0+0长离/r伤害",
+        "func": lambda attr, role: calc_damage_10(attr, role),
     }
 ]
 
-rank = damage_detail[1]
+rank = damage_detail[2]
