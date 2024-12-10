@@ -83,7 +83,7 @@ async def get_random_waves_role_pile(name: str = None):
 async def get_role_pile(resource_id: Union[int, str], custom: bool = False) -> (bool, Image.Image):
     if custom:
         custom_dir = f'{CUSTOM_CARD_PATH}/{resource_id}'
-        if os.path.isdir(custom_dir):
+        if os.path.isdir(custom_dir) and len(os.listdir(custom_dir)) > 0:
             logger.info(f'使用自定义角色头像: {resource_id}')
             path = random.choice(os.listdir(custom_dir))
             if path:
