@@ -599,6 +599,29 @@ class Weapon_21050026(WeaponAbstract):
     type = 5
     name = "琼枝冰绡"
 
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_damage != attack_damage:
+            return
+
+        if attr.sync_strike:
+            dmg = f"{self.param(5)}"
+            title = self.get_title()
+            msg = f"使自身不在场时普攻伤害加成提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        else:
+            buff_layer = int(self.param(2))
+            effect_value = attr.get_effect("默认手法")
+            if effect_value and isinstance(effect_value, str):
+                count_e = effect_value.count('e')
+
+                buff_layer = min(buff_layer, count_e)
+
+            dmg = f"{self.param(1)}*{buff_layer}"
+            title = self.get_title()
+            msg = f"施放共鸣技能时，自身在场时普攻伤害加成提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21050034(WeaponAbstract):
     id = 21050034
@@ -614,7 +637,7 @@ class Weapon_21050036(WeaponAbstract):
     def skill_create_healing(self, attr: DamageAttribute, isGroup: bool = False):
         """共鸣技能造成治疗"""
         dmg = f"{self.weapon_detail.param[4][self.weapon_reson_level - 1]}"
-        title = f"星序协响-{self.weapon_detail.get_resonLevel_name()}"
+        title = self.get_title()
         msg = f"使附近队伍中所有角色的攻击提升{dmg}"
         attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 

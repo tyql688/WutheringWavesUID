@@ -273,6 +273,12 @@ class DamageAttribute:
             return
         self.effect.append(effect)
 
+    def get_effect(self, title: str):
+        for effect in self.effect:
+            if effect.element_msg != title:
+                continue
+            return effect.element_value
+
     def set_enemy_level(self, enemy_level: int):
         self.enemy_level = enemy_level
 
