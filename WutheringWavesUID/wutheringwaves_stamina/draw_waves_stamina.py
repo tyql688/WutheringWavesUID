@@ -1,5 +1,6 @@
 import asyncio
 import time
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Union
 
@@ -113,17 +114,29 @@ async def _draw_stamina_img(ev: Event, daily_info: DailyData) -> Union[str, Imag
     base_info_draw.text((226, 173), f'特征码:  {daily_info.roleId}', GOLD, waves_font_25, 'lm')
 
     # 体力剩余恢复时间
+    active_draw = ImageDraw.Draw(info)
     curr_time = int(time.time())
     refreshTimeStamp = daily_info.energyData.refreshTimeStamp if daily_info.energyData.refreshTimeStamp else curr_time
-    remain_time = await seconds2hours(refreshTimeStamp - curr_time)
-    active_draw = ImageDraw.Draw(info)
-    active_draw.text((178, 140), f'剩余时间', GREY, waves_font_24, 'lm')
+    # remain_time = await seconds2hours(refreshTimeStamp - curr_time)
+    if refreshTimeStamp != curr_time:
+        date_from_timestamp = datetime.fromtimestamp(refreshTimeStamp)
+        now = datetime.now()
+        today = now.date()
+        tomorrow = today + timedelta(days=1)
 
-    time_img = Image.new('RGBA', (155, 30), (255, 255, 255, 0))
-    time_img_draw = ImageDraw.Draw(time_img)
-    time_img_draw.rounded_rectangle([0, 0, 155, 30], radius=15, fill=(186, 55, 42, int(0.7 * 255)))
-    time_img_draw.text((10, 15), f'{remain_time}', 'white', waves_font_24, 'lm')
-    info.alpha_composite(time_img, (280, 125))
+        remain_time = datetime.fromtimestamp(refreshTimeStamp).strftime('%m.%d %H:%M:%S')
+        if date_from_timestamp.date() == today:
+            remain_time = "今天 " + datetime.fromtimestamp(refreshTimeStamp).strftime('%H:%M:%S')
+        elif date_from_timestamp.date() == tomorrow:
+            remain_time = "明天 " + datetime.fromtimestamp(refreshTimeStamp).strftime('%H:%M:%S')
+
+        active_draw.text((178, 140), f'恢复时间', GREY, waves_font_24, 'lm')
+
+        time_img = Image.new('RGBA', (190, 33), (255, 255, 255, 0))
+        time_img_draw = ImageDraw.Draw(time_img)
+        time_img_draw.rounded_rectangle([0, 0, 190, 33], radius=15, fill=(186, 55, 42, int(0.7 * 255)))
+        time_img_draw.text((10, 15), f'{remain_time}', 'white', waves_font_24, 'lm')
+        info.alpha_composite(time_img, (280, 125))
 
     max_len = 345
     # 体力
