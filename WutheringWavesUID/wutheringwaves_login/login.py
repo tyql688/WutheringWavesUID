@@ -69,11 +69,12 @@ async def page_login_local(bot: Bot, ev: Event, url):
     game_title = "[鸣潮]"
     at_sender = True if ev.group_id else False
     user_token = get_token(ev.user_id)
+    await bot.send(
+        f"{game_title} \n请复制地址到浏览器打开：\n{url}/waves/i/{user_token}\n您的id为【{ev.user_id}】\n登录地址10分钟内有效\n",
+        at_sender=at_sender)
     result = cache.get(user_token)
     if isinstance(result, dict):
-        return await bot.send(
-            f"{game_title} \n请复制地址到浏览器打开：\n{url}/waves/i/{user_token}\n您的id为【{ev.user_id}】\n登录地址10分钟内有效\n",
-            at_sender=at_sender)
+        return
 
     # 手机登录
     data = {"mobile": -1, "code": -1, "user_id": ev.user_id}
