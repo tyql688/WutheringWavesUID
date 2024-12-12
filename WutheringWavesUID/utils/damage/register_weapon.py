@@ -130,6 +130,22 @@ class Weapon_21010074(WeaponAbstract):
     type = 1
     name = "纹秋"
 
+    # 造成普攻或重击伤害时，攻击提升4%，可叠加5层
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        dmg = f"{self.param(0)}*{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放普攻时，自身攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
+
+    def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放重击伤害"""
+        dmg = f"{self.param(0)}*{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放重击伤害时，自身攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21010084(WeaponAbstract):
     id = 21010084
