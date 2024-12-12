@@ -192,13 +192,13 @@ async def draw_calendar_gacha(side_module, gacha_type):
     res_list = []
     tabs = side_module['content']['tabs']
     for tab in tabs:
-        if 'description' not in tab or not tab.get('description', ''):
+        if 'name' not in tab or not tab.get('name', ''):
             continue
         special_images = SpecialImages(**tab)
         res = {
             'title': side_module['title'],
             'dateRange': tab['countDown']['dateRange'],
-            'description': tab['description'],
+            'description': tab['name'],
             'nodes': []
         }
         for img_item in special_images.imgs:
