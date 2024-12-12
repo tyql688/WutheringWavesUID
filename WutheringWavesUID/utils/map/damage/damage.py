@@ -33,7 +33,7 @@ def check_if_ph_5(ph_name: str, ph_num: int, check_name: str):
 
 def phase_damage(attr: DamageAttribute, role: RoleDetailData, damage_func: Union[List[str], str], isGroup: bool = False,
                  isHealing: bool = False):
-    role_name = role.role.roleName
+    phase_name = '合鸣效果'
 
     if not attr.ph_detail:
         return
@@ -43,37 +43,37 @@ def phase_damage(attr: DamageAttribute, role: RoleDetailData, damage_func: Union
         if (cast_hit in damage_func or cast_attack in damage_func) and check_if_ph_5(ph_detail.ph_name,
                                                                                      ph_detail.ph_num, SONATA_FREEZING):
             # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
+            title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
         # 熔山裂谷
         elif (cast_skill in damage_func) and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_MOLTEN):
-            title = f"{role_name}-{ph_detail.ph_name}"
+            title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
         # 彻空冥雷
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_VOID):
             if cast_skill in damage_func:
-                title = f"{role_name}-{ph_detail.ph_name}"
+                title = f"{phase_name}-{ph_detail.ph_name}"
                 msg = f"使用共鸣技能时，获得一层导电伤害提升15%"
                 attr.add_dmg_bonus(0.15, title, msg)
             if cast_hit in damage_func:
-                title = f"{role_name}-{ph_detail.ph_name}"
+                title = f"{phase_name}-{ph_detail.ph_name}"
                 msg = f"使用重击时，获得一层导电伤害提升15%"
                 attr.add_dmg_bonus(0.15, title, msg)
 
         # 啸谷长风
         elif isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SIERRA):
             # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
+            title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_atk_percent(0.3, title, msg)
 
         # 浮星祛暗
         elif isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_CELESTIAL):
-            title = f"{role_name}-{ph_detail.ph_name}"
+            title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
@@ -82,13 +82,13 @@ def phase_damage(attr: DamageAttribute, role: RoleDetailData, damage_func: Union
                                                                                        ph_detail.ph_num,
                                                                                        SONATA_SINKING):
             # 声骸五件套
-            title = f"{role_name}-{ph_detail.ph_name}"
+            title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
         # 隐世回光
         elif isHealing and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_REJUVENATING):
-            title = f"{role_name}-{ph_detail.ph_name}"
+            title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
