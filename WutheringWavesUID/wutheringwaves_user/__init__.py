@@ -9,6 +9,7 @@ from .deal import add_cookie, delete_cookie, get_cookie
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.message import send_diff_msg
 from ..utils.waves_prefix import PREFIX
+from ..wutheringwaves_config import WutheringWavesConfig
 
 waves_bind_uid = SV('鸣潮绑定特征码', priority=10)
 waves_add_ck = SV('鸣潮添加token', priority=5)
@@ -62,9 +63,15 @@ async def delete_all_invalid_cookie(bot: Bot, ev: Event):
 
 @scheduler.scheduled_job('cron', hour=23, minute=30)
 async def auto_delete_all_invalid_cookie():
+    DelInvalidCookie = WutheringWavesConfig.get_config('DelInvalidCookie').data
+    if not DelInvalidCookie:
+        return
     del_len = await WavesUser.delete_all_invalid_cookie()
+    if del_len == 0:
+        return
     msg = f'[鸣潮] 删除无效token【{del_len}】个'
     config_masters = core_config.get_config('masters')
+
     if not config_masters:
         return
     for bot_id in gss.active_bot:

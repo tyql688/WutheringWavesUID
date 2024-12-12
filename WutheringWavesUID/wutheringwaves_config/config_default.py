@@ -96,4 +96,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '有token才能进排行',
         False,
     ),
+    'DelInvalidCookie': GsBoolConfig(
+        '每天定时删除无效token',
+        '每天定时删除无效token',
+        False,
+    ),
 }
