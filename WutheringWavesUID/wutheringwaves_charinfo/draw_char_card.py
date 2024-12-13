@@ -529,7 +529,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id
             mz_bg_temp_draw.text((147, 230), f'{name}', 'white', waves_font_20, 'mm')
 
         if not _mz.unlocked:
-            mz_bg_temp = ImageEnhance.Brightness(mz_bg_temp).enhance(0.5)
+            mz_bg_temp = ImageEnhance.Brightness(mz_bg_temp).enhance(0.3)
         mz_temp.alpha_composite(mz_bg_temp, dest=(i * 190, 0))
 
     img.paste(mz_temp, (0, 1080 + jineng_len), mz_temp)
