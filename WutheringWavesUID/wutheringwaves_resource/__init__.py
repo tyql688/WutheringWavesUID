@@ -37,8 +37,14 @@ async def startup():
     logger.info(
         '[鸣潮][资源文件下载] 正在检查与下载缺失的资源文件，可能需要较长时间，请稍等'
     )
-    logger.info(f'[鸣潮][资源文件下载] {await download_all_resource()}')
-    logger.info(f'[鸣潮][加载用户面板缓存] 数量: {await load_all_card()}')
+    try:
+        logger.info(f'[鸣潮][资源文件下载] {await download_all_resource()}')
+    except Exception as e:
+        logger.exception(e)
+    try:
+        logger.info(f'[鸣潮][加载用户面板缓存] 数量: {await load_all_card()}')
+    except Exception as e:
+        logger.exception(e)
     # logger.info(f'[鸣潮][加载用户绑定缓存] 数量: {await load_user_bind()}')
 
 
