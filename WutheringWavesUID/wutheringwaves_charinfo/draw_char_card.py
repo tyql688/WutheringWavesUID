@@ -23,7 +23,7 @@ from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_5
     waves_font_24, waves_font_28, waves_font_26, waves_font_42, waves_font_16, waves_font_18, waves_font_36
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow, get_square_avatar, \
-    WAVES_MOONLIT, WAVES_FREEZING
+    WAVES_MOONLIT, WAVES_FREEZING, change_color, WAVES_SHUXING_MAP
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR
 from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_fetter_img, get_skill_img
@@ -510,6 +510,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id
     # 命座部分
     mz_temp = Image.new('RGBA', (1200, 300))
 
+    shuxing_color = WAVES_SHUXING_MAP[role_detail.role.attributeName]
     for i, _mz in enumerate(role_detail.chainList):
         mz_bg = Image.open(TEXT_PATH / 'mz_bg.png')
         mz_bg_temp = Image.new('RGBA', mz_bg.size)
@@ -518,6 +519,8 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id
         chain = chain.resize((100, 100))
         mz_bg.paste(chain, (95, 75), chain)
         mz_bg_temp.alpha_composite(mz_bg, dest=(0, 0))
+        if _mz.unlocked:
+            mz_bg_temp = await change_color(mz_bg_temp, shuxing_color)
 
         name = re.sub(r'[",，]+', '', _mz.name)
         if len(name) >= 8:

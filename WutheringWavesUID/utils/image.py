@@ -58,6 +58,15 @@ WAVES_ECHO_MAP = {
     "不绝余音": WAVES_LINGERING,
 }
 
+WAVES_SHUXING_MAP = {
+    "冷凝": WAVES_FREEZING,
+    "热熔": WAVES_MOLTEN,
+    "导电": WAVES_VOID,
+    "气动": WAVES_SIERRA,
+    "衍射": WAVES_CELESTIAL,
+    "湮灭": WAVES_SINKING,
+}
+
 CHAIN_COLOR = {
     0: WAVES_MOONLIT,
     1: WAVES_LINGERING,
