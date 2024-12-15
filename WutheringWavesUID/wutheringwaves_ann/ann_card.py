@@ -7,7 +7,7 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_pic, easy_paste, draw_text_by_line, easy_alpha_composite
 from .main import ann
 from ..utils.fonts.waves_fonts import ww_font_26, ww_font_18, ww_font_24, ww_font_20
-from ..wutheringwaves_config import WutheringWavesConfig, PREFIX
+from ..wutheringwaves_config import PREFIX
 
 assets_dir = Path(__file__).parent / 'assets'
 list_item = (
@@ -222,26 +222,25 @@ def get_duanluo(text: str):
         duanluo += '\n'
     return duanluo, line_height, line_count
 
-
-def sub_ann(bot_id: str, group: str):
-    groups = WutheringWavesConfig.get_config('WavesAnnGroups').data
-    if bot_id not in groups:
-        groups[bot_id] = []
-    if group in groups[bot_id]:
-        return '已经订阅了'
-    else:
-        groups[bot_id].append(group)
-        WutheringWavesConfig.set_config('WavesAnnGroups', groups)
-    return '成功订阅鸣潮公告'
-
-
-def unsub_ann(bot_id: str, group: str):
-    groups = WutheringWavesConfig.get_config('WavesAnnGroups').data
-    if bot_id not in groups:
-        groups[bot_id] = []
-    if group in groups[bot_id]:
-        groups[bot_id].remove(group)
-        WutheringWavesConfig.set_config('WavesAnnGroups', groups)
-        return '成功取消订阅鸣潮公告'
-    else:
-        return '已经不在订阅中了'
+# def sub_ann(bot_id: str, group: str):
+#     groups = WutheringWavesConfig.get_config('WavesAnnGroups').data
+#     if bot_id not in groups:
+#         groups[bot_id] = []
+#     if group in groups[bot_id]:
+#         return '已经订阅了'
+#     else:
+#         groups[bot_id].append(group)
+#         WutheringWavesConfig.set_config('WavesAnnGroups', groups)
+#     return '成功订阅鸣潮公告'
+#
+#
+# def unsub_ann(bot_id: str, group: str):
+#     groups = WutheringWavesConfig.get_config('WavesAnnGroups').data
+#     if bot_id not in groups:
+#         groups[bot_id] = []
+#     if group in groups[bot_id]:
+#         groups[bot_id].remove(group)
+#         WutheringWavesConfig.set_config('WavesAnnGroups', groups)
+#         return '成功取消订阅鸣潮公告'
+#     else:
+#         return '已经不在订阅中了'
