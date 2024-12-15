@@ -1,5 +1,5 @@
 # 今夕
-from .buff import weilinai_buff, zhezhi_buff
+from .buff import weilinai_buff, zhezhi_buff, shouanren_buff
 from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
@@ -160,6 +160,21 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     return calc_damage_1(attr, role, isGroup)
 
 
+def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+    """
+    0+1守/0折枝/惊龙破空·炳星
+    """
+    attr.set_char_damage(skill_damage)
+
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 折枝buff
+    zhezhi_buff(attr, 0, 1, isGroup)
+
+    return calc_damage_1(attr, role, isGroup)
+
+
 damage_detail = [
     {
         "title": "惊龙破空·炳星",
@@ -172,6 +187,10 @@ damage_detail = [
     {
         "title": "0维/0折枝/惊龙破空·炳星",
         "func": lambda attr, role: calc_damage_3(attr, role),
+    },
+    {
+        "title": "0+1守/0折枝/惊龙破空·炳星",
+        "func": lambda attr, role: calc_damage_4(attr, role),
     }
 ]
 
