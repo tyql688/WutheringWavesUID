@@ -152,4 +152,4 @@ damage_detail = [
     }
 ]
 
-rank = damage_detail[0]
+rank = damage_detail[2]
