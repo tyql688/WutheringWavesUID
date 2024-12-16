@@ -1,5 +1,6 @@
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
+from gsuid_core.subscribe import gs_subscribe
 from ..utils.database.models import WavesUser, WavesPush
 
 PUSH_MAP = {
@@ -13,6 +14,8 @@ SIGN_MAP = {
 WAVES_USER_MAP = {
     "体力背景": "stamina_bg"
 }
+
+task_name_sign = '订阅鸣潮签到'
 
 
 async def set_waves_user_value(ev: Event, func: str, uid: str, value: str):
@@ -77,6 +80,10 @@ async def set_config_func(ev: Event, uid: str = "0"):
                 bot_id=ev.bot_id,
                 **{f"{SIGN_MAP['自动社区签到']}_switch": option, },
             )
+        if option == 'off':
+            await gs_subscribe.delete_subscribe('single', task_name_sign, ev)
+        else:
+            await gs_subscribe.add_subscribe('single', task_name_sign, ev)
     elif config_name.replace('推送', '') in PUSH_MAP:
         await WavesPush.update_data_by_uid(
             uid=uid,

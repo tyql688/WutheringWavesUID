@@ -13,13 +13,13 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.segment import MessageSegment
 from gsuid_core.utils.boardcast.models import BoardCastMsg, BoardCastMsgDict
-from gsuid_core.utils.boardcast.send_msg import send_board_cast_msg
 from ..utils.api.api import MAIN_URL
 from ..utils.api.model import DailyData
 from ..utils.database.models import WavesUser, WavesBind
 from ..utils.error_reply import WAVES_CODE_999, ERROR_CODE, WAVES_CODE_102, WAVES_CODE_101
 from ..utils.util import generate_random_string
 from ..utils.waves_api import waves_api
+from ..utils.waves_send_msg import send_board_cast_msg
 from ..wutheringwaves_config import WutheringWavesConfig
 
 GET_GOLD_URL = f'{MAIN_URL}/encourage/gold/getTotalGold'
@@ -377,7 +377,7 @@ async def auto_sign_task():
         result, num = await daily_sign_action(sign_expiregid2uid, sign_user_list)
         if not IS_REPORT:
             result['private_msg_dict'] = {}
-        await send_board_cast_msg(result)
+        await send_board_cast_msg(result, 'sign')
         sign_success = num['success_num']
         sign_fail = num['failed_num']
 
@@ -388,7 +388,7 @@ async def auto_sign_task():
         result, num = await auto_bbs_task_action(bbs_expiregid2uid, bbs_user_list)
         if not IS_REPORT:
             result['private_msg_dict'] = {}
-        await send_board_cast_msg(result)
+        await send_board_cast_msg(result, 'sign')
         bbs_success = num['success_num']
         bbs_fail = num['failed_num']
 
