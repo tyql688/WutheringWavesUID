@@ -252,6 +252,26 @@ class Char_1504(CharAbstract):
     name = "灯灯"
     starLevel = 4
 
+    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+        if chain >= 6:
+            title = f"{self.name}-六命"
+            msg = "施放共鸣解放时，队伍中的角色的攻击提升20%"
+            attr.add_atk_percent(0.2, title, msg)
+
+        title = f"{self.name}-合鸣效果-轻云出月"
+        msg = "使用延奏技能后，下一个登场的共鸣者攻击提升22.5%"
+        attr.add_atk_percent(0.225, title, msg)
+
+        # 无常凶鹭
+        title = f"{self.name}-声骸技能-无常凶鹭"
+        msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
+        attr.add_dmg_bonus(0.12, title, msg)
+
+        if skill_damage == attr.char_damage:
+            title = f"{self.name}-延奏技能"
+            msg = "下一位登场角色共鸣技能伤害加深38%"
+            attr.add_dmg_deepen(0.38, title, msg)
+
 
 class Char_1505(CharAbstract):
     id = 1505
