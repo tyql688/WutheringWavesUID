@@ -1,115 +1,91 @@
 from typing import Dict, List, Union
 
-from gsuid_core.gss import gss
-from gsuid_core.logger import logger
+from gsuid_core.segment import MessageSegment
 from ..utils.api.model import DailyData
 from ..utils.database.models import WavesUser, WavesPush
 from ..utils.waves_api import waves_api
-from ..wutheringwaves_config import WutheringWavesConfig
-
-NOTICE = {
-    'resin': '🌜你的结晶波片达到设定阈值啦！',
-}
+from ..wutheringwaves_config import WutheringWavesConfig, PREFIX
 
 
 async def get_notice_list() -> Dict[str, Dict[str, Dict]]:
-    msg_dict = {}
-    for bot_id in gss.active_bot:
-        user_list: List[WavesUser] = await WavesUser.get_all_push_user_list()
-        for user in user_list:
-            if not user.uid or not user.cookie or user.status or not user.bot_id:
-                continue
+    msg_dict = {
+        'private_msg_dict': {},
+        'group_msg_dict': {}
+    }
 
-            push_data = await WavesPush.select_data_by_uid(user.uid)
-            if push_data is None:
-                continue
+    user_list: List[WavesUser] = await WavesUser.get_all_push_user_list()
+    for user in user_list:
+        if not user.uid or not user.cookie or user.status or not user.bot_id:
+            continue
 
-            succ, daily_info = await waves_api.get_daily_info(user.cookie)
-            if not succ:
-                await WavesUser.mark_invalid(user.cookie, '无效')
-                try:
-                    await gss.active_bot[bot_id].target_send(
-                        f'❌ 鸣潮账号: {user.uid}\n'
-                        f'您的ck已失效，请重新绑定ck\n', 'direct', user.user_id, user.bot_id, '', '')
-                except Exception as e:
-                    logger.error(f'[鸣潮推送提醒]推送{user.uid}数据失败! {e}')
-                continue
+        push_data = await WavesPush.select_data_by_uid(user.uid)
+        if push_data is None:
+            continue
 
-            daily_info = DailyData(**daily_info)
-
-            msg_dict = await all_check(
-                user.bot_id,
-                daily_info,
-                push_data.__dict__,
-                msg_dict,
-                user.user_id,
-                user.uid,
-            )
+        await all_check(
+            push_data.__dict__,
+            msg_dict,
+            user
+        )
 
     return msg_dict
 
 
 async def all_check(
-    bot_id: str,
-    raw_data: DailyData,
     push_data: Dict,
     msg_dict: Dict[str, Dict[str, Dict]],
-    user_id: str,
-    uid: str,
-) -> Dict[str, Dict[str, Dict]]:
-    for mode in NOTICE.keys():
-        _check = await check(
-            mode,
-            raw_data,
-            push_data[f'{mode}_value'],
-        )
+    user: WavesUser
+):
+    # 检查条件
+    mode = 'resin'
 
-        # 检查条件
-        if push_data[f'{mode}_is_push'] == 'on':
-            if not WutheringWavesConfig.get_config('CrazyNotice').data:
-                if not _check:
-                    await WavesPush.update_data_by_uid(
-                        uid=uid, bot_id=bot_id, **{f'{mode}_is_push': 'off'}
-                    )
-                continue
+    bot_id = user.bot_id
+    uid = user.uid
 
-        # 准备推送
-        if _check:
-            if push_data[f'{mode}_push'] == 'off':
-                pass
-            else:
-                notice = NOTICE[mode]
-                if isinstance(_check, int):
-                    notice += f'（当前值: {_check}）'
+    succ, daily_info = await waves_api.get_daily_info(user.cookie)
+    if not succ:
+        await WavesUser.mark_invalid(user.cookie, '无效')
+        notice_msg = [
+            MessageSegment.text(f'❌[鸣潮] 特征码: {user.uid}\n'),
+            MessageSegment.text(f'您的登录状态已失效\n'),
+            MessageSegment.text(f'请使用命令【{PREFIX}登录】进行登录\n')
+        ]
+        await save_push_data(mode, notice_msg, push_data, msg_dict, user)
+        return
 
-                if bot_id not in msg_dict:
-                    msg_dict[bot_id] = {'direct': {}, 'group': {}}
-                    direct_data = msg_dict[bot_id]['direct']
-                    group_data = msg_dict[bot_id]['group']
+    # 体力数据
+    daily_info = DailyData(**daily_info)
 
-                # on 推送到私聊
-                if push_data[f'{mode}_push'] == 'on':
-                    # 添加私聊信息
-                    if user_id not in direct_data:
-                        direct_data[user_id] = notice
-                    else:
-                        direct_data[user_id] += notice
-                # 群号推送到群聊
-                else:
-                    # 初始化
-                    gid = push_data[f'{mode}_push']
-                    if gid not in group_data:
-                        group_data[gid] = {}
+    _check = await check(
+        mode,
+        daily_info,
+        push_data[f'{mode}_value'],
+    )
 
-                    if user_id not in group_data[gid]:
-                        group_data[gid][user_id] = notice
-                    else:
-                        group_data[gid][user_id] += notice
-
+    if push_data[f'{mode}_is_push'] == 'on':
+        if not WutheringWavesConfig.get_config('CrazyNotice').data:
+            if not _check:
                 await WavesPush.update_data_by_uid(
-                    uid=uid, bot_id=bot_id, **{f'{mode}_is_push': 'on'}
+                    uid=uid, bot_id=bot_id, **{f'{mode}_is_push': 'off'}
                 )
-    return msg_dict
+            return
+
+    # 准备推送
+    if _check:
+        if push_data[f'{mode}_push'] == 'off':
+            pass
+        else:
+            notice = '🌜你的结晶波片达到设定阈值啦！'
+            if isinstance(_check, int):
+                notice += f'（当前值: {_check}）'
+
+            msg_list = [
+                MessageSegment.text('✅[鸣潮] 推送提醒:\n'),
+                MessageSegment.text(notice),
+                MessageSegment.text(f'\n可发送[{PREFIX}mr]或者[{PREFIX}每日]来查看更多信息！\n')
+            ]
+
+            await save_push_data(mode, msg_list, push_data, msg_dict, user, True)
 
 
 async def check(
@@ -124,3 +100,45 @@ async def check(
             return False
 
     return False
+
+
+async def save_push_data(
+    mode: str,
+    msg_list: List,
+    push_data: Dict,
+    msg_dict: Dict[str, Dict[str, Dict]],
+    user: WavesUser,
+    is_need_save: bool = False
+):
+    # 获取数据
+    bot_id = user.bot_id
+    qid = user.user_id
+    uid = user.uid
+
+    private_msgs: Dict = msg_dict['private_msg_dict']
+    group_data: Dict = msg_dict['group_msg_dict']
+
+    # on 推送到私聊
+    if push_data[f'{mode}_push'] == 'on':
+        # 添加私聊信息
+        if qid not in private_msgs:
+            private_msgs[qid] = []
+
+        private_msgs[qid].append(
+            {'bot_id': bot_id, 'messages': msg_list}
+        )
+    # 群号推送到群聊
+    else:
+        # 初始化
+        gid = push_data[f'{mode}_push']
+        if gid not in group_data:
+            group_data[gid] = []
+        msg_list.append(MessageSegment.at(qid))
+        group_data[gid].append(
+            {'bot_id': bot_id, 'messages': msg_list}
+        )
+
+    if is_need_save:
+        await WavesPush.update_data_by_uid(
+            uid=uid, bot_id=bot_id, **{f'{mode}_is_push': 'on'}
+        )

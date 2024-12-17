@@ -16,6 +16,7 @@ WAVES_USER_MAP = {
 }
 
 task_name_sign = '订阅鸣潮签到'
+task_name_resin = '订阅体力推送'
 
 
 async def set_waves_user_value(ev: Event, func: str, uid: str, value: str):
@@ -90,6 +91,10 @@ async def set_config_func(ev: Event, uid: str = "0"):
             bot_id=ev.bot_id,
             **{f'{PUSH_MAP[config_name.replace("推送", "")]}_push': option, },
         )
+        if option == 'off':
+            await gs_subscribe.delete_subscribe('single', task_name_resin, ev)
+        else:
+            await gs_subscribe.add_subscribe('single', task_name_resin, ev)
     else:
         return "该配置项不存在!"
 

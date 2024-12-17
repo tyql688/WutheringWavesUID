@@ -1,17 +1,14 @@
-import asyncio
-
 from gsuid_core.aps import scheduler
 from gsuid_core.bot import Bot
-from gsuid_core.gss import gss
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
-from gsuid_core.segment import MessageSegment
 from gsuid_core.sv import SV
 from .draw_waves_stamina import draw_stamina_img
 from .notice_stamina import get_notice_list
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_103
 from ..utils.waves_prefix import PREFIX
+from ..utils.waves_send_msg import send_board_cast_msg
 
 waves_daily_info = SV('waves查询体力')
 
@@ -38,25 +35,4 @@ async def send_daily_info_pic(bot: Bot, ev: Event):
 async def waves_daily_info_notice_job():
     result = await get_notice_list()
     logger.debug(f"鸣潮推送开始：{result}")
-    # 执行私聊推送
-    for bot_id in result:
-        for BOT_ID in gss.active_bot:
-            bot = gss.active_bot[BOT_ID]
-            for user_id in result[bot_id]['direct']:
-                msg_list = [MessageSegment.text('✅[鸣潮] 推送提醒:\n'),
-                            MessageSegment.text(result[bot_id]['direct'][user_id])]
-
-                await bot.target_send(msg_list, 'direct', user_id, bot_id, '', '')
-                await asyncio.sleep(0.5)
-            logger.info('[推送检查] 私聊推送完成')
-            for gid in result[bot_id]['group']:
-                msg_list = [MessageSegment.text('✅[鸣潮] 推送提醒:\n')]
-                for user_id in result[bot_id]['group'][gid]:
-                    msg_list.append(MessageSegment.at(user_id))
-                    msg = result[bot_id]['group'][gid][user_id]
-                    msg_list.append(MessageSegment.text(msg))
-
-                msg_list.append(MessageSegment.text(f'\n可发送[{PREFIX}mr]或者[{PREFIX}每日]来查看更多信息！\n'))
-                await bot.target_send(msg_list, 'group', gid, bot_id, '', '')
-                await asyncio.sleep(0.5)
-            logger.info('[推送检查] 群聊推送完成')
+    await send_board_cast_msg(result, 'resin')
