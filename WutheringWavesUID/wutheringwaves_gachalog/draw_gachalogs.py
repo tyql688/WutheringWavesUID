@@ -1,4 +1,5 @@
 import json
+import os
 import random
 from datetime import datetime
 from pathlib import Path
@@ -10,12 +11,16 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
-from ..utils.fonts.waves_fonts import waves_font_25, waves_font_18, waves_font_32, waves_font_20, waves_font_40, \
-    waves_font_23, waves_font_24
-from ..utils.image import get_waves_bg, add_footer, GOLD, cropped_square_avatar, get_square_avatar, get_square_weapon, \
-    get_event_avatar
+from ..utils import hint
+from ..utils.api.model import AccountBaseInfo
+from ..utils.error_reply import WAVES_CODE_102
+from ..utils.fonts.waves_fonts import waves_font_18, waves_font_32, waves_font_20, waves_font_40, \
+    waves_font_23, waves_font_24, waves_font_25, waves_font_30
+from ..utils.image import get_waves_bg, add_footer, cropped_square_avatar, get_square_avatar, get_square_weapon, \
+    get_event_avatar, GOLD
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.resource.constant import NORMAL_LIST
+from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -176,7 +181,7 @@ async def draw_card(uid: int, ev: Event):
         else:
             _num = len(total_data[name]['rank_s_list'])
             if _num == 0:
-                _numlen += 50
+                _numlen += 80
             else:
                 _numlen += bset * get_num_h(_num, 5)
 
@@ -200,11 +205,11 @@ async def draw_card(uid: int, ev: Event):
         if item['resourceType'] == '武器':
             item_icon = await get_square_weapon(item['resourceId'])
             item_icon = item_icon.resize((130, 130)).convert('RGBA')
-            item_temp.paste(item_icon, (22, 28), item_icon)
+            item_temp.paste(item_icon, (22, 0), item_icon)
         else:
             item_icon = await get_square_avatar(item['resourceId'])
             item_icon = await cropped_square_avatar(item_icon, 130)
-            item_temp.paste(item_icon, (22, 28), item_icon)
+            item_temp.paste(item_icon, (22, 0), item_icon)
 
         item_bg.paste(item_temp, (-2, -2), item_temp)
         gnum = item['gacha_num']
@@ -215,10 +220,11 @@ async def draw_card(uid: int, ev: Event):
             gcolor = (43, 210, 43)
         else:
             gcolor = 'white'
-        info_block = Image.new("RGBA", (50, 25), "white")
+        info_block = Image.new("RGBA", (137, 28), color=(255, 255, 255, 0))
         info_block_draw = ImageDraw.Draw(info_block)
-        info_block_draw.rectangle([0, 0, 50, 25], fill=(0, 0, 0, int(0.9 * 255)))
-        info_block_draw.text((25, 12), f'{item["gacha_num"]}抽', gcolor, waves_font_20, 'mm')
+        info_block_draw.rectangle([0, 0, 137, 28], fill=(0, 0, 0, int(0.6 * 255)))
+        info_block_draw.text((65, 12), f'{item["gacha_num"]}抽', gcolor, waves_font_20, 'mm')
+
         item_bg.paste(info_block, (15, 130), info_block)
 
         if item['is_up']:
@@ -328,18 +334,24 @@ async def draw_card(uid: int, ev: Event):
         card_img.paste(newbie_bg_cp, (10 + nindex * 300, _newbielen), newbie_bg_cp)
         nindex += 1
 
-    title = Image.open(TEXT_PATH / 'title.png')
-    base_info_draw = ImageDraw.Draw(title)
-    base_info_draw.text((346, 370), f'特征码:  {uid}', GOLD, waves_font_25, 'lm')
+    ck = await waves_api.get_ck(uid, ev.user_id)
+    if not ck:
+        return hint.error_reply(WAVES_CODE_102)
+    succ, account_info = await waves_api.get_base_info(uid, ck)
+    if not succ:
+        return account_info
+    account_info = AccountBaseInfo(**account_info)
 
-    avatar = await draw_pic_with_ring(ev)
-    avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
+    base_info_bg = Image.open(TEXT_PATH / 'base_info_bg.png')
+    base_info_draw = ImageDraw.Draw(base_info_bg)
+    base_info_draw.text((275, 120), f'{account_info.name[:7]}', 'white', waves_font_30, 'lm')
+    base_info_draw.text((226, 173), f'特征码:  {account_info.id}', GOLD, waves_font_25, 'lm')
+    base_info_bg = base_info_bg.resize((800, 400))
+    card_img.alpha_composite(base_info_bg, (150, 45))
 
-    card_img.paste(avatar, (346, 40), avatar)
-    avatar_ring = avatar_ring.resize((300, 300))
-    card_img.paste(avatar_ring, (340, 35), avatar_ring)
-
-    card_img.paste(title, (0, 0), title)
+    #
+    card_polygon = await get_random_card_polygon(ev)
+    card_img.alpha_composite(card_polygon, (80, 0))
 
     card_img = add_footer(card_img, 600, 20)
     card_img = await convert_img(card_img)
@@ -355,4 +367,19 @@ async def draw_pic_with_ring(ev: Event):
     resize_pic = crop_center_img(pic, 250, 250)
     img.paste(resize_pic, (20, 20), mask)
 
-    return img
+    return img.resize((500, 500))
+
+
+async def get_random_card_polygon(ev: Event):
+    CARD_POLYGON_PATH = TEXT_PATH / 'card_polygon'
+    path = random.choice(os.listdir(f'{CARD_POLYGON_PATH}'))
+    card_img = Image.open(f'{CARD_POLYGON_PATH}/{path}').convert('RGBA')
+
+    avatar = await draw_pic_with_ring(ev)
+    card_img.paste(avatar, (0, 120), avatar)
+
+    avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
+    avatar_ring = avatar_ring.resize((450, 450))
+    card_img.paste(avatar_ring, (0, 120), avatar_ring)
+
+    return card_img.resize((280, 400))
