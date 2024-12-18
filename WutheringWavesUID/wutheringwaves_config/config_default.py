@@ -2,7 +2,7 @@ from typing import Dict
 
 from gsuid_core.utils.plugins_config.models import (
     GSC,
-    GsStrConfig, GsListStrConfig, GsBoolConfig, GsDictConfig, GsListConfig, )
+    GsStrConfig, GsListStrConfig, GsBoolConfig, GsDictConfig, GsListConfig, GsIntConfig, )
 
 CONFIG_DEFAULT: Dict[str, GSC] = {
     'WavesAnnGroups': GsDictConfig(
@@ -100,5 +100,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '每天定时删除无效token',
         '每天定时删除无效token',
         False,
+    ),
+    'AnnMinuteCheck': GsIntConfig(
+        '公告推送时间检测（单位min）',
+        '公告推送时间检测（单位min）',
+        10,
+        60
     ),
 }

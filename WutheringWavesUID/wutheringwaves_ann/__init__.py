@@ -16,6 +16,7 @@ sv_ann = SV('鸣潮公告')
 sv_ann_sub = SV('订阅鸣潮公告', pm=3)
 
 task_name_ann = '订阅鸣潮公告'
+ann_minute_check: int = WutheringWavesConfig.get_config('AnnMinuteCheck').data
 
 
 @sv_ann.on_command(f'{PREFIX}公告')
@@ -70,7 +71,7 @@ async def unsub_ann_(bot: Bot, ev: Event):
     return await bot.send('未曾订阅鸣潮公告！')
 
 
-@scheduler.scheduled_job('cron', minute='*/30')
+@scheduler.scheduled_job('interval', minutes=ann_minute_check)
 async def check_waves_ann():
     await check_waves_ann_state()
 

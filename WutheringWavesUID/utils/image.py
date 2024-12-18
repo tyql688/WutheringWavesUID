@@ -6,7 +6,6 @@ from typing import Union, Literal, Optional, Tuple
 
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 
-from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
 from gsuid_core.utils.image.utils import sget
@@ -93,7 +92,7 @@ async def get_role_pile(resource_id: Union[int, str], custom: bool = False) -> (
     if custom:
         custom_dir = f'{CUSTOM_CARD_PATH}/{resource_id}'
         if os.path.isdir(custom_dir) and len(os.listdir(custom_dir)) > 0:
-            logger.info(f'使用自定义角色头像: {resource_id}')
+            # logger.info(f'使用自定义角色头像: {resource_id}')
             path = random.choice(os.listdir(custom_dir))
             if path:
                 return True, Image.open(f'{custom_dir}/{path}').convert('RGBA')
