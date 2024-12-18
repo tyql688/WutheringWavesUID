@@ -76,6 +76,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     damage_func = [cast_skill, cast_hit]
     attr.set_char_damage(hit_damage)
+    attr.set_char_template("temp_atk")
 
     role_id = role.role.roleId
     role_level = role.role.level
@@ -121,6 +122,7 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     damage_func = [cast_liberation, cast_skill]
     attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
 
     role_id = role.role.roleId
     role_level = role.role.level

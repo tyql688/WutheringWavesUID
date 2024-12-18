@@ -12,6 +12,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     破阵之枪第一段
     """
     attr.set_char_damage(hit_damage)
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -91,6 +92,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     重击·破阵之枪
     """
     attr.set_char_damage(hit_damage)
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -180,6 +182,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     苍躣八荒·后动
     """
     attr.set_char_damage(hit_damage)
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -265,6 +268,7 @@ def calc_damage_5(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     0维/6+1莫/重击·破阵之枪
     """
     attr.set_char_damage(hit_damage)
+    attr.set_char_template("temp_atk")
 
     # 维里奈buff
     weilinai_buff(attr, 0, 1, isGroup)

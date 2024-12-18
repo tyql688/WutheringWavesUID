@@ -14,6 +14,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     """
     damage_func = cast_skill
     attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -89,6 +90,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     移岁诛邪
     """
     attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -150,6 +152,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     0维/0折枝/惊龙破空·炳星
     """
     attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
 
     # 维里奈buff
     weilinai_buff(attr, 0, 1, isGroup)
@@ -165,6 +168,7 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     0+1守/0折枝/惊龙破空·炳星
     """
     attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
 
     # 守岸人buff
     shouanren_buff(attr, 0, 1, isGroup)
@@ -180,6 +184,7 @@ def calc_damage_5(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     6+5守/6灯灯/惊龙破空·炳星
     """
     attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
 
     # 守岸人buff
     shouanren_buff(attr, 6, 5, isGroup)

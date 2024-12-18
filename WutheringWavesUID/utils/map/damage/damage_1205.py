@@ -1,11 +1,13 @@
 # 长离
+import copy
+
 from .buff import shouanren_buff, sanhua_buff
 from .damage import weapon_damage, echo_damage, phase_damage
 from ...api.model import RoleDetailData
-from ...ascension.char import get_char_detail, WavesCharResult
+from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
 from ...damage.utils import skill_damage_calc, skill_damage, liberation_damage, \
-    cast_skill, hit_damage, cast_liberation
+    cast_skill, hit_damage, cast_liberation, cast_attack, add_comma_separated_numbers
 
 
 def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False):
@@ -55,12 +57,11 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     焚身以火
     """
     attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
 
+    # 获取角色详情
     role_name = role.role.roleName
-    role_id = role.role.roleId
-    role_level = role.role.level
-    role_breach = role.role.breach
-    char_result: WavesCharResult = get_char_detail(role_id, role_level, role_breach)
+    char_result: WavesCharResult = get_char_detail2(role)
 
     # 焚身以火 技能倍率
     skillLevel = role.skillList[4].level - 1
@@ -71,11 +72,12 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     attr.add_skill_multi(skill_multi, title, msg)
 
     # 设置角色等级
-    attr.set_character_level(role_level)
+    attr.set_character_level(role.role.level)
 
-    damage_func = [cast_skill]
+    damage_func = [cast_skill, cast_attack]
     phase_damage(attr, role, damage_func, isGroup)
 
+    role_breach = role.role.breach
     if role_breach and role_breach >= 3:
         # 固2(散势) 0.2
         title = f"{role_name}-固有技能-散势"
@@ -105,12 +107,11 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     离火照丹心
     """
     attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
 
+    # 获取角色详情
     role_name = role.role.roleName
-    role_id = role.role.roleId
-    role_level = role.role.level
-    role_breach = role.role.breach
-    char_result: WavesCharResult = get_char_detail(role_id, role_level, role_breach)
+    char_result: WavesCharResult = get_char_detail2(role)
 
     # 离火照丹心 技能倍率
     skillLevel = role.skillList[2].level - 1
@@ -120,12 +121,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     msg = f"{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    damage_func = [cast_skill, cast_liberation]
+    damage_func = [cast_attack, cast_skill, cast_liberation]
     phase_damage(attr, role, damage_func, isGroup)
 
     # 设置角色等级
-    attr.set_character_level(role_level)
+    attr.set_character_level(role.role.level)
 
+    role_breach = role.role.breach
     if role_breach and role_breach >= 3:
         # 固2(散势) 0.2
         title = f"{role_name}-固有技能-散势"
@@ -151,7 +153,30 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
 
 def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+    attr1 = copy.deepcopy(attr)
+    crit_damage1, expected_damage1 = calc_damage_0(attr1, role, isGroup)
+
+    attr2 = copy.deepcopy(attr)
+    crit_damage2, expected_damage2 = calc_damage_1(attr2, role, isGroup)
+
+    attr3 = copy.deepcopy(attr)
+    crit_damage3, expected_damage3 = calc_damage_0(attr3, role, isGroup)
+
+    crit_damage = add_comma_separated_numbers(crit_damage1, crit_damage2, crit_damage3)
+    expected_damage = add_comma_separated_numbers(expected_damage1, expected_damage2, expected_damage3)
+
+    attr.add_effect(' ', ' ')
+    attr.effect.extend(attr1.effect[2:])
+    attr.add_effect(' ', ' ')
+    attr.effect.extend(attr2.effect[2:])
+    attr.add_effect(' ', ' ')
+    attr.effect.extend(attr3.effect[2:])
+    return crit_damage, expected_damage
+
+
+def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
     attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
 
     # 守岸人buff
     shouanren_buff(attr, 0, 1, isGroup)
@@ -172,9 +197,13 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_1(attr, role),
     },
     {
-        "title": "0+1守6散焚身以火",
+        "title": "zrz总伤",
         "func": lambda attr, role: calc_damage_2(attr, role),
+    },
+    {
+        "title": "0+1守/6散/焚身以火",
+        "func": lambda attr, role: calc_damage_3(attr, role),
     }
 ]
 
-rank = damage_detail[0]
+rank = damage_detail[2]

@@ -1,5 +1,5 @@
 from .damage import DamageAttribute, calc_percent_expression
-from .utils import hit_damage, skill_damage, attack_damage, liberation_damage
+from .utils import hit_damage, skill_damage, attack_damage, liberation_damage, temp_atk
 from ..damage.abstract import WeaponAbstract, WavesWeaponRegister
 
 
@@ -132,19 +132,21 @@ class Weapon_21010074(WeaponAbstract):
 
     # 造成普攻或重击伤害时，攻击提升4%，可叠加5层
     def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
-        dmg = f"{self.param(0)}*{self.param(1)}"
-        title = self.get_title()
-        msg = f"施放普攻时，自身攻击提升{dmg}"
-        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
-        return True
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(0)}*{self.param(1)}"
+            title = self.get_title()
+            msg = f"施放普攻时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+            return True
 
     def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
         """施放重击伤害"""
-        dmg = f"{self.param(0)}*{self.param(1)}"
-        title = self.get_title()
-        msg = f"施放重击伤害时，自身攻击提升{dmg}"
-        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
-        return True
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(0)}*{self.param(1)}"
+            title = self.get_title()
+            msg = f"施放重击伤害时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+            return True
 
 
 class Weapon_21010084(WeaponAbstract):
@@ -178,11 +180,12 @@ class Weapon_21020015(WeaponAbstract):
 
     def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣技能"""
-        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
-        title = self.get_title()
-        msg = f"施放共鸣技能时，攻击提升{dmg}"
-        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
-        return True
+        if attr.char_template == temp_atk:
+            dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
+            title = self.get_title()
+            msg = f"施放共鸣技能时，攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+            return True
 
 
 class Weapon_21020016(WeaponAbstract):
@@ -209,14 +212,18 @@ class Weapon_21020017(WeaponAbstract):
 
     def _damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
-        dmg1 = f"{self.weapon_detail.param[3][self.weapon_reson_level - 1]}*{self.weapon_detail.param[5][self.weapon_reson_level - 1]}"
-        attr.add_atk_percent(calc_percent_expression(dmg1))
+        title = self.get_title()
+
+        if attr.char_template == temp_atk:
+            dmg1 = f"{self.weapon_detail.param[3][self.weapon_reson_level - 1]}*{self.weapon_detail.param[5][self.weapon_reson_level - 1]}"
+            attr.add_atk_percent(calc_percent_expression(dmg1))
+            msg = f"【凶猛】为10层时，攻击提升{dmg1}"
+            attr.add_effect(title, msg)
 
         dmg2 = f"{self.weapon_detail.param[7][self.weapon_reson_level - 1]}"
         attr.add_crit_rate(calc_percent_expression(dmg2))
-
         title = self.get_title()
-        msg = f"【凶猛】为10层时，攻击提升{dmg1}, 暴击率提升{dmg2}"
+        msg = f"【凶猛】为10层时， 暴击率提升{dmg2}"
         attr.add_effect(title, msg)
 
     def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
@@ -266,7 +273,6 @@ class Weapon_21020026(WeaponAbstract):
         title = self.get_title()
         msg = f"普攻伤害加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
-        return True
 
 
 class Weapon_21020034(WeaponAbstract):
@@ -343,11 +349,11 @@ class Weapon_21030015(WeaponAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
         if isGroup:
-            dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
-            title = self.get_title()
-            msg = f"施放延奏技能后，入场角色攻击提升{dmg}"
-            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
-            return True
+            if attr.char_template == temp_atk:
+                dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[2][self.weapon_reson_level - 1]}"
+                title = self.get_title()
+                msg = f"施放延奏技能后，入场角色攻击提升{dmg}"
+                attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21030023(WeaponAbstract):
@@ -587,6 +593,9 @@ class Weapon_21050016(WeaponAbstract):
 
     def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣技能"""
+        if attr.char_template != temp_atk:
+            return
+
         dmg1 = f"{self.param(1)}*{self.param(2)}"
         title = self.get_title()
         msg = f"造成共鸣技能伤害时，自身攻击提升{dmg1}"
@@ -595,7 +604,6 @@ class Weapon_21050016(WeaponAbstract):
             dmg2 = f"{self.param(4)}"
             msg = f"自身不在场时，该效果攻击额外提升{dmg2}"
             attr.add_atk_percent(calc_percent_expression(dmg2), title, msg)
-        return True
 
 
 class Weapon_21050023(WeaponAbstract):
@@ -652,6 +660,8 @@ class Weapon_21050036(WeaponAbstract):
 
     def skill_create_healing(self, attr: DamageAttribute, isGroup: bool = False):
         """共鸣技能造成治疗"""
+        if attr.char_template != temp_atk:
+            return
         dmg = f"{self.weapon_detail.param[4][self.weapon_reson_level - 1]}"
         title = self.get_title()
         msg = f"使附近队伍中所有角色的攻击提升{dmg}"
@@ -696,11 +706,13 @@ class Weapon_21050074(WeaponAbstract):
     # 施放共鸣解放时，自身攻击提升15%，持续15秒。
     def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣解放"""
+        if attr.char_template != temp_atk:
+            return
+        
         dmg = f"{self.param(0)}"
         title = self.get_title()
         msg = f"施放共鸣解放时，自身攻击提升{dmg}"
         attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
-        return True
 
 
 class Weapon_21050084(WeaponAbstract):

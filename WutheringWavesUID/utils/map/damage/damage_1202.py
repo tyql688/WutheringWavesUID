@@ -146,6 +146,8 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
 def calc_damage_10(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
     attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
+    
     # 守岸人buff
     shouanren_buff(attr, 0, 1, isGroup)
 

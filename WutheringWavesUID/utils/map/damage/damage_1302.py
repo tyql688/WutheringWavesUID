@@ -12,6 +12,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     审判之雷
     """
     attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -75,6 +76,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     破天雷灭击
     """
     attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId

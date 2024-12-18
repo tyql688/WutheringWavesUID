@@ -1,6 +1,6 @@
 from .damage import DamageAttribute
 from .utils import CHAR_ATTR_SIERRA, CHAR_ATTR_SINKING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID, liberation_damage, \
-    attack_damage, hit_damage, skill_damage, CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING
+    attack_damage, hit_damage, skill_damage, CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING, temp_atk
 from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
 
 
@@ -350,9 +350,10 @@ class Echo_6000048(EchoAbstract):
 
     # 施放声骸技能后，自身攻击提升12.00%
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
-        title = self.name
-        msg = '自身攻击提升12.00%'
-        attr.add_atk_percent(0.12, title, msg)
+        if attr.char_template == temp_atk:
+            title = self.name
+            msg = '自身攻击提升12.00%'
+            attr.add_atk_percent(0.12, title, msg)
 
 
 class Echo_6000049(EchoAbstract):

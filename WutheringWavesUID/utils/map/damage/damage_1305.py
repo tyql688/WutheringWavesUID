@@ -12,6 +12,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     万方法则
     """
     attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -79,6 +80,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     思维矩阵
     """
     attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId

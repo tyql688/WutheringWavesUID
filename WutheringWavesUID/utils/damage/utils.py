@@ -49,6 +49,13 @@ skill_create_healing = "skill_create_healing"
 # 定义一个类型别名
 SkillType = Literal["常态攻击", "共鸣技能", "共鸣解放", "变奏技能", "共鸣回路"]
 
+# 攻击模版
+temp_atk = "temp_atk"
+# 生命模版
+temp_life = "temp_life"
+# 防御模版
+temp_def = "temp_def"
+
 SkillTreeMap = {
     "常态攻击": "1",
     "共鸣技能": "2",
@@ -80,3 +87,12 @@ def parse_healing_skill_multi(temp):
         percent = float(match.group(3))  # 获取百分比部分
         return value, percent
     return 0, 0
+
+
+def add_comma_separated_numbers(*nums: str) -> str:
+    """
+    接受多个带逗号的数字字符串，去除逗号后进行加法计算，并返回结果，结果也带逗号。
+    :return: 计算后的整数和，格式化为带逗号的字符串
+    """
+    total = sum(float(num.replace(',', '')) for num in nums)
+    return f"{total:,.0f}"

@@ -11,7 +11,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色伤害类型
     attr.set_char_damage(heal_bonus)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template('temp_life')
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -55,7 +55,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色伤害类型
     attr.set_char_damage(heal_bonus)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template('temp_life')
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -99,7 +99,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色伤害类型
     attr.set_char_damage(heal_bonus)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template('temp_life')
 
     role_name = role.role.roleName
     role_id = role.role.roleId
