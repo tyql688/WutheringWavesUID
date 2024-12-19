@@ -168,8 +168,8 @@ async def draw_card(uid: int, ev: Event):
                 if current_data['avg'] != '-':
                     current_data['level'] = get_level_from_list(current_data['avg'], [10, 20, 30, 40, 45])
 
-    oset = 300
-    bset = 180
+    oset = 280
+    bset = 170
 
     _numlen = 0
     newbie_flag = False
@@ -181,13 +181,14 @@ async def draw_card(uid: int, ev: Event):
         else:
             _num = len(total_data[name]['rank_s_list'])
             if _num == 0:
-                _numlen += 80
+                _numlen += 50
             else:
                 _numlen += bset * get_num_h(_num, 5)
 
-    _newbielen = 320 if newbie_flag else 0
+    _newbielen = 395 if newbie_flag else 0
     _header = 380
-    w, h = 1000, _header + title_num * oset + _numlen + _newbielen
+    footer = 50
+    w, h = 1000, _header + title_num * oset + _numlen + _newbielen + footer
 
     card_img = get_waves_bg(w, h)
     card_draw = ImageDraw.Draw(card_img)
@@ -275,14 +276,15 @@ async def draw_card(uid: int, ev: Event):
         title.paste(level_icon, (710, 51), level_icon)
         title_draw.text((783, 225), tag, 'white', waves_font_24, 'mm')
 
-        card_img.paste(title, (10, _header + y + gindex * oset + _newbielen), title)
+        card_img.paste(title, (10, _header + y + gindex * oset), title)
+        gindex += 1
         s_list = gacha_data['rank_s_list']
         s_list.reverse()
         for index, item in enumerate(s_list):
             item_bg = await draw_pic(item)
 
             _x = 95 + 162 * (index % 5)
-            _y = _header + bset * (index // 5) + y + (gindex + 1) * oset + _newbielen
+            _y = _header + bset * (index // 5) + y + gindex * oset
 
             card_img.paste(
                 item_bg,
@@ -291,14 +293,15 @@ async def draw_card(uid: int, ev: Event):
             )
         if not s_list:
             card_draw.text(
-                (475, _header + y + (gindex + 1) * oset + _newbielen),
+                (475, _header + y + gindex * oset + 25),
                 '当前该卡池暂未有5星数据噢!',
                 (157, 157, 157),
                 waves_font_20,
                 'mm',
             )
-        y += get_num_h(len(s_list), 5) * bset
-        gindex += 1
+            y += 50
+        else:
+            y += get_num_h(len(s_list), 5) * bset
 
     newbie_bg = Image.open(TEXT_PATH / 'newbie.png')
     nindex = 0
@@ -314,7 +317,7 @@ async def draw_card(uid: int, ev: Event):
 
         newbie_bg_cp = newbie_bg.copy()
         newbie_bg_cp_draw = ImageDraw.Draw(newbie_bg_cp)
-        newbie_bg_cp.paste(item_bg, (115, 210), item_bg)
+        newbie_bg_cp.paste(item_bg, (115, 220), item_bg)
         newbie_bg_cp_draw.text((200, 160), gacha_type_meta_rename[gacha_name], 'white', waves_font_40, 'mm')
         if gacha_data['time_range']:
             time_range = gacha_data['time_range'].split("~")[1] \
@@ -330,8 +333,7 @@ async def draw_card(uid: int, ev: Event):
             'lm',
         )
 
-        # card_img.paste(newbie_bg_cp, (10 + nindex * 300, 400 + y + gindex * oset), newbie_bg_cp)
-        card_img.paste(newbie_bg_cp, (10 + nindex * 300, _newbielen), newbie_bg_cp)
+        card_img.paste(newbie_bg_cp, (10 + nindex * 290, _header + y + gindex * oset - 80), newbie_bg_cp)
         nindex += 1
 
     ck = await waves_api.get_ck(uid, ev.user_id)
@@ -346,8 +348,8 @@ async def draw_card(uid: int, ev: Event):
     base_info_draw = ImageDraw.Draw(base_info_bg)
     base_info_draw.text((275, 120), f'{account_info.name[:7]}', 'white', waves_font_30, 'lm')
     base_info_draw.text((226, 173), f'特征码:  {account_info.id}', GOLD, waves_font_25, 'lm')
-    base_info_bg = base_info_bg.resize((800, 400))
-    card_img.alpha_composite(base_info_bg, (150, 45))
+    base_info_bg = base_info_bg.resize((900, 450))
+    card_img.alpha_composite(base_info_bg, (110, 30))
 
     #
     card_polygon = await get_random_card_polygon(ev)
@@ -376,10 +378,10 @@ async def get_random_card_polygon(ev: Event):
     card_img = Image.open(f'{CARD_POLYGON_PATH}/{path}').convert('RGBA')
 
     avatar = await draw_pic_with_ring(ev)
-    card_img.paste(avatar, (0, 120), avatar)
+    card_img.paste(avatar, (-10, 150), avatar)
 
     avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
     avatar_ring = avatar_ring.resize((450, 450))
-    card_img.paste(avatar_ring, (0, 120), avatar_ring)
+    card_img.paste(avatar_ring, (-10, 150), avatar_ring)
 
     return card_img.resize((280, 400))
