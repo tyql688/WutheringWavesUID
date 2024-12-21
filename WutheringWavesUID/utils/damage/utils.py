@@ -28,6 +28,8 @@ skill_damage = "skill_damage"
 liberation_damage = "liberation_damage"
 # 治疗效果加成
 heal_bonus = "heal_bonus"
+# 护盾量加成
+shield_bonus = "shield_bonus"
 
 # 造成伤害
 cast_damage = "cast_damage"
@@ -77,7 +79,7 @@ def skill_damage_calc(skillTree: Dict, skillTreeId: str, skillParamId: str, skil
     return skillTree[skillTreeId]["skill"]["level"][skillParamId]["param"][0][skillLevel]
 
 
-def parse_healing_skill_multi(temp):
+def parse_skill_multi(temp):
     """
     解析 "1313+5.97%"
     """

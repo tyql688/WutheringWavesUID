@@ -1,6 +1,6 @@
 from typing import Dict, List, Union, Literal
 
-from ...utils.damage.utils import parse_healing_skill_multi
+from ...utils.damage.utils import parse_skill_multi
 
 
 class WavesEffect(object):
@@ -120,6 +120,7 @@ class DamageAttribute:
         def_flat=0,
         skill_multi=0,
         healing_skill_multi='0+0%',
+        shield_skill_multi='0+0%',
         skill_ratio=0,
         dmg_bonus=0,
         dmg_deepen=0,
@@ -191,6 +192,8 @@ class DamageAttribute:
         self.skill_multi = skill_multi
         # 奶量技能倍率
         self.healing_skill_multi = healing_skill_multi
+        # 盾量技能倍率
+        self.shield_skill_multi = shield_skill_multi
         # 技能倍率加成 (如命座 椿2命 = 1.2）
         self.skill_ratio = skill_ratio
         # 伤害加成百分比
@@ -371,14 +374,28 @@ class DamageAttribute:
 
     def add_healing_skill_multi(self, healing_skill_multi: Union[str, float], title='', msg=''):
         """增加奶的技能倍率"""
-        value1, percent1 = parse_healing_skill_multi(self.healing_skill_multi)
-        value2, percent2 = parse_healing_skill_multi(healing_skill_multi)
+        value1, percent1 = parse_skill_multi(self.healing_skill_multi)
+        value2, percent2 = parse_skill_multi(healing_skill_multi)
 
         # 计算总和
         total_value = value1 + value2
         total_percent = percent1 + percent2
 
         self.healing_skill_multi = f"{total_value}+{total_percent}%"
+        self.add_effect(title, msg)
+        return self
+
+    def add_shield_skill_multi(self, shield_skill_multi: Union[str, float], title='', msg=''):
+        """增加盾量的技能倍率"""
+
+        value1, percent1 = parse_skill_multi(self.shield_skill_multi)
+        value2, percent2 = parse_skill_multi(shield_skill_multi)
+
+        # 计算总和
+        total_value = value1 + value2
+        total_percent = percent1 + percent2
+
+        self.shield_skill_multi = f"{total_value}+{total_percent}%"
         self.add_effect(title, msg)
         return self
 
@@ -552,5 +569,12 @@ class DamageAttribute:
         """
         计算治疗量。
         """
-        flat, percent = parse_healing_skill_multi(self.healing_skill_multi)
+        flat, percent = parse_skill_multi(self.healing_skill_multi)
+        return effect_value * (percent * 0.01) * (1 + self.dmg_bonus) + flat * (1 + self.dmg_bonus)
+
+    def calculate_shield(self, effect_value):
+        """
+        计算盾量。
+        """
+        flat, percent = parse_skill_multi(self.shield_skill_multi)
         return effect_value * (percent * 0.01) * (1 + self.dmg_bonus) + flat * (1 + self.dmg_bonus)
