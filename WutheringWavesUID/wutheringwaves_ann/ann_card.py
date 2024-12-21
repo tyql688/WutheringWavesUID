@@ -163,10 +163,13 @@ async def ann_detail_card(ann_id: int) -> Union[bytes, str]:
             # 图片
             _size = (temp['imgWidth'], temp['imgHeight'])
             img = await get_pic(temp['url'], _size)
+            img_x = 0
             if img.width > im.width:
                 ratio = im.width / img.width
                 img = img.resize((int(img.width * ratio), int(img.height * ratio)))
-            easy_paste(im, img, (0, y))
+            else:
+                img_x = (im.width - img.width) // 2
+            easy_paste(im, img, (img_x, y))
             y += img.size[1] + 40
 
     if hasattr(ww_font_26, 'getsize'):
