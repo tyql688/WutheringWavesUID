@@ -32,11 +32,12 @@
 <details><summary>帮助 - 命令: ww帮助</summary><p>
 <a><img src="https://s2.loli.net/2024/12/22/DR9oWlcwpdkmt87.jpg"></a>
 </p></details>
+<details><summary>面板图 - 命令: ww椿面板</summary><p>
+<a><img src="https://s2.loli.net/2024/12/22/DreE28uzNCByTtW.jpg"></a>
+</p></details>
 <details><summary>ck获取方法</summary><p>
 https://github.com/tyql688/WutheringWavesUID/wiki
 </details>
-
-![ww椿面板](https://s2.loli.net/2024/12/22/DreE28uzNCByTtW.jpg)
 
 ## 丨其他
 
