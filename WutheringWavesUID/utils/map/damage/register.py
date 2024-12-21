@@ -6,6 +6,7 @@ def register_damage():
     from .damage_1103 import damage_detail as damage_1103
     from .damage_1104 import damage_detail as damage_1104
     from .damage_1105 import damage_detail as damage_1105
+    from .damage_1106 import damage_detail as damage_1106
     from .damage_1202 import damage_detail as damage_1202
     from .damage_1203 import damage_detail as damage_1203
     from .damage_1204 import damage_detail as damage_1204
@@ -36,6 +37,8 @@ def register_damage():
     DamageDetailRegister.register_class("1104", damage_1104)
     # 折枝
     DamageDetailRegister.register_class("1105", damage_1105)
+    # 釉瑚
+    DamageDetailRegister.register_class("1106", damage_1106)
 
     # 炽霞
     DamageDetailRegister.register_class("1202", damage_1202)
@@ -94,6 +97,7 @@ def register_rank():
     from .damage_1103 import rank as rank_1103
     from .damage_1104 import rank as rank_1104
     from .damage_1105 import rank as rank_1105
+    from .damage_1106 import rank as rank_1106
     from .damage_1202 import rank as rank_1202
     from .damage_1203 import rank as rank_1203
     from .damage_1204 import rank as rank_1204
@@ -124,6 +128,8 @@ def register_rank():
     DamageRankRegister.register_class("1104", rank_1104)
     # 折枝
     DamageRankRegister.register_class("1105", rank_1105)
+    # 釉瑚
+    DamageRankRegister.register_class("1106", rank_1106)
 
     # 炽霞
     DamageRankRegister.register_class("1202", rank_1202)
