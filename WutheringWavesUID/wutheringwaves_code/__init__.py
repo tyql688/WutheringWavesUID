@@ -10,6 +10,8 @@ from ..wutheringwaves_config import PREFIX
 
 sv_waves_code = SV('鸣潮兑换码')
 
+invalid_code_list = ('MINGCHAO',)
+
 url = 'https://newsimg.5054399.com/comm/mlcxqcommon/static/wap/js/data_102.js'
 
 
@@ -25,6 +27,8 @@ async def get_sign_func(bot: Bot, ev: Event):
         if is_fail == '1':
             continue
         order = code.get("order", '')
+        if order in invalid_code_list or not order:
+            continue
         reward = code.get("reward", '')
         label = code.get("label", '')
         msg = [
