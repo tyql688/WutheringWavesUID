@@ -471,9 +471,9 @@
     "desc": "bot主人功能",
     "data": [
       {
-        "name": "git更新记录",
-        "desc": "更新记录",
-        "eg": "更新记录",
+        "name": "git更新日志",
+        "desc": "更新日志",
+        "eg": "更新日志",
         "need_ck": false,
         "need_sk": false,
         "need_admin": true

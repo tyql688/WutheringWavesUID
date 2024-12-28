@@ -4,11 +4,10 @@ from gsuid_core.sv import SV
 from .draw_update_log import draw_update_log_img
 from ..wutheringwaves_config import PREFIX
 
-sv_gs_config = SV('GS管理', pm=1)
-sv_waves_update_history = SV('waves更新记录')
+sv_waves_update_history = SV('waves更新日志', pm=1)
 
 
-@sv_waves_update_history.on_fullmatch((f'{PREFIX}更新记录'))
+@sv_waves_update_history.on_fullmatch((f'{PREFIX}更新日志'))
 async def send_waves_update_log_msg(bot: Bot, ev: Event):
     im = await draw_update_log_img()
     await bot.send(im)
