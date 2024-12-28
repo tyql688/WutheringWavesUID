@@ -7,7 +7,7 @@ from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
 from ...damage.utils import skill_damage_calc, skill_damage, liberation_damage, \
-    cast_skill, hit_damage, cast_liberation, cast_attack, add_comma_separated_numbers
+    cast_skill, hit_damage, cast_liberation, cast_attack, add_comma_separated_numbers, SkillType, SkillTreeMap
 
 
 def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False):
@@ -63,11 +63,13 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     role_name = role.role.roleName
     char_result: WavesCharResult = get_char_detail2(role)
 
-    # 焚身以火 技能倍率
-    skillLevel = role.skillList[4].level - 1
-    # 技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, "7", "1", skillLevel)
-    title = f"{role_name}-焚身以火"
+    skill_type: SkillType = "共鸣回路"
+    # 获取角色技能等级
+    skillLevel = role.get_skill_level(skill_type)
+    # 技能技能倍率
+    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+
+    title = f"焚身以火"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
@@ -114,11 +116,14 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     char_result: WavesCharResult = get_char_detail2(role)
 
     # 离火照丹心 技能倍率
-    skillLevel = role.skillList[2].level - 1
-    # 技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "1", skillLevel)
-    title = f"{role_name}-离火照丹心技能倍率"
-    msg = f"{skill_multi}"
+    skill_type: SkillType = "共鸣解放"
+    # 获取角色技能等级
+    skillLevel = role.get_skill_level(skill_type)
+    # 技能技能倍率
+    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+
+    title = f"离火照丹心"
+    msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
     damage_func = [cast_attack, cast_skill, cast_liberation]

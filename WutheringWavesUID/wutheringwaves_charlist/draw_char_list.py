@@ -131,7 +131,7 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
 
         # 技能
         skill_img_temp = Image.new('RGBA', (1500, 300))
-        for i, _skill in enumerate(role_detail.skillList):
+        for i, _skill in enumerate(role_detail.get_skill_list()):
             if _skill.skill.type == '延奏技能':
                 continue
             temp = Image.new('RGBA', (120, 140))

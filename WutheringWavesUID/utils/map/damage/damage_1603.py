@@ -5,7 +5,7 @@ from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail
 from ...damage.damage import DamageAttribute
 from ...damage.utils import skill_damage_calc, attack_damage, cast_attack, \
-    liberation_damage, cast_liberation
+    liberation_damage, cast_liberation, SkillType, SkillTreeMap
 
 
 def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
@@ -22,12 +22,14 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     char_result: WavesCharResult = get_char_detail(role_id, role_level, role_breach)
 
     # 一日花 技能倍率
-    # 回路倍率 = 4
-    skillLevel = role.skillList[4].level - 1
-    # 技能倍率 回路技能树 "7"
-    skill_multi = skill_damage_calc(char_result.skillTrees, "7", "1", skillLevel)
-    title = f"{role_name}-一日花技能倍率"
-    msg = f"{skill_multi}"
+    skill_type: SkillType = "共鸣回路"
+    # 获取角色技能等级
+    skillLevel = role.get_skill_level(skill_type)
+    # 技能技能倍率
+    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+
+    title = f"一日花"
+    msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
     # 设置角色等级
@@ -91,10 +93,15 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     char_result: WavesCharResult = get_char_detail(role_id, role_level, role_breach)
 
     # 芳华绽烬 技能倍率
-    skillLevel = role.skillList[2].level - 1
-    # 技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, "3", "1", skillLevel)
-    attr.add_skill_multi(skill_multi)
+    skill_type: SkillType = "共鸣解放"
+    # 获取角色技能等级
+    skillLevel = role.get_skill_level(skill_type)
+    # 技能技能倍率
+    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+
+    title = f"芳华绽烬"
+    msg = f"技能倍率{skill_multi}"
+    attr.add_skill_multi(skill_multi, title, msg)
 
     damage_func = [cast_attack, cast_liberation]
     phase_damage(attr, role, damage_func, isGroup)
@@ -143,7 +150,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
     attr.set_char_damage(attack_damage)
     attr.set_char_template("temp_atk")
-    
+
     # 守岸人buff
     shouanren_buff(attr, 0, 1, isGroup)
 

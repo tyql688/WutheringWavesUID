@@ -214,6 +214,10 @@ class RoleDetailData(BaseModel):
             skill_level = _skill.level - 1
         return skill_level
 
+    def get_skill_list(self):
+        sort = ["常态攻击", "共鸣技能", "共鸣回路", "共鸣解放", "变奏技能", "延奏技能"]
+        return sorted(self.skillList, key=lambda x: sort.index(x.skill.type))
+
 
 class CalabashData(BaseModel):
     """数据坞"""

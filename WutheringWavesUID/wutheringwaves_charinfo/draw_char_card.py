@@ -603,7 +603,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id
     skill_bg_1 = Image.open(TEXT_PATH / 'skill_bg.png')
 
     temp_i = 0
-    for _, _skill in enumerate(role_detail.skillList):
+    for _, _skill in enumerate(role_detail.get_skill_list()):
         if _skill.skill.type == '延奏技能':
             continue
         skill_bg = skill_bg_1.copy()
