@@ -5,7 +5,6 @@ from typing import Union, List
 from PIL import Image, ImageDraw
 
 from gsuid_core.logger import logger
-from gsuid_core.utils.error_reply import UPDATE_HINT
 from gsuid_core.utils.image.convert import convert_img
 from ..utils.fonts.waves_fonts import waves_font_origin
 from ..utils.image import get_waves_bg
@@ -30,7 +29,7 @@ async def draw_update_log_img(
 ) -> Union[bytes, str]:
     log_list = await update_from_git(repo_path, log_config)
     if len(log_list) == 0:
-        return UPDATE_HINT
+        return '获取失败'
 
     log_title = Image.open(TEXT_PATH / 'log_title.png')
 
@@ -67,25 +66,29 @@ async def update_from_git(
         'key': '✨🐛',
         'num': 7,
     },
-    is_update: bool = True,
 ) -> List[str]:
     if repo_path is None:
         repo_path = Path(__file__).parents[2]
     try:
-        # 获取提交记录
-        process = subprocess.run(
+        # 获取提交记录，使用Popen以二进制模式读取
+        process = subprocess.Popen(
             ['git', 'log', '--pretty=format:%s', '-40'],
             cwd=str(repo_path),
-            capture_output=True,
-            text=True,
-            check=True
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
         )
 
-        # 处理提交信息
-        commits = process.stdout.split('\n')
-        log_list = []
+        # 读取输出并解码
+        stdout, stderr = process.communicate()
+        if process.returncode != 0:
+            logger.warning(f'Git log failed: {stderr.decode("utf-8", errors="ignore")}')
+            return []
 
-        # 筛选包含关键字的提交信息
+        # 解码输出，使用errors='ignore'忽略无法解码的字符
+        commits = stdout.decode('utf-8', errors='ignore').split('\n')
+
+        # 处理提交信息
+        log_list = []
         for commit in commits:
             if commit:  # 确保不是空字符串
                 for key in log_config['key']:
