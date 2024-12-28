@@ -119,12 +119,6 @@ class Weapon_21010064(WeaponAbstract):
     name = "东落"
 
 
-class Weapon_21010073(WeaponAbstract):
-    id = 21010073
-    type = 1
-    name = ""
-
-
 class Weapon_21010074(WeaponAbstract):
     id = 21010074
     type = 1
@@ -153,6 +147,12 @@ class Weapon_21010084(WeaponAbstract):
     id = 21010084
     type = 1
     name = "凋亡频移"
+
+
+class Weapon_21010094(WeaponAbstract):
+    id = 21010094
+    type = 1
+    name = "容赦的沉思录"
 
 
 class Weapon_21020011(WeaponAbstract):
@@ -299,12 +299,6 @@ class Weapon_21020053(WeaponAbstract):
     name = "戍关迅刀·镇海"
 
 
-class Weapon_21020063(WeaponAbstract):
-    id = 21020063
-    type = 2
-    name = ""
-
-
 class Weapon_21020064(WeaponAbstract):
     id = 21020064
     type = 2
@@ -321,6 +315,12 @@ class Weapon_21020084(WeaponAbstract):
     id = 21020084
     type = 2
     name = "永续坍缩"
+
+
+class Weapon_21020094(WeaponAbstract):
+    id = 21020094
+    type = 2
+    name = "风流的寓言诗"
 
 
 class Weapon_21030011(WeaponAbstract):
@@ -354,6 +354,12 @@ class Weapon_21030015(WeaponAbstract):
                 title = self.get_title()
                 msg = f"施放延奏技能后，入场角色攻击提升{dmg}"
                 attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+
+class Weapon_21030016(WeaponAbstract):
+    id = 21030016
+    type = 3
+    name = "死与舞"
 
 
 class Weapon_21030023(WeaponAbstract):
@@ -392,12 +398,6 @@ class Weapon_21030053(WeaponAbstract):
     name = "戍关佩枪·平云"
 
 
-class Weapon_21030063(WeaponAbstract):
-    id = 21030063
-    type = 3
-    name = ""
-
-
 class Weapon_21030064(WeaponAbstract):
     id = 21030064
     type = 3
@@ -414,6 +414,12 @@ class Weapon_21030084(WeaponAbstract):
     id = 21030084
     type = 3
     name = "悖论喷流"
+
+
+class Weapon_21030094(WeaponAbstract):
+    id = 21030094
+    type = 3
+    name = "叙别的罗曼史"
 
 
 class Weapon_21040011(WeaponAbstract):
@@ -490,6 +496,12 @@ class Weapon_21040024(WeaponAbstract):
     name = "呼啸重音"
 
 
+class Weapon_21040026(WeaponAbstract):
+    id = 21040026
+    type = 4
+    name = "悲喜剧"
+
+
 class Weapon_21040034(WeaponAbstract):
     id = 21040034
     type = 4
@@ -510,12 +522,6 @@ class Weapon_21040044(WeaponAbstract):
 
 class Weapon_21040053(WeaponAbstract):
     id = 21040053
-    type = 4
-    name = "戍关臂铠·拔山"
-
-
-class Weapon_21040063(WeaponAbstract):
-    id = 21040063
     type = 4
     name = "戍关臂铠·拔山"
 
@@ -546,6 +552,12 @@ class Weapon_21040084(WeaponAbstract):
     id = 21040084
     type = 4
     name = "尘云旋臂"
+
+
+class Weapon_21040094(WeaponAbstract):
+    id = 21040094
+    type = 4
+    name = "酩酊的英雄志"
 
 
 class Weapon_21050011(WeaponAbstract):
@@ -604,6 +616,12 @@ class Weapon_21050016(WeaponAbstract):
             dmg2 = f"{self.param(4)}"
             msg = f"自身不在场时，该效果攻击额外提升{dmg2}"
             attr.add_atk_percent(calc_percent_expression(dmg2), title, msg)
+
+
+class Weapon_21050017(WeaponAbstract):
+    id = 21050017
+    type = 5
+    name = "渊海回声"
 
 
 class Weapon_21050023(WeaponAbstract):
@@ -686,12 +704,6 @@ class Weapon_21050053(WeaponAbstract):
     name = "戍关音感仪·留光"
 
 
-class Weapon_21050063(WeaponAbstract):
-    id = 21050063
-    type = 5
-    name = "戍关音感仪·留光"
-
-
 class Weapon_21050064(WeaponAbstract):
     id = 21050064
     type = 5
@@ -708,7 +720,7 @@ class Weapon_21050074(WeaponAbstract):
         """施放共鸣解放"""
         if attr.char_template != temp_atk:
             return
-        
+
         dmg = f"{self.param(0)}"
         title = self.get_title()
         msg = f"施放共鸣解放时，自身攻击提升{dmg}"
@@ -719,6 +731,12 @@ class Weapon_21050084(WeaponAbstract):
     id = 21050084
     type = 5
     name = "核熔星盘"
+
+
+class Weapon_21050094(WeaponAbstract):
+    id = 21050094
+    type = 5
+    name = "虚饰的华尔兹"
 
 
 def register_weapon():
@@ -736,9 +754,9 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21010053.id, Weapon_21010053)
     WavesWeaponRegister.register_class(Weapon_21010063.id, Weapon_21010063)
     WavesWeaponRegister.register_class(Weapon_21010064.id, Weapon_21010064)
-    WavesWeaponRegister.register_class(Weapon_21010073.id, Weapon_21010073)
     WavesWeaponRegister.register_class(Weapon_21010074.id, Weapon_21010074)
     WavesWeaponRegister.register_class(Weapon_21010084.id, Weapon_21010084)
+    WavesWeaponRegister.register_class(Weapon_21010094.id, Weapon_21010094)
     WavesWeaponRegister.register_class(Weapon_21020011.id, Weapon_21020011)
     WavesWeaponRegister.register_class(Weapon_21020012.id, Weapon_21020012)
     WavesWeaponRegister.register_class(Weapon_21020013.id, Weapon_21020013)
@@ -752,24 +770,25 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21020043.id, Weapon_21020043)
     WavesWeaponRegister.register_class(Weapon_21020044.id, Weapon_21020044)
     WavesWeaponRegister.register_class(Weapon_21020053.id, Weapon_21020053)
-    WavesWeaponRegister.register_class(Weapon_21020063.id, Weapon_21020063)
     WavesWeaponRegister.register_class(Weapon_21020064.id, Weapon_21020064)
     WavesWeaponRegister.register_class(Weapon_21020074.id, Weapon_21020074)
     WavesWeaponRegister.register_class(Weapon_21020084.id, Weapon_21020084)
+    WavesWeaponRegister.register_class(Weapon_21020094.id, Weapon_21020094)
     WavesWeaponRegister.register_class(Weapon_21030011.id, Weapon_21030011)
     WavesWeaponRegister.register_class(Weapon_21030012.id, Weapon_21030012)
     WavesWeaponRegister.register_class(Weapon_21030013.id, Weapon_21030013)
     WavesWeaponRegister.register_class(Weapon_21030015.id, Weapon_21030015)
+    WavesWeaponRegister.register_class(Weapon_21030016.id, Weapon_21030016)
     WavesWeaponRegister.register_class(Weapon_21030023.id, Weapon_21030023)
     WavesWeaponRegister.register_class(Weapon_21030024.id, Weapon_21030024)
     WavesWeaponRegister.register_class(Weapon_21030034.id, Weapon_21030034)
     WavesWeaponRegister.register_class(Weapon_21030043.id, Weapon_21030043)
     WavesWeaponRegister.register_class(Weapon_21030044.id, Weapon_21030044)
     WavesWeaponRegister.register_class(Weapon_21030053.id, Weapon_21030053)
-    WavesWeaponRegister.register_class(Weapon_21030063.id, Weapon_21030063)
     WavesWeaponRegister.register_class(Weapon_21030064.id, Weapon_21030064)
     WavesWeaponRegister.register_class(Weapon_21030074.id, Weapon_21030074)
     WavesWeaponRegister.register_class(Weapon_21030084.id, Weapon_21030084)
+    WavesWeaponRegister.register_class(Weapon_21030094.id, Weapon_21030094)
     WavesWeaponRegister.register_class(Weapon_21040011.id, Weapon_21040011)
     WavesWeaponRegister.register_class(Weapon_21040012.id, Weapon_21040012)
     WavesWeaponRegister.register_class(Weapon_21040013.id, Weapon_21040013)
@@ -777,19 +796,21 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21040016.id, Weapon_21040016)
     WavesWeaponRegister.register_class(Weapon_21040023.id, Weapon_21040023)
     WavesWeaponRegister.register_class(Weapon_21040024.id, Weapon_21040024)
+    WavesWeaponRegister.register_class(Weapon_21040026.id, Weapon_21040026)
     WavesWeaponRegister.register_class(Weapon_21040034.id, Weapon_21040034)
     WavesWeaponRegister.register_class(Weapon_21040043.id, Weapon_21040043)
     WavesWeaponRegister.register_class(Weapon_21040044.id, Weapon_21040044)
     WavesWeaponRegister.register_class(Weapon_21040053.id, Weapon_21040053)
-    WavesWeaponRegister.register_class(Weapon_21040063.id, Weapon_21040063)
     WavesWeaponRegister.register_class(Weapon_21040064.id, Weapon_21040064)
     WavesWeaponRegister.register_class(Weapon_21040074.id, Weapon_21040074)
     WavesWeaponRegister.register_class(Weapon_21040084.id, Weapon_21040084)
+    WavesWeaponRegister.register_class(Weapon_21040094.id, Weapon_21040094)
     WavesWeaponRegister.register_class(Weapon_21050011.id, Weapon_21050011)
     WavesWeaponRegister.register_class(Weapon_21050012.id, Weapon_21050012)
     WavesWeaponRegister.register_class(Weapon_21050013.id, Weapon_21050013)
     WavesWeaponRegister.register_class(Weapon_21050015.id, Weapon_21050015)
     WavesWeaponRegister.register_class(Weapon_21050016.id, Weapon_21050016)
+    WavesWeaponRegister.register_class(Weapon_21050017.id, Weapon_21050017)
     WavesWeaponRegister.register_class(Weapon_21050023.id, Weapon_21050023)
     WavesWeaponRegister.register_class(Weapon_21050024.id, Weapon_21050024)
     WavesWeaponRegister.register_class(Weapon_21050026.id, Weapon_21050026)
@@ -798,7 +819,7 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21050043.id, Weapon_21050043)
     WavesWeaponRegister.register_class(Weapon_21050044.id, Weapon_21050044)
     WavesWeaponRegister.register_class(Weapon_21050053.id, Weapon_21050053)
-    WavesWeaponRegister.register_class(Weapon_21050063.id, Weapon_21050063)
     WavesWeaponRegister.register_class(Weapon_21050064.id, Weapon_21050064)
     WavesWeaponRegister.register_class(Weapon_21050074.id, Weapon_21050074)
     WavesWeaponRegister.register_class(Weapon_21050084.id, Weapon_21050084)
+    WavesWeaponRegister.register_class(Weapon_21050094.id, Weapon_21050094)

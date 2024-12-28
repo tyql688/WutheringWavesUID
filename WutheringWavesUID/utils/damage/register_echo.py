@@ -429,6 +429,166 @@ class Echo_6000060(EchoAbstract):
     #     attr.add_atk_percent(0.1, title, msg)
 
 
+class Echo_6000061(EchoAbstract):
+    id = 6000061
+    name = "风鬃狼"
+
+
+class Echo_6000062(EchoAbstract):
+    id = 6000062
+    name = "雷鬃狼"
+
+
+class Echo_6000063(EchoAbstract):
+    id = 6000063
+    name = "霜鬃狼"
+
+
+class Echo_6000064(EchoAbstract):
+    id = 6000064
+    name = "浮灵偶·海德"
+
+
+class Echo_6000065(EchoAbstract):
+    id = 6000065
+    name = "浮灵偶·蕾弗"
+
+
+class Echo_6000066(EchoAbstract):
+    id = 6000066
+    name = "浮灵偶·莱特"
+
+
+class Echo_6000067(EchoAbstract):
+    id = 6000067
+    name = "幽翎火"
+
+
+class Echo_6000068(EchoAbstract):
+    id = 6000068
+    name = "云海妖精"
+
+
+class Echo_6000069(EchoAbstract):
+    id = 6000069
+    name = "魔术先生"
+
+
+class Echo_6000070(EchoAbstract):
+    id = 6000070
+    name = "寂寞小姐"
+
+
+class Echo_6000071(EchoAbstract):
+    id = 6000071
+    name = "工头布偶"
+
+
+class Echo_6000072(EchoAbstract):
+    id = 6000072
+    name = "欺诈奇藏"
+
+
+class Echo_6000073(EchoAbstract):
+    id = 6000073
+    name = "巡游骑士"
+
+
+class Echo_6000074(EchoAbstract):
+    id = 6000074
+    name = "幻昼骑士"
+
+
+class Echo_6000075(EchoAbstract):
+    id = 6000075
+    name = "暗夜骑士"
+
+
+class Echo_6000076(EchoAbstract):
+    id = 6000076
+    name = "毒冠贵族"
+
+
+class Echo_6000077(EchoAbstract):
+    id = 6000077
+    name = "持刃贵族"
+
+
+class Echo_6000078(EchoAbstract):
+    id = 6000078
+    name = "凝水贵族"
+
+
+class Echo_6000079(EchoAbstract):
+    id = 6000079
+    name = "浮灵偶"
+
+
+class Echo_6000080(EchoAbstract):
+    id = 6000080
+    name = "琉璃刀伶"
+
+
+class Echo_6000081(EchoAbstract):
+    id = 6000081
+    name = "巨布偶"
+
+
+class Echo_6000082(EchoAbstract):
+    id = 6000082
+    name = "罗蕾莱"
+
+
+class Echo_6000083(EchoAbstract):
+    id = 6000083
+    name = "异构武装"
+
+
+class Echo_6000084(EchoAbstract):
+    id = 6000084
+    name = "叹息古龙"
+
+
+class Echo_6000085(EchoAbstract):
+    id = 6000085
+    name = "赫卡忒"
+
+
+class Echo_6000086(EchoAbstract):
+    id = 6000086
+    name = "梦魇·飞廉之猩"
+
+
+class Echo_6000087(EchoAbstract):
+    id = 6000087
+    name = "梦魇·无常凶鹭"
+
+
+class Echo_6000088(EchoAbstract):
+    id = 6000088
+    name = "梦魇·云闪之鳞"
+
+
+class Echo_6000089(EchoAbstract):
+    id = 6000089
+    name = "梦魇·朔雷之鳞"
+
+
+class Echo_6000090(EchoAbstract):
+    id = 6000090
+    name = "梦魇·无冠者"
+
+
+class Echo_6000091(EchoAbstract):
+    id = 6000091
+    name = "梦魇·燎照之骑"
+
+
+class Echo_6000092(EchoAbstract):
+    id = 6000092
+    name = "梦魇·哀声鸷"
+
+
 class Echo_6000145(Echo_6000045):
     id = 6000145
     name = "异相·哀声鸷"
@@ -504,5 +664,37 @@ def register_echo():
     WavesEchoRegister.register_class(Echo_6000058.id, Echo_6000058)
     WavesEchoRegister.register_class(Echo_6000059.id, Echo_6000059)
     WavesEchoRegister.register_class(Echo_6000060.id, Echo_6000060)
+    WavesEchoRegister.register_class(Echo_6000061.id, Echo_6000061)
+    WavesEchoRegister.register_class(Echo_6000062.id, Echo_6000062)
+    WavesEchoRegister.register_class(Echo_6000063.id, Echo_6000063)
+    WavesEchoRegister.register_class(Echo_6000064.id, Echo_6000064)
+    WavesEchoRegister.register_class(Echo_6000065.id, Echo_6000065)
+    WavesEchoRegister.register_class(Echo_6000066.id, Echo_6000066)
+    WavesEchoRegister.register_class(Echo_6000067.id, Echo_6000067)
+    WavesEchoRegister.register_class(Echo_6000068.id, Echo_6000068)
+    WavesEchoRegister.register_class(Echo_6000069.id, Echo_6000069)
+    WavesEchoRegister.register_class(Echo_6000070.id, Echo_6000070)
+    WavesEchoRegister.register_class(Echo_6000071.id, Echo_6000071)
+    WavesEchoRegister.register_class(Echo_6000072.id, Echo_6000072)
+    WavesEchoRegister.register_class(Echo_6000073.id, Echo_6000073)
+    WavesEchoRegister.register_class(Echo_6000074.id, Echo_6000074)
+    WavesEchoRegister.register_class(Echo_6000075.id, Echo_6000075)
+    WavesEchoRegister.register_class(Echo_6000076.id, Echo_6000076)
+    WavesEchoRegister.register_class(Echo_6000077.id, Echo_6000077)
+    WavesEchoRegister.register_class(Echo_6000078.id, Echo_6000078)
+    WavesEchoRegister.register_class(Echo_6000079.id, Echo_6000079)
+    WavesEchoRegister.register_class(Echo_6000080.id, Echo_6000080)
+    WavesEchoRegister.register_class(Echo_6000081.id, Echo_6000081)
+    WavesEchoRegister.register_class(Echo_6000082.id, Echo_6000082)
+    WavesEchoRegister.register_class(Echo_6000083.id, Echo_6000083)
+    WavesEchoRegister.register_class(Echo_6000084.id, Echo_6000084)
+    WavesEchoRegister.register_class(Echo_6000085.id, Echo_6000085)
+    WavesEchoRegister.register_class(Echo_6000086.id, Echo_6000086)
+    WavesEchoRegister.register_class(Echo_6000087.id, Echo_6000087)
+    WavesEchoRegister.register_class(Echo_6000088.id, Echo_6000088)
+    WavesEchoRegister.register_class(Echo_6000089.id, Echo_6000089)
+    WavesEchoRegister.register_class(Echo_6000090.id, Echo_6000090)
+    WavesEchoRegister.register_class(Echo_6000091.id, Echo_6000091)
+    WavesEchoRegister.register_class(Echo_6000092.id, Echo_6000092)
     WavesEchoRegister.register_class(Echo_6000145.id, Echo_6000145)
     WavesEchoRegister.register_class(Echo_6010052.id, Echo_6010052)

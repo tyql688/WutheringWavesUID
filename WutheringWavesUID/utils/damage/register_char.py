@@ -82,6 +82,12 @@ class Char_1106(CharAbstract):
     starLevel = 4
 
 
+class Char_1107(CharAbstract):
+    id = 1107
+    name = "珂莱塔"
+    starLevel = 5
+
+
 class Char_1202(CharAbstract):
     id = 1202
     name = "炽霞"
@@ -352,12 +358,19 @@ class Char_1605(CharAbstract):
     starLevel = 5
 
 
+class Char_1606(CharAbstract):
+    id = 1606
+    name = "洛可可"
+    starLevel = 5
+
+
 def register_char():
     WavesCharRegister.register_class(Char_1102.id, Char_1102)
     WavesCharRegister.register_class(Char_1103.id, Char_1103)
     WavesCharRegister.register_class(Char_1104.id, Char_1104)
     WavesCharRegister.register_class(Char_1105.id, Char_1105)
     WavesCharRegister.register_class(Char_1106.id, Char_1106)
+    WavesCharRegister.register_class(Char_1107.id, Char_1107)
     WavesCharRegister.register_class(Char_1202.id, Char_1202)
     WavesCharRegister.register_class(Char_1203.id, Char_1203)
     WavesCharRegister.register_class(Char_1204.id, Char_1204)
@@ -381,3 +394,4 @@ def register_char():
     WavesCharRegister.register_class(Char_1603.id, Char_1603)
     WavesCharRegister.register_class(Char_1604.id, Char_1604)
     WavesCharRegister.register_class(Char_1605.id, Char_1605)
+    WavesCharRegister.register_class(Char_1606.id, Char_1606)
