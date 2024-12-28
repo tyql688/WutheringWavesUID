@@ -134,6 +134,7 @@ class DamageAttribute:
         echo_id=0,
         char_attr=None,
         sync_strike=False,
+        energy_regen=0,
         char_damage=None,
         enemy_level=90,
     ):
@@ -222,6 +223,8 @@ class DamageAttribute:
         self.char_damage = char_damage
         # 协同攻击
         self.sync_strike = sync_strike
+        # 共鸣效率
+        self.energy_regen = energy_regen
         # 效果
         self.effect = []
         # 敌人等级
@@ -265,6 +268,8 @@ class DamageAttribute:
             f"  声骸的加成百分比={self.dmg_bonus_phantom}, \n"
             f"  角色属性={self.char_attr}, \n"
             f"  角色属性伤害={self.char_damage}, \n"
+            f"  协同攻击={self.sync_strike}, \n"
+            f"  共鸣效率={self.energy_regen}, \n"
             f"  声骸={ph_details_str}, \n"
             f"  效果={effect_str}\n"
             f")"
@@ -450,6 +455,10 @@ class DamageAttribute:
             self.enemy_resistance = 0
         self.add_effect(title, msg)
         return self
+
+    def add_energy_regen(self, energy_regen: float):
+        """增加共鸣效率"""
+        self.energy_regen += energy_regen
 
     def set_dmg_bonus_phantom(self, dmg_bonus_phantom_map: Dict):
         """设置声骸加成"""

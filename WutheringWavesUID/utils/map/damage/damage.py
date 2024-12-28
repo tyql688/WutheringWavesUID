@@ -5,7 +5,10 @@ from ...ascension.sonata import get_sonata_detail
 from ...damage.abstract import WavesWeaponRegister, WavesEchoRegister
 from ...damage.damage import DamageAttribute
 from ...damage.utils import SONATA_CELESTIAL, SONATA_SINKING, SONATA_MOLTEN, SONATA_VOID, \
-    SONATA_FREEZING, SONATA_SIERRA, SONATA_REJUVENATING, cast_hit, cast_attack, cast_skill
+    SONATA_FREEZING, SONATA_SIERRA, SONATA_REJUVENATING, cast_hit, cast_attack, cast_skill, SONATA_FROSTY, \
+    cast_liberation, skill_damage, CHAR_ATTR_FREEZING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID, CHAR_ATTR_SIERRA, \
+    CHAR_ATTR_CELESTIAL, CHAR_ATTR_SINKING, SONATA_MOONLIT, SONATA_LINGERING, SONATA_EMPYREAN, SONATA_MIDNIGHT, \
+    SONATA_ETERNAL, SONATA_TIDEBREAKING
 
 
 def weapon_damage(attr: DamageAttribute, weapon_data: WeaponData, damage_func: Union[List[str], str], isGroup: bool):
@@ -40,56 +43,122 @@ def phase_damage(attr: DamageAttribute, role: RoleDetailData, damage_func: Union
 
     for ph_detail in attr.ph_detail:
         # 凝夜白霜
-        if (cast_hit in damage_func or cast_attack in damage_func) and check_if_ph_5(ph_detail.ph_name,
-                                                                                     ph_detail.ph_num, SONATA_FREEZING):
-            # 声骸五件套
-            title = f"{phase_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_FREEZING):
+            if attr.char_attr != CHAR_ATTR_FREEZING:
+                return
+            if cast_hit in damage_func or cast_attack in damage_func:
+                # 声骸五件套
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
+                attr.add_dmg_bonus(0.3, title, msg)
 
         # 熔山裂谷
-        elif (cast_skill in damage_func) and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_MOLTEN):
-            title = f"{phase_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_MOLTEN):
+            if attr.char_attr != CHAR_ATTR_MOLTEN:
+                return
+            if cast_skill in damage_func:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
+                attr.add_dmg_bonus(0.3, title, msg)
 
         # 彻空冥雷
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_VOID):
-            if cast_skill in damage_func:
+            if cast_skill in damage_func and attr.char_attr == CHAR_ATTR_VOID:
                 title = f"{phase_name}-{ph_detail.ph_name}"
                 msg = f"使用共鸣技能时，获得一层导电伤害提升15%"
                 attr.add_dmg_bonus(0.15, title, msg)
-            if cast_hit in damage_func:
+            if cast_hit in damage_func and attr.char_attr == CHAR_ATTR_VOID:
                 title = f"{phase_name}-{ph_detail.ph_name}"
                 msg = f"使用重击时，获得一层导电伤害提升15%"
                 attr.add_dmg_bonus(0.15, title, msg)
 
         # 啸谷长风
-        elif isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SIERRA):
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SIERRA):
+            if not isGroup:
+                return
+            if attr.char_attr != CHAR_ATTR_SIERRA:
+                return
             # 声骸五件套
             title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_atk_percent(0.3, title, msg)
 
         # 浮星祛暗
-        elif isGroup and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_CELESTIAL):
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_CELESTIAL):
+            if not isGroup:
+                return
+            if attr.char_attr != CHAR_ATTR_CELESTIAL:
+                return
             title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
             attr.add_dmg_bonus(0.3, title, msg)
 
         # 沉日劫明
-        elif (cast_hit in damage_func or cast_attack in damage_func) and check_if_ph_5(ph_detail.ph_name,
-                                                                                       ph_detail.ph_num,
-                                                                                       SONATA_SINKING):
-            # 声骸五件套
-            title = f"{phase_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_SINKING):
+            if attr.char_attr != CHAR_ATTR_SINKING:
+                return
+            if cast_hit in damage_func or cast_attack in damage_func:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
+                attr.add_dmg_bonus(0.3, title, msg)
 
         # 隐世回光
         elif isHealing and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_REJUVENATING):
+            if attr.char_template != 'temp_atk':
+                return
             title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
-            attr.add_dmg_bonus(0.3, title, msg)
+            attr.add_atk_percent(0.15, title, msg)
 
-        # 不绝余音
+        # 轻云出月
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_MOONLIT):
+            pass
+        # 不绝余音 查无此人
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_LINGERING):
+            pass
+        # 凌冽决断之心 -新冷凝
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_FROSTY):
+            if cast_skill in damage_func and attr.char_attr == CHAR_ATTR_FREEZING:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = f"施放共鸣技能时，自身冷凝伤害提升22.5%"
+                attr.add_dmg_bonus(0.225, title, msg)
+            if cast_liberation in damage_func and attr.char_damage == skill_damage:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = f"施放共鸣解放时，自身共鸣技能伤害提升18%"
+                attr.add_dmg_bonus(0.18, title, msg)
+
+        # 高天共奏之曲 -协同
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_EMPYREAN):
+            if attr.sync_strike:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = f"当前角色协同攻击造成的伤害提升80%"
+                attr.add_dmg_bonus(0.8, title, msg)
+
+                # 协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%
+
+        # 幽夜隐匿之帷
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_MIDNIGHT):
+            # 角色触发延奏技能离场时，额外对周围敌人造成480%的湮灭伤害，该伤害为延奏技能伤害，并使下一个登场角色湮灭属性伤害加成提升15%，持续15秒
+            pass
+
+        # 此间永驻之光
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_ETERNAL):
+            # 角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒。
+            title = f"{phase_name}-{ph_detail.ph_name}"
+            msg = f"角色为敌人添加【光噪效应】时，自身暴击提升20%"
+            attr.add_crit_rate(0.2, title, msg)
+            if attr.char_attr == CHAR_ATTR_CELESTIAL:
+                msg = f"攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%"
+                attr.add_dmg_bonus(0.15, title, msg)
+
+        # 无惧浪涛之勇
+        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_TIDEBREAKING):
+            # 角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%
+            title = f"{phase_name}-{ph_detail.ph_name}"
+            if attr.char_template == 'temp_atk':
+                msg = f"角色攻击提升15%"
+                attr.add_atk_percent(0.15, title, msg)
+
+            if attr.energy_regen >= 2.5:
+                msg = f"共鸣效率达到250%后，当前角色全属性伤害提升30%"
+                attr.add_dmg_bonus(0.3, title, msg)

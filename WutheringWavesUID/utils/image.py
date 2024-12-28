@@ -157,7 +157,7 @@ async def get_attribute_prop(name: str = "") -> Image.Image:
 
 
 async def get_attribute_effect(name: str = "") -> Image.Image:
-    return Image.open(TEXT_PATH / f'attribute_effect/attr_{name}.webp').convert("RGBA")
+    return Image.open(TEXT_PATH / f'attribute_effect/attr_{name}.png').convert("RGBA")
 
 
 async def get_weapon_type(name: str = "") -> Image.Image:

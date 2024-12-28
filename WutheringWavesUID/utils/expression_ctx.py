@@ -241,6 +241,7 @@ def enhance_summation_card_value(role_id, role_level, role_breach, role_attr,
 
     char_regen = '100%'
     card_sort_map['共鸣效率'] = sum_percentages(char_regen, result.get("共鸣效率", "0%"), card_sort_map['共鸣效率'])
+    card_sort_map['energy_regen'] = percent_to_float(card_sort_map['共鸣效率'])
 
     card_sort_map[shuxing] = sum_percentages(
         result.get(shuxing, "0%"),
@@ -297,6 +298,7 @@ def card_sort_map_to_attribute(card_sort_map: Dict):
     attr.add_def_percent(card_sort_map['def_percent'])
     attr.add_crit_rate(card_sort_map['crit_rate'])
     attr.add_crit_dmg(card_sort_map['crit_dmg'])
+    attr.add_energy_regen(card_sort_map['energy_regen'])
     # attr.add_dmg_bonus(card_sort_map['dmg_bonus'])
     attr.set_dmg_bonus_phantom(card_sort_map)
     attr.set_echo_id(card_sort_map['echo_id'])

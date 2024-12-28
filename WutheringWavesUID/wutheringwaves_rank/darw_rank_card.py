@@ -24,8 +24,8 @@ from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_va
 from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_16, waves_font_40, waves_font_30, \
     waves_font_24, waves_font_20, waves_font_44
 from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_GOLD, \
-    get_square_weapon, CHAIN_COLOR, get_attribute, WAVES_ECHO_MAP, get_attribute_effect, \
-    change_color, GREY, RED, get_role_pile_old
+    get_square_weapon, CHAIN_COLOR, get_attribute, get_attribute_effect, \
+    GREY, RED, get_role_pile_old
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.simple_async_cache_card import card_cache
@@ -331,10 +331,10 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         # 合鸣效果
         if rank.sonata_name:
             effect_image = await get_attribute_effect(rank.sonata_name)
-            effect_image = effect_image.resize((60, 60))
-            sonata_color = WAVES_ECHO_MAP.get(rank.sonata_name, (0, 0, 0))
-            effect_image = await change_color(effect_image, sonata_color)
-            bar_bg.alpha_composite(effect_image, (525, 15))
+            effect_image = effect_image.resize((50, 50))
+            # sonata_color = WAVES_ECHO_MAP.get(rank.sonata_name, (0, 0, 0))
+            # effect_image = await change_color(effect_image, sonata_color)
+            bar_bg.alpha_composite(effect_image, (533, 15))
             sonata_name = rank.sonata_name
         else:
             sonata_name = '合鸣效果'

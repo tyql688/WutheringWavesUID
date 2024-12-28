@@ -13,7 +13,7 @@ from ..utils.api.requests import Wiki
 from ..utils.ascension.weapon import get_weapon_star
 from ..utils.fonts.waves_fonts import waves_font_70, waves_font_30, waves_font_24, waves_font_40, waves_font_origin
 from ..utils.image import get_waves_bg, add_footer, GOLD, GREY, SPECIAL_GOLD, get_weapon_type, get_crop_waves_bg, \
-    get_attribute_prop, WAVES_ECHO_MAP, get_attribute_effect, change_color
+    get_attribute_prop, WAVES_ECHO_MAP, get_attribute_effect
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 
@@ -107,7 +107,7 @@ async def draw_wiki_echo(name, raw_data: Dict):
             continue
         effect_image = await get_attribute_effect(e)
         effect_image = effect_image.resize((30, 30))
-        effect_image = await change_color(effect_image, color)
+        # effect_image = await change_color(effect_image, color)
         echo_image.alpha_composite(effect_image, (250, 20 + index * 20))
         # echo_image_draw.text((250, 20 + index * 20), f'{e}', color, waves_font_18, 'lm')
 
