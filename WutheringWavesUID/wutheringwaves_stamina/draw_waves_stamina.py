@@ -53,6 +53,9 @@ async def draw_stamina_img(bot: Bot, ev: Event):
             if not succ:
                 continue
             daily_info = DailyData(**daily_info)
+            res = await waves_api.sign_in_task_list(uid, ck)
+            if isinstance(res, dict):
+                daily_info.hasSignIn = res.get("data", {}).get("isSigIn", False)
             valid_daily_list.append(daily_info)
 
         if len(valid_daily_list) == 0:

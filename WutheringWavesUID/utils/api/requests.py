@@ -310,6 +310,13 @@ class WavesApi:
         return await self._waves_request(SIGNIN_URL, "POST", header, data=data)
         # return await _check_response(raw_data)
 
+    async def sign_in_task_list(self, roleId: str, token: str, serverId: str = None) -> (bool, Union[Dict, str]):
+        """签到"""
+        header = copy.deepcopy(await get_headers(token))
+        header.update({'token': token, 'devcode': ''})
+        data = {'gameId': GAME_ID, 'serverId': self.get_server_id(roleId, serverId), 'roleId': roleId}
+        return await self._waves_request(SIGNIN_TASK_LIST_URL, "POST", header, data=data)
+
     async def get_gacha_log(self, cardPoolType: str, recordId: str, roleId: str, serverId: str = None):
         """抽卡记录"""
         header = {"Content-Type": "application/json;charset=UTF-8"}
