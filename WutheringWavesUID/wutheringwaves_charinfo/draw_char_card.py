@@ -607,7 +607,7 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id
         if _skill.skill.type == '延奏技能':
             continue
         skill_bg = skill_bg_1.copy()
-
+        logger.debug(f"{char_name}-{_skill.skill.name}")
         skill_img = await get_skill_img(role_detail.role.roleId, _skill.skill.name, _skill.skill.iconUrl)
         skill_img = skill_img.resize((70, 70))
         skill_bg.paste(skill_img, (57, 65), skill_img)

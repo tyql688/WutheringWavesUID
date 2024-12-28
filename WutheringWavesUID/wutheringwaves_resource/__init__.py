@@ -18,18 +18,18 @@ from ..wutheringwaves_config import PREFIX
 sv_download_config = SV('资源下载', pm=1)
 
 
-@sv_download_config.on_fullmatch((f'{PREFIX}下载全部资源', f'{PREFIX}补充资源'))
+@sv_download_config.on_fullmatch((f'{PREFIX}下载全部资源', f'{PREFIX}补充资源', f'{PREFIX}刷新补充资源'))
 async def send_download_resource_msg(bot: Bot, ev: Event):
     await bot.send('[鸣潮] 正在开始下载~可能需要较久的时间!')
     await download_all_resource()
 
     if '补充' in ev.command:
+        isForce = True if '刷新' in ev.command else False
         all_char = await hakush_api.get_all_character()
-        await hakush_api.download_all_avatar_pic(all_char)
-        await hakush_api.download_all_pile_pic(all_char)
+        await hakush_api.download_all_char_pic(all_char, isForce)
 
         all_weapon = await hakush_api.get_all_weapon()
-        await hakush_api.download_all_weapon_pic(all_weapon)
+        await hakush_api.download_all_weapon_pic(all_weapon, isForce)
     await bot.send('[鸣潮] 下载完成！')
 
 
