@@ -48,7 +48,7 @@ class PhantomDetail:
     @classmethod
     def dict2Object(cls, d):
         res = PhantomDetail()
-        res.ph_name = d.get('ph_name', 0)
+        res.ph_name = d.get('ph_name', '')
         res.ph_num = d.get('ph_num', 0)
         return res
 

@@ -135,7 +135,7 @@ class Char_1204(CharAbstract):
                            90,
                            6,
                            resonLevel)
-            w.do_action('damage', attr, isGroup)
+            w.do_action('buff', attr, isGroup)
 
 
 class Char_1205(CharAbstract):

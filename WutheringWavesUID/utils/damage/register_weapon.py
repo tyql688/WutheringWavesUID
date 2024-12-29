@@ -32,19 +32,25 @@ class Weapon_21010016(WeaponAbstract):
     type = 1
     name = "苍鳞千嶂"
 
+    # 每次施放变奏技能或共鸣解放时，自身重击伤害加成提升{1}，可叠加{2}层
+
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放变奏技能"""
+        if attr.char_damage != hit_damage:
+            return
+        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
+        title = self.get_title()
+        msg = f"施放变奏技能时，自身重击伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
     def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣解放"""
-        if attr.char_damage == hit_damage:
-            if isGroup:
-                dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
-                title = self.get_title()
-                msg = f"施放变奏技能时，自身重击伤害加成提升{dmg}"
-                attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
-
-            dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
-            title = self.get_title()
-            msg = f"施放共鸣解放时，自身重击伤害加成提升{dmg}"
-            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        if attr.char_damage != hit_damage:
+            return
+        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
+        title = self.get_title()
+        msg = f"施放共鸣解放时，自身重击伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21010023(WeaponAbstract):
@@ -64,17 +70,20 @@ class Weapon_21010026(WeaponAbstract):
     type = 1
     name = "时和岁稔"
 
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放变奏技能"""
+        if attr.char_damage != skill_damage:
+            return
+        # 施放变奏技能时，自身获得【岁蕴】，使共鸣技能伤害加成提升24%
+        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
+        title = self.get_title()
+        msg = f"施放变奏技能时，使共鸣技能伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
     def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣技能"""
         if attr.char_damage != skill_damage:
             return
-
-        if isGroup:
-            # 施放变奏技能时，自身获得【岁蕴】，使共鸣技能伤害加成提升24%
-            dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
-            title = self.get_title()
-            msg = f"施放变奏技能时，使共鸣技能伤害加成提升{dmg}"
-            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
         # 施放共鸣技能时，自身获得【福泽】，使共鸣技能伤害加成提升24%
         dmg = f"{self.weapon_detail.param[3][self.weapon_reson_level - 1]}"
@@ -346,7 +355,7 @@ class Weapon_21030015(WeaponAbstract):
     type = 3
     name = "停驻之烟"
 
-    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+    def buff(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""
         if isGroup:
             if attr.char_template == temp_atk:
@@ -360,6 +369,28 @@ class Weapon_21030016(WeaponAbstract):
     id = 21030016
     type = 3
     name = "死与舞"
+
+    # 施放变奏技能或共鸣解放时，自身共鸣技能伤害加成提升48%
+
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放变奏技能"""
+        if attr.char_damage != skill_damage:
+            return
+        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
+        title = self.get_title()
+        msg = f"施放变奏技能时，自身共鸣技能伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
+
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣解放"""
+        if attr.char_damage != skill_damage:
+            return
+        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}"
+        title = self.get_title()
+        msg = f"施放共鸣解放时，自身共鸣技能伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
 
 
 class Weapon_21030023(WeaponAbstract):

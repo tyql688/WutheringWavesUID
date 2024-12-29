@@ -62,6 +62,9 @@ class WeaponAbstract(object):
         if isinstance(func_list, str):
             func_list = [func_list]
 
+        if isGroup:
+            func_list.append('cast_variation')
+
         for func_name in func_list:
             method = getattr(self, func_name, None)
             if callable(method):
@@ -73,6 +76,10 @@ class WeaponAbstract(object):
 
     def param(self, param):
         return self.weapon_detail.param[param][self.weapon_reson_level - 1]
+
+    def buff(self, attr: DamageAttribute, isGroup: bool = False):
+        """buff"""
+        pass
 
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         """造成伤害"""

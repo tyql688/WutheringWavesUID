@@ -543,6 +543,18 @@ class Echo_6000083(EchoAbstract):
     id = 6000083
     name = "异构武装"
 
+    # 在首位装配该声骸技能时，自身获得12.00%冷凝伤害加成提升，12.00%共鸣技能伤害加成提升
+    # def damage(self, attr: DamageAttribute, isGroup: bool = False):
+    #     if attr.char_damage == skill_damage:
+    #         title = self.name
+    #         msg = '共鸣技能伤害加成提升12.00%'
+    #         attr.add_dmg_bonus(0.12, title, msg)
+    #
+    #     if attr.char_attr == CHAR_ATTR_FREEZING:
+    #         title = self.name
+    #         msg = '冷凝伤害加成提升12.00%'
+    #         attr.add_dmg_bonus(0.12, title, msg)
+
 
 class Echo_6000084(EchoAbstract):
     id = 6000084
