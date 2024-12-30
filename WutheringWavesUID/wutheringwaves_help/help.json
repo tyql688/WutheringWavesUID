@@ -509,6 +509,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": true
+      },
+      {
+        "name": "删除自动签到",
+        "desc": "删除自动签到",
+        "eg": "删除自动签到123456",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
       }
     ]
   }

@@ -1,6 +1,6 @@
 from typing import Optional, Any, Type, List
 
-from sqlalchemy import and_, or_, null, delete
+from sqlalchemy import and_, or_, null, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Field, select, col
 
@@ -258,6 +258,33 @@ class WavesUser(User, table=True):
                 )
             )
         )
+        await session.execute(sql)
+        return len(query)
+
+    @classmethod
+    @with_session
+    async def delete_group_sign_switch(
+        cls, session: AsyncSession,
+        param_id: str
+    ):
+        '''删除自动签到
+        '''
+        # 先查数量
+        sql = select(cls).where(
+            and_(
+                cls.sign_switch == param_id
+            )
+        )
+        result = await session.execute(sql)
+        query = result.scalars().all()
+        if len(query) == 0:
+            return 0
+
+        sql = update(cls).where(
+            and_(
+                cls.sign_switch == param_id
+            )
+        ).values({'sign_switch': 'off'})
         await session.execute(sql)
         return len(query)
 

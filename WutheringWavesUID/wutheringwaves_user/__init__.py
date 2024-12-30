@@ -15,6 +15,7 @@ waves_bind_uid = SV('鸣潮绑定特征码', priority=10)
 waves_add_ck = SV('鸣潮添加token', priority=5)
 waves_del_ck = SV('鸣潮删除token', priority=5)
 waves_get_ck = SV('waves获取ck', area='DIRECT')
+waves_del_group_ck = SV('鸣潮删除自动签到', priority=1, pm=1)
 waves_del_all_invalid_ck = SV('鸣潮删除无效token', priority=1, pm=1)
 
 
@@ -49,6 +50,22 @@ async def send_waves_del_ck_msg(bot: Bot, ev: Event):
     block=True)
 async def send_waves_get_ck_msg(bot: Bot, ev: Event):
     await bot.send(await get_cookie(bot, ev))
+
+
+@waves_del_group_ck.on_command((
+    f'{PREFIX}删除自动签到'
+),
+    block=True)
+async def delete_group_cookie(bot: Bot, ev: Event):
+    at_sender = True if ev.group_id else False
+
+    param_id = ev.text.strip()
+    # 检测为数字
+    if not param_id.isdigit():
+        return await bot.send(f'[鸣潮] 参数[{param_id}]有误！\n', at_sender)
+
+    del_len = await WavesUser.delete_group_sign_switch(param_id)
+    await bot.send(f'[鸣潮] 已删除【{param_id}】自动签到【{del_len}】个\n', at_sender)
 
 
 @waves_del_all_invalid_ck.on_fullmatch((
