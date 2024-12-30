@@ -3,7 +3,7 @@ from pathlib import Path
 from PIL import ImageFont
 
 FONT_ORIGIN_PATH = Path(__file__).parent / 'waves_fonts.ttf'
-FONT2_ORIGIN_PATH = Path(__file__).parent / 'SourceHanSansSC-Bold.otf'
+FONT2_ORIGIN_PATH = Path(__file__).parent / 'arial-unicode-ms-bold.ttf'
 
 
 def waves_font_origin(size: int) -> ImageFont.FreeTypeFont:
