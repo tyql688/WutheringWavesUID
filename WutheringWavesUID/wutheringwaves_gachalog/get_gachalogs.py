@@ -203,7 +203,6 @@ async def export_gachalogs(uid: str) -> dict:
             'name': f'export_{uid}.json',
             'url': str((path / f'export_{uid}.json').absolute()),
         }
-        logger.info(f'[导出抽卡记录] {im['url']} 导出成功!')
     else:
         logger.error('[导出抽卡记录] 没有找到抽卡记录!')
         im = {
