@@ -266,6 +266,14 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "导出抽卡记录",
+        "desc": "导出抽卡记录",
+        "eg": "导出抽卡记录",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },

@@ -8,6 +8,7 @@ from typing import Dict, List, Union
 import aiofiles
 import msgspec
 
+from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from ..utils.api.model import GachaLog
 from ..utils.database.models import WavesUser
@@ -15,6 +16,7 @@ from ..utils.error_reply import WAVES_CODE_104, WAVES_CODE_108
 from ..utils.hint import error_reply
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
+from ..version import WutheringWavesUID_version
 from ..wutheringwaves_config import PREFIX
 
 gacha_type_meta_data = {
@@ -152,3 +154,63 @@ async def save_record_id(user_id, bot_id, uid, record_id):
             })
     else:
         await WavesUser.insert_data(user_id, bot_id, record_id=record_id, uid=uid)
+
+
+async def export_gachalogs(uid: str) -> dict:
+    path = PLAYER_PATH / uid
+    if not path.exists():
+        path.mkdir(parents=True, exist_ok=True)
+
+    # 获取当前时间
+    now = datetime.now()
+    current_time = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    # 抽卡记录json路径
+    gachalogs_path = path / 'gacha_logs.json'
+    if gachalogs_path.exists():
+        async with aiofiles.open(gachalogs_path, 'r', encoding='UTF-8') as f:
+            raw_data = json.loads(await f.read())
+
+        result = {
+            'info': {
+                'export_time': current_time,
+                'export_app': 'WutheringWavesUID',
+                'export_app_version': WutheringWavesUID_version,
+                'export_timestamp': round(now.timestamp()),
+                'version': 'v1.0',
+                'uid': uid,
+            },
+            'list': [],
+        }
+        gachalogs_history = raw_data['data']
+        for name, gachalogs in gachalogs_history.items():
+            result['list'].append(gachalogs)
+
+        async with aiofiles.open(
+            path / f'export_{uid}.json', 'w', encoding='UTF-8'
+        ) as file:
+            await file.write(
+                json.dumps(
+                    result,
+                    ensure_ascii=False,
+                    indent=4,
+                )
+            )
+        logger.success('[导出抽卡记录] 导出成功!')
+        im = {
+            'retcode': 'ok',
+            'data': '导出成功!',
+            'name': f'export_{uid}.json',
+            'url': str((path / f'export_{uid}.json').absolute()),
+        }
+        logger.info(f'[导出抽卡记录] {im['url']} 导出成功!')
+    else:
+        logger.error('[导出抽卡记录] 没有找到抽卡记录!')
+        im = {
+            'retcode': 'error',
+            'data': '你还没有抽卡记录可以导出!',
+            'name': '',
+            'url': '',
+        }
+
+    return im
