@@ -26,6 +26,11 @@
 >
 >
 > ✨如果需要添加其他鸣潮相关功能欢迎在issues中提出✨
+>
+
+## 丨反馈渠道
+
+- QQ群号：[76436110](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=hmB3ejtTx6cIDHegsLM91jd1Rn97eGAe&authKey=HqcnRdI0S98dUBcpHxwjWv72LYpUYE%2BSXVOEjiuBrAZbepCHPzP86szZFhxeiQkG&noverify=0&group_code=76436110)
 
 ## 丨功能
 

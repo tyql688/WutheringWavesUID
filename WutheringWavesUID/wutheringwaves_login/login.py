@@ -221,7 +221,7 @@ async def login_help():
         '       https://域名',
         '       https://域名:port',
         '3. 家里云或者不想暴露公网ip',
-        '   3.1 询要域名地址请加群: 929275476',
+        '   3.1 询要域名地址请加群: 76436110',
         '   3.2 在ww配置`鸣潮登录url`中填写提供的域名'
     ]
     for i, t in enumerate(text):
