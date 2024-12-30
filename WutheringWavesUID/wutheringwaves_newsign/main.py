@@ -459,9 +459,10 @@ async def process_all_users(_user_list: List):
     for batch in batches:
         tasks = [process_user_with_semaphore(user) for user in batch]
         await asyncio.gather(*tasks)
-        delay = 1 + random.randint(1, 3)
+        delay = random.uniform(3.0, 5.0)
+        delay = round(delay, 2)
         logger.info(
-            f'[鸣潮] [签到任务] 正在处理token验证批次[{flag}]，共{len(tasks)}个用户, 等待{delay}秒进行下一次token验证'
+            f'[鸣潮] [签到任务] 正在处理token验证批次[{flag}]，共{len(tasks)}个用户, 等待{delay:.2f}秒进行下一次token验证'
         )
         flag += 1
         await asyncio.sleep(delay)
@@ -487,11 +488,12 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
                 group_msgs,
                 all_msgs,
             ))
-        if len(tasks) >= 10:
+        if len(tasks) >= 2:
             await asyncio.gather(*tasks)
-            delay = 1 + random.randint(1, 3)
+            delay = random.uniform(1.0, 3.0)
+            delay = round(delay, 2)
             logger.info(
-                f'[鸣潮] [社区签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
+                f'[鸣潮] [社区签到] 已签到{len(tasks)}个用户, 等待{delay:.2f}秒进行下一次签到'
             )
             tasks.clear()
             await asyncio.sleep(delay)
@@ -611,11 +613,12 @@ async def daily_sign_action(expiregid2uid, user_list):
                 all_msgs,
             )
         )
-        if len(tasks) >= 10:
+        if len(tasks) >= 5:
             await asyncio.gather(*tasks)
-            delay = 1 + random.randint(1, 3)
+            delay = random.uniform(1.0, 3.0)
+            delay = round(delay, 2)
             logger.info(
-                f'[鸣潮] [签到] 已签到{len(tasks)}个用户, 等待{delay}秒进行下一次签到'
+                f'[鸣潮] [签到] 已签到{len(tasks)}个用户, 等待{delay:.2f}秒进行下一次签到'
             )
             tasks.clear()
             await asyncio.sleep(delay)
