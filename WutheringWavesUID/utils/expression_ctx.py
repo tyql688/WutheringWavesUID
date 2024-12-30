@@ -3,11 +3,13 @@ from typing import Dict, List, Union
 
 from pydantic import BaseModel
 
+from gsuid_core.logger import logger
 from .ascension.char import WavesCharResult, get_char_detail
 from .ascension.constant import sum_percentages, sum_numbers, percent_to_float
 from .ascension.weapon import WavesWeaponResult, get_weapon_detail
 from .calculate import get_calc_map, calc_phantom_score, get_total_score_bg
 from .char_info_utils import get_all_role_detail_info
+from .damage.abstract import WavesEchoRegister
 from .damage.damage import DamageAttribute
 from ..utils.api.model import Props
 from ..utils.ascension.sonata import WavesSonataResult, get_sonata_detail
@@ -160,6 +162,21 @@ def enhance_summation_phantom_value(role_id, role_level, role_breach,
     result['def_percent'] = per_def
     new_def = int(base_def * per_def) + int(result.get("防御", "0"))
     result["防御"] = f"{new_def}"
+
+    # 声骸首位
+    if 'echo_id' in result:
+        echo_clz = WavesEchoRegister.find_class(result['echo_id'])
+        if echo_clz:
+            e = echo_clz()
+            temp = e.do_equipment_first()
+            logger.debug(f"首位声骸数据 {e.name}-{e.id}-{temp}")
+            for key, value in temp.items():
+                if key not in result:
+                    result[key] = value
+                else:
+                    old = float(result[key].replace("%", ""))
+                    new = float(value.replace("%", ""))
+                    result[key] = f"{old + new:.1f}%"
 
     return result
 

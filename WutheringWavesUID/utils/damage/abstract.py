@@ -125,6 +125,10 @@ class EchoAbstract(object):
         """造成伤害"""
         pass
 
+    def do_equipment_first(self):
+        """首位装备"""
+        return {}
+
 
 class CharAbstract(object):
     name = None

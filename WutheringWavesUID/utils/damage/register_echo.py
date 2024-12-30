@@ -423,10 +423,11 @@ class Echo_6000060(EchoAbstract):
     name = "无归的谬误"
 
     # 自身共鸣效率提升10%，全队角色攻击提升10%
-    # def damage(self, attr: DamageAttribute, isGroup: bool = False):
-    #     title = self.name
-    #     msg = '全队角色攻击提升10%'
-    #     attr.add_atk_percent(0.1, title, msg)
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.char_template == temp_atk:
+            title = self.name
+            msg = '全队角色攻击提升10%'
+            attr.add_atk_percent(0.1, title, msg)
 
 
 class Echo_6000061(EchoAbstract):
@@ -528,6 +529,13 @@ class Echo_6000080(EchoAbstract):
     id = 6000080
     name = "琉璃刀伶"
 
+    # 在首位装备该声骸技能时，自身导电伤害加成提升12.00%。
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "导电伤害加成": "12%"
+        }
+
 
 class Echo_6000081(EchoAbstract):
     id = 6000081
@@ -538,67 +546,141 @@ class Echo_6000082(EchoAbstract):
     id = 6000082
     name = "罗蕾莱"
 
+    # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，普攻伤害加成提升12.00%。
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "湮灭伤害加成": "12%",
+            "普攻伤害加成": "12%"
+        }
+
 
 class Echo_6000083(EchoAbstract):
     id = 6000083
     name = "异构武装"
 
     # 在首位装配该声骸技能时，自身获得12.00%冷凝伤害加成提升，12.00%共鸣技能伤害加成提升
-    # def damage(self, attr: DamageAttribute, isGroup: bool = False):
-    #     if attr.char_damage == skill_damage:
-    #         title = self.name
-    #         msg = '共鸣技能伤害加成提升12.00%'
-    #         attr.add_dmg_bonus(0.12, title, msg)
-    #
-    #     if attr.char_attr == CHAR_ATTR_FREEZING:
-    #         title = self.name
-    #         msg = '冷凝伤害加成提升12.00%'
-    #         attr.add_dmg_bonus(0.12, title, msg)
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "共鸣技能伤害加成": "12%",
+            "冷凝伤害加成": "12%"
+        }
 
 
 class Echo_6000084(EchoAbstract):
     id = 6000084
     name = "叹息古龙"
 
+    # 在首位装配该声骸技能时，自身获得12.00%热熔伤害加成提升，12.00%普攻伤害加成提升
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "热熔伤害加成": "12%",
+            "普攻伤害加成": "12%"
+        }
+
 
 class Echo_6000085(EchoAbstract):
     id = 6000085
     name = "赫卡忒"
+
+    # 在首位装配该声骸技能时，自身协同攻击造成的伤害提升40.00%。
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.sync_strike:
+            title = self.name
+            msg = '自身协同攻击造成的伤害提升40.00%'
+            attr.add_dmg_bonus(0.4, title, msg)
 
 
 class Echo_6000086(EchoAbstract):
     id = 6000086
     name = "梦魇·飞廉之猩"
 
+    # 在首位装配该声骸技能时，自身气动伤害加成提升12.00%，重击伤害加成提升12.00%。
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "气动伤害加成": "12%",
+            "重击伤害加成": "12%"
+        }
+
 
 class Echo_6000087(EchoAbstract):
     id = 6000087
     name = "梦魇·无常凶鹭"
+
+    # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，重击伤害加成提升12.00%。
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "湮灭伤害加成": "12%",
+            "重击伤害加成": "12%"
+        }
 
 
 class Echo_6000088(EchoAbstract):
     id = 6000088
     name = "梦魇·云闪之鳞"
 
+    # 在首位装配该声骸技能时，自身导电伤害加成提升12.00%，共鸣解放伤害加成提升12.00%。
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "导电伤害加成": "12%",
+            "共鸣解放伤害加成": "12%"
+        }
+
 
 class Echo_6000089(EchoAbstract):
     id = 6000089
     name = "梦魇·朔雷之鳞"
+
+    # 在首位装配该声骸技能时，自身导电伤害加成提升12.00%，共鸣技能伤害加成提升12.00%。
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "导电伤害加成": "12%",
+            "共鸣技能伤害加成": "12%"
+        }
 
 
 class Echo_6000090(EchoAbstract):
     id = 6000090
     name = "梦魇·无冠者"
 
+    # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，普攻伤害加成提升12.00%。
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "湮灭伤害加成": "12%",
+            "普攻伤害加成": "12%"
+        }
+
 
 class Echo_6000091(EchoAbstract):
     id = 6000091
     name = "梦魇·燎照之骑"
 
+    # 在首位装配该声骸技能时，自身热熔伤害加成提升12.00%，共鸣技能伤害加成提升12.00%。
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "热熔伤害加成": "12%",
+            "共鸣技能伤害加成": "12%"
+        }
+
 
 class Echo_6000092(EchoAbstract):
     id = 6000092
     name = "梦魇·哀声鸷"
+
+    # 在首位装配该声骸技能时，自身衍射伤害加成提升12.00%。
+    def do_equipment_first(self):
+        """首位装备"""
+        return {
+            "衍射伤害加成": "12%"
+        }
 
 
 class Echo_6000145(Echo_6000045):

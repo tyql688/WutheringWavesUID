@@ -124,8 +124,8 @@ def phase_damage(attr: DamageAttribute, role: RoleDetailData, damage_func: Union
                 attr.add_dmg_bonus(0.225, title, msg)
             if cast_liberation in damage_func and attr.char_damage == skill_damage:
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = f"施放共鸣解放时，自身共鸣技能伤害提升18%"
-                attr.add_dmg_bonus(0.18, title, msg)
+                msg = f"施放共鸣解放时，自身共鸣技能伤害提升18%*2"
+                attr.add_dmg_bonus(0.18 * 2, title, msg)
 
         # 高天共奏之曲 -协同
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_EMPYREAN):

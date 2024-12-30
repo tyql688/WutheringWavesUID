@@ -1,4 +1,5 @@
 # 珂莱塔
+from .buff import shouanren_buff, zhezhi_buff
 from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
@@ -165,6 +166,22 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
+def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+    """
+    0+1守/0折枝/致死以终伤害
+    """
+    attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 折枝buff
+    zhezhi_buff(attr, 0, 1, isGroup)
+
+    return calc_damage_2(attr, role, isGroup)
+
+
 damage_detail = [
     {
         "title": "末路见行伤害",
@@ -173,6 +190,10 @@ damage_detail = [
     {
         "title": "致死以终伤害",
         "func": lambda attr, role: calc_damage_2(attr, role),
+    },
+    {
+        "title": "0+1守/0折/致死以终伤害",
+        "func": lambda attr, role: calc_damage_3(attr, role),
     }
 ]
 
