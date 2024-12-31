@@ -79,16 +79,21 @@ async def page_login_local(bot: Bot, ev: Event, url):
     # 手机登录
     data = {"mobile": -1, "code": -1, "user_id": ev.user_id}
     cache.set(user_token, data)
-    async with timeout(600):
-        while True:
-            result = cache.get(user_token)
-            if result is None:
-                return await bot.send("登录超时!\n", at_sender=at_sender)
-            if result.get("mobile") != -1 and result.get("code") != -1:
-                text = f"{result['mobile']},{result['code']}"
-                cache.delete(user_token)
-                break
-            await asyncio.sleep(1)
+    try:
+        async with timeout(600):
+            while True:
+                result = cache.get(user_token)
+                if result is None:
+                    return await bot.send("登录超时!\n", at_sender=at_sender)
+                if result.get("mobile") != -1 and result.get("code") != -1:
+                    text = f"{result['mobile']},{result['code']}"
+                    cache.delete(user_token)
+                    break
+                await asyncio.sleep(1)
+    except asyncio.TimeoutError:
+        return await bot.send("登录超时!\n", at_sender=at_sender)
+    except Exception as e:
+        logger.error(e)
 
     return await code_login(bot, ev, text, True)
 
