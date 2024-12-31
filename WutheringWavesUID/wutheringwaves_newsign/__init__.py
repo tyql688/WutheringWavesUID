@@ -2,7 +2,7 @@ from gsuid_core.aps import scheduler
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from .main import do_sign_task, auto_sign_task
+from .main import do_sign_task, auto_sign_task, auto_bbs_sign_task
 
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
@@ -28,3 +28,10 @@ async def sign_recheck_all(bot: Bot, ev: Event):
     await bot.send('[鸣潮] [全部签到] 已开始执行!')
     await auto_sign_task()
     await bot.send('[鸣潮] [全部签到] 执行完成!')
+
+
+@waves_sign_all.on_fullmatch((f'{PREFIX}全部社区签到'))
+async def sign_recheck_all(bot: Bot, ev: Event):
+    await bot.send('[鸣潮] [全部社区签到] 已开始执行!')
+    await auto_bbs_sign_task()
+    await bot.send('[鸣潮] [全部社区签到] 执行完成!')

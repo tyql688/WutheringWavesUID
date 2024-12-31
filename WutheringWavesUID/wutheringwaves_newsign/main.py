@@ -73,62 +73,83 @@ class KuroBBS:
     ssl_verify = True
 
     async def get_task(self, token: str) -> (bool, Union[Dict, str]):
-        header = copy.deepcopy(await get_headers())
-        header.update({"token": token})
-        data = {"gameId": "0"}
-        return await self._waves_request(GET_TASK_URL, "POST", header, data=data)
+        try:
+            header = copy.deepcopy(await get_headers())
+            header.update({"token": token})
+            data = {"gameId": "0"}
+            return await self._waves_request(GET_TASK_URL, "POST", header, data=data)
+        except Exception as e:
+            logger.exception(f"get_task token {token}", e)
 
     async def get_form_list(self, token: str) -> (bool, Union[Dict, str]):
-        header = copy.deepcopy(await get_headers())
-        header.update({"token": token, "version": "2.25"})
-        data = {
-            "pageIndex": "1",
-            "pageSize": "20",
-            "timeType": "0",
-            "searchType": "1",
-            "forumId": "9",
-            "gameId": "3"
-        }
-        return await self._waves_request(FORUM_LIST_URL, "POST", header, data=data)
+        try:
+            header = copy.deepcopy(await get_headers())
+            header.update({"token": token, "version": "2.25"})
+            data = {
+                "pageIndex": "1",
+                "pageSize": "20",
+                "timeType": "0",
+                "searchType": "1",
+                "forumId": "9",
+                "gameId": "3"
+            }
+            return await self._waves_request(FORUM_LIST_URL, "POST", header, data=data)
+        except Exception as e:
+            logger.exception(f"get_form_list token {token}", e)
 
     async def get_gold(self, token: str) -> (bool, Union[Dict, str]):
-        header = copy.deepcopy(await get_headers())
-        header.update({"token": token})
-        return await self._waves_request(GET_GOLD_URL, "POST", header)
+        try:
+            header = copy.deepcopy(await get_headers())
+            header.update({"token": token})
+            return await self._waves_request(GET_GOLD_URL, "POST", header)
+        except Exception as e:
+            logger.exception(f"get_gold token {token}", e)
 
     async def do_like(self, token: str, postId, toUserId) -> (bool, Union[Dict, str]):
         """点赞"""
-        header = copy.deepcopy(await get_headers())
-        header.update({"token": token})
-        data = {
-            'gameId': "3",  # 鸣潮
-            'likeType': "1",  # 1.点赞帖子 2.评论
-            'operateType': "1",  # 1.点赞 2.取消
-            'postId': postId,
-            'toUserId': toUserId
-        }
-        return await self._waves_request(LIKE_URL, "POST", header, data=data)
+        try:
+            header = copy.deepcopy(await get_headers())
+            header.update({"token": token})
+            data = {
+                'gameId': "3",  # 鸣潮
+                'likeType': "1",  # 1.点赞帖子 2.评论
+                'operateType': "1",  # 1.点赞 2.取消
+                'postId': postId,
+                'toUserId': toUserId
+            }
+            return await self._waves_request(LIKE_URL, "POST", header, data=data)
+        except Exception as e:
+            logger.exception(f"do_like token {token}", e)
 
     async def do_sign_in(self, token: str) -> (bool, Union[Dict, str]):
         """签到"""
-        header = copy.deepcopy(await get_headers())
-        header.update({"token": token})
-        data = {"gameId": "3"}
-        return await self._waves_request(SIGN_IN_URL, "POST", header, data=data)
+        try:
+            header = copy.deepcopy(await get_headers())
+            header.update({"token": token})
+            data = {"gameId": "3"}
+            return await self._waves_request(SIGN_IN_URL, "POST", header, data=data)
+        except Exception as e:
+            logger.exception(f"do_sign_in token {token}", e)
 
     async def do_post_detail(self, token: str, postId) -> (bool, Union[Dict, str]):
         """浏览"""
-        header = copy.deepcopy(await get_headers())
-        header.update({"token": token})
-        data = {'gameId': "3", "postId": postId}
-        return await self._waves_request(POST_DETAIL_URL, "POST", header, data=data)
+        try:
+            header = copy.deepcopy(await get_headers())
+            header.update({"token": token})
+            data = {'gameId': "3", "postId": postId}
+            return await self._waves_request(POST_DETAIL_URL, "POST", header, data=data)
+        except Exception as e:
+            logger.exception(f"do_post_detail token {token}", e)
 
     async def do_share(self, token: str) -> (bool, Union[Dict, str]):
         """分享"""
-        header = copy.deepcopy(await get_headers())
-        header.update({"token": token})
-        data = {'gameId': "3"}
-        return await self._waves_request(SHARE_URL, "POST", header, data=data)
+        try:
+            header = copy.deepcopy(await get_headers())
+            header.update({"token": token})
+            data = {'gameId': "3"}
+            return await self._waves_request(SHARE_URL, "POST", header, data=data)
+        except Exception as e:
+            logger.exception(f"do_share token {token}", e)
 
     async def _waves_request(
         self,
@@ -406,6 +427,44 @@ async def auto_sign_task():
                     '',
                 )
             logger.info(f'[鸣潮]推送主人签到结果: {msg}')
+    except Exception as e:
+        logger.warning(f'[鸣潮]私聊推送主人结果失败!错误信息: {e}')
+
+
+async def auto_bbs_sign_task():
+    bbs_expiregid2uid = {}
+    sign_expiregid2uid = {}
+    bbs_user_list = []
+    sign_user_list = []
+    if WutheringWavesConfig.get_config('BBSSchedSignin').data:
+        _user_list: List[WavesUser] = await WavesUser.get_waves_all_user2()
+        bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list = await process_all_users(_user_list)
+
+    bbs_success = 0
+    bbs_fail = 0
+    if WutheringWavesConfig.get_config('BBSSchedSignin').data:
+        logger.info('[鸣潮] [手动社区签到] 开始执行!')
+        result, num = await auto_bbs_task_action(bbs_expiregid2uid, bbs_user_list)
+        # if not IS_REPORT:
+        #     result['private_msg_dict'] = {}
+        # await send_board_cast_msg(result, 'sign')
+        bbs_success = num['success_num']
+        bbs_fail = num['failed_num']
+
+    try:
+        msg = f'[鸣潮]手动社区签到\n今日社区签到 {bbs_success} 个账号'
+        config_masters = core_config.get_config('masters')
+        if SigninMaster and len(config_masters) > 0:
+            for bot_id in gss.active_bot:
+                await gss.active_bot[bot_id].target_send(
+                    msg,
+                    'direct',
+                    config_masters[0],
+                    'onebot',
+                    '',
+                    '',
+                )
+            logger.info(f'[鸣潮]推送主人手动社区签到结果: {msg}')
     except Exception as e:
         logger.warning(f'[鸣潮]私聊推送主人结果失败!错误信息: {e}')
 
