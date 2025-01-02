@@ -29,6 +29,7 @@ tag_no_draw.text((85, 30), '未完成', 'white', waves_font_36, 'mm')
 country_color_map = {
     "黑海岸": (28, 55, 118),
     "瑝珑": (140, 113, 58),
+    "黎那汐塔": (95, 52, 39),
 }
 
 progress_color = [
@@ -53,7 +54,7 @@ def get_progress_color(progress):
 
 
 async def draw_explore_img(ev: Event, uid: str, user_id: str):
-    ck = await waves_api.get_ck(uid, user_id)
+    is_self_ck, ck = await waves_api.get_ck_result(uid, user_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
     # 账户数据
@@ -66,14 +67,19 @@ async def draw_explore_img(ev: Event, uid: str, user_id: str):
     if not succ:
         return explore_data
     explore_data = ExploreList(**explore_data)
-    if not explore_data.open:
+    if not is_self_ck and not explore_data.open:
         return hint.error_reply(msg='探索数据未开启')
 
     # 计算总高度
-    h = 0
+    base_info_h = 250
+    footer_h = 70
+    h = base_info_h + footer_h
+    explore_title_h = 200
+    explore_frame_h = 500
+
     for mi, _explore in enumerate(explore_data.exploreList):
-        h += 250
-        h += math.ceil(len(_explore.areaInfoList) / 3) * 570
+        h += explore_title_h
+        h += math.ceil(len(_explore.areaInfoList) / 3) * explore_frame_h
 
     img = get_waves_bg(2000, h, 'bg3')
 
@@ -107,7 +113,7 @@ async def draw_explore_img(ev: Event, uid: str, user_id: str):
     explore_frame = Image.open(TEXT_PATH / 'explore_frame.png')
     explore_bar = Image.open(TEXT_PATH / 'explore_bar.png')
     max_len = 357
-    hi = 250
+    hi = base_info_h
     for mi, _explore in enumerate(explore_data.exploreList):
         _explore: ExploreArea
         _explore_title = explore_title.copy()
@@ -158,10 +164,10 @@ async def draw_explore_img(ev: Event, uid: str, user_id: str):
                 _explore_frame_draw.text((580, 120 + 70 * bi), f'{_item.progress}%', 'white', waves_font_30, 'rm')
 
             _w = 100 + 600 * (ni % 3)
-            _h = hi + 250 + 510 * int(ni / 3)
+            _h = hi + explore_title_h + explore_frame_h * int(ni / 3)
             img.alpha_composite(_explore_frame, (_w, _h))
 
-        hi += math.ceil(len(_explore.areaInfoList) / 3) * 570
+        hi += math.ceil(len(_explore.areaInfoList) / 3) * explore_frame_h + explore_title_h
 
     img = add_footer(img)
     img = await convert_img(img)
