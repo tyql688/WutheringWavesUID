@@ -5,7 +5,7 @@ from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...damage.damage import DamageAttribute
 from ...damage.utils import skill_damage_calc, liberation_damage, cast_liberation, \
-    cast_attack
+    cast_attack, cast_hit
 
 
 def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
@@ -34,7 +34,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    damage_func = [cast_attack, cast_liberation]
+    damage_func = [cast_attack, cast_liberation, cast_hit]
     phase_damage(attr, role, damage_func, isGroup)
 
     if role_breach and role_breach >= 3:
@@ -43,22 +43,19 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = "处于暗涌状态时，湮灭伤害加成提升20%。"
         attr.add_dmg_bonus(0.2, title, msg)
 
-    # if chain_num >= 4:
-    #     # 4命
-    #     title = f"{role_name}-四命"
-    #     msg = "重击灭音、共鸣解放命中目标时，目标的湮灭抗性降低10%，持续20秒。"
-    #     attr.add_enemy_resistance(0.10, title, msg)
-    #
-    # if chain_num >= 5 and cast_attack in damage_func:
-    #     # 5命
-    #     title = f"{role_name}-五命"
-    #     msg = "处于暗涌状态时第5段普攻可额外造成一次湮灭伤害，此次伤害为第5段普攻伤害的50%。"
-    #
-    # if chain_num >= 6:
-    #     # 6命
-    #     title = f"{role_name}-六命"
-    #     msg = "处于暗涌状态时，漂泊者的暴击提升25%。"
-    #     attr.add_crit_rate(0.2, title, msg)
+    # 设置命座
+    chain_num = role.get_chain_num()
+    if chain_num >= 4:
+        # 4命
+        title = f"{role_name}-四命"
+        msg = "重击灭音、共鸣解放命中目标时，目标的湮灭抗性降低10%，持续20秒。"
+        attr.add_enemy_resistance(-0.1, title, msg)
+
+    if chain_num >= 6:
+        # 6命
+        title = f"{role_name}-六命"
+        msg = "处于暗涌状态时，漂泊者的暴击提升25%。"
+        attr.add_crit_rate(0.25, title, msg)
 
     echo_damage(attr, isGroup)
 
