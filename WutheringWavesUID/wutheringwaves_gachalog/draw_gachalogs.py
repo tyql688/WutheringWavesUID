@@ -336,24 +336,7 @@ async def draw_card(uid: int, ev: Event):
         card_img.paste(newbie_bg_cp, (10 + nindex * 290, _header + y + gindex * oset - 80), newbie_bg_cp)
         nindex += 1
 
-    ck = await waves_api.get_ck(uid, ev.user_id)
-    if not ck:
-        return hint.error_reply(WAVES_CODE_102)
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info
-    account_info = AccountBaseInfo(**account_info)
-
-    base_info_bg = Image.open(TEXT_PATH / 'base_info_bg.png')
-    base_info_draw = ImageDraw.Draw(base_info_bg)
-    base_info_draw.text((275, 120), f'{account_info.name[:7]}', 'white', waves_font_30, 'lm')
-    base_info_draw.text((226, 173), f'特征码:  {account_info.id}', GOLD, waves_font_25, 'lm')
-    base_info_bg = base_info_bg.resize((900, 450))
-    card_img.alpha_composite(base_info_bg, (110, 30))
-
-    #
-    card_polygon = await get_random_card_polygon(ev)
-    card_img.alpha_composite(card_polygon, (80, 0))
+    await draw_uid_avatar(uid, ev, card_img)
 
     card_img = add_footer(card_img, 600, 20)
     card_img = await convert_img(card_img)
@@ -368,8 +351,7 @@ async def draw_pic_with_ring(ev: Event):
     mask = mask_pic.resize((250, 250))
     resize_pic = crop_center_img(pic, 250, 250)
     img.paste(resize_pic, (20, 20), mask)
-
-    return img.resize((500, 500))
+    return img
 
 
 async def get_random_card_polygon(ev: Event):
@@ -378,6 +360,7 @@ async def get_random_card_polygon(ev: Event):
     card_img = Image.open(f'{CARD_POLYGON_PATH}/{path}').convert('RGBA')
 
     avatar = await draw_pic_with_ring(ev)
+    avatar = avatar.resize((500, 500))
     card_img.paste(avatar, (-10, 150), avatar)
 
     avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
@@ -385,3 +368,38 @@ async def get_random_card_polygon(ev: Event):
     card_img.paste(avatar_ring, (-10, 150), avatar_ring)
 
     return card_img.resize((280, 400))
+
+
+async def draw_uid_avatar(uid, ev, card_img):
+    if waves_api.is_net(uid):
+        title = Image.open(TEXT_PATH / 'title.png')
+        base_info_draw = ImageDraw.Draw(title)
+        base_info_draw.text((346, 370), f'特征码:  {uid}', GOLD, waves_font_25, 'lm')
+
+        avatar = await draw_pic_with_ring(ev)
+        avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
+
+        card_img.paste(avatar, (346, 40), avatar)
+        avatar_ring = avatar_ring.resize((300, 300))
+        card_img.paste(avatar_ring, (340, 35), avatar_ring)
+
+        card_img.paste(title, (0, 0), title)
+
+    else:
+        ck = await waves_api.get_ck(uid, ev.user_id)
+        if not ck:
+            return hint.error_reply(WAVES_CODE_102)
+        succ, account_info = await waves_api.get_base_info(uid, ck)
+        if not succ:
+            return account_info
+        account_info = AccountBaseInfo(**account_info)
+
+        base_info_bg = Image.open(TEXT_PATH / 'base_info_bg.png')
+        base_info_draw = ImageDraw.Draw(base_info_bg)
+        base_info_draw.text((275, 120), f'{account_info.name[:7]}', 'white', waves_font_30, 'lm')
+        base_info_draw.text((226, 173), f'特征码:  {account_info.id}', GOLD, waves_font_25, 'lm')
+        base_info_bg = base_info_bg.resize((900, 450))
+        card_img.alpha_composite(base_info_bg, (110, 30))
+        #
+        card_polygon = await get_random_card_polygon(ev)
+        card_img.alpha_composite(card_polygon, (80, 0))
