@@ -16,8 +16,8 @@ from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_va
 from ..utils.fonts.waves_fonts import waves_font_26, waves_font_42, waves_font_25, waves_font_30, waves_font_24, \
     waves_font_28
 from ..utils.image import get_waves_bg, get_event_avatar, GREY, get_small_logo, GOLD, add_footer, get_attribute_prop, \
-    SPECIAL_GOLD, get_square_avatar
-from ..utils.resource.download_file import get_phantom_img, get_fetter_img
+    SPECIAL_GOLD, get_square_avatar, get_attribute_effect
+from ..utils.resource.download_file import get_phantom_img
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 
@@ -148,8 +148,9 @@ async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
         # 声骸
         phantom: EquipPhantom = _echo.phantom
         phantom_icon = await get_phantom_img(phantom.phantomProp.phantomId, phantom.phantomProp.iconUrl)
-        fetter_icon = await get_fetter_img(phantom.fetterDetail.name, phantom.fetterDetail.iconUrl)
-        phantom_icon.alpha_composite(fetter_icon, dest=(210, 0))
+        fetter_icon = await get_attribute_effect(phantom.fetterDetail.name)
+        fetter_icon = fetter_icon.resize((50, 50))
+        phantom_icon.alpha_composite(fetter_icon, dest=(205, 0))
         phantom_icon = phantom_icon.resize((100, 100))
         sh_temp.alpha_composite(phantom_icon, dest=(20, 20 + head_high))
         phantomName = phantom.phantomProp.name.replace("·", " ").replace("（", " ").replace("）", "")

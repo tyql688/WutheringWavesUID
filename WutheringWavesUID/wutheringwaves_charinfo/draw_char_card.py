@@ -23,10 +23,10 @@ from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_5
     waves_font_24, waves_font_28, waves_font_26, waves_font_42, waves_font_16, waves_font_18, waves_font_36
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow, get_square_avatar, \
-    WAVES_MOONLIT, WAVES_FREEZING, change_color, WAVES_SHUXING_MAP
+    WAVES_MOONLIT, WAVES_FREEZING, change_color, WAVES_SHUXING_MAP, get_attribute_effect
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR
-from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_fetter_img, get_skill_img
+from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_skill_img
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 
@@ -157,8 +157,10 @@ async def ph_card_draw(
                 sh_temp.alpha_composite(sh_title, dest=(0, 0))
 
                 phantom_icon = await get_phantom_img(_phantom.phantomProp.phantomId, _phantom.phantomProp.iconUrl)
-                fetter_icon = await get_fetter_img(_phantom.fetterDetail.name, _phantom.fetterDetail.iconUrl)
-                phantom_icon.alpha_composite(fetter_icon, dest=(210, 0))
+                # fetter_icon = await get_fetter_img(_phantom.fetterDetail.name, _phantom.fetterDetail.iconUrl)
+                fetter_icon = await get_attribute_effect(_phantom.fetterDetail.name)
+                fetter_icon = fetter_icon.resize((50, 50))
+                phantom_icon.alpha_composite(fetter_icon, dest=(205, 0))
                 phantom_icon = phantom_icon.resize((100, 100))
                 sh_temp.alpha_composite(phantom_icon, dest=(20, 20))
                 phantomName = _phantom.phantomProp.name.replace("·", " ").replace("（", " ").replace("）", "")
@@ -746,8 +748,9 @@ async def draw_char_score_img(ev: Event, uid: str, char: str, user_id: str, wave
                 sh_temp.alpha_composite(sh_title, dest=(0, 0))
 
                 phantom_icon = await get_phantom_img(_phantom.phantomProp.phantomId, _phantom.phantomProp.iconUrl)
-                fetter_icon = await get_fetter_img(_phantom.fetterDetail.name, _phantom.fetterDetail.iconUrl)
-                phantom_icon.alpha_composite(fetter_icon, dest=(210, 0))
+                fetter_icon = await get_attribute_effect(_phantom.fetterDetail.name)
+                fetter_icon = fetter_icon.resize((50, 50))
+                phantom_icon.alpha_composite(fetter_icon, dest=(205, 0))
                 phantom_icon = phantom_icon.resize((100, 100))
                 sh_temp.alpha_composite(phantom_icon, dest=(20, 20))
                 phantomName = _phantom.phantomProp.name.replace("·", " ").replace("（", " ").replace("）", "")
