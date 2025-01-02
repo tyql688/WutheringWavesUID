@@ -17,6 +17,7 @@ from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, add_footer, GOLD, GREY, get_event_avatar, get_square_avatar, CHAIN_COLOR, \
     draw_text_with_shadow
 from ..utils.refresh_char_detail import refresh_char
+from ..utils.resource.constant import NAME_ALIAS
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 
@@ -25,11 +26,6 @@ TEXT_PATH = Path(__file__).parent / 'texture2d'
 refresh_char_bg = Image.open(TEXT_PATH / 'refresh_char_bg.png')
 refresh_yes = Image.open(TEXT_PATH / 'refresh_yes.png')
 refresh_yes = refresh_yes.resize((40, 40))
-
-name_alias = {
-    '漂泊者·湮灭': '暗主',
-    '漂泊者': '光主'
-}
 
 refresh_roleShare_02 = Image.open(TEXT_PATH / "refresh_roleShare_02.png")
 refresh_roleShare_02 = refresh_roleShare_02.crop((560, 300, 2560, 650))
@@ -116,7 +112,7 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     # 提示文案
     title = f"共刷新{role_update}个角色，可以使用"
     name = role_detail_list[0].role.roleName
-    name = name_alias.get(name, name)
+    name = NAME_ALIAS.get(name, name)
     title2 = f"{PREFIX}{name}面板"
     title3 = f"来查询该角色的具体面板"
     info_block = Image.new("RGBA", (980, 50), color=(255, 255, 255, 0))
@@ -192,7 +188,7 @@ async def draw_pic(char_rank: WavesCharRank, isUpdate=False):
     img_draw = ImageDraw.Draw(img)
     img.alpha_composite(resize_pic, (50, 50))
     # 名字
-    roleName = name_alias.get(char_rank.roleName, char_rank.roleName)
+    roleName = NAME_ALIAS.get(char_rank.roleName, char_rank.roleName)
     img_draw.text((150, 290), f'{roleName}', 'white', waves_font_40, 'mm')
     # 命座
     info_block = Image.new("RGBA", (80, 40), color=(255, 255, 255, 0))

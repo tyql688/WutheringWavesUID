@@ -45,7 +45,7 @@ async def send_waves_wiki(bot: Bot, ev: Event):
             return await bot.send(msg, at_sender)
 
         name = alias_to_char_name(char_name)
-        if name == '漂泊者':
+        if name == '漂泊者·衍射':
             name = '漂泊者-女-衍射'
         elif name == '漂泊者·湮灭':
             name = '漂泊者-女-湮灭'
@@ -91,8 +91,6 @@ async def send_role_guide_pic(bot: Bot, ev: Event):
         return await bot.send(msg, at_sender)
 
     name = alias_to_char_name(char_name)
-    if name == '漂泊者':
-        name = '漂泊者·衍射'
     await bot.logger.info(f'[鸣潮] 开始获取{name}图鉴')
 
     config = WutheringWavesConfig.get_config('WavesGuideProvide')
