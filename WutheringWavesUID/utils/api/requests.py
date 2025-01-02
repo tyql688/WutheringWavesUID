@@ -8,12 +8,11 @@ import httpx
 from aiohttp import FormData, TCPConnector, ClientSession, ContentTypeError
 
 from gsuid_core.logger import logger
-from gsuid_core.plugins.core_command.core_webconsole import generate_random_string
 from .api import *
 from ..database.models import WavesUser
 from ..error_reply import WAVES_CODE_100, WAVES_CODE_999, WAVES_CODE_107, WAVES_CODE_101, WAVES_CODE_109
 from ..hint import error_reply
-from ..util import get_public_ip
+from ..util import get_public_ip, generate_random_string
 from ...wutheringwaves_config import WutheringWavesConfig
 
 
