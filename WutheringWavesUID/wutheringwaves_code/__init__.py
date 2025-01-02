@@ -1,4 +1,6 @@
 import json
+import re
+from datetime import datetime
 
 import httpx
 
@@ -24,7 +26,7 @@ async def get_sign_func(bot: Bot, ev: Event):
     msgs = []
     for code in code_list:
         is_fail = code.get("is_fail", '0')
-        if is_fail == '1':
+        if is_fail == '1' or is_code_expired(code.get('label')):
             continue
         order = code.get("order", '')
         if order in invalid_code_list or not order:
@@ -50,3 +52,49 @@ async def get_code_list():
     except Exception as e:
         logger.exception('[获取兑换码失败] ', e)
         return
+
+
+def is_code_expired(label: str) -> bool:
+    if not label:
+        return False
+
+    # 使用正则提取月份和日期
+    pattern = r'(\d{1,2})月(\d{1,2})日(\d{1,2})点'
+    match = re.search(pattern, label)
+    if not match:
+        return False
+
+    expire_month = int(match.group(1))
+    expire_day = int(match.group(2))
+    expire_hour = int(match.group(2))
+
+    now = datetime.now()
+    current_month = now.month
+
+    expire_year = now.year
+    # 处理跨年的情况
+    if current_month < expire_month:
+        # 当前月份小于截止月份，说明截止日期是去年的
+        expire_year -= 1
+    elif current_month == expire_month:
+        # 当前月份等于截止月份，需要比较日期
+        if now.day > expire_day:
+            # 当前日期已经过了截止日期，说明是明年的
+            expire_year += 1
+    else:
+        # 当前月份大于截止月份，使用当前年份
+        pass
+
+    if expire_hour == 24:
+        expire_hour = 23
+        expire_min = 59
+        expire_sec = 59
+    else:
+        expire_min = 0
+        expire_sec = 0
+
+    # 构建截止时间
+    expire_date = datetime(expire_year, expire_month, expire_day, expire_hour, expire_min, expire_sec)
+
+    # 比较时间
+    return now > expire_date
