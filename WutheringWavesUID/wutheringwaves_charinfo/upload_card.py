@@ -44,9 +44,21 @@ def get_char_id_and_name(char: str) -> (str, str, str):
     return char_id, char, ''
 
 
+async def get_image(ev: Event):
+    if ev.image:
+        return ev.image
+    
+    for content in ev.content:
+        if content.type == 'img' and content.data:
+            return content.data
+    return
+
+
 async def upload_custom_card(bot: Bot, ev: Event, char: str):
     at_sender = True if ev.group_id else False
-    if not ev.image:
+
+    upload_image = await get_image(ev)
+    if not upload_image:
         return await bot.send(f'[鸣潮] 上传角色面板图失败\n请同时发送图片及其命令\n', at_sender)
 
     char_id, char, msg = get_char_id_and_name(char)
@@ -59,7 +71,7 @@ async def upload_custom_card(bot: Bot, ev: Event, char: str):
     name = f"{char}_{int(time.time() * 1000)}.jpg"
     temp_path = temp_dir / name
     if not temp_path.exists():
-        await download(ev.image, temp_dir, name, tag="[鸣潮]")
+        await download(upload_image, temp_dir, name, tag="[鸣潮]")
 
     return await bot.send(f'[鸣潮]【{char}】上传面板图成功！\n')
 
