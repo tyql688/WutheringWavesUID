@@ -85,6 +85,11 @@ async def refresh_char(uid: str, user_id, ck: str = '', waves_map: Dict = None) 
             continue
         if role_detail_info['phantomData']['cost'] == 0:
             role_detail_info['phantomData']['equipPhantomList'] = None
+        try:
+            # 扰我道心 难道谐振几阶还算不明白吗
+            del role_detail_info['weaponData']['weapon']['effectDescription']
+        except Exception as _:
+            pass
         waves_datas.append(role_detail_info)
 
     await save_card_info(uid, waves_datas, waves_map)

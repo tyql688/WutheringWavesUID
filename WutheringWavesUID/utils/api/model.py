@@ -115,7 +115,7 @@ class Weapon(BaseModel):
     weaponStarLevel: int
     weaponIcon: Optional[str]
     weaponEffectName: Optional[str]
-    effectDescription: Optional[str]
+    # effectDescription: Optional[str]
 
 
 class WeaponData(BaseModel):
