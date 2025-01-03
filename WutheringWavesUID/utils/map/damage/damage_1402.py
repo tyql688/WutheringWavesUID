@@ -47,21 +47,21 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
         if isGroup:
-            title = f"{role_name}-一命"
+            title = f"{role_name}-一链"
             msg = f"施放变奏技能后，秧秧的气动伤害加成额外提升15%"
             attr.add_dmg_bonus(0.15, title, msg)
 
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"空中攻击释羽的伤害提升95%。"
         attr.add_dmg_bonus(0.95, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"施放空中攻击释羽后，队伍中的角色的攻击提升20%"
         attr.add_atk_percent(0.2, title, msg)
 
@@ -117,21 +117,21 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
         if isGroup:
-            title = f"{role_name}-一命"
+            title = f"{role_name}-一链"
             msg = f"施放变奏技能后，秧秧的气动伤害加成额外提升15%"
             attr.add_dmg_bonus(0.15, title, msg)
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"共鸣解放朔风旋涌的伤害提升85%。"
         attr.add_dmg_bonus(0.85, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"施放空中攻击释羽后，队伍中的角色的攻击提升20%"
         attr.add_atk_percent(0.2, title, msg)
 

@@ -45,25 +45,25 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"施放共鸣技能时，漂泊者的暴击提升15%"
         attr.add_crit_rate(0.15, title, msg)
 
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"漂泊者的衍射伤害加成提升20%。"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"共鸣解放伤害加成提升40%。"
         attr.add_dmg_bonus(0.4, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"共鸣技能命中目标时，目标衍射伤害抗性降低10%"
         attr.add_enemy_resistance(-0.1, title, msg)
 
@@ -137,20 +137,20 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"施放共鸣技能时，漂泊者的暴击提升15%"
         attr.add_crit_rate(0.15, title, msg)
 
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"漂泊者的衍射伤害加成提升20%。"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"共鸣技能命中目标时，目标衍射伤害抗性降低10%"
         attr.add_enemy_resistance(-0.1, title, msg)
 

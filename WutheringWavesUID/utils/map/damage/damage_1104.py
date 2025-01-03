@@ -75,10 +75,10 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"施放共鸣解放时，将额外造成凌阳200%攻击的冷凝伤害"
         attr.add_skill_multi(2, title, msg)
 
@@ -135,10 +135,10 @@ def calc_damage_a(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"共鸣解放狮子奋迅持续期间，凌阳的普攻伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
@@ -202,15 +202,15 @@ def calc_damage_ea(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = 
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"共鸣解放狮子奋迅持续期间，凌阳的普攻伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"奋迅持续期间，施放共鸣技能，下一次普攻伤害加成提升100%"
         attr.add_dmg_bonus(1, title, msg)
 
@@ -270,10 +270,10 @@ def calc_damage_e(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"共鸣解放狮子奋迅持续期间，共鸣技能伤害加成提升10%"
         attr.add_dmg_bonus(0.1, title, msg)
 

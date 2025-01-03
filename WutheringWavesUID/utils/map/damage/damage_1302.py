@@ -48,13 +48,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 3:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"共鸣回路审判之雷伤害倍率提升55%。"
         attr.add_skill_ratio(0.55, title, msg)
 
     if chain_num >= 4:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"共鸣回路审判之雷命中时，队伍中的角色攻击提升20%."
         attr.add_atk_percent(0.2, title, msg)
 
@@ -113,13 +113,13 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 4:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"共鸣回路审判之雷命中时，队伍中的角色攻击提升20%."
         attr.add_atk_percent(0.2, title, msg)
 
     if chain_num >= 5:
         # 5命
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"共鸣解放命中带有共鸣回路缚罪标记、惩罚印记的目标时，伤害提升100%。"
         attr.add_dmg_bonus(1, title, msg)
 

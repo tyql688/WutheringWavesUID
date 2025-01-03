@@ -50,13 +50,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 2 and isGroup:
         # 2命
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"施放变奏技能后，忌炎的攻击提升28%"
         attr.add_atk_percent(0.25, title, msg)
 
     if chain_num >= 3:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"施放共鸣解放或变奏技能攻其不备时，忌炎的暴击提升16%、暴击伤害提升32%"
         attr.add_crit_rate(0.16)
         attr.add_crit_dmg(0.32)
@@ -64,13 +64,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 4 and isGroup:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"施放共鸣解放时，队伍中的角色重击伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 
     if chain_num >= 5 and isGroup:
         # 5命
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = "施放变奏技能攻其不备后，忌炎的攻击提升3%*15"
         attr.add_atk_percent(0.45, title, msg)
 
@@ -140,13 +140,13 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 2 and isGroup:
         # 2命
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"施放变奏技能后，忌炎的攻击提升28%"
         attr.add_atk_percent(0.25, title, msg)
 
     if chain_num >= 3:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"施放共鸣解放或变奏技能攻其不备时，忌炎的暴击提升16%、暴击伤害提升32%"
         attr.add_crit_rate(0.16)
         attr.add_crit_dmg(0.32)
@@ -154,13 +154,13 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 4:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"施放共鸣解放时，队伍中的角色重击伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 
     if chain_num >= 5 and isGroup:
         # 5命
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = "施放变奏技能攻其不备后，忌炎的攻击提升3%*15"
         attr.add_atk_percent(0.45, title, msg)
 
@@ -220,13 +220,13 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 2 and isGroup:
         # 2命
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"施放变奏技能后，忌炎的攻击提升28%"
         attr.add_atk_percent(0.25, title, msg)
 
     if chain_num >= 3:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"施放共鸣解放或变奏技能攻其不备时，忌炎的暴击提升16%、暴击伤害提升32%"
         attr.add_crit_rate(0.16)
         attr.add_crit_dmg(0.32)
@@ -234,19 +234,19 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 4:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"施放共鸣解放时，队伍中的角色重击伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 
     if chain_num >= 5 and isGroup:
         # 5命
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = "施放变奏技能攻其不备后，忌炎的攻击提升3%*15"
         attr.add_atk_percent(0.45, title, msg)
 
     if chain_num >= 6:
         # 6命
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = "苍躣八荒·后动的伤害倍率提升120%*2"
         attr.add_skill_ratio(1.2 * 2, title, msg)
 

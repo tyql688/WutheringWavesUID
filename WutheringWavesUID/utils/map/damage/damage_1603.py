@@ -44,25 +44,25 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     if chain_num >= 1 and isGroup:
         # 1命
         # 变奏入场
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"施放变奏技能八千春秋时，暴击伤害提升28%"
         attr.add_crit_dmg(0.28, title, msg)
 
     if chain_num >= 2:
         # 2命
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"共鸣回路一日花伤害倍率提升120%"
         attr.add_skill_ratio(1.2, title, msg)
 
     if chain_num >= 3:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"含苞状态期间，椿的攻击提升58%。"
         attr.add_atk_percent(0.58, title, msg)
 
     if chain_num >= 4 and isGroup:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"变奏技能八千春秋后，队伍中的角色普攻伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 
@@ -115,13 +115,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     if chain_num >= 1 and isGroup:
         # 1命
         # 变奏入场
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"施放变奏技能八千春秋时，暴击伤害提升28%"
         attr.add_crit_dmg(0.28, title, msg)
 
     if chain_num >= 3:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"共鸣解放芳华绽烬伤害倍率提升50%；含苞状态期间，椿的攻击提升58%。"
         attr.add_atk_percent(0.58)
         attr.add_skill_ratio(0.5)
@@ -130,7 +130,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     if chain_num >= 4 and isGroup:
         # 4命
         # 变奏入场
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"变奏技能八千春秋后，队伍中的角色普攻伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 

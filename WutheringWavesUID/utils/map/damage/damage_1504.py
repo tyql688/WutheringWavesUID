@@ -49,20 +49,20 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"强化前扑攻击敌人时，无视对方20%的防御"
         attr.add_defense_reduction(0.2, title, msg)
 
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"灯灯普攻伤害加成提升30%。"
         attr.add_dmg_bonus(0.3, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"施放啾啾专送时，队伍中的角色的攻击提升20%"
         attr.add_atk_percent(0.2, title, msg)
 
@@ -117,20 +117,20 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"强化后撤攻击敌人时，无视对方20%的防御"
         attr.add_defense_reduction(0.2, title, msg)
 
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"灯灯普攻伤害加成提升30%。"
         attr.add_dmg_bonus(0.3, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"施放啾啾专送时，队伍中的角色的攻击提升20%"
         attr.add_atk_percent(0.2, title, msg)
 
@@ -200,15 +200,15 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"灯灯普攻伤害加成提升30%。"
         attr.add_dmg_bonus(0.3, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"施放啾啾专送时，队伍中的角色的攻击提升20%"
         attr.add_atk_percent(0.2, title, msg)
 
@@ -267,15 +267,15 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"啾啾专送造成的伤害提升30%。"
         attr.add_dmg_bonus(0.3, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"施放啾啾专送时，队伍中的角色的攻击提升20%"
         attr.add_atk_percent(0.2, title, msg)
 

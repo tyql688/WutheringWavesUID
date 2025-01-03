@@ -43,22 +43,22 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = "施放共鸣技能或共鸣解放思维矩阵时，自身暴击伤害提升30%。"
         attr.add_crit_dmg(0.3, title, msg)
 
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = "施放共鸣解放思维矩阵后，后续5次共鸣技能伤害提升63%。"
         attr.add_dmg_bonus(0.63, title, msg)
 
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = "施放共鸣解放思维矩阵时，全队共鸣解放伤害加成提升25%。"
         attr.add_dmg_bonus(0.25, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = "共鸣技能万方法则伤害倍率提升76%。"
         attr.add_skill_ratio(0.76, title, msg)
 
@@ -111,17 +111,17 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = "施放共鸣技能或共鸣解放思维矩阵时，自身暴击伤害提升30%。"
         attr.add_crit_dmg(0.3, title, msg)
 
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = "施放共鸣解放思维矩阵时，全队共鸣解放伤害加成提升25%。"
         attr.add_dmg_bonus(0.25, title, msg)
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = "共鸣解放思维矩阵伤害倍率提升100%。"
         attr.add_skill_ratio(1, title, msg)
 

@@ -37,7 +37,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"施放共鸣技能时，满【念意】，治疗效果加成提升15%"
         attr.add_dmg_bonus(0.15, title, msg)
 
@@ -81,7 +81,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"施放共鸣技能时，满【念意】，治疗效果加成提升15%"
         attr.add_dmg_bonus(0.15, title, msg)
 
@@ -125,12 +125,12 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"施放共鸣技能时，满【念意】，治疗效果加成提升15%"
         attr.add_dmg_bonus(0.15, title, msg)
 
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"频隙回响治疗倍率提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 

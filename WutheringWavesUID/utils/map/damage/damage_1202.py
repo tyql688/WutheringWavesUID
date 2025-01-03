@@ -50,17 +50,17 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     crit_only = False
     chain_num = role.get_chain_num()
     if chain_num >= 1:
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"施放共鸣技能轰轰时，必定暴击。"
         attr.add_effect(title, msg)
         crit_only = True
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"固有技能加麻加辣叠加至满层时，攻击额外提升30%。"
         attr.add_atk_percent(0.3, title, msg)
 
@@ -119,15 +119,15 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"共鸣解放对生命值低于50%的目标，伤害提升40%"
         attr.add_dmg_bonus(0.4, title, msg)
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"固有技能加麻加辣叠加至满层时，攻击额外提升30%。"
         attr.add_atk_percent(0.3, title, msg)
 
@@ -147,7 +147,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 def calc_damage_10(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
     attr.set_char_damage(liberation_damage)
     attr.set_char_template("temp_atk")
-    
+
     # 守岸人buff
     shouanren_buff(attr, 0, 1, isGroup)
 

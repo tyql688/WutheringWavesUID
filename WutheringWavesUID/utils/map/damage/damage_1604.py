@@ -43,17 +43,17 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         msg = "处于暗涌状态时，湮灭伤害加成提升20%。"
         attr.add_dmg_bonus(0.2, title, msg)
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 4:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = "重击灭音、共鸣解放命中目标时，目标的湮灭抗性降低10%，持续20秒。"
         attr.add_enemy_resistance(-0.1, title, msg)
 
     if chain_num >= 6:
         # 6命
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = "处于暗涌状态时，漂泊者的暴击提升25%。"
         attr.add_crit_rate(0.25, title, msg)
 

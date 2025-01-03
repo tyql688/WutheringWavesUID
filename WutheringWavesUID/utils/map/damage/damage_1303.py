@@ -42,15 +42,15 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"雷之楔的协同攻击命中目标时，基于渊武20%防御额外提升伤害"
         attr.add_skill_multi(0.2, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"处在雷之楔范围内的所有角色将持续获得效果：防御提升32%"
         attr.add_def_percent(0.32, title, msg)
 
@@ -103,11 +103,11 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"共鸣技能雷之楔在场时，渊武的共鸣解放伤害加成提升50%"
         attr.add_dmg_bonus(0.5, title, msg)
 

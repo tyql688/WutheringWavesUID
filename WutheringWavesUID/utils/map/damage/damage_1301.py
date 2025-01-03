@@ -45,20 +45,20 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"共鸣解放杀戮武装状态持续期间，导电伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"施放延奏技能掠影奇袭时，队伍中的角色导电伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"召唤2个猎杀影进行协同攻击，造成卡卡罗100.00%*2攻击的导电伤害"
         attr.add_dmg_bonus(2, title, msg)
 

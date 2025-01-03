@@ -53,20 +53,20 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"对拥有解离效果的目标攻击造成伤害时，该次伤害的暴击提升12.5%"
         attr.add_crit_rate(0.125, title, msg)
 
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"珂莱塔施放重击末路见行时，队伍中的角色共鸣技能伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"重击末路见行的伤害倍率提升47%"
         attr.add_skill_ratio(0.47, title, msg)
 
@@ -136,20 +136,20 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"对拥有解离效果的目标攻击造成伤害时，该次伤害的暴击提升12.5%"
         attr.add_crit_rate(0.125, title, msg)
 
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"共鸣解放致死以终的伤害倍率提升126%"
         attr.add_skill_ratio(1.26, title, msg)
 
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"珂莱塔施放重击末路见行时，队伍中的角色共鸣技能伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 

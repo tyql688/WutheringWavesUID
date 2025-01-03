@@ -12,14 +12,14 @@ from ...damage.utils import skill_damage_calc, SkillType, SkillTreeMap, cast_ski
 def skill_effect(attr, role_name, skill_type, isChain):
     if "联珠" in skill_type:
         if isChain:
-            title = f"{role_name}-二命-联珠"
+            title = f"{role_name}-二链-联珠"
         else:
             title = f"{role_name}-联珠"
         msg = f"拥有三个相同的【吉兆】时。诗中物造成的伤害提升175%"
         attr.add_dmg_bonus(1.75, title, msg)
     elif "对偶" in skill_type:
         if isChain:
-            title = f"{role_name}-二命-对偶"
+            title = f"{role_name}-二链-对偶"
         else:
             title = f"{role_name}-对偶"
         msg = f"拥有一对相同的【吉兆】时。诗中物造成的伤害提升70%"
@@ -68,24 +68,24 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 2:
         skill_effect(attr, role_name, skill_name, True)
 
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"釉瑚的攻击提升20%。"
         attr.add_atk_percent(0.2, title, msg)
 
     if chain_num >= 5:
         if isGroup:
-            title = f"{role_name}-五命"
+            title = f"{role_name}-五链"
             msg = f"施放变奏技能遂心匣时，釉瑚的暴击提升15%"
             attr.add_crit_rate(0.15, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"4层霁青效果，暴击伤害提升15%*4"
         attr.add_crit_dmg(0.15 * 4, title, msg)
 

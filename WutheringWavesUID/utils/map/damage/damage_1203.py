@@ -64,15 +64,15 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"热熔伤害加成额外提升3%，可叠加4层"
         attr.add_dmg_bonus(0.12, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = "黑咩大暴走期间，每次造成伤害叠加1层【迷失羔羊】，增加5%*5攻击"
         attr.add_atk_percent(0.25, title, msg)
 
@@ -131,20 +131,20 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"热熔伤害加成额外提升3%，可叠加4层"
         attr.add_dmg_bonus(0.12, title, msg)
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = "共鸣技能伤害加成提升35%。"
         attr.add_dmg_bonus(0.35, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = "黑咩大暴走期间，每次造成伤害叠加1层【迷失羔羊】，增加5%*5攻击"
         attr.add_atk_percent(0.25, title, msg)
 

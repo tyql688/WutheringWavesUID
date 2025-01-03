@@ -13,7 +13,7 @@ class Char_1102(CharAbstract):
         """获得buff"""
         if attr.char_template == temp_atk:
             if chain >= 6:
-                title = "散华-六命"
+                title = "散华-六链"
                 msg = "队伍中的角色攻击提升20%"
                 attr.add_atk_percent(0.2, title, msg)
 
@@ -52,7 +52,7 @@ class Char_1105(CharAbstract):
     def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
         if attr.char_template == temp_atk:
             if chain >= 4:
-                title = f"{self.name}-四命"
+                title = f"{self.name}-四链"
                 msg = "折枝施放共鸣解放虚实境趣时，队伍中角色攻击提升20%"
                 attr.add_atk_percent(0.2, title, msg)
 
@@ -109,7 +109,7 @@ class Char_1204(CharAbstract):
         """获得buff"""
         if attr.char_template == temp_atk:
             if chain >= 6:
-                title = "莫特斐-六命"
+                title = "莫特斐-六链"
                 msg = "施放共鸣解放暴烈终曲时，队伍中的角色攻击提升20%"
                 attr.add_atk_percent(0.2, title, msg)
 
@@ -147,7 +147,7 @@ class Char_1205(CharAbstract):
         """获得buff"""
         if attr.char_template == temp_atk:
             if chain >= 4:
-                title = "长离-四命"
+                title = "长离-四链"
                 msg = "施放变奏技能后，队伍中的角色攻击提升20%"
                 attr.add_atk_percent(0.2, title, msg)
 
@@ -241,7 +241,7 @@ class Char_1503(CharAbstract):
             attr.add_atk_percent(0.2, title, msg)
 
         if chain >= 4 and attr.char_attr == CHAR_ATTR_CELESTIAL:
-            title = "维里奈-四命"
+            title = "维里奈-四链"
             msg = "队伍中的角色衍射伤害加成提升15%"
             attr.add_dmg_bonus(0.4, title, msg)
 
@@ -267,7 +267,7 @@ class Char_1504(CharAbstract):
     def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
         if attr.char_template == temp_atk:
             if chain >= 6:
-                title = f"{self.name}-六命"
+                title = f"{self.name}-六链"
                 msg = "施放共鸣解放时，队伍中的角色的攻击提升20%"
                 attr.add_atk_percent(0.2, title, msg)
 
@@ -295,7 +295,7 @@ class Char_1505(CharAbstract):
         """获得buff"""
         if attr.char_template == temp_atk:
             if chain >= 2:
-                title = "守岸人-二命"
+                title = "守岸人-二链"
                 msg = "队伍中的角色攻击提升40%"
                 attr.add_atk_percent(0.4, title, msg)
 

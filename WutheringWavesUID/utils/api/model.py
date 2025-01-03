@@ -205,7 +205,7 @@ class RoleDetailData(BaseModel):
 
     def get_chain_name(self):
         n = self.get_chain_num()
-        return f'{["零", "一", "二", "三", "四", "五", "六"][n]}命'
+        return f'{["零", "一", "二", "三", "四", "五", "六"][n]}链'
 
     def get_skill_level(self, skill_type: Literal["常态攻击", "共鸣技能", "共鸣解放", "变奏技能", "共鸣回路"]):
         skill_level = 1

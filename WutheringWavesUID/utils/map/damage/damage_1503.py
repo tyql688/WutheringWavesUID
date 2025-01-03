@@ -43,7 +43,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"治疗生命值低于50%的角色时，维里奈的治疗效果加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
@@ -94,7 +94,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"治疗生命值低于50%的角色时，维里奈的治疗效果加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
@@ -145,12 +145,12 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"共鸣解放光合标记的治疗效果加成提升12%"
         attr.add_dmg_bonus(0.12, title, msg)
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"治疗生命值低于50%的角色时，维里奈的治疗效果加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 

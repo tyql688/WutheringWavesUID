@@ -43,10 +43,10 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"折枝施放共鸣技能以形写神时，攻击提升15%*1"
         attr.add_atk_percent(0.15, title, msg)
 
@@ -99,10 +99,10 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"折枝施放共鸣技能以形写神时，攻击提升15%*1"
         attr.add_atk_percent(0.15, title, msg)
 
@@ -159,15 +159,15 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"施放以形写神+神来之笔，攻击提升15%*2"
         attr.add_atk_percent(0.3, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"施放神来之笔时，白鹤能造成等同于神来之笔120%的伤害"
         attr.add_skill_ratio(1.2, title, msg)
 
@@ -224,15 +224,15 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"施放以形写神+神来之笔，攻击提升15%*3"
         attr.add_atk_percent(0.45, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"施放神来之笔时，白鹤能造成等同于神来之笔120%的伤害"
         attr.add_skill_ratio(1.2, title, msg)
 
@@ -289,20 +289,20 @@ def calc_damage_5(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"施放极意·神来之笔时，自身暴击提升10%"
         attr.add_crit_rate(0.1, title, msg)
 
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"施放以形写神+2神来之笔，攻击提升15%*3"
         attr.add_atk_percent(0.45, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"施放神来之笔时，白鹤能造成等同于神来之笔120%的伤害"
         attr.add_skill_ratio(1.2, title, msg)
 
@@ -360,15 +360,15 @@ def calc_damage_6(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"施放极意·神来之笔时，自身暴击提升10%"
         attr.add_crit_rate(0.1, title, msg)
 
     if chain_num >= 3:
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"施放以形写神+2神来之笔，攻击提升15%*3"
         attr.add_atk_percent(0.45, title, msg)
 

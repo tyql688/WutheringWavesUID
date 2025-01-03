@@ -57,20 +57,20 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 4 and isHitCounterattack:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"成功触发重击后发制人时，防御提升50%"
         attr.add_def_percent(0.5, title, msg)
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"共鸣回路攻防转换的伤害提升50%"
         attr.add_dmg_bonus(0.5, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"共鸣技能磐岩护壁获得的护盾持续期间，桃祈普攻伤害提升40%"
         attr.add_dmg_bonus(0.4, title, msg)
 
@@ -127,17 +127,17 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"共鸣解放不动如山的暴击提升20%，暴击伤害提升20%。"
         attr.add_crit_rate(0.2)
         attr.add_crit_dmg(0.2)
         attr.add_effect(title, msg)
 
     if chain_num >= 4 and isHitCounterattack:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"成功触发重击后发制人时，防御提升50%"
         attr.add_def_percent(0.5, title, msg)
 
@@ -199,10 +199,10 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus(needPhantom=False, needShuxing=False)
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 4 and isHitCounterattack:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"成功触发重击后发制人时，防御提升50%"
         attr.add_def_percent(0.5, title, msg)
 

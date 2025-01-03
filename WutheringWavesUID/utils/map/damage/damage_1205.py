@@ -15,31 +15,31 @@ def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = Fals
     chain_num = role.get_chain_num()
     if chain_num >= 1 and attr.char_damage in [skill_damage, hit_damage]:
         # 1命
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"施放共鸣技能赫羽三相或重击焚身以火, 伤害提升10%"
         attr.add_dmg_bonus(0.1, title, msg)
 
     if chain_num >= 2:
         # 2命
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"获得【离火】时，长离的暴击提升25%"
         attr.add_crit_rate(0.25, title, msg)
 
     if chain_num >= 3 and attr.char_damage in [liberation_damage]:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = "共鸣解放离火照丹心造成的伤害提升80%。"
         attr.add_dmg_bonus(0.8, title, msg)
 
     if chain_num >= 4 and isGroup:
         # 4命 变奏入场
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"施放变奏技能后，队伍中的角色攻击提升20%"
         attr.add_atk_percent(0.2, title, msg)
 
     if chain_num >= 5 and attr.char_damage in [skill_damage]:
         # 5命
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = "重击焚身以火倍率提升50%，造成的伤害提升50%。"
         attr.add_skill_ratio(0.5)
         attr.add_dmg_bonus(0.5)
@@ -47,7 +47,7 @@ def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = Fals
 
     if chain_num >= 6:
         # 6命
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = "忽视目标40%防御"
         attr.add_defense_reduction(0.4, title, msg)
 

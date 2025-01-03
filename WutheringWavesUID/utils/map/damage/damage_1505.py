@@ -32,7 +32,7 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"施放共鸣技能混沌理论时，治疗效果加成提升70%。"
         attr.add_dmg_bonus(0.7, title, msg)
 
@@ -72,7 +72,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     chain_num = role.get_chain_num()
     if chain_num >= 4:
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"施放共鸣技能混沌理论时，治疗效果加成提升70%。"
         attr.add_dmg_bonus(0.7, title, msg)
 
@@ -124,7 +124,7 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
 
     chain_num = role.get_chain_num()
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"洞悉伤害倍率提升42%。守岸人的暴击伤害提升500%。"
         attr.add_skill_ratio(0.42, title, msg)
         attr.add_crit_dmg(5)

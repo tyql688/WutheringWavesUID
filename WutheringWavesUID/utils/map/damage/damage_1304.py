@@ -49,25 +49,25 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 1:
         # 1命
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"施放共鸣技能时，共鸣技能造成的伤害提升20%*4"
         attr.add_dmg_bonus(0.2 * 4, title, msg)
 
     if chain_num >= 3 and isGroup:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"施放变奏技能后，获得一层谪仙效果，攻击提升25%*2"
         attr.add_atk_percent(0.25 * 2, title, msg)
 
     if chain_num >= 4:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"施放共鸣技能时，角色全属性伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 6:
         # 6命
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = "共鸣技能伤害倍率提升45%，消耗韶光时倍率额外提升45%。"
         attr.add_skill_ratio(0.45)
         attr.add_effect(title, msg)
@@ -118,19 +118,19 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     if chain_num >= 3 and isGroup:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"施放变奏技能后，获得一层谪仙效果，攻击提升25%*2"
         attr.add_atk_percent(0.25 * 2, title, msg)
 
     if chain_num >= 4:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = f"施放共鸣解放时，角色全属性伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 5:
         # 4命
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"共鸣解放移岁诛邪伤害倍率提升120%。"
         attr.add_skill_ratio(1.2, title, msg)
 

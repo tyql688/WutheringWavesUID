@@ -49,25 +49,25 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
-    # 设置命座
+    # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 2:
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = f"秋水攻击被分身嘲讽的目标时，攻击提升15%。"
         attr.add_atk_percent(0.15, title, msg)
 
     # if chain_num >= 3:
-    #     title = f"{role_name}-三命"
+    #     title = f"{role_name}-三链"
     #     msg = f"空中攻击穿过【雾气】时，共造成空中攻击的50%*2伤害"
     #     attr.add_skill_ratio(0.5 * 2, title, msg)
 
     if chain_num >= 5:
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"处于迷雾潜行时，秋水的气动伤害加成提升25%"
         attr.add_dmg_bonus(0.25, title, msg)
 
     if chain_num >= 6:
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = f"共鸣解放持续时，额外增加暴击8%"
         attr.add_crit_rate(0.08, title, msg)
 

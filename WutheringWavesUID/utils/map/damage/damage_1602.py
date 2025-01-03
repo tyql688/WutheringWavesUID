@@ -29,37 +29,37 @@ def calc_damage(attr: DamageAttribute, role: RoleDetailData, damage_func, isGrou
 
     if chain_num >= 1:
         # 1命
-        title = f"{role_name}-一命"
+        title = f"{role_name}-一链"
         msg = f"自身的攻击提升5%*6"
         attr.add_atk_percent(0.3, title, msg)
 
     if chain_num >= 2:
         # 2命
-        title = f"{role_name}-二命"
+        title = f"{role_name}-二链"
         msg = "丹瑾攻击携带朱蚀之刻的目标时，造成的伤害额外提升20%。"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 3 and cast_liberation in damage_func:
         # 3命
-        title = f"{role_name}-三命"
+        title = f"{role_name}-三链"
         msg = f"共鸣解放伤害加成提升30%。"
         attr.add_dmg_bonus(0.3, title, msg)
 
     if chain_num >= 4:
         # 4命
-        title = f"{role_name}-四命"
+        title = f"{role_name}-四链"
         msg = "【彤华】积攒60点以上时，丹瑾的暴击提升15%。"
         attr.add_crit_rate(0.15, title, msg)
 
     if chain_num >= 5:
         # 5命
-        title = f"{role_name}-五命"
+        title = f"{role_name}-五链"
         msg = f"湮灭伤害加成提升15%，生命低于60%时湮灭伤害加成提升15%。"
         attr.add_dmg_bonus(0.3, title, msg)
 
     if chain_num >= 6:
         # 6命
-        title = f"{role_name}-六命"
+        title = f"{role_name}-六链"
         msg = "施放重击缭乱时，队伍中的角色的攻击提升20%。"
         attr.add_atk_percent(0.2, title, msg)
 
