@@ -49,6 +49,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
         attr.add_effect(title, msg)
 
     # 设置角色技能施放是不是也有加成 eg：守岸人
+    title = f"{role_name}-解离状态"
+    msg = f"造成伤害时忽视目标18%防御"
+    attr.add_defense_reduction(0.18, title, msg)
 
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
