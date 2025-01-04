@@ -122,6 +122,7 @@ class DamageAttribute:
         healing_skill_multi='0+0%',
         shield_skill_multi='0+0%',
         skill_ratio=0,
+        skill_ratio_in_skill_description=0,
         dmg_bonus=0,
         dmg_deepen=0,
         crit_rate=0,
@@ -197,6 +198,8 @@ class DamageAttribute:
         self.shield_skill_multi = shield_skill_multi
         # 技能倍率加成 (如命座 椿2命 = 1.2）
         self.skill_ratio = skill_ratio
+        # 技能倍率加成（技能描述里
+        self.skill_ratio_in_skill_description = skill_ratio_in_skill_description
         # 伤害加成百分比
         self.dmg_bonus = dmg_bonus
         # 伤害加深百分比
@@ -412,6 +415,14 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
+    def add_skill_ratio_in_skill_description(self, skill_ratio: Union[str, float], title='', msg=''):
+        """增加技能倍率加成 -> 技能伤害倍率提升"""
+        if isinstance(skill_ratio, str):
+            skill_ratio = calc_percent_expression(skill_ratio)
+        self.skill_ratio_in_skill_description += skill_ratio
+        self.add_effect(title, msg)
+        return self
+
     def add_dmg_bonus(self, dmg_bonus: float, title='', msg=''):
         """增加伤害加成百分比"""
         self.dmg_bonus += dmg_bonus
@@ -555,7 +566,8 @@ class DamageAttribute:
         if not effect_value:
             effect_value = self.effect_attack
         # 计算暴击伤害
-        return effect_value * self.skill_multi * (1 + self.skill_ratio) * (1 + self.dmg_bonus) * (
+        return effect_value * self.skill_multi * (1 + self.skill_ratio) * (
+            1 + self.skill_ratio_in_skill_description) * (1 + self.dmg_bonus) * (
             1 + self.dmg_deepen) * (1 - self.enemy_resistance) * self.defense_ratio * self.crit_dmg
 
     def calculate_expected_damage(self, effect_value=None):
@@ -570,7 +582,8 @@ class DamageAttribute:
         if not effect_value:
             effect_value = self.effect_attack
 
-        return effect_value * self.skill_multi * (1 + self.skill_ratio) * (1 + self.dmg_bonus) * (
+        return effect_value * self.skill_multi * (1 + self.skill_ratio) * (
+                1 + self.skill_ratio_in_skill_description) * (1 + self.dmg_bonus) * (
             1 + self.dmg_deepen) * (1 - self.enemy_resistance) * self.defense_ratio * (
             self.crit_rate * (self.crit_dmg - 1) + 1)
 

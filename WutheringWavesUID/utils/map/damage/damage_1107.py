@@ -134,7 +134,7 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
 
     title = f"{role_name}-揭幕者状态"
     msg = f"共鸣解放致死以终的伤害倍率提升80%"
-    attr.add_skill_ratio(0.8, title, msg)
+    attr.add_skill_ratio_in_skill_description(0.8, title, msg)
 
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
