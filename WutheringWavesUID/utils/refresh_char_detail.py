@@ -5,6 +5,7 @@ from typing import List, Union, Dict
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
+from .resource.constant import SPECIAL_CHAR_INT
 from .simple_async_cache_card import card_cache
 from ..utils.api.model import RoleList
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_101
@@ -31,6 +32,15 @@ async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
     refresh_unchanged = {}
     for item in waves_data:
         role_id = item['role']['roleId']
+
+        if role_id in SPECIAL_CHAR_INT:
+            # 漂泊者预处理
+            for piaobo_id in SPECIAL_CHAR_INT[role_id]:
+                old = old_data.get(piaobo_id)
+                if not old:
+                    continue
+                if piaobo_id != role_id:
+                    del old_data[piaobo_id]
 
         old = old_data.get(role_id)
         if old != item:
