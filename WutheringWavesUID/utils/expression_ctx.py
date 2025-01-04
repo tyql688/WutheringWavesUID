@@ -78,16 +78,18 @@ def prepare_phantom(equipPhantomList):
             result = sum_phantom_value(result, props)
             sonata_result: WavesSonataResult = get_sonata_detail(_phantom.fetterDetail.name)
             if sonata_result.name not in temp_result:
-                temp_result[sonata_result.name] = {"num": 1, "result": sonata_result}
+                temp_result[sonata_result.name] = {"phantomIds": [_phantom.phantomProp.phantomId],
+                                                   "result": sonata_result}
             else:
-                temp_result[sonata_result.name]['num'] += 1
+                temp_result[sonata_result.name]['phantomIds'].append(_phantom.phantomProp.phantomId)
 
     for key, value in temp_result.items():
+        num = len(value['phantomIds'])
         result['ph_detail'].append({
-            'ph_num': value['num'],
+            'ph_num': num,
             'ph_name': key,
         })
-        if value['num'] >= 2:
+        if num >= 2:
             name = value['result'].set['2']['effect']
             effect = value['result'].set['2']['param'][0]
             result['ph'] = value['result'].name
