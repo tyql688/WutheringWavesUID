@@ -22,7 +22,7 @@ from ..utils.database.models import WavesBind, WavesUser
 from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value, enhance_summation_card_value, \
     card_sort_map_to_attribute
 from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_16, waves_font_40, waves_font_30, \
-    waves_font_24, waves_font_20, waves_font_44
+    waves_font_24, waves_font_20, waves_font_44, waves_font_14
 from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_GOLD, \
     get_square_weapon, CHAIN_COLOR, get_attribute, get_attribute_effect, \
     GREY, RED, get_role_pile_old
@@ -338,7 +338,11 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
             sonata_name = rank.sonata_name
         else:
             sonata_name = '合鸣效果'
-        bar_star_draw.text((558, 75), f'{sonata_name}', 'white', waves_font_16, 'mm')
+
+        sonata_font = waves_font_16
+        if len(sonata_name) > 4:
+            sonata_font = waves_font_14
+        bar_star_draw.text((558, 75), f'{sonata_name}', 'white', sonata_font, 'mm')
 
         # 武器
         weapon_bg_temp = Image.new('RGBA', (600, 300))
