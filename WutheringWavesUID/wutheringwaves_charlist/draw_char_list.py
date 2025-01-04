@@ -15,7 +15,7 @@ from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_2
     waves_font_22, waves_font_40, waves_font_24, waves_font_18, waves_font_20, waves_font_16, waves_font_34
 from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, get_event_avatar, add_footer, GOLD, GREY, get_attribute, get_square_avatar, \
-    get_square_weapon, SPECIAL_GOLD
+    get_square_weapon, SPECIAL_GOLD, CHAIN_COLOR
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NORMAL_LIST
 from ..utils.resource.download_file import get_skill_img
@@ -118,7 +118,8 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
         # 命座
         info_block = Image.new("RGBA", (40, 20), color=(255, 255, 255, 0))
         info_block_draw = ImageDraw.Draw(info_block)
-        info_block_draw.rectangle([0, 0, 40, 20], fill=(220, 39, 36, int(0.9 * 255)))
+        fill = CHAIN_COLOR[role_detail.get_chain_num()] + (int(0.9 * 255),)
+        info_block_draw.rectangle([0, 0, 40, 20], fill=fill)
         info_block_draw.text((2, 10), f'{role_detail.get_chain_name()}', 'white', waves_font_18, 'lm')
         bar_star.alpha_composite(info_block, (120, 15))
 
