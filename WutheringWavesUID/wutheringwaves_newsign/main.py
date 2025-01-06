@@ -4,7 +4,6 @@ import json as j
 import random
 from typing import Literal, Optional, Union, Dict, Any, List
 
-import numpy as np
 from PIL import Image, ImageDraw
 from aiohttp import FormData, ClientSession, TCPConnector, ContentTypeError
 
@@ -853,20 +852,29 @@ async def sign_in(uid: str, ck: str) -> str:
 
 def create_gradient_background(width, height, start_color, end_color=(255, 255, 255)):
     """
-    创建渐变背景
+    使用 PIL 创建渐变背景
     start_color: 起始颜色，如 (230, 230, 255) 浅蓝
     end_color: 结束颜色，默认白色
     """
-    background = np.zeros((height, width, 3), dtype=np.uint8)
+    # 创建新图像
+    image = Image.new('RGB', (width, height))
+
     for y in range(height):
+        # 计算当前行的颜色比例
         ratio = y / height
+
+        # 计算当前行的 RGB 值
+        r = int(end_color[0] * ratio + start_color[0] * (1 - ratio))
+        g = int(end_color[1] * ratio + start_color[1] * (1 - ratio))
+        b = int(end_color[2] * ratio + start_color[2] * (1 - ratio))
+
+        # 创建当前行的颜色
+        line_color = (r, g, b)
+        # 绘制当前行
         for x in range(width):
-            # 计算当前位置的颜色
-            r = int(end_color[0] * ratio + start_color[0] * (1 - ratio))
-            g = int(end_color[1] * ratio + start_color[1] * (1 - ratio))
-            b = int(end_color[2] * ratio + start_color[2] * (1 - ratio))
-            background[y, x] = [r, g, b]
-    return background
+            image.putpixel((x, y), line_color)
+
+    return image
 
 
 def create_sign_info_image(text, theme="blue"):
@@ -887,8 +895,7 @@ def create_sign_info_image(text, theme="blue"):
     start_color = themes.get(theme, themes["blue"])
 
     # 创建渐变背景
-    background = create_gradient_background(width, height, start_color)
-    img = Image.fromarray(background)
+    img = create_gradient_background(width, height, start_color)
     draw = ImageDraw.Draw(img)
 
     # 颜色定义
