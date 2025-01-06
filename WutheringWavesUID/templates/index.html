@@ -336,7 +336,7 @@
   });
 
   const headers = {
-    "devcode": "",
+    "devcode": generateRandomString(),
     "source": "h5",
   };
 
@@ -464,6 +464,14 @@
   }
 
   window.addEventListener('load', loadBackgroundImage);
+
+  function generateRandomString() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    return Array(32)
+      .fill(0)
+      .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
+      .join('');
+  }
 </script>
 </body>
 </html>
