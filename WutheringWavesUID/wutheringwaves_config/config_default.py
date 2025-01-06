@@ -50,6 +50,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         '关闭后将不再给任何人推送当天签到任务完成情况',
         False,
     ),
+    'GroupSignReport': GsBoolConfig(
+        '签到群组报告',
+        '关闭后将不再给任何群推送当天签到任务完成情况',
+        True,
+    ),
     'SigninMaster': GsBoolConfig(
         '全部开启签到',
         '开启后自动帮登录的人签到',

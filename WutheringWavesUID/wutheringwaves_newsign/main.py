@@ -31,7 +31,6 @@ POST_DETAIL_URL = f'{MAIN_URL}/forum/getPostDetail'
 SHARE_URL = f'{MAIN_URL}/encourage/level/shareTask'
 
 SigninMaster = WutheringWavesConfig.get_config('SigninMaster').data
-IS_REPORT = WutheringWavesConfig.get_config('PrivateSignReport').data
 
 
 async def get_headers_h5():
@@ -396,8 +395,10 @@ async def auto_sign_task():
     if WutheringWavesConfig.get_config('SchedSignin').data:
         logger.info('[鸣潮] [定时签到] 开始执行!')
         result, num = await daily_sign_action(sign_expiregid2uid, sign_user_list)
-        if not IS_REPORT:
+        if not WutheringWavesConfig.get_config('PrivateSignReport').data:
             result['private_msg_dict'] = {}
+        if not WutheringWavesConfig.get_config('GroupSignReport').data:
+            result['group_msg_dict'] = {}
         await send_board_cast_msg(result, 'sign')
         sign_success = num['success_num']
         sign_fail = num['failed_num']
@@ -407,8 +408,10 @@ async def auto_sign_task():
     if WutheringWavesConfig.get_config('BBSSchedSignin').data:
         logger.info('[鸣潮] [定时社区签到] 开始执行!')
         result, num = await auto_bbs_task_action(bbs_expiregid2uid, bbs_user_list)
-        if not IS_REPORT:
+        if not WutheringWavesConfig.get_config('PrivateSignReport').data:
             result['private_msg_dict'] = {}
+        if not WutheringWavesConfig.get_config('GroupSignReport').data:
+            result['group_msg_dict'] = {}
         await send_board_cast_msg(result, 'sign')
         bbs_success = num['success_num']
         bbs_fail = num['failed_num']

@@ -9,7 +9,6 @@ from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 sv_waves_sign = SV('鸣潮-签到', priority=1)
 waves_sign_all = SV('鸣潮-全部签到', pm=1)
 SIGN_TIME = WutheringWavesConfig.get_config('SignTime').data
-IS_REPORT = WutheringWavesConfig.get_config('PrivateSignReport').data
 
 
 @sv_waves_sign.on_fullmatch(f'{PREFIX}签到', block=True)
