@@ -4,6 +4,8 @@ import json as j
 import random
 from typing import Literal, Optional, Union, Dict, Any, List
 
+import numpy as np
+from PIL import Image, ImageDraw
 from aiohttp import FormData, ClientSession, TCPConnector, ContentTypeError
 
 from gsuid_core.bot import Bot
@@ -17,6 +19,7 @@ from ..utils.api.api import MAIN_URL
 from ..utils.api.model import DailyData
 from ..utils.database.models import WavesUser, WavesBind
 from ..utils.error_reply import WAVES_CODE_999, ERROR_CODE, WAVES_CODE_102, WAVES_CODE_101
+from ..utils.fonts.waves_fonts import waves_font_24
 from ..utils.util import generate_random_string
 from ..utils.waves_api import waves_api
 from ..utils.waves_send_msg import send_board_cast_msg
@@ -588,8 +591,13 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
         faild = group_msgs[gid]['failed']
         success_num += int(success)
         failed_num += int(faild)
-        title = f'✅[鸣潮]今日社区签到任务已完成！\n📝本群共签到成功{success}人，共签到失败{faild}人, Token过期{len(expiregid2uid.get(gid, []))}人'
-        messages = [MessageSegment.text(title)]
+        title = f'✅[鸣潮]今日社区签到任务已完成！\n本群共签到成功{success}人\n共签到失败{faild}人\nToken过期{len(expiregid2uid.get(gid, []))}人'
+        messages = []
+        if WutheringWavesConfig.get_config('GroupSignReportPic').data:
+            image = create_sign_info_image(title, theme="yellow")
+            messages.append(MessageSegment.image(image))
+        else:
+            messages.append(MessageSegment.text(title))
         if group_msgs[gid]['push_message']:
             messages.append(MessageSegment.text('\n'))
             messages.extend(group_msgs[gid]['push_message'])
@@ -610,7 +618,7 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
         'push_failed_num': failed_num,
     }
     logger.info(f'自动社区签到结果: {num}')
-    logger.info(result)
+    # logger.info(result)
     return result, num
 
 
@@ -712,8 +720,13 @@ async def daily_sign_action(expiregid2uid, user_list):
         faild = group_msgs[gid]['failed']
         failed_num += int(faild)
         success_num += int(success)
-        title = f'✅[鸣潮]今日自动签到已完成！\n📝本群共签到成功{success}人，共签到失败{faild}人, Token过期{len(expiregid2uid.get(gid, []))}人'
-        messages = [MessageSegment.text(title)]
+        title = f'✅[鸣潮]今日自动签到已完成！\n本群共签到成功{success}人\n共签到失败{faild}人\nToken过期{len(expiregid2uid.get(gid, []))}人'
+        messages = []
+        if WutheringWavesConfig.get_config('GroupSignReportPic').data:
+            image = create_sign_info_image(title, theme="blue")
+            messages.append(MessageSegment.image(image))
+        else:
+            messages.append(MessageSegment.text(title))
         if group_msgs[gid]['push_message']:
             messages.append(MessageSegment.text('\n'))
             messages.extend(group_msgs[gid]['push_message'])
@@ -734,7 +747,7 @@ async def daily_sign_action(expiregid2uid, user_list):
         'push_failed_num': failed_num,
     }
     logger.info(f'自动游戏签到结果: {num}')
-    logger.info(result)
+    # logger.info(result)
     return result, num
 
 
@@ -836,3 +849,65 @@ async def sign_in(uid: str, ck: str) -> str:
             return f'今日已签到！请勿重复签到！'
     # 签到失败
     return f'签到失败！'
+
+
+def create_gradient_background(width, height, start_color, end_color=(255, 255, 255)):
+    """
+    创建渐变背景
+    start_color: 起始颜色，如 (230, 230, 255) 浅蓝
+    end_color: 结束颜色，默认白色
+    """
+    background = np.zeros((height, width, 3), dtype=np.uint8)
+    for y in range(height):
+        ratio = y / height
+        for x in range(width):
+            # 计算当前位置的颜色
+            r = int(end_color[0] * ratio + start_color[0] * (1 - ratio))
+            g = int(end_color[1] * ratio + start_color[1] * (1 - ratio))
+            b = int(end_color[2] * ratio + start_color[2] * (1 - ratio))
+            background[y, x] = [r, g, b]
+    return background
+
+
+def create_sign_info_image(text, theme="blue"):
+    text = text[1:]
+    # 创建图片
+    width = 600
+    height = 250  # 稍微减小高度使布局更紧凑
+
+    # 预定义主题颜色
+    themes = {
+        "blue": (230, 230, 255),  # 浅蓝
+        "yellow": (255, 255, 230),  # 浅黄
+        "pink": (255, 230, 230),  # 浅粉
+        "green": (230, 255, 230),  # 浅绿
+    }
+
+    # 获取主题颜色，默认浅蓝
+    start_color = themes.get(theme, themes["blue"])
+
+    # 创建渐变背景
+    background = create_gradient_background(width, height, start_color)
+    img = Image.fromarray(background)
+    draw = ImageDraw.Draw(img)
+
+    # 颜色定义
+    title_color = (51, 51, 51)  # 标题色
+
+    # 绘制装饰边框
+    border_color = (200, 200, 200)
+    draw.rectangle([(10, 10), (width - 10, height - 10)], outline=border_color, width=2)
+
+    # 文本处理
+    lines = text.split('\n')
+    left_margin = 40  # 左边距
+    y = 40  # 起始y坐标
+
+    for i, line in enumerate(lines):
+        draw.text((left_margin, y), line, font=waves_font_24, fill=title_color)
+        if i == 0:
+            y += 60
+        else:
+            y += 45
+
+    return img
