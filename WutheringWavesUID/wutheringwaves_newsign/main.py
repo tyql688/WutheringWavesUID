@@ -127,7 +127,7 @@ class KuroBBS:
         try:
             header = copy.deepcopy(await get_headers())
             header.update({"token": token})
-            data = {"gameId": "3"}
+            data = {"gameId": "2"}
             return await self._waves_request(SIGN_IN_URL, "POST", header, data=data)
         except Exception as e:
             logger.exception(f"do_sign_in token {token}", e)
