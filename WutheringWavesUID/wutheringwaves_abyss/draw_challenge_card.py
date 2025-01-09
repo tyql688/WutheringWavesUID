@@ -5,7 +5,6 @@ from typing import Union
 
 from PIL import Image, ImageDraw
 
-from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
@@ -16,6 +15,7 @@ from ..utils.fonts.waves_fonts import waves_font_26, waves_font_42, waves_font_3
     waves_font_24
 from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, GREY, get_event_avatar, get_square_avatar, add_footer, GOLD
+from ..utils.name_convert import char_name_to_char_id
 from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / 'texture2d'
@@ -104,11 +104,15 @@ async def draw_challenge_img(
                 role = next((role for role in role_info.roleList if
                              role.roleName == _role.roleName or _role.roleName in role.roleName), None)
                 if not role:
-                    logger.error(f'角色[{_role.roleName}]未找到')
-                avatar = await draw_pic(role.roleId)
-                char_bg = Image.open(TEXT_PATH / f'char_bg{role.starLevel}.png')
+                    roleId = char_name_to_char_id(_role.roleName)
+                    avatar = await draw_pic(roleId)
+                    char_bg = Image.open(TEXT_PATH / f'char_bg{5}.png')
+                else:
+                    avatar = await draw_pic(role.roleId)
+                    char_bg = Image.open(TEXT_PATH / f'char_bg{role.starLevel}.png')
+
                 char_bg_draw = ImageDraw.Draw(char_bg)
-                char_bg_draw.text((90, 150), f'{role.roleName}', 'white', waves_font_18, 'mm')
+                char_bg_draw.text((90, 150), f'{_role.roleName}', 'white', waves_font_18, 'mm')
                 char_bg.paste(avatar, (0, 0), avatar)
 
                 info_block = Image.new("RGBA", (40, 20), color=(255, 255, 255, 0))
