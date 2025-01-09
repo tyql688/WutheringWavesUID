@@ -8,7 +8,7 @@ from ...damage.utils import SONATA_CELESTIAL, SONATA_SINKING, SONATA_MOLTEN, SON
     SONATA_FREEZING, SONATA_SIERRA, SONATA_REJUVENATING, cast_hit, cast_attack, cast_skill, SONATA_FROSTY, \
     cast_liberation, skill_damage, CHAR_ATTR_FREEZING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID, CHAR_ATTR_SIERRA, \
     CHAR_ATTR_CELESTIAL, CHAR_ATTR_SINKING, SONATA_MOONLIT, SONATA_LINGERING, SONATA_EMPYREAN, SONATA_MIDNIGHT, \
-    SONATA_ETERNAL, SONATA_TIDEBREAKING
+    SONATA_ETERNAL, SONATA_TIDEBREAKING, Spectro_Frazzle_Role_Ids
 
 
 def weapon_damage(attr: DamageAttribute, weapon_data: WeaponData, damage_func: Union[List[str], str], isGroup: bool):
@@ -143,6 +143,8 @@ def phase_damage(attr: DamageAttribute, role: RoleDetailData, damage_func: Union
 
         # 此间永驻之光
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_ETERNAL):
+            if role.role.roleId not in Spectro_Frazzle_Role_Ids:
+                return
             # 角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒。
             title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"角色为敌人添加【光噪效应】时，自身暴击提升20%"

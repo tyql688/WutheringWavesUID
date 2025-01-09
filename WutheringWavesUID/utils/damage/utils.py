@@ -72,6 +72,11 @@ SkillTreeMap = {
     "共鸣回路": "7",
 }
 
+# 光噪效应
+Spectro_Frazzle_Role_Ids = [
+    1501, 1502
+]
+
 
 def skill_damage_calc(skillTree: Dict, skillTreeId: str, skillParamId: str, skillLevel: int) -> str:
     """
