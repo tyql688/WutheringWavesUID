@@ -24,9 +24,10 @@ async def get_sign_func(bot: Bot, ev: Event):
         return await bot.send('[获取兑换码失败] 请稍后再试')
 
     msgs = []
+    # logger.info(f'[获取兑换码] {code_list}')
     for code in code_list:
         is_fail = code.get("is_fail", '0')
-        if is_fail == '1' or is_code_expired(code.get('label')):
+        if is_fail == '1':
             continue
         order = code.get("order", '')
         if order in invalid_code_list or not order:
