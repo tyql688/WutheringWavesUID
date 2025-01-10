@@ -68,6 +68,9 @@ async def set_config_func(ev: Event, uid: str = "0"):
         option = 'off'
 
     logger.info(f"uid: {uid}, option: {option}, config_name: {config_name}")
+
+    other_msg = ""
+
     if config_name in SIGN_MAP:
         # 执行设置
         await WavesUser.update_data_by_uid(
@@ -84,6 +87,9 @@ async def set_config_func(ev: Event, uid: str = "0"):
         if option == 'off':
             await gs_subscribe.delete_subscribe('single', task_name_sign, ev)
         else:
+            from . import WutheringWavesConfig
+            SIGN_TIME = WutheringWavesConfig.get_config('SignTime').data
+            other_msg = f"😄将于[{SIGN_TIME[0]}:{SIGN_TIME[1]}]点自动为您开始签到"
             await gs_subscribe.add_subscribe('single', task_name_sign, ev)
     elif config_name.replace('推送', '') in PUSH_MAP:
         await WavesPush.update_data_by_uid(
@@ -104,4 +110,5 @@ async def set_config_func(ev: Event, uid: str = "0"):
         succeed_msg = "关闭!"
     else:
         succeed_msg = f"开启至群{option}"
-    return f"{config_name}已{succeed_msg}\n"
+
+    return f"{config_name}已{succeed_msg}\n{other_msg}"
