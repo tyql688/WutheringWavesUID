@@ -1,5 +1,6 @@
 import json
 import re
+import time
 from datetime import datetime
 
 import httpx
@@ -14,7 +15,7 @@ sv_waves_code = SV('鸣潮兑换码')
 
 invalid_code_list = ('MINGCHAO',)
 
-url = 'https://newsimg.5054399.com/comm/mlcxqcommon/static/wap/js/data_102.js'
+url = 'https://newsimg.5054399.com/comm/mlcxqcommon/static/wap/js/data_102.js?{}&callback=?&_={}'
 
 
 @sv_waves_code.on_fullmatch((f'{PREFIX}code', f'{PREFIX}兑换码'))
@@ -24,7 +25,6 @@ async def get_sign_func(bot: Bot, ev: Event):
         return await bot.send('[获取兑换码失败] 请稍后再试')
 
     msgs = []
-    # logger.info(f'[获取兑换码] {code_list}')
     for code in code_list:
         is_fail = code.get("is_fail", '0')
         if is_fail == '1':
@@ -46,10 +46,16 @@ async def get_sign_func(bot: Bot, ev: Event):
 
 async def get_code_list():
     try:
+        now = datetime.now()
+        time_string = f'{now.year - 1900}{now.month - 1}{now.day}{now.hour}{now.minute}'
+        now_time = int(time.time() * 1000)
+        new_url = url.format(time_string, now_time)
         async with httpx.AsyncClient(timeout=None) as client:
-            res = await client.get(url, timeout=10)
+            res = await client.get(new_url, timeout=10)
             json_data = res.text.split('=', 1)[1].strip().rstrip(';')
+            logger.debug(f'[获取兑换码] url:{new_url}, codeList:{json_data}')
             return json.loads(json_data)
+
     except Exception as e:
         logger.exception('[获取兑换码失败] ', e)
         return
