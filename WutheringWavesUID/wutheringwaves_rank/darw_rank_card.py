@@ -57,6 +57,7 @@ promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
 char_mask = Image.open(TEXT_PATH / 'char_mask.png')
 logo_img = Image.open(TEXT_PATH / f'logo_small_2.png')
 pic_cache = TimedCache(86400, 200)
+CardUseCache = WutheringWavesConfig.get_config('CardUseCache').data
 
 
 class RankInfo(BaseModel):
@@ -99,8 +100,8 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
     rankInfoList = []
     if not user.uid:
         return rankInfoList
-
-    tasks = [find_role_detail_cache(uid, find_char_id) for uid in user.uid.split('_')]
+    _func = find_role_detail_cache if CardUseCache else find_role_detail
+    tasks = [_func(uid, find_char_id) for uid in user.uid.split('_')]
     role_details = await asyncio.gather(*tasks)
 
     for uid, role_detail in zip(user.uid.split('_'), role_details):

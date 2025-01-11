@@ -96,6 +96,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         'bot排行',
         False,
     ),
+    'CardUseCache': GsBoolConfig(
+        '面板数据是否用本地缓存（重启生效）',
+        '面板数据是否用本地缓存（重启生效）',
+        False,
+    ),
     'QQPicCache': GsBoolConfig(
         '排行榜qq头像缓存开关',
         '排行榜qq头像缓存开关',

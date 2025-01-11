@@ -12,6 +12,9 @@ from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_101
 from ..utils.hint import error_reply
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
+from ..wutheringwaves_config import WutheringWavesConfig
+
+CardUseCache = WutheringWavesConfig.get_config('CardUseCache').data
 
 
 async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
@@ -51,8 +54,10 @@ async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
         old_data[role_id] = item
 
     save_data = list(old_data.values())
-    # 保存缓存
-    await card_cache.set(uid, save_data)
+
+    if CardUseCache:
+        # 保存缓存
+        await card_cache.set(uid, save_data)
 
     with Path.open(path, "wb") as file:
         file.write(msgjson.format(msgjson.encode(save_data)))

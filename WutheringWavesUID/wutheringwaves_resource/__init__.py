@@ -13,7 +13,7 @@ from ..utils.database.models import WavesBind
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.resource.download_all_resource import download_all_resource
 from ..utils.simple_async_cache_card import AsyncCache, card_cache, user_bind_cache
-from ..wutheringwaves_config import PREFIX
+from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 sv_download_config = SV('资源下载', pm=1)
 
@@ -81,6 +81,9 @@ async def load_all_players(player_path: Path, cache: AsyncCache):
 
 
 async def load_all_card():
+    if not WutheringWavesConfig.get_config('CardUseCache').data:
+        return -1
+
     # 并行加载所有玩家数据
     await load_all_players(PLAYER_PATH, card_cache)
     return await card_cache.size()
