@@ -8,7 +8,12 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     'RedisFromUrl': GsStrConfig(
         'Redis连接配置',
         'Redis连接配置',
-        'redis://127.0.0.1:6379/3',
+        'redis://127.0.0.1:6379/0',
+    ),
+    'IsRedisCluster': GsBoolConfig(
+        'Redis集群开关',
+        'Redis集群开关',
+        False,
     ),
     'WavesAnnGroups': GsDictConfig(
         '推送公告群组',
