@@ -76,6 +76,16 @@ CHAIN_COLOR = {
     6: WAVES_MOLTEN,
 }
 
+WEAPON_RESONLEVEL_COLOR = {
+    0: WAVES_MOONLIT,
+    1: WAVES_LINGERING,
+    2: WAVES_FREEZING,
+    3: WAVES_SIERRA,
+    4: WAVES_VOID,
+    5: AMBER,
+    6: WAVES_MOLTEN,
+}
+
 
 async def get_random_waves_role_pile(name: str = None):
     if name:

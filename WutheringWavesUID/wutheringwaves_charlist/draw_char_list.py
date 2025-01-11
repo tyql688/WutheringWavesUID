@@ -15,7 +15,7 @@ from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_2
     waves_font_22, waves_font_40, waves_font_24, waves_font_18, waves_font_20, waves_font_16, waves_font_34
 from ..utils.hint import error_reply
 from ..utils.image import get_waves_bg, get_event_avatar, add_footer, GOLD, GREY, get_attribute, get_square_avatar, \
-    get_square_weapon, SPECIAL_GOLD, CHAIN_COLOR
+    get_square_weapon, SPECIAL_GOLD, CHAIN_COLOR, WEAPON_RESONLEVEL_COLOR
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NORMAL_LIST
 from ..utils.resource.download_file import get_skill_img
@@ -166,8 +166,10 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
 
         _x = 220 + 43 * len(weaponData.weapon.weaponName)
         _y = 37
+
+        wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)
         weapon_bg_temp_draw.rounded_rectangle([_x - 15, _y - 15, _x + 50, _y + 15], radius=7,
-                                              fill=(128, 138, 135, int(0.8 * 255)))
+                                              fill=wrc_fill)
         weapon_bg_temp_draw.text((_x, _y), f'精{weaponData.resonLevel}', 'white',
                                  waves_font_24, 'lm')
 

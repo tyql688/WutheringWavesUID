@@ -23,7 +23,7 @@ from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_5
     waves_font_24, waves_font_28, waves_font_26, waves_font_42, waves_font_16, waves_font_18, waves_font_36
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow, get_square_avatar, \
-    WAVES_MOONLIT, WAVES_FREEZING, change_color, WAVES_SHUXING_MAP, get_attribute_effect
+    WAVES_MOONLIT, WAVES_FREEZING, change_color, WAVES_SHUXING_MAP, get_attribute_effect, WEAPON_RESONLEVEL_COLOR
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR
 from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_skill_img
@@ -479,8 +479,10 @@ async def draw_char_detail_img(ev: Event, uid: str, char: str, user_id, waves_id
 
     _x = 220 + 43 * len(weaponData.weapon.weaponName)
     _y = 37
+    wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)
     weapon_bg_temp_draw.rounded_rectangle([_x - 15, _y - 15, _x + 50, _y + 15], radius=7,
-                                          fill=(128, 138, 135, int(0.8 * 255)))
+                                          fill=wrc_fill)
+
     weapon_bg_temp_draw.text((_x, _y), f'精{weaponData.resonLevel}', 'white',
                              waves_font_24, 'lm')
 

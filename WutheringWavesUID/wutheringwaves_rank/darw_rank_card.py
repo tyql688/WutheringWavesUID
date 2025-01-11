@@ -25,7 +25,7 @@ from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_1
     waves_font_24, waves_font_20, waves_font_44, waves_font_14
 from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_GOLD, \
     get_square_weapon, CHAIN_COLOR, get_attribute, get_attribute_effect, \
-    GREY, RED, get_role_pile_old
+    GREY, RED, get_role_pile_old, WEAPON_RESONLEVEL_COLOR
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.simple_async_cache_card import card_cache
@@ -359,8 +359,9 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
 
         _x = 220 + 43 * len(weaponData.weapon.weaponName)
         _y = 37
+        wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)
         weapon_bg_temp_draw.rounded_rectangle([_x - 15, _y - 15, _x + 50, _y + 15], radius=7,
-                                              fill=(128, 138, 135, int(0.8 * 255)))
+                                              fill=wrc_fill)
         weapon_bg_temp_draw.text((_x, _y), f'精{weaponData.resonLevel}', 'white',
                                  waves_font_24, 'lm')
 
