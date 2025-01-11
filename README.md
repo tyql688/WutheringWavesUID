@@ -17,6 +17,7 @@
 >
 > **如果已经是最新版本的`gsuid_core`, 可以直接对bot发送`core安装插件WutheringWavesUID`，然后重启core以应用安装**
 >
+> **如使用redis请安装依赖：`pdm run pip install redis` or `poetry run pip install redis`**
 >
 > 如使用命令缺失素材可尝试使用命令`ww下载全部资源`
 >

@@ -5,6 +5,11 @@ from gsuid_core.utils.plugins_config.models import (
     GsStrConfig, GsListStrConfig, GsBoolConfig, GsDictConfig, GsListConfig, GsIntConfig, )
 
 CONFIG_DEFAULT: Dict[str, GSC] = {
+    'RedisFromUrl': GsStrConfig(
+        'Redis连接配置',
+        'Redis连接配置',
+        'redis://localhost:6379/3',
+    ),
     'WavesAnnGroups': GsDictConfig(
         '推送公告群组',
         '鸣潮公告推送群组',
@@ -96,10 +101,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         'bot排行',
         False,
     ),
-    'CardUseCache': GsBoolConfig(
-        '面板数据是否用本地缓存（重启生效）',
-        '面板数据是否用本地缓存（重启生效）',
-        False,
+    "CardUseOptions": GsStrConfig(
+        "排行面板数据启用规则（重启生效）",
+        "排行面板数据启用规则",
+        "不使用缓存",
+        options=["不使用缓存", "redis缓存", "内存缓存"]
     ),
     'QQPicCache': GsBoolConfig(
         '排行榜qq头像缓存开关',

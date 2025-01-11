@@ -16,7 +16,6 @@ from ..utils.api.model import RoleDetailData, WeaponData
 from ..utils.ascension.char import get_breach
 from ..utils.cache import TimedCache
 from ..utils.calculate import get_calc_map, calc_phantom_score, get_total_score_bg
-from ..utils.char_info_utils import get_all_role_detail_info_list
 from ..utils.damage.abstract import DamageRankRegister
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value, enhance_summation_card_value, \
@@ -28,7 +27,7 @@ from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_G
     GREY, RED, get_role_pile_old, WEAPON_RESONLEVEL_COLOR
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
-from ..utils.simple_async_cache_card import card_cache
+from ..utils.waves_card_cache import get_card
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 card_sort_map = {
@@ -57,7 +56,6 @@ promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
 char_mask = Image.open(TEXT_PATH / 'char_mask.png')
 logo_img = Image.open(TEXT_PATH / f'logo_small_2.png')
 pic_cache = TimedCache(86400, 200)
-CardUseCache = WutheringWavesConfig.get_config('CardUseCache').data
 
 
 class RankInfo(BaseModel):
@@ -75,19 +73,7 @@ class RankInfo(BaseModel):
 
 
 async def find_role_detail(uid: str, char_id: Union[int, List[int]]) -> Optional[RoleDetailData]:
-    role_details = await get_all_role_detail_info_list(uid)
-    if role_details is None:
-        return None
-
-    # 使用生成器来进行过滤
-    return next((role for role in role_details if str(role.role.roleId) in char_id), None)
-
-
-async def find_role_detail_cache(uid: str, char_id: Union[int, List[int]]) -> Optional[RoleDetailData]:
-    role_details = await card_cache.get(uid)
-    if role_details is None:
-        return None
-    role_details = iter(RoleDetailData(**r) for r in role_details)
+    role_details = await get_card(uid)
     if role_details is None:
         return None
 
@@ -100,8 +86,8 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
     rankInfoList = []
     if not user.uid:
         return rankInfoList
-    _func = find_role_detail_cache if CardUseCache else find_role_detail
-    tasks = [_func(uid, find_char_id) for uid in user.uid.split('_')]
+
+    tasks = [find_role_detail(uid, find_char_id) for uid in user.uid.split('_')]
     role_details = await asyncio.gather(*tasks)
 
     for uid, role_detail in zip(user.uid.split('_'), role_details):

@@ -5,16 +5,13 @@ from typing import List, Union, Dict
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
+from . import waves_card_cache
 from .resource.constant import SPECIAL_CHAR_INT
-from .simple_async_cache_card import card_cache
 from ..utils.api.model import RoleList
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_101
 from ..utils.hint import error_reply
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
-from ..wutheringwaves_config import WutheringWavesConfig
-
-CardUseCache = WutheringWavesConfig.get_config('CardUseCache').data
 
 
 async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
@@ -55,9 +52,7 @@ async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
 
     save_data = list(old_data.values())
 
-    if CardUseCache:
-        # 保存缓存
-        await card_cache.set(uid, save_data)
+    await waves_card_cache.save_card(uid, save_data)
 
     with Path.open(path, "wb") as file:
         file.write(msgjson.format(msgjson.encode(save_data)))
