@@ -93,7 +93,7 @@ async def send_role_guide_pic(bot: Bot, ev: Event):
     name = alias_to_char_name(char_name)
     await bot.logger.info(f'[鸣潮] 开始获取{name}图鉴')
 
-    config = WutheringWavesConfig.get_config('WavesGuideProvide')
+    config = WutheringWavesConfig.get_config('WavesGuideProvideNew')
     zip_list = []
     if config.data == 'all':
         for i in config.options:

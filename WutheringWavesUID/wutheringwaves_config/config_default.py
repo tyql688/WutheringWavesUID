@@ -80,11 +80,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "开启后当达到推送阈值将会一直推送",
         False
     ),
-    "WavesGuideProvide": GsStrConfig(
+    "WavesGuideProvideNew": GsStrConfig(
         "角色攻略图提供方",
         "使用ww角色攻略时选择的提供方",
-        "Moealkyne",
-        options=["all", "Moealkyne", "小沐XMu", "金铃子攻略组", "結星"]
+        "金铃子攻略组",
+        options=["all", "金铃子攻略组", "結星", "Moealkyne"]
     ),
     'WavesLoginUrl': GsStrConfig(
         '鸣潮登录url',
