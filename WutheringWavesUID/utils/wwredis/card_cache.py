@@ -7,10 +7,10 @@ from ...utils.wwredis.wwredis import wavesRedis
 redis_key = "ww:hash:playerCache"
 
 
-async def save_all_card(data: Dict):
+async def save_all_card(raw_data: Dict):
     new_data = {
-        roleId: json.dumps(data, ensure_ascii=False)
-        for roleId, data in data.items()
+        roleId: json.dumps(i, ensure_ascii=False)
+        for roleId, i in raw_data.items()
     }
     async with wavesRedis.get_client() as client:
         await client.hset(redis_key, mapping=new_data)

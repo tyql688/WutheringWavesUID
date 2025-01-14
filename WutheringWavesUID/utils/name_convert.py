@@ -52,3 +52,7 @@ def alias_to_weapon_name(weapon_name: str) -> str:
             logger.debug(f"别名转换: {weapon_name} -> {i}")
             return i
     return weapon_name
+
+
+def get_all_char_id() -> List[str]:
+    return list(char_id_data.keys())

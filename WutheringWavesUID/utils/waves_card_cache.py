@@ -1,5 +1,6 @@
 import asyncio
 import json
+import time
 from pathlib import Path
 from typing import Dict, Union, List
 
@@ -42,8 +43,19 @@ async def load_all_players(player_path: Path, all_card: Dict):
     # 找到所有 rawData.json 文件
     file_paths = list(player_path.glob("*/rawData.json"))
 
-    # 使用 asyncio.gather 并行加载文件
-    tasks = [load_player_data(file_path, all_card) for file_path in file_paths]
+    # # 使用 asyncio.gather 并行加载文件
+    # tasks = [load_player_data(file_path, all_card) for file_path in file_paths]
+    # await asyncio.gather(*tasks)
+
+    semaphore = asyncio.Semaphore(200)
+
+    async def wrapped_load_player_data(file_path):
+        async with semaphore:
+            return await load_player_data(file_path, all_card)
+
+    # 创建任务列表
+    tasks = [wrapped_load_player_data(file_path) for file_path in file_paths]
+    # 并发执行任务
     await asyncio.gather(*tasks)
 
 
@@ -57,8 +69,14 @@ async def load_all_card() -> int:
     if CardUseOptions == "内存缓存":
         return await save_all_card(all_card)
     elif CardUseOptions == "redis缓存":
-        from .wwredis import card_cache
-        return await card_cache.save_all_card(all_card)
+        from .wwredis import card_cache, rank_cache
+
+        total = await card_cache.save_all_card(all_card)
+        a = time.time()
+        logger.info(f"[鸣潮][开始处理排行......]")
+        await rank_cache.save_rank_caches(all_card)
+        logger.info(f"[鸣潮][结束处理排行......] 耗时:{time.time() - a:.2f}s")
+        return total
 
 
 async def save_card(uid: str, data: Union[List]):
@@ -67,8 +85,9 @@ async def save_card(uid: str, data: Union[List]):
     elif CardUseOptions == "内存缓存":
         await save_user_card(uid, data)
     elif CardUseOptions == "redis缓存":
-        from .wwredis import card_cache
+        from .wwredis import card_cache, rank_cache
         await card_cache.save_user_card(uid, data)
+        await rank_cache.save_rank_cache(uid, data)
 
 
 async def get_card(uid: str):
@@ -92,3 +111,21 @@ async def get_user_all_card():
         from .wwredis import card_cache
         return await card_cache.get_all_card()
     return {}
+
+
+async def refresh_ranks(all_card):
+    if CardUseOptions == "redis缓存":
+        from .wwredis import rank_cache
+        return await rank_cache.save_rank_caches(all_card)
+
+
+async def get_rank(char_id: str, rank_type: str, num=100):
+    if CardUseOptions == "redis缓存":
+        from .wwredis import rank_cache
+        return await rank_cache.get_rank_cache(char_id, rank_type, num)
+
+
+async def get_self_rank(char_id: str, rank_type: str, user_id: str):
+    if CardUseOptions == "redis缓存":
+        from .wwredis import rank_cache
+        return await rank_cache.get_self_rank(char_id, rank_type, user_id)

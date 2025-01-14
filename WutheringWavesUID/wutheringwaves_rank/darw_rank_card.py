@@ -1,6 +1,5 @@
 import asyncio
 import copy
-import json
 import time
 from pathlib import Path
 from typing import Optional, Union, List
@@ -27,24 +26,10 @@ from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_G
     get_square_weapon, CHAIN_COLOR, get_attribute, get_attribute_effect, \
     GREY, RED, get_role_pile_old, WEAPON_RESONLEVEL_COLOR
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
-from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
-from ..utils.waves_card_cache import get_card, get_user_all_card
+from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME, card_sort_map
+from ..utils.waves_card_cache import get_card, get_rank, get_self_rank
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
-card_sort_map = {
-    '生命': '0',
-    '攻击': '0',
-    '防御': '0',
-    '共鸣效率': '0%',
-    '暴击': '0.0%',
-    '暴击伤害': '0.0%',
-    '属性伤害加成': '0.0%',
-    '治疗效果加成': '0.0%',
-    '普攻伤害加成': '0.0%',
-    '重击伤害加成': '0.0%',
-    '共鸣技能伤害加成': '0.0%',
-    '共鸣解放伤害加成': '0.0%'
-}
 rank_length = 20  # 排行长度
 TEXT_PATH = Path(__file__).parent / 'texture2d'
 TITLE_I = Image.open(TEXT_PATH / 'title.png')
@@ -76,38 +61,83 @@ class RankInfo(BaseModel):
 CardUseOptions = WutheringWavesConfig.get_config('CardUseOptions').data
 
 
-async def find_role_detail(uid: str,
-                           char_id: Union[int, List[int]],
-                           server_all_cards=None) -> Optional[RoleDetailData]:
-    if server_all_cards is None:
-        server_all_cards = {}
-    if CardUseOptions == 'redis缓存':
-        role_details = server_all_cards.get(uid)
-        if not role_details:
-            return None
-        try:
-            role_details = json.loads(role_details)
-            if not any(isinstance(item, RoleDetailData) for item in role_details):
-                role_details = iter(RoleDetailData(**r) for r in role_details)
-        except Exception as e:
-            logger.error(f'角色数据缓存错误 {uid} : {e}')
-            return None
+async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
+    equipPhantomList = role_detail.phantomData.equipPhantomList
+    weaponData = role_detail.weaponData
+    phantom_sum_value = prepare_phantom(equipPhantomList)
+    phantom_sum_value = enhance_summation_phantom_value(
+        role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
+        weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
+        phantom_sum_value)
+
+    # 评分
+    phantom_score = 0
+    calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
+    for i, _phantom in enumerate(equipPhantomList):
+        if _phantom and _phantom.phantomProp:
+            props = _phantom.get_props()
+            _score, _bg = calc_phantom_score(role_detail.role.roleName, props, _phantom.cost, calc_temp)
+            phantom_score += _score
+
+    if phantom_score == 0:
+        return
+
+    phantom_bg = get_total_score_bg(role_detail.role.roleName, phantom_score, calc_temp)
+
+    # 面板
+    temp_card_sort_map = copy.deepcopy(card_sort_map)
+    card_map = enhance_summation_card_value(
+        role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
+        role_detail.role.attributeName,
+        weaponData.weapon.weaponId, weaponData.level, weaponData.breach,
+        weaponData.resonLevel,
+        phantom_sum_value, temp_card_sort_map
+    )
+    damageAttribute = card_sort_map_to_attribute(card_map)
+
+    if rankDetail:
+        crit_damage, expected_damage = rankDetail['func'](damageAttribute, role_detail)
     else:
-        role_details = await get_card(uid)
-        if role_details is None:
-            return None
+        expected_damage = '0'
+
+    sonata_name = ''
+    for ph in phantom_sum_value.get('ph_detail', []):
+        if ph['ph_num'] == 5:
+            sonata_name = ph['ph_name']
+
+    rankInfo = RankInfo(**{
+        'roleDetail': role_detail,
+        'qid': user_id,
+        'uid': uid,
+        'level': role_detail.role.level,
+        'chain': role_detail.get_chain_num(),
+        'chainName': role_detail.get_chain_name(),
+        'score': round(phantom_score, 2),
+        'score_bg': phantom_bg,
+        'expected_damage': expected_damage,
+        'expected_damage_int': int(expected_damage.replace(',', '')),
+        'sonata_name': sonata_name,
+    })
+    return rankInfo
+
+
+async def find_role_detail(uid: str,
+                           char_id: Union[int, List[int]]) -> Optional[RoleDetailData]:
+    role_details = await get_card(uid)
+    if role_details is None:
+        return None
 
     # 使用生成器来进行过滤
     return next((role for role in role_details if str(role.role.roleId) in char_id), None)
 
 
 async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDetail, tokenLimitFlag,
-                                 wavesTokenUsersMap, server_all_cards):
+                                 wavesTokenUsersMap):
     rankInfoList = []
     if not user.uid:
         return rankInfoList
 
-    tasks = [find_role_detail(uid, find_char_id, server_all_cards) for uid in user.uid.split('_')]
+    tasks = [find_role_detail(uid, find_char_id) for uid in user.uid.split('_')]
     role_details = await asyncio.gather(*tasks)
 
     for uid, role_detail in zip(user.uid.split('_'), role_details):
@@ -118,62 +148,7 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
         if not role_detail.phantomData or not role_detail.phantomData.equipPhantomList:
             continue
 
-        equipPhantomList = role_detail.phantomData.equipPhantomList
-        weaponData = role_detail.weaponData
-        phantom_sum_value = prepare_phantom(equipPhantomList)
-        phantom_sum_value = enhance_summation_phantom_value(
-            char_id, role_detail.role.level, role_detail.role.breach,
-            weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
-            phantom_sum_value)
-
-        # 评分
-        phantom_score = 0
-        calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
-        for i, _phantom in enumerate(equipPhantomList):
-            if _phantom and _phantom.phantomProp:
-                props = _phantom.get_props()
-                _score, _bg = calc_phantom_score(role_detail.role.roleName, props, _phantom.cost, calc_temp)
-                phantom_score += _score
-
-        if phantom_score == 0:
-            continue
-
-        phantom_bg = get_total_score_bg(role_detail.role.roleName, phantom_score, calc_temp)
-
-        # 面板
-        temp_card_sort_map = copy.deepcopy(card_sort_map)
-        card_map = enhance_summation_card_value(
-            char_id, role_detail.role.level, role_detail.role.breach,
-            role_detail.role.attributeName,
-            weaponData.weapon.weaponId, weaponData.level, weaponData.breach,
-            weaponData.resonLevel,
-            phantom_sum_value, temp_card_sort_map
-        )
-        damageAttribute = card_sort_map_to_attribute(card_map)
-
-        if rankDetail:
-            crit_damage, expected_damage = rankDetail['func'](damageAttribute, role_detail)
-        else:
-            expected_damage = '0'
-
-        sonata_name = ''
-        for ph in phantom_sum_value.get('ph_detail', []):
-            if ph['ph_num'] == 5:
-                sonata_name = ph['ph_name']
-
-        rankInfo = RankInfo(**{
-            'roleDetail': role_detail,
-            'qid': user.user_id,
-            'uid': uid,
-            'level': role_detail.role.level,
-            'chain': role_detail.get_chain_num(),
-            'chainName': role_detail.get_chain_name(),
-            'score': round(phantom_score, 2),
-            'score_bg': phantom_bg,
-            'expected_damage': expected_damage,
-            'expected_damage_int': int(expected_damage.replace(',', '')),
-            'sonata_name': sonata_name,
-        })
+        rankInfo = await get_one_rank_info(user.user_id, uid, role_detail, rankDetail)
         rankInfoList.append(rankInfo)
 
     return rankInfoList
@@ -181,15 +156,18 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
 
 async def get_all_rank_info(users: List[WavesBind], char_id, find_char_id, rankDetail, tokenLimitFlag,
                             wavesTokenUsersMap):
-    server_all_cards = await get_user_all_card()
-    tasks = [get_rank_info_for_user(user,
-                                    char_id,
-                                    find_char_id,
-                                    rankDetail,
-                                    tokenLimitFlag,
-                                    wavesTokenUsersMap,
-                                    server_all_cards) for
-             user in users]
+    semaphore = asyncio.Semaphore(50)
+
+    async def process_user(user):
+        async with semaphore:
+            return await get_rank_info_for_user(user,
+                                                char_id,
+                                                find_char_id,
+                                                rankDetail,
+                                                tokenLimitFlag,
+                                                wavesTokenUsersMap)
+
+    tasks = [process_user(user) for user in users]
     results = await asyncio.gather(*tasks)
 
     # Flatten the results list
@@ -239,6 +217,10 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     if is_bot:
         # users = (await user_bind_cache.get_all()).values()
         users = await WavesBind.get_all_data()
+        uids = await get_rank(char_id, rank_type)
+        if uids:
+            uids = set(uids)
+            users = [u for u in users if u.uid and set(u.uid.split("_")) & uids]
     else:
         users = await WavesBind.get_group_all_uid(ev.group_id)
 
@@ -256,6 +238,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         return '\n'.join(msg)
 
     self_uid = None
+    role_detail = None
     try:
         self_uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
         if self_uid:
@@ -286,6 +269,13 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     rankId, rankInfo = next(
         ((rankId, rankInfo) for rankId, rankInfo in enumerate(rankInfoList, start=1) if rankInfo.uid == self_uid),
         (None, None))
+
+    if not rankId and self_uid and role_detail:
+        rankId = await get_self_rank(char_id, rank_type, self_uid)
+        logger.info(f'[get_rank_info_for_user] userId: {ev.user_id}, self_uid: {self_uid}, rankId: {rankId}')
+        if rankId:
+            rankId = int(rankId) + 1
+            rankInfo = await get_one_rank_info(ev.user_id, self_uid, role_detail, rankDetail)
 
     rankInfoList = rankInfoList[:rank_length]
     if rankId is not None and rankId > rank_length:

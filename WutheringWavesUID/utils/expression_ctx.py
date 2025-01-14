@@ -1,5 +1,5 @@
 import copy
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 from pydantic import BaseModel
 
@@ -9,9 +9,11 @@ from .ascension.constant import sum_percentages, sum_numbers, percent_to_float
 from .ascension.weapon import WavesWeaponResult, get_weapon_detail
 from .calculate import get_calc_map, calc_phantom_score, get_total_score_bg
 from .char_info_utils import get_all_role_detail_info
-from .damage.abstract import WavesEchoRegister
+from .damage.abstract import WavesEchoRegister, DamageRankRegister
 from .damage.damage import DamageAttribute
-from ..utils.api.model import Props
+from .damage.utils import comma_separated_number
+from .resource.constant import card_sort_map
+from ..utils.api.model import Props, RoleDetailData
 from ..utils.ascension.sonata import WavesSonataResult, get_sonata_detail
 
 
@@ -24,9 +26,10 @@ class WavesCharRank(BaseModel):
     chainName: str  # 命座
     score: float  # 角色评分
     score_bg: str  # 评分背景
+    expected_damage: Optional[float]  # 期望伤害
 
 
-async def get_waves_char_rank(uid, all_role_detail):
+async def get_waves_char_rank(uid, all_role_detail, need_expected_damage=False):
     if not all_role_detail:
         all_role_detail = await get_all_role_detail_info(uid)
     if isinstance(all_role_detail, Dict):
@@ -35,11 +38,16 @@ async def get_waves_char_rank(uid, all_role_detail):
         temp = all_role_detail
     waves_char_rank = []
     for role_detail in temp:
+        if not isinstance(role_detail, RoleDetailData):
+            role_detail = RoleDetailData(**role_detail)
+
         phantom_score = 0
         calc_temp = None
+        expected_damage = None
+        weaponData = role_detail.weaponData
+
         if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
             equipPhantomList = role_detail.phantomData.equipPhantomList
-            weaponData = role_detail.weaponData
             phantom_sum_value = prepare_phantom(equipPhantomList)
             phantom_sum_value = enhance_summation_phantom_value(
                 role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
@@ -52,6 +60,21 @@ async def get_waves_char_rank(uid, all_role_detail):
                     _score, _bg = calc_phantom_score(role_detail.role.roleName, props, _phantom.cost, calc_temp)
                     phantom_score += _score
 
+            if need_expected_damage:
+                rankDetail = DamageRankRegister.find_class(str(role_detail.role.roleId))
+                if rankDetail:
+                    temp_card_sort_map = copy.deepcopy(card_sort_map)
+                    card_map = enhance_summation_card_value(
+                        role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
+                        role_detail.role.attributeName,
+                        weaponData.weapon.weaponId, weaponData.level, weaponData.breach,
+                        weaponData.resonLevel,
+                        phantom_sum_value, temp_card_sort_map
+                    )
+                    damageAttribute = card_sort_map_to_attribute(card_map)
+                    _, expected_damage = rankDetail['func'](damageAttribute, role_detail)
+                    expected_damage = comma_separated_number(expected_damage)
+
         wcr = WavesCharRank(**{
             "roleId": role_detail.role.roleId,
             "roleName": role_detail.role.roleName,
@@ -60,7 +83,8 @@ async def get_waves_char_rank(uid, all_role_detail):
             "chain": role_detail.get_chain_num(),
             "chainName": role_detail.get_chain_name(),
             "score": phantom_score,
-            "score_bg": get_total_score_bg(role_detail.role.roleName, phantom_score, calc_temp)
+            "score_bg": get_total_score_bg(role_detail.role.roleName, phantom_score, calc_temp),
+            "expected_damage": expected_damage
         })
         waves_char_rank.append(wcr)
 

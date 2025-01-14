@@ -109,3 +109,7 @@ def add_comma_separated_numbers(*nums: str) -> str:
     """
     total = sum(float(num.replace(',', '')) for num in nums)
     return f"{total:,.0f}"
+
+
+def comma_separated_number(num: str):
+    return float(num.replace(',', ''))

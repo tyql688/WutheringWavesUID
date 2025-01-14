@@ -525,6 +525,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": true
+      },
+      {
+        "name": "刷新排行榜",
+        "desc": "刷新排行榜",
+        "eg": "刷新全部排行",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
       }
     ]
   }
