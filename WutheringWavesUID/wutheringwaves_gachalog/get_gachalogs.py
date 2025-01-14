@@ -184,18 +184,11 @@ async def export_gachalogs(uid: str) -> dict:
         }
         gachalogs_history = raw_data['data']
         for name, gachalogs in gachalogs_history.items():
-            result['list'].append(gachalogs)
+            result['list'].extend(gachalogs)
 
-        async with aiofiles.open(
-            path / f'export_{uid}.json', 'w', encoding='UTF-8'
-        ) as file:
-            await file.write(
-                json.dumps(
-                    result,
-                    ensure_ascii=False,
-                    indent=4,
-                )
-            )
+        async with aiofiles.open(path / f'export_{uid}.json', 'w', encoding='UTF-8') as file:
+            await file.write(json.dumps(result, ensure_ascii=False, indent=4))
+
         logger.success('[导出抽卡记录] 导出成功!')
         im = {
             'retcode': 'ok',
