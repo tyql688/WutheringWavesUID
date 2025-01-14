@@ -1,6 +1,7 @@
 import json
 from typing import Dict, Union, List
 
+from gsuid_core.logger import logger
 from ...utils.wwredis.wwredis import wavesRedis
 
 redis_key = "ww:hash:playerCache"
@@ -31,3 +32,11 @@ async def get_user_card(roleId: str):
     if data:
         return json.loads(data)
     return None
+
+
+async def get_all_card():
+    async with wavesRedis.get_client() as client:
+        player_all_card = await client.hgetall(redis_key)
+
+    logger.info(f"[鸣潮] {len(player_all_card)} 个角色数据已从缓存中获取")
+    return player_all_card

@@ -1,5 +1,6 @@
 import asyncio
 import copy
+import json
 import time
 from pathlib import Path
 from typing import Optional, Union, List
@@ -27,7 +28,7 @@ from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_G
     GREY, RED, get_role_pile_old, WEAPON_RESONLEVEL_COLOR
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
-from ..utils.waves_card_cache import get_card
+from ..utils.waves_card_cache import get_card, get_user_all_card
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 card_sort_map = {
@@ -72,22 +73,41 @@ class RankInfo(BaseModel):
     sonata_name: str  # 合鸣效果
 
 
-async def find_role_detail(uid: str, char_id: Union[int, List[int]]) -> Optional[RoleDetailData]:
-    role_details = await get_card(uid)
-    if role_details is None:
-        return None
+CardUseOptions = WutheringWavesConfig.get_config('CardUseOptions').data
+
+
+async def find_role_detail(uid: str,
+                           char_id: Union[int, List[int]],
+                           server_all_cards=None) -> Optional[RoleDetailData]:
+    if server_all_cards is None:
+        server_all_cards = {}
+    if CardUseOptions == 'redis缓存':
+        role_details = server_all_cards.get(uid)
+        if not role_details:
+            return None
+        try:
+            role_details = json.loads(role_details)
+            if not any(isinstance(item, RoleDetailData) for item in role_details):
+                role_details = iter(RoleDetailData(**r) for r in role_details)
+        except Exception as e:
+            logger.error(f'角色数据缓存错误 {uid} : {e}')
+            return None
+    else:
+        role_details = await get_card(uid)
+        if role_details is None:
+            return None
 
     # 使用生成器来进行过滤
     return next((role for role in role_details if str(role.role.roleId) in char_id), None)
 
 
 async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDetail, tokenLimitFlag,
-                                 wavesTokenUsersMap):
+                                 wavesTokenUsersMap, server_all_cards):
     rankInfoList = []
     if not user.uid:
         return rankInfoList
 
-    tasks = [find_role_detail(uid, find_char_id) for uid in user.uid.split('_')]
+    tasks = [find_role_detail(uid, find_char_id, server_all_cards) for uid in user.uid.split('_')]
     role_details = await asyncio.gather(*tasks)
 
     for uid, role_detail in zip(user.uid.split('_'), role_details):
@@ -161,7 +181,14 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
 
 async def get_all_rank_info(users: List[WavesBind], char_id, find_char_id, rankDetail, tokenLimitFlag,
                             wavesTokenUsersMap):
-    tasks = [get_rank_info_for_user(user, char_id, find_char_id, rankDetail, tokenLimitFlag, wavesTokenUsersMap) for
+    server_all_cards = await get_user_all_card()
+    tasks = [get_rank_info_for_user(user,
+                                    char_id,
+                                    find_char_id,
+                                    rankDetail,
+                                    tokenLimitFlag,
+                                    wavesTokenUsersMap,
+                                    server_all_cards) for
              user in users]
     results = await asyncio.gather(*tasks)
 

@@ -85,3 +85,10 @@ async def get_card(uid: str):
         if not player_data:
             return None
         return iter(RoleDetailData(**r) for r in player_data)
+
+
+async def get_user_all_card():
+    if CardUseOptions == "redis缓存":
+        from .wwredis import card_cache
+        return await card_cache.get_all_card()
+    return {}
