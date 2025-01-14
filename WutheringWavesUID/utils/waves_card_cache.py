@@ -58,7 +58,7 @@ async def load_all_card() -> int:
         return await save_all_card(all_card)
     elif CardUseOptions == "redis缓存":
         from .wwredis import card_cache
-        return card_cache.save_all_card(all_card)
+        return await card_cache.save_all_card(all_card)
 
 
 async def save_card(uid: str, data: Union[List]):
@@ -68,7 +68,7 @@ async def save_card(uid: str, data: Union[List]):
         await save_user_card(uid, data)
     elif CardUseOptions == "redis缓存":
         from .wwredis import card_cache
-        card_cache.save_user_card(uid, data)
+        await card_cache.save_user_card(uid, data)
 
 
 async def get_card(uid: str):
@@ -81,7 +81,7 @@ async def get_card(uid: str):
         return iter(RoleDetailData(**r) for r in player_data)
     elif CardUseOptions == "redis缓存":
         from .wwredis import card_cache
-        player_data = card_cache.get_user_card(uid)
+        player_data = await card_cache.get_user_card(uid)
         if not player_data:
             return None
         return iter(RoleDetailData(**r) for r in player_data)
