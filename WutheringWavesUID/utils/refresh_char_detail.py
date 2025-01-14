@@ -14,7 +14,7 @@ from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
 
 
-async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
+async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None, user_id=''):
     if len(waves_data) == 0:
         return
     _dir = PLAYER_PATH / uid
@@ -52,7 +52,7 @@ async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None):
 
     save_data = list(old_data.values())
 
-    await waves_card_cache.save_card(uid, save_data)
+    await waves_card_cache.save_card(uid, save_data, user_id)
 
     with Path.open(path, "wb") as file:
         file.write(msgjson.format(msgjson.encode(save_data)))
@@ -102,7 +102,7 @@ async def refresh_char(uid: str, user_id, ck: str = '', waves_map: Dict = None) 
             pass
         waves_datas.append(role_detail_info)
 
-    await save_card_info(uid, waves_datas, waves_map)
+    await save_card_info(uid, waves_datas, waves_map, user_id)
 
     if not waves_datas:
         return error_reply(WAVES_CODE_101)

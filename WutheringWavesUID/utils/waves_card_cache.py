@@ -74,12 +74,12 @@ async def load_all_card() -> int:
         total = await card_cache.save_all_card(all_card)
         a = time.time()
         logger.info(f"[鸣潮][开始处理排行......]")
-        await rank_cache.save_rank_caches(all_card)
-        logger.info(f"[鸣潮][结束处理排行......] 耗时:{time.time() - a:.2f}s")
+        total = await rank_cache.save_rank_caches(all_card)
+        logger.info(f"[鸣潮][结束处理排行......] 耗时:{time.time() - a:.2f}s 共加载{total}个用户")
         return total
 
 
-async def save_card(uid: str, data: Union[List]):
+async def save_card(uid: str, data: Union[List], user_id: str):
     if CardUseOptions == "不使用缓存":
         return
     elif CardUseOptions == "内存缓存":
@@ -87,7 +87,7 @@ async def save_card(uid: str, data: Union[List]):
     elif CardUseOptions == "redis缓存":
         from .wwredis import card_cache, rank_cache
         await card_cache.save_user_card(uid, data)
-        await rank_cache.save_rank_cache(uid, data)
+        await rank_cache.save_rank_cache(uid, data, user_id)
 
 
 async def get_card(uid: str):

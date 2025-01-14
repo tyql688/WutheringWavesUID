@@ -149,6 +149,8 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
             continue
 
         rankInfo = await get_one_rank_info(user.user_id, uid, role_detail, rankDetail)
+        if not rankInfo:
+            continue
         rankInfoList.append(rankInfo)
 
     return rankInfoList
