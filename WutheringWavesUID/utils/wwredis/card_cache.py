@@ -11,8 +11,8 @@ async def save_all_card(data: Dict):
         roleId: json.dumps(data, ensure_ascii=False)
         for roleId, data in data.items()
     }
-    client = await wavesRedis.get_client
-    await client.hset(redis_key, mapping=new_data)
+    async with wavesRedis.get_client() as client:
+        await client.hset(redis_key, mapping=new_data)
     return len(new_data)
 
 
@@ -21,13 +21,13 @@ async def save_user_card(roleId: str, data: Union[List, str]):
         return
     if isinstance(data, list):
         data = json.dumps(data, ensure_ascii=False)
-    client = await wavesRedis.get_client
-    await client.hset(redis_key, roleId, data)
+    async with wavesRedis.get_client() as client:
+        await client.hset(redis_key, roleId, data)
 
 
 async def get_user_card(roleId: str):
-    client = await wavesRedis.get_client
-    data = await client.hget(redis_key, roleId)
+    async with wavesRedis.get_client() as client:
+        data = await client.hget(redis_key, roleId)
     if data:
         return json.loads(data)
     return None

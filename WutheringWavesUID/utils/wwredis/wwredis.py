@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import asynccontextmanager
 from typing import Dict
 
 from redis.asyncio import RedisCluster, Redis
@@ -13,15 +14,25 @@ class WavesRedisClient:
         self._redis_client = None
         self._is_cluster = False
 
-    @property
+    @asynccontextmanager
     async def get_client(self) -> Redis | RedisCluster:
+        """
+        获取 Redis 客户端的上下文管理器
+        使用方式:
+        async with wavesRedis.get_client() as client:
+            await client.get("key")
+        """
+        current_loop = None
         try:
             current_loop = id(asyncio.get_running_loop())
             if current_loop not in self._instances:
                 await self._initialize_redis_connection(current_loop)
-            return self._instances[current_loop]
+            client = self._instances[current_loop]
+            yield client
         except RuntimeError:
             raise RuntimeError("No running event loop - Redis client must be accessed within an async context")
+        finally:
+            logger.debug(f" [鸣潮][Redis连接关闭] - Loop ID: {current_loop}")
 
     async def _initialize_redis_connection(self, loop_id: int):
         """初始化 Redis 连接"""
