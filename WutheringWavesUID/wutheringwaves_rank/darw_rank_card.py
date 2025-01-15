@@ -268,19 +268,22 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     else:
         rankInfoList.sort(key=lambda i: (i.expected_damage_int, i.score, i.level, i.chain), reverse=True)
 
-    rankId, rankInfo = next(
-        ((rankId, rankInfo) for rankId, rankInfo in enumerate(rankInfoList, start=1) if rankInfo.uid == self_uid),
-        (None, None))
+    rankId = None
+    rankInfo = None
 
-    if not rankId and self_uid and role_detail:
+    if self_uid and role_detail:
         rankId = await get_self_rank(char_id, rank_type, self_uid)
-        logger.info(f'[get_rank_info_for_user] userId: {ev.user_id}, self_uid: {self_uid}, rankId: {rankId}')
         if rankId:
             rankId = int(rankId) + 1
             rankInfo = await get_one_rank_info(ev.user_id, self_uid, role_detail, rankDetail)
 
+    if not rankId:
+        rankId, rankInfo = next(
+            ((rankId, rankInfo) for rankId, rankInfo in enumerate(rankInfoList, start=1) if rankInfo.uid == self_uid),
+            (None, None))
+
     rankInfoList = rankInfoList[:rank_length]
-    if rankId is not None and rankId > rank_length:
+    if rankId and rankInfo and rankId > rank_length:
         rankInfoList.append(rankInfo)
 
     totalNum = len(rankInfoList)

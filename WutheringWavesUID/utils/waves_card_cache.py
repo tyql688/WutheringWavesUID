@@ -119,7 +119,7 @@ async def refresh_ranks(all_card):
         return await rank_cache.save_rank_caches(all_card)
 
 
-async def get_rank(char_id: str, rank_type: str, num=100):
+async def get_rank(char_id: str, rank_type: str, num=50):
     if CardUseOptions == "redis缓存":
         from .wwredis import rank_cache
         return await rank_cache.get_rank_cache(char_id, rank_type, num)
