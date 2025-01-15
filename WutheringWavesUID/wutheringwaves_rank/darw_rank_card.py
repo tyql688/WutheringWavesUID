@@ -271,7 +271,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     rankId = None
     rankInfo = None
 
-    if self_uid and role_detail:
+    if is_bot and self_uid and role_detail:
         rankId = await get_self_rank(char_id, rank_type, self_uid)
         if rankId:
             rankId = int(rankId) + 1
