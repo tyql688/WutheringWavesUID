@@ -79,6 +79,11 @@ class Box(BaseModel):
     num: int
 
 
+class Box2(BaseModel):
+    name: str
+    num: int
+
+
 class AccountBaseInfo(BaseModel):
     """账户基本信息"""
     name: str  # 名字
@@ -93,6 +98,11 @@ class AccountBaseInfo(BaseModel):
     achievementCount: Optional[int] = None  # 成就数量
     achievementStar: Optional[int] = None  # 成就星数
     boxList: Optional[List[Optional[Box]]] = None  # 宝箱
+    treasureBoxList: Optional[List[Optional[Box2]]] = None  # 宝箱
+    weeklyInstCount: Optional[int] = None  # 周本次数
+    weeklyInstCountLimit: Optional[int] = None  # 周本限制次数
+    storeEnergy: Optional[int] = None  # 结晶单质数量
+    storeEnergyLimit: Optional[int] = None  # 结晶单质限制
 
     @property
     def is_full(self):

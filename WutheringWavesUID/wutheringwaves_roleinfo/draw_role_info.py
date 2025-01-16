@@ -55,8 +55,8 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
             {"key": "中型信标", "value": f"{account_info.bigCount}", "info_block": ""},
         ]
 
-        for b in account_info.boxList:
-            base_info_value_list.append({"key": b.boxName, "value": f"{b.num}", "info_block": ""})
+        for b in account_info.treasureBoxList:
+            base_info_value_list.append({"key": b.name, "value": f"{b.num}", "info_block": ""})
 
     # 初始化基础信息栏位
     bs = Image.open(TEXT_PATH / 'bs.png')
