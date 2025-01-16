@@ -17,7 +17,7 @@ homepage = "https://github.com/tyql688/WutheringWavesUID"
 repository = "https://github.com/tyql688/WutheringWavesUID"
 
 [tool.poetry.dependencies]
-python = ">=3.8.1,<4.0"
+python = ">=3.10, <4.0"
 
 
 
@@ -29,11 +29,12 @@ build-backend = "pdm.backend"
 
 [project]
 authors = [
-    {name = "tyql688", email = "632558678@qq.com"},
+  { name = "tyql688", email = "632558678@qq.com" },
 ]
-license = {text = "GPL-3.0-or-later"}
-requires-python = "<4.0,>=3.8.1"
+license = { text = "GPL-3.0-or-later" }
+requires-python = ">=3.10, <4.0"
 dependencies = [
+  "redis>=5.2.1",
 ]
 name = "WutheringWavesUID"
 version = "1.0.0"

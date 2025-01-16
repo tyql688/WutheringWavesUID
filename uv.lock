@@ -1,0 +1,34 @@
+version = 1
+requires-python = ">=3.10, <4.0"
+
+[[package]]
+name = "async-timeout"
+version = "5.0.1"
+source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }
+sdist = { url = "https://mirror.nju.edu.cn/pypi/web/packages/a5/ae/136395dfbfe00dfc94da3f3e136d0b13f394cba8f4841120e34226265780/async_timeout-5.0.1.tar.gz", hash = "sha256:d9321a7a3d5a6a5e187e824d2fa0793ce379a202935782d555d6e9d2735677d3" }
+wheels = [
+    { url = "https://mirror.nju.edu.cn/pypi/web/packages/fe/ba/e2081de779ca30d473f21f5b30e0e737c438205440784c7dfc81efc2b029/async_timeout-5.0.1-py3-none-any.whl", hash = "sha256:39e3809566ff85354557ec2398b55e096c8364bacac9405a7a1fa429e77fe76c" },
+]
+
+[[package]]
+name = "redis"
+version = "5.2.1"
+source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }
+dependencies = [
+    { name = "async-timeout", marker = "python_full_version < '3.11.3'" },
+]
+sdist = { url = "https://mirror.nju.edu.cn/pypi/web/packages/47/da/d283a37303a995cd36f8b92db85135153dc4f7a8e4441aa827721b442cfb/redis-5.2.1.tar.gz", hash = "sha256:16f2e22dff21d5125e8481515e386711a34cbec50f0e44413dd7d9c060a54e0f" }
+wheels = [
+    { url = "https://mirror.nju.edu.cn/pypi/web/packages/3c/5f/fa26b9b2672cbe30e07d9a5bdf39cf16e3b80b42916757c5f92bca88e4ba/redis-5.2.1-py3-none-any.whl", hash = "sha256:ee7e1056b9aea0f04c6c2ed59452947f34c4940ee025f5dd83e6a6418b6989e4" },
+]
+
+[[package]]
+name = "wutheringwavesuid"
+version = "1.0.0"
+source = { editable = "." }
+dependencies = [
+    { name = "redis" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "redis", specifier = ">=5.2.1" }]
