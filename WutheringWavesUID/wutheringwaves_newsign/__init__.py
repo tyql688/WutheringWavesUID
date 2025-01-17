@@ -11,7 +11,13 @@ waves_sign_all = SV('鸣潮-全部签到', pm=1)
 SIGN_TIME = WutheringWavesConfig.get_config('SignTime').data
 
 
-@sv_waves_sign.on_fullmatch(f'{PREFIX}签到', block=True)
+@sv_waves_sign.on_fullmatch((
+    f'{PREFIX}签到',
+    f'{PREFIX}社区签到',
+    f'{PREFIX}每日任务',
+    f'{PREFIX}社区任务',
+    f'{PREFIX}库街区签到'
+), block=True)
 async def get_sign_func(bot: Bot, ev: Event):
     msg = await do_sign_task(bot, ev)
     return await bot.send(msg)

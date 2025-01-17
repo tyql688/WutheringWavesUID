@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Union, Dict
 
 from PIL import Image, ImageDraw
-
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
@@ -245,7 +244,7 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Union[str, Image.Image]:
     img.paste(avatar, (40, 620), avatar)
     # account_info 放背景上
     img.paste(title_bar, (190, 620), title_bar)
-    img = add_footer(img, 600, 20)
+    img = add_footer(img, 600, 25)
     return img
 
 
