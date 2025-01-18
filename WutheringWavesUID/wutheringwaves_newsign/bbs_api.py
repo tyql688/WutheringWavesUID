@@ -9,7 +9,6 @@ from ..utils.api.api import MAIN_URL
 from ..utils.database.models import WavesUser
 from ..utils.error_reply import WAVES_CODE_999
 from ..utils.util import generate_random_string
-from ..wutheringwaves_config import WutheringWavesConfig
 
 GET_GOLD_URL = f'{MAIN_URL}/encourage/gold/getTotalGold'
 GET_TASK_URL = f'{MAIN_URL}/encourage/level/getTaskProcess'
@@ -18,8 +17,6 @@ LIKE_URL = f'{MAIN_URL}/forum/like'
 SIGN_IN_URL = f'{MAIN_URL}/user/signIn'
 POST_DETAIL_URL = f'{MAIN_URL}/forum/getPostDetail'
 SHARE_URL = f'{MAIN_URL}/encourage/level/shareTask'
-
-SigninMaster = WutheringWavesConfig.get_config('SigninMaster').data
 
 
 async def get_headers_h5():

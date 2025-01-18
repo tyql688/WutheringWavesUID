@@ -342,37 +342,41 @@ class WavesApi:
         if header is None:
             header = await get_headers()
 
-        async with ClientSession(
-            connector=TCPConnector(verify_ssl=self.ssl_verify)
-        ) as client:
-            async with client.request(
-                method,
-                url=url,
-                headers=header,
-                params=params,
-                json=json,
-                data=data,
-                timeout=300,
-            ) as resp:
-                try:
-                    raw_data = await resp.json()
-                except ContentTypeError:
-                    _raw_data = await resp.text()
-                    raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                # if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
-                #     try:
-                #         des_data = ds.decrypt(raw_data['data'])
-                #         raw_data['data'] = des_data
-                #     except:
-                #         pass
-                if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
+        try:
+            async with ClientSession(
+                connector=TCPConnector(verify_ssl=self.ssl_verify)
+            ) as client:
+                async with client.request(
+                    method,
+                    url=url,
+                    headers=header,
+                    params=params,
+                    json=json,
+                    data=data,
+                    timeout=300,
+                ) as resp:
                     try:
-                        des_data = j.loads(raw_data['data'])
-                        raw_data['data'] = des_data
-                    except:
-                        pass
-                logger.debug(f'url:[{url}] raw_data:{raw_data}')
-                return raw_data
+                        raw_data = await resp.json()
+                    except ContentTypeError:
+                        _raw_data = await resp.text()
+                        raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
+                    # if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
+                    #     try:
+                    #         des_data = ds.decrypt(raw_data['data'])
+                    #         raw_data['data'] = des_data
+                    #     except:
+                    #         pass
+                    if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
+                        try:
+                            des_data = j.loads(raw_data['data'])
+                            raw_data['data'] = des_data
+                        except:
+                            pass
+                    logger.debug(f'url:[{url}] raw_data:{raw_data}')
+                    return raw_data
+        except Exception as e:
+            logger.exception(f'url:[{url}]', e)
+            return {}
 
 
 class KuroLogin:

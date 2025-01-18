@@ -533,6 +533,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": true
+      },
+      {
+        "name": "订阅自动签到结果",
+        "desc": "订阅自动签到结果",
+        "eg": "订阅签到结果",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
       }
     ]
   }

@@ -5,8 +5,6 @@ from typing import Dict, List
 from PIL import Image, ImageDraw
 
 from gsuid_core.bot import Bot
-from gsuid_core.config import core_config
-from gsuid_core.gss import gss
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.segment import MessageSegment
@@ -29,8 +27,6 @@ SIGN_IN_URL = f'{MAIN_URL}/user/signIn'
 POST_DETAIL_URL = f'{MAIN_URL}/forum/getPostDetail'
 SHARE_URL = f'{MAIN_URL}/encourage/level/shareTask'
 
-SigninMaster = WutheringWavesConfig.get_config('SigninMaster').data
-
 
 async def do_sign_in(taskData, uid, token, form_result):
     key = '用户签到'
@@ -46,7 +42,7 @@ async def do_sign_in(taskData, uid, token, form_result):
             # 签到成功
             form_result[uid][key] = taskData['needActionTimes']
             return
-    logger.warning(f'[鸣潮][社区签到]签到失败 uid: {uid}')
+    logger.warning(f'[鸣潮][社区签到]签到失败 uid: {uid} sign_in_res: {sign_in_res}')
 
 
 async def do_detail(taskData, uid, token, form_result, post_list):
@@ -203,9 +199,15 @@ async def single_task(
         private_msgs[qid].append(
             {'bot_id': bot_id, 'uid': uid, 'msg': [MessageSegment.text(im)]}
         )
-        all_msgs['success'] += 1
+        if "失败" in im:
+            all_msgs['failed'] += 1
+        else:
+            all_msgs['success'] += 1
     elif gid == 'off':
-        all_msgs['success'] += 1
+        if "失败" in im:
+            all_msgs['failed'] += 1
+        else:
+            all_msgs['success'] += 1
     else:
         # 向群消息推送列表添加这个群
         if gid not in group_msgs:
@@ -216,8 +218,19 @@ async def single_task(
                 'push_message': [],
             }
 
-        group_msgs[gid]['success'] += 1
-        all_msgs['success'] += 1
+        if "失败" in im:
+            all_msgs['failed'] += 1
+            group_msgs[gid]['failed'] += 1
+            group_msgs[gid]['push_message'].extend(
+                [
+                    MessageSegment.text('\n'),
+                    MessageSegment.at(qid),
+                    MessageSegment.text(im),
+                ]
+            )
+        else:
+            all_msgs['success'] += 1
+            group_msgs[gid]['success'] += 1
 
 
 async def auto_sign_task():
@@ -227,12 +240,13 @@ async def auto_sign_task():
     sign_user_list = []
     if WutheringWavesConfig.get_config('BBSSchedSignin').data or WutheringWavesConfig.get_config('SchedSignin').data:
         _user_list: List[WavesUser] = await WavesUser.get_waves_all_user2()
+        logger.info(f'[鸣潮] [定时签到] 需要处理token总人数 {len(_user_list)}')
         bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list = await process_all_users(_user_list)
 
     sign_success = 0
     sign_fail = 0
     if WutheringWavesConfig.get_config('SchedSignin').data:
-        logger.info('[鸣潮] [定时签到] 开始执行!')
+        logger.info(f'[鸣潮] [定时签到] 开始执行! 总人数: {len(sign_user_list)}')
         result, num = await daily_sign_action(sign_expiregid2uid, sign_user_list)
         if not WutheringWavesConfig.get_config('PrivateSignReport').data:
             result['private_msg_dict'] = {}
@@ -245,7 +259,7 @@ async def auto_sign_task():
     bbs_success = 0
     bbs_fail = 0
     if WutheringWavesConfig.get_config('BBSSchedSignin').data:
-        logger.info('[鸣潮] [定时社区签到] 开始执行!')
+        logger.info(f'[鸣潮] [定时社区签到] 开始执行! 总人数: {len(bbs_user_list)}')
         result, num = await auto_bbs_task_action(bbs_expiregid2uid, bbs_user_list)
         if not WutheringWavesConfig.get_config('PrivateSignReport').data:
             result['private_msg_dict'] = {}
@@ -255,60 +269,7 @@ async def auto_sign_task():
         bbs_success = num['success_num']
         bbs_fail = num['failed_num']
 
-    try:
-        msg = f'[鸣潮]自动任务\n今日成功游戏签到 {sign_success} 个账号\n今日社区签到 {bbs_success} 个账号'
-        config_masters = core_config.get_config('masters')
-        if SigninMaster and len(config_masters) > 0:
-            for bot_id in gss.active_bot:
-                await gss.active_bot[bot_id].target_send(
-                    msg,
-                    'direct',
-                    config_masters[0],
-                    'onebot',
-                    '',
-                    '',
-                )
-            logger.info(f'[鸣潮]推送主人签到结果: {msg}')
-    except Exception as e:
-        logger.warning(f'[鸣潮]私聊推送主人结果失败!错误信息: {e}')
-
-
-async def auto_bbs_sign_task():
-    bbs_expiregid2uid = {}
-    sign_expiregid2uid = {}
-    bbs_user_list = []
-    sign_user_list = []
-    if WutheringWavesConfig.get_config('BBSSchedSignin').data:
-        _user_list: List[WavesUser] = await WavesUser.get_waves_all_user2()
-        bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list = await process_all_users(_user_list)
-
-    bbs_success = 0
-    bbs_fail = 0
-    if WutheringWavesConfig.get_config('BBSSchedSignin').data:
-        logger.info('[鸣潮] [手动社区签到] 开始执行!')
-        result, num = await auto_bbs_task_action(bbs_expiregid2uid, bbs_user_list)
-        # if not IS_REPORT:
-        #     result['private_msg_dict'] = {}
-        # await send_board_cast_msg(result, 'sign')
-        bbs_success = num['success_num']
-        bbs_fail = num['failed_num']
-
-    try:
-        msg = f'[鸣潮]手动社区签到\n今日社区签到 {bbs_success} 个账号'
-        config_masters = core_config.get_config('masters')
-        if SigninMaster and len(config_masters) > 0:
-            for bot_id in gss.active_bot:
-                await gss.active_bot[bot_id].target_send(
-                    msg,
-                    'direct',
-                    config_masters[0],
-                    'onebot',
-                    '',
-                    '',
-                )
-            logger.info(f'[鸣潮]推送主人手动社区签到结果: {msg}')
-    except Exception as e:
-        logger.warning(f'[鸣潮]私聊推送主人结果失败!错误信息: {e}')
+    return f'[鸣潮]自动任务\n今日成功游戏签到 {sign_success} 个账号\n今日社区签到 {bbs_success} 个账号'
 
 
 async def process_user(user, bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list):
@@ -318,6 +279,7 @@ async def process_user(user, bbs_expiregid2uid, sign_expiregid2uid, bbs_user_lis
     # 异步调用 refresh_data
     succ, _ = await waves_api.refresh_data(user.uid, user.cookie)
     if not succ:
+        await WavesUser.mark_invalid(user.cookie, '无效')
         # 如果刷新数据失败，更新 expiregid2uid
         if user.bbs_sign_switch != 'off':
             bbs_expiregid2uid.setdefault(user.bbs_sign_switch, []).append(user.user_id)
@@ -325,7 +287,7 @@ async def process_user(user, bbs_expiregid2uid, sign_expiregid2uid, bbs_user_lis
             sign_expiregid2uid.setdefault(user.sign_switch, []).append(user.user_id)
         return
 
-    if SigninMaster:
+    if WutheringWavesConfig.get_config('SigninMaster').data:
         # 如果 SigninMaster 为 True，添加到 user_list 中
         bbs_user_list.append(user)
         sign_user_list.append(user)
@@ -347,7 +309,7 @@ async def process_all_users(_user_list: List):
     sign_user_list = []
 
     # 定义每个批次的大小
-    batch_size = 10
+    batch_size: int = WutheringWavesConfig.get_config('SigninConcurrentNum').data
     semaphore = asyncio.Semaphore(batch_size)
     batches = [_user_list[i:i + batch_size] for i in range(0, len(_user_list), batch_size)]
 
@@ -359,9 +321,8 @@ async def process_all_users(_user_list: List):
     flag = 1
     for batch in batches:
         tasks = [process_user_with_semaphore(user) for user in batch]
-        await asyncio.gather(*tasks)
-        delay = random.uniform(3.0, 5.0)
-        delay = round(delay, 2)
+        await asyncio.gather(*tasks, return_exceptions=True)
+        delay = round(random.uniform(0, 1), 2)
         logger.info(
             f'[鸣潮] [签到任务] 正在处理token验证批次[{flag}]，共{len(tasks)}个用户, 等待{delay:.2f}秒进行下一次token验证'
         )
@@ -377,9 +338,9 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
     group_msgs = {}
     all_msgs = {'failed': 0, 'success': 0}
 
-    for user in user_list:
-        tasks.append(
-            single_task(
+    async def process_user(semaphore, user):
+        async with semaphore:
+            return await single_task(
                 user.bot_id,
                 user.uid,
                 user.bbs_sign_switch,
@@ -388,19 +349,18 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
                 private_msgs,
                 group_msgs,
                 all_msgs,
-            ))
-        if len(tasks) >= 2:
-            await asyncio.gather(*tasks)
-            delay = random.uniform(1.0, 3.0)
-            delay = round(delay, 2)
-            logger.info(
-                f'[鸣潮] [社区签到] 已签到{len(tasks)}个用户, 等待{delay:.2f}秒进行下一次签到'
             )
-            tasks.clear()
-            await asyncio.sleep(delay)
 
-    await asyncio.gather(*tasks)
-    tasks.clear()
+    max_concurrent: int = WutheringWavesConfig.get_config('SigninConcurrentNum').data
+    semaphore = asyncio.Semaphore(max_concurrent)
+    tasks = [process_user(semaphore, user) for user in user_list]
+    for i in range(0, len(tasks), max_concurrent):
+        batch = tasks[i:i + max_concurrent]
+        results = await asyncio.gather(*batch, return_exceptions=True)
+
+        delay = round(random.uniform(0, 1), 2)
+        logger.info(f'[鸣潮] [社区签到] 等待{delay:.2f}秒进行下一次签到')
+        await asyncio.sleep(delay)
 
     # 转为广播消息
     private_msg_dict: Dict[str, List[BoardCastMsg]] = {}
@@ -475,9 +435,15 @@ async def single_daily_sign(
         private_msgs[qid].append(
             {'bot_id': bot_id, 'uid': uid, 'msg': [MessageSegment.text(im)]}
         )
-        all_msgs['success'] += 1
+        if "失败" in im:
+            all_msgs['failed'] += 1
+        else:
+            all_msgs['success'] += 1
     elif gid == 'off':
-        all_msgs['success'] += 1
+        if "失败" in im:
+            all_msgs['failed'] += 1
+        else:
+            all_msgs['success'] += 1
     else:
         # 向群消息推送列表添加这个群
         if gid not in group_msgs:
@@ -487,7 +453,8 @@ async def single_daily_sign(
                 'failed': 0,
                 'push_message': [],
             }
-        if im.startswith(('签到失败', '网络有点忙', 'OK', 'ok')):
+        if "失败" in im:
+            all_msgs['failed'] += 1
             group_msgs[gid]['failed'] += 1
             group_msgs[gid]['push_message'].extend(
                 [
@@ -497,8 +464,8 @@ async def single_daily_sign(
                 ]
             )
         else:
-            group_msgs[gid]['success'] += 1
             all_msgs['success'] += 1
+            group_msgs[gid]['success'] += 1
 
 
 async def daily_sign_action(expiregid2uid, user_list):
@@ -506,9 +473,10 @@ async def daily_sign_action(expiregid2uid, user_list):
     private_msgs = {}
     group_msgs = {}
     all_msgs = {'failed': 0, 'success': 0}
-    for user in user_list:
-        tasks.append(
-            single_daily_sign(
+
+    async def process_user(semaphore, user):
+        async with semaphore:
+            return await single_daily_sign(
                 user.bot_id,
                 user.uid,
                 user.sign_switch,
@@ -518,18 +486,17 @@ async def daily_sign_action(expiregid2uid, user_list):
                 group_msgs,
                 all_msgs,
             )
-        )
-        if len(tasks) >= 5:
-            await asyncio.gather(*tasks)
-            delay = random.uniform(1.0, 3.0)
-            delay = round(delay, 2)
-            logger.info(
-                f'[鸣潮] [签到] 已签到{len(tasks)}个用户, 等待{delay:.2f}秒进行下一次签到'
-            )
-            tasks.clear()
-            await asyncio.sleep(delay)
-    await asyncio.gather(*tasks)
-    tasks.clear()
+
+    max_concurrent: int = WutheringWavesConfig.get_config('SigninConcurrentNum').data
+    semaphore = asyncio.Semaphore(max_concurrent)
+    tasks = [process_user(semaphore, user) for user in user_list]
+    for i in range(0, len(tasks), max_concurrent):
+        batch = tasks[i:i + max_concurrent]
+        results = await asyncio.gather(*batch, return_exceptions=True)
+
+        delay = round(random.uniform(0, 1), 2)
+        logger.info(f'[鸣潮] [签到]  等待{delay:.2f}秒进行下一次签到')
+        await asyncio.sleep(delay)
 
     # 转为广播消息
     private_msg_dict: Dict[str, List[BoardCastMsg]] = {}
@@ -666,7 +633,7 @@ async def sign_in(uid: str, ck: str) -> str:
     succ, daily_info = await waves_api.get_daily_info(ck)
     if not succ:
         # 检查ck
-        return f'{ERROR_CODE[WAVES_CODE_101]}'
+        return f'签到失败！\n{ERROR_CODE[WAVES_CODE_101]}'
 
     daily_info = DailyData(**daily_info)
     if daily_info.hasSignIn:
