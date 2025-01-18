@@ -5,14 +5,14 @@ from PIL import Image, ImageDraw
 
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img
+from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import AccountBaseInfo, AbyssChallenge, RoleList, RoleDetailData, AbyssFloor
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_32, \
     waves_font_18, waves_font_40, waves_font_36
 from ..utils.hint import error_reply
-from ..utils.image import get_waves_bg, add_footer, GOLD, GREY, get_square_avatar
+from ..utils.image import get_waves_bg, add_footer, GOLD, GREY, get_square_avatar, get_event_avatar
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 

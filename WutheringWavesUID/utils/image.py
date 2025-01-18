@@ -7,7 +7,7 @@ from typing import Union, Literal, Optional, Tuple
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 
 from gsuid_core.models import Event
-from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
+from gsuid_core.utils.image.image_tools import crop_center_img
 from gsuid_core.utils.image.utils import sget
 from .name_convert import char_name_to_char_id
 from ..utils.resource.RESOURCE_PATH import (
@@ -192,19 +192,45 @@ def get_crop_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
     return crop_center_img(cropped_image, w, h)
 
 
+async def get_qq_avatar(
+    qid: Optional[Union[int, str]] = None, avatar_url: Optional[str] = None
+) -> Image.Image:
+    if qid:
+        avatar_url = f'http://q1.qlogo.cn/g?b=qq&nk={qid}&s=640'
+    elif avatar_url is None:
+        avatar_url = 'https://q1.qlogo.cn/g?b=qq&nk=3399214199&s=640'
+    char_pic = Image.open(BytesIO((await sget(avatar_url)).content)).convert(
+        'RGBA'
+    )
+    return char_pic
+
+
 async def get_event_avatar(
     ev: Event, avatar_path: Optional[Path] = None, is_valid_at: bool = True
 ) -> Image.Image:
     img = None
     if ev.bot_id == 'onebot' and ev.at and is_valid_at:
-        return await get_qq_avatar(ev.at)
-    elif 'avatar' in ev.sender and ev.sender['avatar']:
-        avatar_url = ev.sender['avatar']
-        content = (await sget(avatar_url)).content
-        return Image.open(BytesIO(content)).convert('RGBA')
-    elif ev.bot_id == 'onebot' and not ev.sender:
-        return await get_qq_avatar(ev.user_id)
-    elif avatar_path:
+        try:
+            img = await get_qq_avatar(ev.at)
+        except Exception:
+            img = None
+
+    if img is None and 'avatar' in ev.sender and ev.sender['avatar']:
+        avatar_url: str = ev.sender['avatar']
+        if avatar_url.startswith(('http', 'https')):
+            try:
+                content = (await sget(avatar_url)).content
+                img = Image.open(BytesIO(content)).convert('RGBA')
+            except Exception:
+                img = None
+
+    if img is None and ev.bot_id == 'onebot' and not ev.sender:
+        try:
+            img = await get_qq_avatar(ev.at)
+        except Exception:
+            img = None
+
+    if img is None and avatar_path:
         pic_path_list = list(avatar_path.iterdir())
         if pic_path_list:
             path = random.choice(pic_path_list)

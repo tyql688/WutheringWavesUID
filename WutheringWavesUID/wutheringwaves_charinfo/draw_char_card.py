@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageEnhance
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import get_event_avatar, crop_center_img, get_qq_avatar
+from gsuid_core.utils.image.image_tools import crop_center_img, get_qq_avatar
 from ..utils import hint
 from ..utils.api.model import RoleDetailData, WeaponData, AccountBaseInfo
 from ..utils.ascension.weapon import get_weapon_detail, WavesWeaponResult, get_breach
@@ -23,7 +23,8 @@ from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_5
     waves_font_24, waves_font_28, waves_font_26, waves_font_42, waves_font_16, waves_font_18, waves_font_36
 from ..utils.image import get_waves_bg, add_footer, GOLD, get_role_pile, get_weapon_type, get_attribute, \
     get_square_weapon, get_attribute_prop, GREY, SPECIAL_GOLD, get_small_logo, draw_text_with_shadow, get_square_avatar, \
-    WAVES_MOONLIT, WAVES_FREEZING, change_color, WAVES_SHUXING_MAP, get_attribute_effect, WEAPON_RESONLEVEL_COLOR
+    WAVES_MOONLIT, WAVES_FREEZING, change_color, WAVES_SHUXING_MAP, get_attribute_effect, WEAPON_RESONLEVEL_COLOR, \
+    get_event_avatar
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR
 from ..utils.resource.download_file import get_chain_img, get_phantom_img, get_skill_img
