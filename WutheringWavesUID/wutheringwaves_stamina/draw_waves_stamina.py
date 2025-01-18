@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Union, Dict
 
 from PIL import Image, ImageDraw
+
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
@@ -36,6 +37,40 @@ async def seconds2hours(seconds: int) -> str:
     return '%02d小时%02d分' % (h, m)
 
 
+async def process_uid(uid, ev, waves_api, bbs_api):
+    ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
+    if not ck:
+        return None
+
+    # 并行请求所有相关 API
+    results = await asyncio.gather(
+        waves_api.refresh_data(uid, ck),
+        waves_api.get_daily_info(ck),
+        waves_api.get_base_info(uid, ck),
+        bbs_api.check_bbs_completed(ck),
+        return_exceptions=True
+    )
+
+    (refresh_res, daily_info_res, account_info_res, bbs_state) = results
+
+    if not refresh_res[0] or not daily_info_res[0] or not account_info_res[0]:
+        return None
+
+    daily_info = DailyData(**daily_info_res[1])
+    account_info = AccountBaseInfo(**account_info_res[1])
+
+    # 处理签到状态
+    res = await waves_api.sign_in_task_list(uid, ck)
+    if isinstance(res, dict):
+        daily_info.hasSignIn = res.get("data", {}).get("isSigIn", False)
+
+    return {
+        "daily_info": daily_info,
+        "account_info": account_info,
+        "bbs_state": bbs_state
+    }
+
+
 async def draw_stamina_img(bot: Bot, ev: Event):
     try:
         uid_list = await WavesBind.get_uid_list_by_game(ev.user_id, ev.bot_id)
@@ -43,37 +78,11 @@ async def draw_stamina_img(bot: Bot, ev: Event):
         if uid_list is None:
             return ERROR_CODE[WAVES_CODE_103]
         # 进行校验UID是否绑定CK
-        valid_daily_list = []
-        for uid in uid_list:
-            ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
-            if not ck:
-                continue
-            succ, _ = await waves_api.refresh_data(uid, ck)
-            if not succ:
-                continue
-            succ, daily_info = await waves_api.get_daily_info(ck)
-            if not succ:
-                continue
-            daily_info = DailyData(**daily_info)
-            res = await waves_api.sign_in_task_list(uid, ck)
-            if isinstance(res, dict):
-                daily_info.hasSignIn = res.get("data", {}).get("isSigIn", False)
+        tasks = [process_uid(uid, ev, waves_api, bbs_api) for uid in uid_list]
+        results = await asyncio.gather(*tasks)
 
-            # 账户数据
-            succ, account_info = await waves_api.get_base_info(uid, ck)
-            account_info = AccountBaseInfo(**account_info)
-            if not succ:
-                continue
-
-            bbs_state = await bbs_api.check_bbs_completed(ck)
-
-            valid = {
-                "daily_info": daily_info,
-                "account_info": account_info,
-                "bbs_state": bbs_state
-            }
-
-            valid_daily_list.append(valid)
+        # 过滤掉 None 值
+        valid_daily_list = [res for res in results if res is not None]
 
         if len(valid_daily_list) == 0:
             return ERROR_CODE[WAVES_CODE_102]
