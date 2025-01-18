@@ -1,3 +1,4 @@
+import asyncio
 import random
 from datetime import timedelta, datetime
 from io import BytesIO
@@ -191,9 +192,11 @@ async def draw_calendar_img(ev: Event, uid: str):
 async def draw_calendar_gacha(side_module, gacha_type):
     res_list = []
     tabs = side_module['content']['tabs']
+
     for tab in tabs:
         if 'name' not in tab or not tab.get('name', ''):
             continue
+
         special_images = SpecialImages(**tab)
         res = {
             'title': side_module['title'],
@@ -201,23 +204,27 @@ async def draw_calendar_gacha(side_module, gacha_type):
             'description': tab['name'],
             'nodes': []
         }
-        for img_item in special_images.imgs:
+
+        async def process_item(img_item):
             item_detail = await wiki.get_entry_detail(img_item.linkConfig.entryId)
-            if item_detail['code'] == 200:
-                name = item_detail['data']['name']
-                if gacha_type == "角色":
-                    id = get_char_id(name)
-                    pic = await get_square_avatar(id)
-                    pic = pic.resize((180, 180))
-                else:
-                    id = get_weapon_id(name)
-                    pic = await get_square_weapon(id)
-                    pic = pic.resize((180, 180))
-                res['nodes'].append({
-                    'name': name,
-                    'id': id,
-                    'pic': pic
-                })
+            if item_detail['code'] != 200:
+                return None
+
+            name = item_detail['data']['name']
+            if gacha_type == "角色":
+                id = get_char_id(name)
+                pic = await get_square_avatar(id)
+            else:
+                id = get_weapon_id(name)
+                pic = await get_square_weapon(id)
+
+            pic = pic.resize((180, 180))
+            return {'name': name, 'id': id, 'pic': pic}
+
+        tasks = [process_item(img_item) for img_item in special_images.imgs]
+        nodes = await asyncio.gather(*tasks)
+
+        res['nodes'].extend(filter(None, nodes))
         res_list.append(res)
 
     return res_list
