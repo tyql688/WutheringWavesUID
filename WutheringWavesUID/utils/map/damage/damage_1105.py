@@ -332,12 +332,12 @@ def calc_damage_6(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色详情
     char_result: WavesCharResult = get_char_detail2(role)
 
-    skill_type: SkillType = "共鸣回路"
+    skill_type: SkillType = "共鸣解放"
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "4", skillLevel)
-    title = f"极意·神来之笔"
+    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+    title = f"墨鹤伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
