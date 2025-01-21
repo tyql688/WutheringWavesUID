@@ -1,5 +1,5 @@
 # 椿
-from .buff import sanhua_buff, shouanren_buff
+from .buff import sanhua_buff, shouanren_buff, luokeke_buff
 from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail
@@ -160,6 +160,32 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     return calc_damage_0(attr, role, isGroup)
 
 
+def calc_damage_10(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+    attr.set_char_damage(attack_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 洛可可buff
+    luokeke_buff(attr, 0, 1, isGroup)
+
+    return calc_damage_0(attr, role, isGroup)
+
+
+def calc_damage_12(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+    attr.set_char_damage(attack_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 6, 5, isGroup)
+
+    # 洛可可buff
+    luokeke_buff(attr, 2, 1, isGroup)
+
+    return calc_damage_0(attr, role, isGroup)
+
+
 damage_detail = [
     {
         "title": "一日花",
@@ -172,6 +198,14 @@ damage_detail = [
     {
         "title": "0+1守/6散/一日花",
         "func": lambda attr, role: calc_damage_2(attr, role),
+    },
+    {
+        "title": "0+1守/0洛/一日花",
+        "func": lambda attr, role: calc_damage_10(attr, role),
+    },
+    {
+        "title": "6+5守/2洛/一日花",
+        "func": lambda attr, role: calc_damage_12(attr, role),
     }
 ]
 

@@ -15,7 +15,7 @@ class WavesEffect(object):
     def add_effect(cls, title, msg):
         if not title or not msg:
             return
-        e = WavesEffect(f'{title}', f'{msg}')
+        e = WavesEffect(f"{title}", f"{msg}")
         return e
 
 
@@ -27,7 +27,7 @@ def calc_percent_expression(express) -> float:
     :return: 计算结果，浮点数
     """
     # 将百分号替换为小数表示
-    express = express.replace('%', '/100')
+    express = express.replace("%", "/100")
 
     try:
         result = eval(express)
@@ -38,7 +38,7 @@ def calc_percent_expression(express) -> float:
 
 
 class PhantomDetail:
-    def __init__(self, ph_name: str = '', ph_num: int = 0):
+    def __init__(self, ph_name: str = "", ph_num: int = 0):
         self.ph_name = ph_name
         self.ph_num = ph_num
 
@@ -48,8 +48,8 @@ class PhantomDetail:
     @classmethod
     def dict2Object(cls, d):
         res = PhantomDetail()
-        res.ph_name = d.get('ph_name', '')
-        res.ph_num = d.get('ph_num', 0)
+        res.ph_name = d.get("ph_name", "")
+        res.ph_num = d.get("ph_num", 0)
         return res
 
 
@@ -95,12 +95,12 @@ class DamageBonusPhantom:
     @classmethod
     def dict2Object(cls, d):
         res = DamageBonusPhantom()
-        res.attack_damage = d.get('attack_damage', 0)
-        res.hit_damage = d.get('hit_damage', 0)
-        res.skill_damage = d.get('skill_damage', 0)
-        res.liberation_damage = d.get('liberation_damage', 0)
-        res.heal_bonus = d.get('heal_bonus', 0)
-        res.shuxing_bonus = d.get('shuxing_bonus', 0)
+        res.attack_damage = d.get("attack_damage", 0)
+        res.hit_damage = d.get("hit_damage", 0)
+        res.skill_damage = d.get("skill_damage", 0)
+        res.liberation_damage = d.get("liberation_damage", 0)
+        res.heal_bonus = d.get("heal_bonus", 0)
+        res.shuxing_bonus = d.get("shuxing_bonus", 0)
         return res
 
 
@@ -119,8 +119,8 @@ class DamageAttribute:
         life_flat=0,
         def_flat=0,
         skill_multi=0,
-        healing_skill_multi='0+0%',
-        shield_skill_multi='0+0%',
+        healing_skill_multi="0+0%",
+        shield_skill_multi="0+0%",
         skill_ratio=0,
         skill_ratio_in_skill_description=0,
         dmg_bonus=0,
@@ -234,12 +234,14 @@ class DamageAttribute:
         self.enemy_level = 0
 
         if enemy_resistance:
-            self.add_enemy_resistance(enemy_resistance, '敌人抗性', f'{enemy_resistance:.0%}')
+            self.add_enemy_resistance(
+                enemy_resistance, "敌人抗性", f"{enemy_resistance:.0%}"
+            )
         self.set_enemy_level(enemy_level)
 
     def __str__(self):
-        ph_details_str = '\n'.join(str(ph) for ph in self.ph_detail)
-        effect_str = '\n'.join(str(e) for e in self.effect)
+        ph_details_str = "\n".join(str(ph) for ph in self.ph_detail)
+        effect_str = "\n".join(str(e) for e in self.effect)
         return (
             f"\nDamageAttribute(\n"
             f"  角色模版={self.char_template}, \n"
@@ -304,7 +306,9 @@ class DamageAttribute:
 
         return self
 
-    def set_char_template(self, char_template: Literal["temp_atk", "temp_life", "temp_def"]):
+    def set_char_template(
+        self, char_template: Literal["temp_atk", "temp_life", "temp_def"]
+    ):
         self.char_template = char_template
         return self
 
@@ -312,67 +316,73 @@ class DamageAttribute:
         self.char_attr = char_attr
         return self
 
-    def set_char_atk(self, char_atk: float, title='', msg=''):
+    def set_char_atk(self, char_atk: float, title="", msg=""):
         """设置角色基础攻击力"""
         self.char_atk = char_atk
         self.add_effect(title, msg)
         return self
 
-    def set_char_life(self, char_life: float, title='', msg=''):
+    def set_char_life(self, char_life: float, title="", msg=""):
         """设置角色基础生命值"""
         self.char_life = char_life
         self.add_effect(title, msg)
         return self
 
-    def set_char_def(self, char_def: float, title='', msg=''):
+    def set_char_def(self, char_def: float, title="", msg=""):
         """设置角色基础防御力"""
         self.char_def = char_def
         self.add_effect(title, msg)
         return self
 
-    def set_weapon_atk(self, weapon_atk: float, title='', msg=''):
+    def set_weapon_atk(self, weapon_atk: float, title="", msg=""):
         """设置武器基础攻击力"""
         self.weapon_atk = weapon_atk
         self.add_effect(title, msg)
         return self
 
-    def add_atk_percent(self, atk_percent: float, title='', msg=''):
+    def add_atk_percent(self, atk_percent: float, title="", msg=""):
         """增加攻击力百分比"""
         self.atk_percent += atk_percent
         self.add_effect(title, msg)
         return self
 
-    def add_life_percent(self, life_percent: float, title='', msg=''):
+    def add_life_percent(self, life_percent: float, title="", msg=""):
         """增加生命百分比"""
         self.life_percent += life_percent
         self.add_effect(title, msg)
         return self
 
-    def add_def_percent(self, def_percent: float, title='', msg=''):
+    def add_def_percent(self, def_percent: float, title="", msg=""):
         """增加防御力百分比"""
         self.def_percent += def_percent
         self.add_effect(title, msg)
         return self
 
-    def set_atk_flat(self, atk_flat: float, title='', msg=''):
+    def set_atk_flat(self, atk_flat: float, title="", msg=""):
         """设置固定攻击数值"""
         self.atk_flat = atk_flat
         self.add_effect(title, msg)
         return self
 
-    def set_life_flat(self, life_flat: float, title='', msg=''):
+    def add_atk_flat(self, atk_flat: float, title="", msg=""):
+        """增加攻击数值 如洛可可大招"""
+        self.atk_flat += atk_flat
+        self.add_effect(title, msg)
+        return self
+
+    def set_life_flat(self, life_flat: float, title="", msg=""):
         """设置固定生命数值"""
         self.life_flat = life_flat
         self.add_effect(title, msg)
         return self
 
-    def set_def_flat(self, def_flat: float, title='', msg=''):
+    def set_def_flat(self, def_flat: float, title="", msg=""):
         """设置固定防御数值"""
         self.def_flat = def_flat
         self.add_effect(title, msg)
         return self
 
-    def add_skill_multi(self, skill_multi: Union[str, float], title='', msg=''):
+    def add_skill_multi(self, skill_multi: Union[str, float], title="", msg=""):
         """增加技能倍率"""
         if isinstance(skill_multi, str):
             skill_multi = calc_percent_expression(skill_multi)
@@ -380,7 +390,17 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
-    def add_healing_skill_multi(self, healing_skill_multi: Union[str, float], title='', msg=''):
+    def set_skill_multi(self, skill_multi: Union[str, float], title="", msg=""):
+        """设置技能倍率"""
+        if isinstance(skill_multi, str):
+            skill_multi = calc_percent_expression(skill_multi)
+        self.skill_multi = skill_multi
+        self.add_effect(title, msg)
+        return self
+
+    def add_healing_skill_multi(
+        self, healing_skill_multi: Union[str, float], title="", msg=""
+    ):
         """增加奶的技能倍率"""
         value1, percent1 = parse_skill_multi(self.healing_skill_multi)
         value2, percent2 = parse_skill_multi(healing_skill_multi)
@@ -393,7 +413,9 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
-    def add_shield_skill_multi(self, shield_skill_multi: Union[str, float], title='', msg=''):
+    def add_shield_skill_multi(
+        self, shield_skill_multi: Union[str, float], title="", msg=""
+    ):
         """增加盾量的技能倍率"""
 
         value1, percent1 = parse_skill_multi(self.shield_skill_multi)
@@ -407,7 +429,7 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
-    def add_skill_ratio(self, skill_ratio: Union[str, float], title='', msg=''):
+    def add_skill_ratio(self, skill_ratio: Union[str, float], title="", msg=""):
         """增加技能倍率加成 -> 技能伤害倍率提升"""
         if isinstance(skill_ratio, str):
             skill_ratio = calc_percent_expression(skill_ratio)
@@ -415,7 +437,9 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
-    def add_skill_ratio_in_skill_description(self, skill_ratio: Union[str, float], title='', msg=''):
+    def add_skill_ratio_in_skill_description(
+        self, skill_ratio: Union[str, float], title="", msg=""
+    ):
         """增加技能倍率加成 -> 技能伤害倍率提升"""
         if isinstance(skill_ratio, str):
             skill_ratio = calc_percent_expression(skill_ratio)
@@ -423,43 +447,43 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
-    def add_dmg_bonus(self, dmg_bonus: float, title='', msg=''):
+    def add_dmg_bonus(self, dmg_bonus: float, title="", msg=""):
         """增加伤害加成百分比"""
         self.dmg_bonus += dmg_bonus
         self.add_effect(title, msg)
         return self
 
-    def add_dmg_deepen(self, dmg_deepen: float, title='', msg=''):
+    def add_dmg_deepen(self, dmg_deepen: float, title="", msg=""):
         """增加伤害加深百分比"""
         self.dmg_deepen += dmg_deepen
         self.add_effect(title, msg)
         return self
 
-    def add_crit_rate(self, crit_rate: float, title='', msg=''):
+    def add_crit_rate(self, crit_rate: float, title="", msg=""):
         """设置暴击率"""
         self.crit_rate += crit_rate
         self.add_effect(title, msg)
         return self
 
-    def add_crit_dmg(self, crit_dmg: float, title='', msg=''):
+    def add_crit_dmg(self, crit_dmg: float, title="", msg=""):
         """设置暴击伤害倍率"""
         self.crit_dmg += crit_dmg
         self.add_effect(title, msg)
         return self
 
-    def set_character_level(self, character_level: int, title='', msg=''):
+    def set_character_level(self, character_level: int, title="", msg=""):
         """设置角色等级"""
         self.character_level = character_level
         self.add_effect(title, msg)
         return self
 
-    def add_defense_reduction(self, defense_reduction: float, title='', msg=''):
+    def add_defense_reduction(self, defense_reduction: float, title="", msg=""):
         """增加减防百分比"""
         self.defense_reduction += defense_reduction
         self.add_effect(title, msg)
         return self
 
-    def add_enemy_resistance(self, enemy_resistance: float, title='', msg=''):
+    def add_enemy_resistance(self, enemy_resistance: float, title="", msg=""):
         """增加敌人抗性百分比"""
         self.enemy_resistance += enemy_resistance
         if self.enemy_resistance <= 0:
@@ -555,7 +579,10 @@ class DamageAttribute:
         enemy_defense = self.enemy_level * 8 + 792
         # 计算公式为 (800 + 8 * 等级) / (800 + 8 * 等级 + 敌人防御 * (1 - 减防))
         return (800 + 8 * self.character_level) / (
-            800 + 8 * self.character_level + enemy_defense * (1 - self.defense_reduction))
+            800
+            + 8 * self.character_level
+            + enemy_defense * (1 - self.defense_reduction)
+        )
 
     def calculate_crit_damage(self, effect_value=None):
         """
@@ -566,9 +593,17 @@ class DamageAttribute:
         if not effect_value:
             effect_value = self.effect_attack
         # 计算暴击伤害
-        return effect_value * self.skill_multi * (1 + self.skill_ratio) * (
-            1 + self.skill_ratio_in_skill_description) * (1 + self.dmg_bonus) * (
-            1 + self.dmg_deepen) * (1 - self.enemy_resistance) * self.defense_ratio * self.crit_dmg
+        return (
+            effect_value
+            * self.skill_multi
+            * (1 + self.skill_ratio)
+            * (1 + self.skill_ratio_in_skill_description)
+            * (1 + self.dmg_bonus)
+            * (1 + self.dmg_deepen)
+            * (1 - self.enemy_resistance)
+            * self.defense_ratio
+            * self.crit_dmg
+        )
 
     def calculate_expected_damage(self, effect_value=None):
         """
@@ -582,21 +617,32 @@ class DamageAttribute:
         if not effect_value:
             effect_value = self.effect_attack
 
-        return effect_value * self.skill_multi * (1 + self.skill_ratio) * (
-                1 + self.skill_ratio_in_skill_description) * (1 + self.dmg_bonus) * (
-            1 + self.dmg_deepen) * (1 - self.enemy_resistance) * self.defense_ratio * (
-            self.crit_rate * (self.crit_dmg - 1) + 1)
+        return (
+            effect_value
+            * self.skill_multi
+            * (1 + self.skill_ratio)
+            * (1 + self.skill_ratio_in_skill_description)
+            * (1 + self.dmg_bonus)
+            * (1 + self.dmg_deepen)
+            * (1 - self.enemy_resistance)
+            * self.defense_ratio
+            * (self.crit_rate * (self.crit_dmg - 1) + 1)
+        )
 
     def calculate_healing(self, effect_value):
         """
         计算治疗量。
         """
         flat, percent = parse_skill_multi(self.healing_skill_multi)
-        return effect_value * (percent * 0.01) * (1 + self.dmg_bonus) + flat * (1 + self.dmg_bonus)
+        return effect_value * (percent * 0.01) * (1 + self.dmg_bonus) + flat * (
+            1 + self.dmg_bonus
+        )
 
     def calculate_shield(self, effect_value):
         """
         计算盾量。
         """
         flat, percent = parse_skill_multi(self.shield_skill_multi)
-        return effect_value * (percent * 0.01) * (1 + self.dmg_bonus) + flat * (1 + self.dmg_bonus)
+        return effect_value * (percent * 0.01) * (1 + self.dmg_bonus) + flat * (
+            1 + self.dmg_bonus
+        )

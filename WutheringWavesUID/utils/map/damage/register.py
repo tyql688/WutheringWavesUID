@@ -29,6 +29,7 @@ def register_damage():
     from .damage_1602 import damage_detail as damage_1602
     from .damage_1603 import damage_detail as damage_1603
     from .damage_1604 import damage_detail as damage_1604
+    from .damage_1606 import damage_detail as damage_1606
 
     # 散华
     DamageDetailRegister.register_class("1102", damage_1102)
@@ -93,6 +94,8 @@ def register_damage():
     DamageDetailRegister.register_class("1604", damage_1604)
     # 暗主男
     DamageDetailRegister.register_class("1605", damage_1604)
+    # 洛可可
+    DamageDetailRegister.register_class("1606", damage_1606)
 
 
 def register_rank():
@@ -123,6 +126,7 @@ def register_rank():
     from .damage_1602 import rank as rank_1602
     from .damage_1603 import rank as rank_1603
     from .damage_1604 import rank as rank_1604
+    from .damage_1606 import rank as rank_1606
 
     # 散华
     DamageRankRegister.register_class("1102", rank_1102)
@@ -187,3 +191,5 @@ def register_rank():
     DamageRankRegister.register_class("1604", rank_1604)
     # 暗主男
     DamageRankRegister.register_class("1605", rank_1604)
+    # 洛可可
+    DamageRankRegister.register_class("1606", rank_1606)

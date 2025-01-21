@@ -55,3 +55,11 @@ def dengdeng_buff(attr, chain, resonLevel, isGroup):
     if char_clz:
         s = char_clz()
         s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)
+
+
+def luokeke_buff(attr, chain, resonLevel, isGroup):
+    # 洛可可buff
+    char_clz = WavesCharRegister.find_class(1606)
+    if char_clz:
+        s = char_clz()
+        s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)

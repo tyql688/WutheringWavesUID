@@ -1,6 +1,6 @@
 from .damage import DamageAttribute
 from .utils import CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING, attack_damage, skill_damage, hit_damage, CHAR_ATTR_MOLTEN, \
-    liberation_damage, temp_atk
+    liberation_damage, temp_atk, CHAR_ATTR_SINKING
 from ...utils.damage.abstract import CharAbstract, WavesCharRegister, WavesWeaponRegister
 
 
@@ -362,6 +362,45 @@ class Char_1606(CharAbstract):
     id = 1606
     name = "洛可可"
     starLevel = 5
+
+    # 下一位登场角色湮灭伤害加深20%，普攻伤害加深25%，效果持续14秒，若切换至其他角色则该效果提前结束。
+
+    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+        """获得buff"""
+        if attr.char_template == temp_atk:
+            title = "洛可可-共鸣解放"
+            msg = "施放共鸣解放最多提供200点攻击"
+            attr.add_atk_flat(200, title, msg)
+
+            title = "洛可可-合鸣效果-轻云出月"
+            msg = "下一个登场的共鸣者攻击提升22.5%"
+            attr.add_atk_percent(0.225, title, msg)
+
+        # 无常凶鹭
+        title = "洛可可-声骸技能-无常凶鹭"
+        msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
+        attr.add_dmg_bonus(0.12, title, msg)
+
+        if attack_damage == attr.char_damage:
+            title = "洛可可-延奏技能"
+            msg = "下一位登场角色普攻伤害加深25%"
+            attr.add_dmg_deepen(0.25, title, msg)
+
+        if CHAR_ATTR_SINKING == attr.char_attr:
+            # # 幽夜隐匿之帷
+            # title = "洛可可-合鸣效果-幽夜隐匿之帷"
+            # msg = "下一个登场角色湮灭属性伤害加成提升15%"
+            # attr.add_dmg_bonus(0.15, title, msg)
+
+            title = "洛可可-延奏技能"
+            msg = "下一位登场角色湮灭伤害加深20%"
+            attr.add_dmg_deepen(0.2, title, msg)
+
+            if chain >= 2:
+                # 施放普攻幻想照进现实时，队伍中的角色湮灭伤害加成提升10%，可叠加3层
+                title = "洛可可-二链"
+                msg = "队伍中的角色湮灭伤害提升10%*4"
+                attr.add_dmg_bonus(0.1 * 4, title, msg)
 
 
 def register_char():

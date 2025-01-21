@@ -532,6 +532,30 @@ class Weapon_21040026(WeaponAbstract):
     type = 4
     name = "悲喜剧"
 
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放普攻"""
+        if attr.char_damage != hit_damage:
+            return
+
+        # 攻击提升12%。施放普攻或变奏技能时，自身重击伤害加成提升48%，持续3秒。
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放普攻技能时，自身重击伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
+
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放变奏技能"""
+        if attr.char_damage != hit_damage:
+            return
+
+        # 攻击提升12%。施放普攻或变奏技能时，自身重击伤害加成提升48%，持续3秒。
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放变奏技能时，自身重击伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21040034(WeaponAbstract):
     id = 21040034
@@ -686,7 +710,7 @@ class Weapon_21050026(WeaponAbstract):
             buff_layer = int(self.param(2))
             effect_value = attr.get_effect("默认手法")
             if effect_value and isinstance(effect_value, str):
-                count_e = effect_value.count('e')
+                count_e = effect_value.count("e")
 
                 buff_layer = min(buff_layer, count_e)
 
