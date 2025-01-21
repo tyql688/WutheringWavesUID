@@ -10,13 +10,13 @@ from ..utils.database.models import WavesUser
 from ..utils.error_reply import WAVES_CODE_999
 from ..utils.util import generate_random_string
 
-GET_GOLD_URL = f'{MAIN_URL}/encourage/gold/getTotalGold'
-GET_TASK_URL = f'{MAIN_URL}/encourage/level/getTaskProcess'
-FORUM_LIST_URL = f'{MAIN_URL}/forum/list'
-LIKE_URL = f'{MAIN_URL}/forum/like'
-SIGN_IN_URL = f'{MAIN_URL}/user/signIn'
-POST_DETAIL_URL = f'{MAIN_URL}/forum/getPostDetail'
-SHARE_URL = f'{MAIN_URL}/encourage/level/shareTask'
+GET_GOLD_URL = f"{MAIN_URL}/encourage/gold/getTotalGold"
+GET_TASK_URL = f"{MAIN_URL}/encourage/level/getTaskProcess"
+FORUM_LIST_URL = f"{MAIN_URL}/forum/list"
+LIKE_URL = f"{MAIN_URL}/forum/like"
+SIGN_IN_URL = f"{MAIN_URL}/user/signIn"
+POST_DETAIL_URL = f"{MAIN_URL}/forum/getPostDetail"
+SHARE_URL = f"{MAIN_URL}/encourage/level/shareTask"
 
 
 async def get_headers_h5():
@@ -24,7 +24,7 @@ async def get_headers_h5():
     header = {
         "source": "h5",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        "devCode": devCode
+        "devCode": devCode,
     }
     return header
 
@@ -34,8 +34,8 @@ async def get_headers_ios():
     header = {
         "source": "ios",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        "User-Agent": "KuroGameBox/55 CFNetwork/1399 Darwin/22.1.0",
-        "devCode": devCode
+        "User-Agent": "KuroGameBox/1 CFNetwork/1399 Darwin/22.1.0",
+        "devCode": devCode,
     }
     return header
 
@@ -47,10 +47,9 @@ async def get_headers(ck: str = None, platform: str = None):
             platform = waves_user.platform
         except Exception as _:
             pass
-
-    if platform == 'h5' or not platform:
+    if platform == "h5" or not platform:
         return await get_headers_h5()
-    elif platform == 'ios':
+    elif platform == "ios":
         return await get_headers_ios()
 
 
@@ -59,7 +58,7 @@ class KuroBBS:
 
     async def get_task(self, token: str) -> (bool, Union[Dict, str]):
         try:
-            header = copy.deepcopy(await get_headers())
+            header = copy.deepcopy(await get_headers(token))
             header.update({"token": token})
             data = {"gameId": "0"}
             return await self._waves_request(GET_TASK_URL, "POST", header, data=data)
@@ -68,7 +67,7 @@ class KuroBBS:
 
     async def get_form_list(self, token: str) -> (bool, Union[Dict, str]):
         try:
-            header = copy.deepcopy(await get_headers())
+            header = copy.deepcopy(await get_headers(token))
             header.update({"token": token, "version": "2.25"})
             data = {
                 "pageIndex": "1",
@@ -76,7 +75,7 @@ class KuroBBS:
                 "timeType": "0",
                 "searchType": "1",
                 "forumId": "9",
-                "gameId": "3"
+                "gameId": "3",
             }
             return await self._waves_request(FORUM_LIST_URL, "POST", header, data=data)
         except Exception as e:
@@ -84,7 +83,7 @@ class KuroBBS:
 
     async def get_gold(self, token: str) -> (bool, Union[Dict, str]):
         try:
-            header = copy.deepcopy(await get_headers())
+            header = copy.deepcopy(await get_headers(token))
             header.update({"token": token})
             return await self._waves_request(GET_GOLD_URL, "POST", header)
         except Exception as e:
@@ -93,14 +92,14 @@ class KuroBBS:
     async def do_like(self, token: str, postId, toUserId) -> (bool, Union[Dict, str]):
         """点赞"""
         try:
-            header = copy.deepcopy(await get_headers())
+            header = copy.deepcopy(await get_headers(token))
             header.update({"token": token})
             data = {
-                'gameId': "3",  # 鸣潮
-                'likeType': "1",  # 1.点赞帖子 2.评论
-                'operateType': "1",  # 1.点赞 2.取消
-                'postId': postId,
-                'toUserId': toUserId
+                "gameId": "3",  # 鸣潮
+                "likeType": "1",  # 1.点赞帖子 2.评论
+                "operateType": "1",  # 1.点赞 2.取消
+                "postId": postId,
+                "toUserId": toUserId,
             }
             return await self._waves_request(LIKE_URL, "POST", header, data=data)
         except Exception as e:
@@ -109,7 +108,7 @@ class KuroBBS:
     async def do_sign_in(self, token: str) -> (bool, Union[Dict, str]):
         """签到"""
         try:
-            header = copy.deepcopy(await get_headers())
+            header = copy.deepcopy(await get_headers(token))
             header.update({"token": token})
             data = {"gameId": "2"}
             return await self._waves_request(SIGN_IN_URL, "POST", header, data=data)
@@ -119,9 +118,9 @@ class KuroBBS:
     async def do_post_detail(self, token: str, postId) -> (bool, Union[Dict, str]):
         """浏览"""
         try:
-            header = copy.deepcopy(await get_headers())
+            header = copy.deepcopy(await get_headers(token))
             header.update({"token": token})
-            data = {'gameId': "3", "postId": postId}
+            data = {"gameId": "3", "postId": postId}
             return await self._waves_request(POST_DETAIL_URL, "POST", header, data=data)
         except Exception as e:
             logger.exception(f"do_post_detail token {token}", e)
@@ -129,9 +128,9 @@ class KuroBBS:
     async def do_share(self, token: str) -> (bool, Union[Dict, str]):
         """分享"""
         try:
-            header = copy.deepcopy(await get_headers())
+            header = copy.deepcopy(await get_headers(token))
             header.update({"token": token})
-            data = {'gameId': "3"}
+            data = {"gameId": "3"}
             return await self._waves_request(SHARE_URL, "POST", header, data=data)
         except Exception as e:
             logger.exception(f"do_share token {token}", e)
@@ -140,10 +139,10 @@ class KuroBBS:
         task_res = await self.get_task(token)
         if not isinstance(task_res, dict):
             return False
-        if task_res.get('code') != 200 or not task_res.get('data'):
+        if task_res.get("code") != 200 or not task_res.get("data"):
             return False
-        for i in task_res['data']['dailyTask']:
-            if i['completeTimes'] != i['needActionTimes']:
+        for i in task_res["data"]["dailyTask"]:
+            if i["completeTimes"] != i["needActionTimes"]:
                 return False
         return True
 
@@ -177,13 +176,17 @@ class KuroBBS:
                 except ContentTypeError:
                     _raw_data = await resp.text()
                     raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                if isinstance(raw_data, dict) and 'data' in raw_data and isinstance(raw_data['data'], str):
+                if (
+                    isinstance(raw_data, dict)
+                    and "data" in raw_data
+                    and isinstance(raw_data["data"], str)
+                ):
                     try:
-                        des_data = j.loads(raw_data['data'])
-                        raw_data['data'] = des_data
+                        des_data = j.loads(raw_data["data"])
+                        raw_data["data"] = des_data
                     except:
                         pass
-                logger.debug(f'url:[{url}] raw_data:{raw_data}')
+                logger.debug(f"url:[{url}] raw_data:{raw_data}")
                 return raw_data
 
 
