@@ -193,12 +193,12 @@ def get_crop_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
 
 
 async def get_qq_avatar(
-    qid: Optional[Union[int, str]] = None, avatar_url: Optional[str] = None
+    qid: Optional[Union[int, str]] = None, avatar_url: Optional[str] = None, size: int = 640
 ) -> Image.Image:
     if qid:
-        avatar_url = f'http://q1.qlogo.cn/g?b=qq&nk={qid}&s=640'
+        avatar_url = f'http://q1.qlogo.cn/g?b=qq&nk={qid}&s={size}'
     elif avatar_url is None:
-        avatar_url = 'https://q1.qlogo.cn/g?b=qq&nk=3399214199&s=640'
+        avatar_url = f'https://q1.qlogo.cn/g?b=qq&nk=3399214199&s={size}'
     char_pic = Image.open(BytesIO((await sget(avatar_url)).content)).convert(
         'RGBA'
     )
@@ -206,12 +206,12 @@ async def get_qq_avatar(
 
 
 async def get_event_avatar(
-    ev: Event, avatar_path: Optional[Path] = None, is_valid_at: bool = True
+    ev: Event, avatar_path: Optional[Path] = None, is_valid_at: bool = True, size: int = 640
 ) -> Image.Image:
     img = None
     if ev.bot_id == 'onebot' and ev.at and is_valid_at:
         try:
-            img = await get_qq_avatar(ev.at)
+            img = await get_qq_avatar(ev.at, size=size)
         except Exception:
             img = None
 
@@ -226,7 +226,7 @@ async def get_event_avatar(
 
     if img is None and ev.bot_id == 'onebot' and not ev.sender:
         try:
-            img = await get_qq_avatar(ev.at)
+            img = await get_qq_avatar(ev.at, size=size)
         except Exception:
             img = None
 

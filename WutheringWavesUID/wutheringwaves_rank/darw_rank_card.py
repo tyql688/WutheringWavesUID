@@ -11,7 +11,7 @@ from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
+from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import RoleDetailData, WeaponData
 from ..utils.ascension.char import get_breach
 from ..utils.cache import TimedCache
@@ -24,7 +24,7 @@ from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_1
     waves_font_24, waves_font_20, waves_font_44, waves_font_14
 from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_GOLD, \
     get_square_weapon, CHAIN_COLOR, get_attribute, get_attribute_effect, \
-    GREY, RED, get_role_pile_old, WEAPON_RESONLEVEL_COLOR
+    GREY, RED, get_role_pile_old, WEAPON_RESONLEVEL_COLOR, get_qq_avatar
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME, card_sort_map
 from ..utils.waves_card_cache import get_card, get_rank, get_self_rank
@@ -494,10 +494,10 @@ async def get_avatar(
         if WutheringWavesConfig.get_config('QQPicCache').data:
             pic = pic_cache.get(qid)
             if not pic:
-                pic = await get_qq_avatar(qid)
+                pic = await get_qq_avatar(qid, size=100)
                 pic_cache.set(qid, pic)
         else:
-            pic = await get_qq_avatar(qid)
+            pic = await get_qq_avatar(qid, size=100)
             pic_cache.set(qid, pic)
         pic_temp = crop_center_img(pic, 120, 120)
 
