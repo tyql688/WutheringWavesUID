@@ -19,6 +19,9 @@ with open(WEAPON_ALIAS, "r", encoding="UTF-8") as f:
 with open(MAP_PATH / "CharId2Data.json", "r", encoding="UTF-8") as f:
     char_id_data = msgjson.decode(f.read(), type=Dict[str, Dict[str, str]])
 
+with open(MAP_PATH / "id2name.json", "r", encoding="UTF-8") as f:
+    id2name = msgjson.decode(f.read(), type=Dict[str, str])
+
 
 def alias_to_char_name(char_name: str) -> str:
     for i in char_alias_data:
@@ -38,10 +41,9 @@ def char_id_to_char_name(char_id: str) -> Optional[str]:
 
 def char_name_to_char_id(char_name: str) -> Optional[str]:
     char_name = alias_to_char_name(char_name)
-    for i in char_id_data:
-        chars = char_id_data[i]
-        if char_name == chars["name"]:
-            return i
+    for id, name in id2name.items():
+        if char_name == name:
+            return id
     else:
         return None
 
@@ -49,9 +51,17 @@ def char_name_to_char_id(char_name: str) -> Optional[str]:
 def alias_to_weapon_name(weapon_name: str) -> str:
     for i in weapon_alias_data:
         if (weapon_name in i) or (weapon_name in weapon_alias_data[i]):
-            logger.debug(f"别名转换: {weapon_name} -> {i}")
             return i
     return weapon_name
+
+
+def weapon_name_to_weapon_id(weapon_name: str) -> Optional[str]:
+    weapon_name = alias_to_weapon_name(weapon_name)
+    for id, name in id2name.items():
+        if weapon_name == name:
+            return id
+    else:
+        return None
 
 
 def get_all_char_id() -> List[str]:
