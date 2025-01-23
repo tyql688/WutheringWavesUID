@@ -9,13 +9,12 @@ redis_key = "ww:hash:playerCache"
 
 
 async def save_all_card(raw_data: Dict, max_concurrent_batches=10):
+    async with wavesRedis.get_client() as client:
+        await client.delete(redis_key)
+
     new_data = {
-        roleId: json.dumps(i, ensure_ascii=False)
-        for roleId, i in raw_data.items()
+        roleId: json.dumps(i, ensure_ascii=False) for roleId, i in raw_data.items()
     }
-    # async with wavesRedis.get_client() as client:
-    #     await client.hset(redis_key, mapping=new_data)
-    # return len(new_data)
 
     total_items = len(new_data)
 
