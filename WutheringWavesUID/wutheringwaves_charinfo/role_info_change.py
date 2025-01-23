@@ -107,6 +107,24 @@ def parse_skills(content: str) -> list[int] | None:
     return skills[:5]
 
 
+def get_breach(level: int):
+    if level <= 20:
+        breach = 0
+    elif level <= 40:
+        breach = 1
+    elif level <= 50:
+        breach = 2
+    elif level <= 60:
+        breach = 3
+    elif level <= 70:
+        breach = 4
+    elif level <= 80:
+        breach = 5
+    elif level <= 90:
+        breach = 6
+    return breach
+
+
 class ChangeParser:
 
     def __init__(self, content: str):
@@ -229,7 +247,9 @@ async def change_role_detail(
             weapon.weaponStarLevel = weapon_detail.starLevel
 
     if parserResult.weapon.level:
-        role_detail.weaponData.level = int(parserResult.weapon.level)
+        weaponLevel = int(parserResult.weapon.level)
+        role_detail.weaponData.level = weaponLevel
+        role_detail.weaponData.breach = get_breach(weaponLevel)
 
     if parserResult.weapon.resonLevel:
         role_detail.weaponData.resonLevel = int(parserResult.weapon.resonLevel)
