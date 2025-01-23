@@ -67,7 +67,7 @@ def parse_weapon_reson_level(content: str) -> tuple[str, str] | None:
     match = re.search(pattern, content)
     if match:
         matched_string = match.group(0)
-        number = re.search(r"[1-5一二三四五]", matched_string)
+        number = re.search(r"[1-5一二三四五满]", matched_string)
         if number:
             number = number.group(0)
             number_map = {
@@ -224,7 +224,7 @@ async def change_role_detail(
         )
         weapon = role_detail.weaponData.weapon
         if weapon.weaponType == weapon_detail.type:
-            weapon.weaponId = parserResult.weapon.weaponId
+            weapon.weaponId = int(parserResult.weapon.weaponId)
             weapon.weaponName = weapon_detail.name
             weapon.weaponStarLevel = weapon_detail.starLevel
 

@@ -181,6 +181,14 @@
         "need_admin": false
       },
       {
+        "name": "面板替换帮助",
+        "desc": "面板替换帮助",
+        "eg": "替换帮助",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "兑换码",
         "desc": "兑换码",
         "eg": "兑换码",
