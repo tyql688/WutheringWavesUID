@@ -13,10 +13,11 @@ from .name_convert import char_name_to_char_id
 from ..utils.resource.RESOURCE_PATH import (
     AVATAR_PATH,
     WEAPON_PATH,
-    ROLE_PILE_PATH, CUSTOM_CARD_PATH,
+    ROLE_PILE_PATH,
+    CUSTOM_CARD_PATH,
 )
 
-TEXT_PATH = Path(__file__).parent / 'texture2d'
+TEXT_PATH = Path(__file__).parent / "texture2d"
 GREY = (216, 216, 216)
 BLACK_G = (40, 40, 40)
 YELLOW = (255, 200, 1)
@@ -91,22 +92,24 @@ WEAPON_RESONLEVEL_COLOR = {
 async def get_random_waves_role_pile(name: str = None):
     if name:
         char_id = char_name_to_char_id(name)
-        png_name = f'role_pile_{char_id}.png'
-        if os.path.exists(f'{ROLE_PILE_PATH}/{png_name}'):
-            return Image.open(f'{ROLE_PILE_PATH}/{png_name}').convert('RGBA')
+        png_name = f"role_pile_{char_id}.png"
+        if os.path.exists(f"{ROLE_PILE_PATH}/{png_name}"):
+            return Image.open(f"{ROLE_PILE_PATH}/{png_name}").convert("RGBA")
 
-    path = random.choice(os.listdir(f'{ROLE_PILE_PATH}'))
-    return Image.open(f'{ROLE_PILE_PATH}/{path}').convert('RGBA')
+    path = random.choice(os.listdir(f"{ROLE_PILE_PATH}"))
+    return Image.open(f"{ROLE_PILE_PATH}/{path}").convert("RGBA")
 
 
-async def get_role_pile(resource_id: Union[int, str], custom: bool = False) -> (bool, Image.Image):
+async def get_role_pile(
+    resource_id: Union[int, str], custom: bool = False
+) -> (bool, Image.Image):
     if custom:
-        custom_dir = f'{CUSTOM_CARD_PATH}/{resource_id}'
+        custom_dir = f"{CUSTOM_CARD_PATH}/{resource_id}"
         if os.path.isdir(custom_dir) and len(os.listdir(custom_dir)) > 0:
             # logger.info(f'使用自定义角色头像: {resource_id}')
             path = random.choice(os.listdir(custom_dir))
             if path:
-                return True, Image.open(f'{custom_dir}/{path}').convert('RGBA')
+                return True, Image.open(f"{custom_dir}/{path}").convert("RGBA")
 
     name = f"role_pile_{resource_id}.png"
     path = ROLE_PILE_PATH / name
@@ -142,9 +145,13 @@ async def cropped_square_avatar(item_icon: Image.Image, size: int) -> Image.Imag
     resized_image = item_icon.resize((new_width, new_height), Image.Resampling.LANCZOS)
     x_center = new_width // 2
     y_center = new_height // 2
-    crop_area = (x_center - target_width // 2, y_center - target_height // 2,
-                 x_center + target_width // 2, y_center + target_height // 2)
-    resized_image = resized_image.crop(crop_area).convert('RGBA')
+    crop_area = (
+        x_center - target_width // 2,
+        y_center - target_height // 2,
+        x_center + target_width // 2,
+        y_center + target_height // 2,
+    )
+    resized_image = resized_image.crop(crop_area).convert("RGBA")
     return resized_image
 
 
@@ -157,31 +164,33 @@ async def get_square_weapon(resource_id: Union[int, str]) -> Image.Image:
 
 async def get_attribute(name: str = "", is_simple: bool = False) -> Image.Image:
     if is_simple:
-        name = f'attribute/attr_simple_{name}.png'
+        name = f"attribute/attr_simple_{name}.png"
     else:
-        name = f'attribute/attr_{name}.png'
+        name = f"attribute/attr_{name}.png"
     return Image.open(TEXT_PATH / name).convert("RGBA")
 
 
 async def get_attribute_prop(name: str = "") -> Image.Image:
-    return Image.open(TEXT_PATH / f'attribute_prop/attr_prop_{name}.png').convert("RGBA")
+    return Image.open(TEXT_PATH / f"attribute_prop/attr_prop_{name}.png").convert(
+        "RGBA"
+    )
 
 
 async def get_attribute_effect(name: str = "") -> Image.Image:
-    return Image.open(TEXT_PATH / f'attribute_effect/attr_{name}.png').convert("RGBA")
+    return Image.open(TEXT_PATH / f"attribute_effect/attr_{name}.png").convert("RGBA")
 
 
 async def get_weapon_type(name: str = "") -> Image.Image:
-    return Image.open(TEXT_PATH / f'weapon_type/weapon_type_{name}.png').convert("RGBA")
+    return Image.open(TEXT_PATH / f"weapon_type/weapon_type_{name}.png").convert("RGBA")
 
 
-def get_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
-    img = Image.open(TEXT_PATH / f'{bg}.jpg').convert('RGBA')
+def get_waves_bg(w: int, h: int, bg: str = "bg") -> Image.Image:
+    img = Image.open(TEXT_PATH / f"{bg}.jpg").convert("RGBA")
     return crop_center_img(img, w, h)
 
 
-def get_crop_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
-    img = Image.open(TEXT_PATH / f'{bg}.jpg').convert('RGBA')
+def get_crop_waves_bg(w: int, h: int, bg: str = "bg") -> Image.Image:
+    img = Image.open(TEXT_PATH / f"{bg}.jpg").convert("RGBA")
 
     width, height = img.size
 
@@ -193,40 +202,43 @@ def get_crop_waves_bg(w: int, h: int, bg: str = 'bg') -> Image.Image:
 
 
 async def get_qq_avatar(
-    qid: Optional[Union[int, str]] = None, avatar_url: Optional[str] = None, size: int = 640
+    qid: Optional[Union[int, str]] = None,
+    avatar_url: Optional[str] = None,
+    size: int = 640,
 ) -> Image.Image:
     if qid:
-        avatar_url = f'http://q1.qlogo.cn/g?b=qq&nk={qid}&s={size}'
+        avatar_url = f"http://q1.qlogo.cn/g?b=qq&nk={qid}&s={size}"
     elif avatar_url is None:
-        avatar_url = f'https://q1.qlogo.cn/g?b=qq&nk=3399214199&s={size}'
-    char_pic = Image.open(BytesIO((await sget(avatar_url)).content)).convert(
-        'RGBA'
-    )
+        avatar_url = f"https://q1.qlogo.cn/g?b=qq&nk=3399214199&s={size}"
+    char_pic = Image.open(BytesIO((await sget(avatar_url)).content)).convert("RGBA")
     return char_pic
 
 
 async def get_event_avatar(
-    ev: Event, avatar_path: Optional[Path] = None, is_valid_at: bool = True, size: int = 640
+    ev: Event,
+    avatar_path: Optional[Path] = None,
+    is_valid_at: bool = True,
+    size: int = 640,
 ) -> Image.Image:
     img = None
-    if ev.bot_id == 'onebot' and ev.at and is_valid_at:
+    if ev.bot_id == "onebot" and ev.at and is_valid_at:
         try:
             img = await get_qq_avatar(ev.at, size=size)
         except Exception:
             img = None
 
-    if img is None and 'avatar' in ev.sender and ev.sender['avatar']:
-        avatar_url: str = ev.sender['avatar']
-        if avatar_url.startswith(('http', 'https')):
+    if img is None and "avatar" in ev.sender and ev.sender["avatar"]:
+        avatar_url: str = ev.sender["avatar"]
+        if avatar_url.startswith(("http", "https")):
             try:
                 content = (await sget(avatar_url)).content
-                img = Image.open(BytesIO(content)).convert('RGBA')
+                img = Image.open(BytesIO(content)).convert("RGBA")
             except Exception:
                 img = None
 
-    if img is None and ev.bot_id == 'onebot' and not ev.sender:
+    if img is None and ev.bot_id == "onebot" and not ev.sender:
         try:
-            img = await get_qq_avatar(ev.at, size=size)
+            img = await get_qq_avatar(ev.user_id, size=size)
         except Exception:
             img = None
 
@@ -234,7 +246,7 @@ async def get_event_avatar(
         pic_path_list = list(avatar_path.iterdir())
         if pic_path_list:
             path = random.choice(pic_path_list)
-            img = Image.open(path).convert('RGBA')
+            img = Image.open(path).convert("RGBA")
 
     if img is None:
         img = await get_square_avatar(1203)
@@ -243,11 +255,11 @@ async def get_event_avatar(
 
 
 def get_small_logo(logo_num=1):
-    return Image.open(TEXT_PATH / f'logo_small_{logo_num}.png')
+    return Image.open(TEXT_PATH / f"logo_small_{logo_num}.png")
 
 
-def get_footer(color: Literal["white", "black"] = 'white'):
-    return Image.open(TEXT_PATH / f'footer_{color}.png')
+def get_footer(color: Literal["white", "black"] = "white"):
+    return Image.open(TEXT_PATH / f"footer_{color}.png")
 
 
 def add_footer(
@@ -255,15 +267,15 @@ def add_footer(
     w: int = 0,
     offset_y: int = 0,
     is_invert: bool = False,
-    color: Literal["white", "black"] = 'white'
+    color: Literal["white", "black"] = "white",
 ):
     footer = get_footer(color)
     if is_invert:
         r, g, b, a = footer.split()
-        rgb_image = Image.merge('RGB', (r, g, b))
-        rgb_image = ImageOps.invert(rgb_image.convert('RGB'))
+        rgb_image = Image.merge("RGB", (r, g, b))
+        rgb_image = ImageOps.invert(rgb_image.convert("RGB"))
         r2, g2, b2 = rgb_image.split()
-        footer = Image.merge('RGBA', (r2, g2, b2, a))
+        footer = Image.merge("RGBA", (r2, g2, b2, a))
 
     if w != 0:
         footer = footer.resize(
@@ -279,7 +291,9 @@ def add_footer(
     return img
 
 
-async def change_color(chain, color: tuple = (255, 255, 255), w: int = None, h: int = None):
+async def change_color(
+    chain, color: tuple = (255, 255, 255), w: int = None, h: int = None
+):
     # 获取图像数据
     pixels = chain.load()  # 加载像素数据
     if w is None:
@@ -299,16 +313,19 @@ async def change_color(chain, color: tuple = (255, 255, 255), w: int = None, h: 
 def draw_text_with_shadow(
     image: ImageDraw,
     text: str,
-    _x: int, _y: int,
+    _x: int,
+    _y: int,
     font: ImageFont,
     fill_color: str = "white",
     shadow_color: str = "black",
     offset: Tuple[int, int] = (2, 2),
-    anchor='rm'
+    anchor="rm",
 ):
     """描边"""
     for i in range(-offset[0], offset[0] + 1):
         for j in range(-offset[1], offset[1] + 1):
-            image.text((_x + i, _y + j), text, font=font, fill=shadow_color, anchor=anchor)
+            image.text(
+                (_x + i, _y + j), text, font=font, fill=shadow_color, anchor=anchor
+            )
 
     image.text((_x, _y), text, font=font, fill=fill_color, anchor=anchor)
