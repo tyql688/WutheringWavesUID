@@ -122,6 +122,8 @@ def get_breach(level: int):
         breach = 5
     elif level <= 90:
         breach = 6
+    else:
+        breach = 0
     return breach
 
 
@@ -218,8 +220,10 @@ async def change_role_detail(
                 j.level = int(level)
 
     if parserResult.role.level:
-        role_detail.role.level = int(parserResult.role.level)
-        role_detail.level = int(parserResult.role.level)
+        roleLevel = int(parserResult.role.level)
+        role_detail.role.level = roleLevel
+        role_detail.level = roleLevel
+        role_detail.role.breach = get_breach(roleLevel)
 
     if parserResult.role.chain:
         chain = int(parserResult.role.chain)
