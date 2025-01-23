@@ -104,6 +104,16 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "强制【鸣潮登录url】为自己的域名",
         False,
     ),
+    "WavesQRLogin": GsBoolConfig(
+        "开启后，登录链接变成二维码",
+        "开启后，登录链接变成二维码",
+        False,
+    ),
+    "WavesLoginForward": GsBoolConfig(
+        "开启后，登录链接变为转发消息",
+        "开启后，登录链接变为转发消息",
+        False,
+    ),
     "WavesOnlySelfCk": GsBoolConfig(
         "所有查询使用自己的ck",
         "所有查询使用自己的ck",
