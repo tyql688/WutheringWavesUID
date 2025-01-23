@@ -1,11 +1,14 @@
 import re
 
 from ..utils.api.model import RoleDetailData
+from ..utils.ascension.sonata import get_sonata_detail, WavesSonataResult
 from ..utils.ascension.weapon import get_weapon_detail, WavesWeaponResult
 from ..utils.name_convert import (
     weapon_name_to_weapon_id,
     alias_to_weapon_name,
+    alias_to_sonata_name,
 )
+from ..utils.resource.constant import SONATA_FIRST_ID
 
 
 class ReplaceRole:
@@ -29,6 +32,13 @@ class ReplaceWeapon:
         self.resonLevel: str | None = None  # 精炼
 
 
+class ReplaceSonata:
+    PREFIX_RE: list[str] = ["合鸣", "套装"]
+
+    def __init__(self):
+        self.sonataName: str | None = None  # 套装名字
+
+
 class ReplacePhantom:
     PREFIX_RE: list[str] = ["声骸", "圣遗物"]
 
@@ -37,6 +47,7 @@ class ReplaceResult:
     def __init__(self):
         self.role: ReplaceRole = ReplaceRole()
         self.weapon: ReplaceWeapon = ReplaceWeapon()
+        self.sonata: ReplaceSonata = ReplaceSonata()
         self.phantom: ReplacePhantom = ReplacePhantom()
 
 
@@ -107,6 +118,17 @@ def parse_skills(content: str) -> list[int] | None:
     return skills[:5]
 
 
+def parse_sonatas(content: str) -> str | None:
+    pattern = r"([^\d]+)"
+    match = re.search(pattern, content)
+
+    if match:
+        type1 = match.group(1).strip()
+        return type1
+
+    return None
+
+
 def get_breach(level: int):
     if level <= 20:
         breach = 0
@@ -152,6 +174,12 @@ class ChangeParser:
         for prefix in self.rr.phantom.PREFIX_RE:
             if cont.startswith(prefix):
                 cont = cont[len(prefix) :].strip()
+                break
+        for prefix in self.rr.sonata.PREFIX_RE:
+            if cont.startswith(prefix):
+                cont = cont[len(prefix) :].strip()
+                matched_list.extend(self.parse_sonata(cont))
+
                 break
 
         if matched_list:
@@ -200,6 +228,15 @@ class ChangeParser:
                 self.rr.weapon.weaponName = weaponName
                 self.rr.weapon.weaponId = weaponId
                 matched_list.append(cont)
+        return matched_list
+
+    def parse_sonata(self, cont: str) -> list[str]:
+        matched_list = []
+        sonata_name = parse_sonatas(cont)
+        sonata_name = alias_to_sonata_name(sonata_name)
+        if sonata_name:
+            self.rr.sonata.sonataName = sonata_name
+            matched_list.append(f"换{self.rr.sonata.PREFIX_RE[0]} {sonata_name}")
         return matched_list
 
     def get_matched_content(self) -> str:
@@ -257,6 +294,26 @@ async def change_role_detail(
 
     if parserResult.weapon.resonLevel:
         role_detail.weaponData.resonLevel = int(parserResult.weapon.resonLevel)
+
+    if parserResult.sonata.sonataName:
+        sonata_result: WavesSonataResult = get_sonata_detail(
+            parserResult.sonata.sonataName
+        )
+        if (
+            sonata_result
+            and role_detail.phantomData
+            and role_detail.phantomData.equipPhantomList
+        ):
+            for index, ep in enumerate(role_detail.phantomData.equipPhantomList):
+                if not ep:
+                    continue
+                ep.fetterDetail.name = sonata_result.name
+                if (
+                    index == 0
+                    and ep.phantomProp.phantomId
+                    not in SONATA_FIRST_ID[sonata_result.name]
+                ):
+                    ep.phantomProp.phantomId = SONATA_FIRST_ID[sonata_result.name][0]
 
     return role_detail, parser.get_matched_content()
 

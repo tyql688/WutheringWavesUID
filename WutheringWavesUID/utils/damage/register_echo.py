@@ -1,6 +1,17 @@
 from .damage import DamageAttribute
-from .utils import CHAR_ATTR_SIERRA, CHAR_ATTR_SINKING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID, liberation_damage, \
-    attack_damage, hit_damage, skill_damage, CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING, temp_atk
+from .utils import (
+    CHAR_ATTR_SIERRA,
+    CHAR_ATTR_SINKING,
+    CHAR_ATTR_MOLTEN,
+    CHAR_ATTR_VOID,
+    liberation_damage,
+    attack_damage,
+    hit_damage,
+    skill_damage,
+    CHAR_ATTR_CELESTIAL,
+    CHAR_ATTR_FREEZING,
+    temp_atk,
+)
 from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
 
 
@@ -182,12 +193,12 @@ class Echo_390080003(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_attr == CHAR_ATTR_VOID:
             title = self.name
-            msg = '自身导电伤害加成提升12.00%'
+            msg = "自身导电伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
         if attr.char_damage == liberation_damage:
             title = self.name
-            msg = '共鸣解放伤害加成提升12.00%'
+            msg = "共鸣解放伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
 
@@ -205,18 +216,13 @@ class Echo_390080007(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_attr == CHAR_ATTR_MOLTEN:
             title = self.name
-            msg = '自身热熔伤害加成提升12.00%'
+            msg = "自身热熔伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
         if attr.char_damage == attack_damage:
             title = self.name
-            msg = '普攻伤害加成提升12.00%'
+            msg = "普攻伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
-
-
-class Echo_390180010(EchoAbstract):
-    id = 390180010
-    name = "异相·飞廉之猩"
 
 
 class Echo_391070105(EchoAbstract):
@@ -247,12 +253,12 @@ class Echo_6000039(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_attr == CHAR_ATTR_VOID:
             title = self.name
-            msg = '自身导电伤害加成提升12.00%'
+            msg = "自身导电伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
         if attr.char_damage == hit_damage:
             title = self.name
-            msg = '重击伤害加成提升12.00%'
+            msg = "重击伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
 
@@ -274,12 +280,12 @@ class Echo_6000042(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_attr == CHAR_ATTR_SINKING:
             title = self.name
-            msg = '自身湮灭伤害加成提升12.00%'
+            msg = "自身湮灭伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
         if attr.char_damage == skill_damage:
             title = self.name
-            msg = '共鸣技能伤害加成提升12.00%'
+            msg = "共鸣技能伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
 
@@ -291,13 +297,18 @@ class Echo_6000043(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_attr == CHAR_ATTR_SIERRA:
             title = self.name
-            msg = '气动伤害加成提升12.00%'
+            msg = "气动伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
         if attr.char_damage == hit_damage:
             title = self.name
-            msg = '重击伤害加成提升12.00%'
+            msg = "重击伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
+
+
+class Echo_390180010(Echo_6000043):
+    id = 390180010
+    name = "异相·飞廉之猩"
 
 
 class Echo_6000044(EchoAbstract):
@@ -308,12 +319,12 @@ class Echo_6000044(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_attr == CHAR_ATTR_FREEZING:
             title = self.name
-            msg = '冷凝伤害加成提升4.00%*3'
+            msg = "冷凝伤害加成提升4.00%*3"
             attr.add_dmg_bonus(0.12, title, msg)
 
         if attr.char_damage == skill_damage:
             title = self.name
-            msg = '共鸣技能伤害加成提升4.00%*3'
+            msg = "共鸣技能伤害加成提升4.00%*3"
             attr.add_dmg_bonus(0.12, title, msg)
 
 
@@ -325,12 +336,12 @@ class Echo_6000045(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_attr == CHAR_ATTR_CELESTIAL:
             title = self.name
-            msg = '衍射伤害加成提升12.00%'
+            msg = "衍射伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
         if attr.char_damage == liberation_damage:
             title = self.name
-            msg = '共鸣解放伤害加成提升12.00%'
+            msg = "共鸣解放伤害加成提升12.00%"
             attr.add_dmg_bonus(0.12, title, msg)
 
 
@@ -352,7 +363,7 @@ class Echo_6000048(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_template == temp_atk:
             title = self.name
-            msg = '自身攻击提升12.00%'
+            msg = "自身攻击提升12.00%"
             attr.add_atk_percent(0.12, title, msg)
 
 
@@ -414,7 +425,7 @@ class Echo_6000059(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_damage == skill_damage:
             title = self.name
-            msg = '共鸣技能伤害加成提升16.00%'
+            msg = "共鸣技能伤害加成提升16.00%"
             attr.add_dmg_bonus(0.16, title, msg)
 
 
@@ -426,7 +437,7 @@ class Echo_6000060(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.char_template == temp_atk:
             title = self.name
-            msg = '全队角色攻击提升10%'
+            msg = "全队角色攻击提升10%"
             attr.add_atk_percent(0.1, title, msg)
 
 
@@ -532,9 +543,7 @@ class Echo_6000080(EchoAbstract):
     # 在首位装备该声骸技能时，自身导电伤害加成提升12.00%。
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "导电伤害加成": "12%"
-        }
+        return {"导电伤害加成": "12%"}
 
 
 class Echo_6000081(EchoAbstract):
@@ -549,10 +558,7 @@ class Echo_6000082(EchoAbstract):
     # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，普攻伤害加成提升12.00%。
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "湮灭伤害加成": "12%",
-            "普攻伤害加成": "12%"
-        }
+        return {"湮灭伤害加成": "12%", "普攻伤害加成": "12%"}
 
 
 class Echo_6000083(EchoAbstract):
@@ -562,10 +568,7 @@ class Echo_6000083(EchoAbstract):
     # 在首位装配该声骸技能时，自身获得12.00%冷凝伤害加成提升，12.00%共鸣技能伤害加成提升
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "共鸣技能伤害加成": "12%",
-            "冷凝伤害加成": "12%"
-        }
+        return {"共鸣技能伤害加成": "12%", "冷凝伤害加成": "12%"}
 
 
 class Echo_6000084(EchoAbstract):
@@ -575,10 +578,7 @@ class Echo_6000084(EchoAbstract):
     # 在首位装配该声骸技能时，自身获得12.00%热熔伤害加成提升，12.00%普攻伤害加成提升
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "热熔伤害加成": "12%",
-            "普攻伤害加成": "12%"
-        }
+        return {"热熔伤害加成": "12%", "普攻伤害加成": "12%"}
 
 
 class Echo_6000085(EchoAbstract):
@@ -589,7 +589,7 @@ class Echo_6000085(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         if attr.sync_strike:
             title = self.name
-            msg = '自身协同攻击造成的伤害提升40.00%'
+            msg = "自身协同攻击造成的伤害提升40.00%"
             attr.add_dmg_bonus(0.4, title, msg)
 
 
@@ -600,10 +600,7 @@ class Echo_6000086(EchoAbstract):
     # 在首位装配该声骸技能时，自身气动伤害加成提升12.00%，重击伤害加成提升12.00%。
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "气动伤害加成": "12%",
-            "重击伤害加成": "12%"
-        }
+        return {"气动伤害加成": "12%", "重击伤害加成": "12%"}
 
 
 class Echo_6000087(EchoAbstract):
@@ -613,10 +610,7 @@ class Echo_6000087(EchoAbstract):
     # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，重击伤害加成提升12.00%。
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "湮灭伤害加成": "12%",
-            "重击伤害加成": "12%"
-        }
+        return {"湮灭伤害加成": "12%", "重击伤害加成": "12%"}
 
 
 class Echo_6000088(EchoAbstract):
@@ -626,10 +620,7 @@ class Echo_6000088(EchoAbstract):
     # 在首位装配该声骸技能时，自身导电伤害加成提升12.00%，共鸣解放伤害加成提升12.00%。
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "导电伤害加成": "12%",
-            "共鸣解放伤害加成": "12%"
-        }
+        return {"导电伤害加成": "12%", "共鸣解放伤害加成": "12%"}
 
 
 class Echo_6000089(EchoAbstract):
@@ -639,10 +630,7 @@ class Echo_6000089(EchoAbstract):
     # 在首位装配该声骸技能时，自身导电伤害加成提升12.00%，共鸣技能伤害加成提升12.00%。
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "导电伤害加成": "12%",
-            "共鸣技能伤害加成": "12%"
-        }
+        return {"导电伤害加成": "12%", "共鸣技能伤害加成": "12%"}
 
 
 class Echo_6000090(EchoAbstract):
@@ -652,10 +640,7 @@ class Echo_6000090(EchoAbstract):
     # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，普攻伤害加成提升12.00%。
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "湮灭伤害加成": "12%",
-            "普攻伤害加成": "12%"
-        }
+        return {"湮灭伤害加成": "12%", "普攻伤害加成": "12%"}
 
 
 class Echo_6000091(EchoAbstract):
@@ -665,10 +650,7 @@ class Echo_6000091(EchoAbstract):
     # 在首位装配该声骸技能时，自身热熔伤害加成提升12.00%，共鸣技能伤害加成提升12.00%。
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "热熔伤害加成": "12%",
-            "共鸣技能伤害加成": "12%"
-        }
+        return {"热熔伤害加成": "12%", "共鸣技能伤害加成": "12%"}
 
 
 class Echo_6000092(EchoAbstract):
@@ -678,9 +660,7 @@ class Echo_6000092(EchoAbstract):
     # 在首位装配该声骸技能时，自身衍射伤害加成提升12.00%。
     def do_equipment_first(self):
         """首位装备"""
-        return {
-            "衍射伤害加成": "12%"
-        }
+        return {"衍射伤害加成": "12%"}
 
 
 class Echo_6000145(Echo_6000045):
