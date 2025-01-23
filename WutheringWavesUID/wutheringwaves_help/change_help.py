@@ -40,7 +40,7 @@ async def get_change_help(pm: int):
         item_bg=Image.open(TEXT_PATH / "item.png"),
         icon_path=ICON_PATH,
         footer=get_footer(),
-        enable_cache=True,
+        enable_cache=False,
         column=4,
         pm=pm,
     )
