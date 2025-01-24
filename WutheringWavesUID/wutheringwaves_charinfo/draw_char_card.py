@@ -1,40 +1,21 @@
-import re
 import copy
+import re
 from pathlib import Path
 from typing import Optional
 
 from PIL import Image, ImageDraw, ImageEnhance
 
-from gsuid_core.models import Event
 from gsuid_core.logger import logger
+from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
-
-from ..utils import hint
-from ..utils.waves_api import waves_api
-from ..wutheringwaves_config import PREFIX
-from ..utils.error_reply import WAVES_CODE_102
 from .role_info_change import change_role_detail
-from ..utils.resource.constant import SPECIAL_CHAR
-from ..utils.damage.abstract import DamageDetailRegister
-from ..utils.char_info_utils import get_all_role_detail_info
+from ..utils import hint
 from ..utils.api.model import WeaponData, RoleDetailData, AccountBaseInfo
-from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.ascension.weapon import (
     WavesWeaponResult,
     get_breach,
     get_weapon_detail,
-)
-from ..utils.resource.download_file import (
-    get_chain_img,
-    get_skill_img,
-    get_phantom_img,
-)
-from ..utils.expression_ctx import (
-    prepare_phantom,
-    card_sort_map_to_attribute,
-    enhance_summation_card_value,
-    enhance_summation_phantom_value,
 )
 from ..utils.calculate import (
     get_calc_map,
@@ -43,6 +24,15 @@ from ..utils.calculate import (
     calc_phantom_entry,
     calc_phantom_score,
     get_total_score_bg,
+)
+from ..utils.char_info_utils import get_all_role_detail_info
+from ..utils.damage.abstract import DamageDetailRegister
+from ..utils.error_reply import WAVES_CODE_102
+from ..utils.expression_ctx import (
+    prepare_phantom,
+    card_sort_map_to_attribute,
+    enhance_summation_card_value,
+    enhance_summation_phantom_value,
 )
 from ..utils.fonts.waves_fonts import (
     waves_font_16,
@@ -80,6 +70,15 @@ from ..utils.image import (
     get_attribute_effect,
     draw_text_with_shadow,
 )
+from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
+from ..utils.resource.constant import SPECIAL_CHAR
+from ..utils.resource.download_file import (
+    get_chain_img,
+    get_skill_img,
+    get_phantom_img,
+)
+from ..utils.waves_api import waves_api
+from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -594,7 +593,7 @@ async def draw_char_detail_img(
         temp = copy.deepcopy(role_detail)
         try:
             role_detail, change_command = await change_role_detail(
-                role_detail, change_list_regex
+                uid, ck, role_detail, change_list_regex
             )
         except Exception as e:
             logger.exception(f"角色数据转换错误", e)
