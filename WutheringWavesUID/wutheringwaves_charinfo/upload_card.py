@@ -18,7 +18,7 @@ def get_hash_id(name):
 
 def get_char_id_and_name(char: str) -> (str, str, str):
     char_id = None
-    msg = f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
+    msg = f"[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
     sex = ""
     if "男" in char:
         char = char.replace("男", "")
@@ -37,19 +37,19 @@ def get_char_id_and_name(char: str) -> (str, str, str):
 
     if char_id in SPECIAL_CHAR:
         if not sex:
-            msg1 = f'[鸣潮] 主角面板【{char}】需要指定性别！\n'
+            msg1 = f"[鸣潮] 主角面板【{char}】需要指定性别！\n"
             return char_id, char, msg1
         char_id = SPECIAL_CHAR_ID[f"{char}·{sex}"]
 
-    return char_id, char, ''
+    return char_id, char, ""
 
 
 async def get_image(ev: Event):
     if ev.image:
         return ev.image
-    
+
     for content in ev.content:
-        if content.type == 'img' and content.data:
+        if content.type == "img" and content.data:
             return content.data
     return
 
@@ -59,21 +59,28 @@ async def upload_custom_card(bot: Bot, ev: Event, char: str):
 
     upload_image = await get_image(ev)
     if not upload_image:
-        return await bot.send(f'[鸣潮] 上传角色面板图失败\n请同时发送图片及其命令\n', at_sender)
+        return await bot.send(
+            f"[鸣潮] 上传角色面板图失败\n请同时发送图片及其命令\n", at_sender
+        )
 
     char_id, char, msg = get_char_id_and_name(char)
     if msg:
         return await bot.send(msg, at_sender)
 
-    temp_dir = CUSTOM_CARD_PATH / f'{char_id}'
+    temp_dir = CUSTOM_CARD_PATH / f"{char_id}"
     temp_dir.mkdir(parents=True, exist_ok=True)
 
     name = f"{char}_{int(time.time() * 1000)}.jpg"
     temp_path = temp_dir / name
-    if not temp_path.exists():
-        await download(upload_image, temp_dir, name, tag="[鸣潮]")
 
-    return await bot.send(f'[鸣潮]【{char}】上传面板图成功！\n')
+    code = None
+    if not temp_path.exists():
+        code = await download(upload_image, temp_dir, name, tag="[鸣潮]")
+
+    if isinstance(code, int) and code == 200:
+        return await bot.send(f"[鸣潮]【{char}】上传面板图成功！\n", at_sender)
+    else:
+        return await bot.send(f"[鸣潮]【{char}】上传面板图失败！\n", at_sender)
 
 
 async def get_custom_card_list(bot: Bot, ev: Event, char: str):
@@ -82,9 +89,9 @@ async def get_custom_card_list(bot: Bot, ev: Event, char: str):
     if msg:
         return await bot.send(msg, at_sender)
 
-    temp_dir = CUSTOM_CARD_PATH / f'{char_id}'
+    temp_dir = CUSTOM_CARD_PATH / f"{char_id}"
     if not temp_dir.exists():
-        return await bot.send(f'[鸣潮] 角色【{char}】暂未上传过面板图！\n', at_sender)
+        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过面板图！\n", at_sender)
 
     # 获取角色文件夹图片数量, 只要图片
     files = [
@@ -102,7 +109,7 @@ async def get_custom_card_list(bot: Bot, ev: Event, char: str):
 
     # imgs 5个一组
     for i in range(0, len(imgs), 10):
-        send = imgs[i:i + 10]
+        send = imgs[i : i + 10]
         await bot.send(send)
         await asyncio.sleep(0.5)
 
@@ -113,9 +120,9 @@ async def delete_custom_card(bot: Bot, ev: Event, char: str, hash_id: str):
     if msg:
         return await bot.send(msg, at_sender)
 
-    temp_dir = CUSTOM_CARD_PATH / f'{char_id}'
+    temp_dir = CUSTOM_CARD_PATH / f"{char_id}"
     if not temp_dir.exists():
-        return await bot.send(f'[鸣潮] 角色【{char}】暂未上传过面板图！\n', at_sender)
+        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过面板图！\n", at_sender)
 
     files_map = {
         get_hash_id(f.name): f
@@ -124,12 +131,16 @@ async def delete_custom_card(bot: Bot, ev: Event, char: str, hash_id: str):
     }
 
     if hash_id not in files_map:
-        return await bot.send(f'[鸣潮] 角色【{char}】未找到id为【{hash_id}】的面板图！\n', at_sender)
+        return await bot.send(
+            f"[鸣潮] 角色【{char}】未找到id为【{hash_id}】的面板图！\n", at_sender
+        )
 
     # 删除文件
     try:
         files_map[hash_id].unlink()
-        return await bot.send(f'[鸣潮] 删除角色【{char}】的id为【{hash_id}】的面板图成功！\n', at_sender)
+        return await bot.send(
+            f"[鸣潮] 删除角色【{char}】的id为【{hash_id}】的面板图成功！\n", at_sender
+        )
     except Exception as e:
         return
 
@@ -140,9 +151,9 @@ async def delete_all_custom_card(bot: Bot, ev: Event, char: str):
     if msg:
         return await bot.send(msg, at_sender)
 
-    temp_dir = CUSTOM_CARD_PATH / f'{char_id}'
+    temp_dir = CUSTOM_CARD_PATH / f"{char_id}"
     if not temp_dir.exists():
-        return await bot.send(f'[鸣潮] 角色【{char}】暂未上传过面板图！\n', at_sender)
+        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过面板图！\n", at_sender)
 
     files_map = {
         get_hash_id(f.name): f
@@ -151,7 +162,7 @@ async def delete_all_custom_card(bot: Bot, ev: Event, char: str):
     }
 
     if len(files_map) == 0:
-        return await bot.send(f'[鸣潮] 角色【{char}】暂未上传过面板图！\n', at_sender)
+        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过面板图！\n", at_sender)
 
     # 删除文件夹包括里面的内容
     try:
@@ -160,4 +171,4 @@ async def delete_all_custom_card(bot: Bot, ev: Event, char: str):
     except Exception as e:
         pass
 
-    return await bot.send(f'[鸣潮] 删除角色【{char}】的所有面板图成功！\n', at_sender)
+    return await bot.send(f"[鸣潮] 删除角色【{char}】的所有面板图成功！\n", at_sender)
