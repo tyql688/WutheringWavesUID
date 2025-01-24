@@ -68,11 +68,13 @@ def weapon_name_to_weapon_id(weapon_name: str) -> Optional[str]:
         return None
 
 
-def alias_to_sonata_name(sonata_name: str) -> str:
+def alias_to_sonata_name(sonata_name: str | None) -> str | None:
+    if sonata_name is None:
+        return None
     for i in sonata_alias_data:
         if (sonata_name in i) or (sonata_name in sonata_alias_data[i]):
             return i
-    return ""
+    return None
 
 
 def get_all_char_id() -> List[str]:

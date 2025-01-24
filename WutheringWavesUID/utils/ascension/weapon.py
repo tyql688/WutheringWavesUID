@@ -5,6 +5,7 @@ from typing import Union
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
+
 from ..ascension.constant import fixed_name
 
 MAP_PATH = Path(__file__).parent.parent / "map/detail_json/weapon"
@@ -12,13 +13,13 @@ weapon_id_data = {}
 
 
 def read_weapon_json_files(directory):
-    files = directory.rglob('*.json')
+    files = directory.rglob("*.json")
 
     for file in files:
         try:
-            with open(file, 'r', encoding='utf-8') as f:
+            with open(file, "r", encoding="utf-8") as f:
                 data = msgjson.decode(f.read())
-                file_name = file.name.split('.')[0]
+                file_name = file.name.split(".")[0]
                 weapon_id_data[file_name] = data
         except Exception as e:
             logger.exception(f"read_weapon_json_files load fail decoding {file}", e)
@@ -29,15 +30,15 @@ read_weapon_json_files(MAP_PATH)
 
 class WavesWeaponResult:
     def __int__(self):
-        self.name = None
-        self.starLevel = None
-        self.type = None
-        self.stats = None
-        self.param = None
-        self.effect = None
-        self.effectName = None
-        self.sub_effect = None
-        self.resonLevel = None
+        self.name: str = ""
+        self.starLevel: int = 4
+        self.type: int = 0
+        self.stats: list[dict] = []
+        self.param: list[list[int]] = []
+        self.effect: str = ""
+        self.effectName: str | None = None
+        self.sub_effect: dict[str, str] | None = None
+        self.resonLevel: int = 1
 
     def get_resonLevel_name(self):
         return f'谐振{["一", "二", "三", "四", "五"][self.resonLevel - 1]}阶'
@@ -66,7 +67,7 @@ def get_weapon_detail(
     weapon_id: Union[str, int],
     level: int,
     breach: Union[int, None] = None,
-    resonLevel: Union[int, None] = 1
+    resonLevel: Union[int, None] = 1,
 ) -> Union[WavesWeaponResult, None]:
     """
     breach 突破
@@ -90,7 +91,7 @@ def get_weapon_detail(
         resonLevel = 1
     result.resonLevel = resonLevel
     for i, p in enumerate(weapon_data["param"]):
-        _temp = '{' + str(i) + '}'
+        _temp = "{" + str(i) + "}"
         effect = effect.replace(f"{_temp}", str(p[resonLevel - 1]))
     result.effect = effect
 
@@ -107,21 +108,24 @@ def get_weapon_detail(
         if result.effect.startswith(v):
             value = weapon_data["param"][0][resonLevel - 1]
             name = v.replace("提升", "").replace("全", "")
-            result.sub_effect = {
-                "name": name,
-                "value": f"{value}"
-            }
+            result.sub_effect = {"name": name, "value": f"{value}"}
 
     return result
 
 
 def get_weapon_id(weapon_name):
-    return next((_id for _id, value in weapon_id_data.items() if value['name'] == weapon_name), None)
+    return next(
+        (_id for _id, value in weapon_id_data.items() if value["name"] == weapon_name),
+        None,
+    )
 
 
-def get_weapon_star(weapon_name):
+def get_weapon_star(weapon_name) -> int:
     weapon_id = get_weapon_id(weapon_name)
+    if weapon_id is None:
+        return 4
 
     result = get_weapon_detail(weapon_id, 90)
-
+    if result is None:
+        return 4
     return result.starLevel

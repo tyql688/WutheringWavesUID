@@ -1,14 +1,28 @@
 import re
+from typing import List
 
+from gsuid_core.logger import logger
 from ..utils.api.model import RoleDetailData
-from ..utils.ascension.sonata import get_sonata_detail, WavesSonataResult
-from ..utils.ascension.weapon import get_weapon_detail, WavesWeaponResult
+from ..utils.ascension.sonata import WavesSonataResult, get_sonata_detail
+from ..utils.ascension.weapon import WavesWeaponResult, get_weapon_detail
 from ..utils.name_convert import (
-    weapon_name_to_weapon_id,
-    alias_to_weapon_name,
     alias_to_sonata_name,
+    alias_to_weapon_name,
+    weapon_name_to_weapon_id,
 )
 from ..utils.resource.constant import SONATA_FIRST_ID
+
+phantom_main_value = [
+    {"name": "攻击", "values": ["18%", "30%", "33%"]},
+    {"name": "生命", "values": ["22.8%", "30%", "33%"]},
+    {"name": "防御", "values": ["18%", "38%", "41.8%"]},
+    {"name": "暴击", "values": ["0%", "0%", "22%"]},
+    {"name": "暴击伤害", "values": ["0%", "0%", "44%"]},
+    {"name": "共鸣效率", "values": ["0%", "32%", "0%"]},
+    {"name": "属性伤害加成", "values": ["0%", "30%", "0%"]},
+    {"name": "治疗效果加成", "values": ["0%", "0%", "26.4%"]},
+]
+phantom_main_value_map = {i["name"]: i["values"] for i in phantom_main_value}
 
 
 class ReplaceRole:
@@ -41,6 +55,13 @@ class ReplaceSonata:
 
 class ReplacePhantom:
     PREFIX_RE: list[str] = ["声骸", "圣遗物"]
+
+    # 主词条更换
+
+    def __init__(self):
+        self.mainc4: List[str] | None = None  # 主词条更换
+        self.mainc3: List[str] | None = None  # 主词条更换
+        self.mainc1: List[str] | None = None  # 主词条更换
 
 
 class ReplaceResult:
@@ -129,6 +150,68 @@ def parse_sonatas(content: str) -> str | None:
     return None
 
 
+def parse_main(content: str) -> list[tuple[str, list[str], str]]:
+    results = []
+    c4_attrs = []
+    c3_attrs = []
+    c1_attrs = []
+
+    attr_map = {
+        "暴击": "暴击",
+        "爆伤": "暴击伤害",
+        "暴伤": "暴击伤害",
+        "攻击": "攻击",
+        "攻": "攻击",
+        "属性": "属性伤害加成",
+        "属": "属性伤害加成",
+        "生命": "生命",
+        "防御": "防御",
+        "暴": "暴击",
+        "爆": "暴击伤害",
+        "防": "防御",
+        "生": "生命",
+    }
+
+    content = re.sub(r"^(?:主词条|主词|主|main)\s*", "", content)
+
+    # 处理带位置的属性
+    position_pattern = r"[cC]([134])\s*([^\s]+)"
+    for match in re.finditer(position_pattern, content):
+        position = match.group(1)
+        attrs_str = match.group(2)
+
+        # 解析属性组合
+        attr_pattern = r"([1-9])?\s*([^\s1-9]+)"
+        for attr_match in re.finditer(attr_pattern, attrs_str):
+            count = int(attr_match.group(1) or 1)
+            attr = attr_match.group(2)
+
+            base_attr = None
+            for key, value in attr_map.items():
+                if key in attr:
+                    base_attr = value
+                    break
+
+            if base_attr:
+                attr_list = [base_attr] * count
+                if position == "4":
+                    c4_attrs.extend(attr_list)
+                elif position == "3":
+                    c3_attrs.extend(attr_list)
+                elif position == "1":
+                    c1_attrs.extend(attr_list)
+
+    # 添加结果
+    if c4_attrs:
+        results.append((f"c4{''.join(c4_attrs)}", c4_attrs, "4"))
+    if c3_attrs:
+        results.append((f"c3{''.join(c3_attrs)}", c3_attrs, "3"))
+    if c1_attrs:
+        results.append((f"c1{''.join(c3_attrs)}", c1_attrs, "1"))
+
+    return results
+
+
 def get_breach(level: int):
     if level <= 20:
         breach = 0
@@ -174,12 +257,12 @@ class ChangeParser:
         for prefix in self.rr.phantom.PREFIX_RE:
             if cont.startswith(prefix):
                 cont = cont[len(prefix) :].strip()
+                matched_list.extend(self.parse_phantom(cont))
                 break
         for prefix in self.rr.sonata.PREFIX_RE:
             if cont.startswith(prefix):
                 cont = cont[len(prefix) :].strip()
                 matched_list.extend(self.parse_sonata(cont))
-
                 break
 
         if matched_list:
@@ -239,13 +322,27 @@ class ChangeParser:
             matched_list.append(f"换{self.rr.sonata.PREFIX_RE[0]} {sonata_name}")
         return matched_list
 
+    def parse_phantom(self, cont: str) -> list[str]:
+        matched_list = [f"换{self.rr.phantom.PREFIX_RE[0]}"]
+        main_results = parse_main(cont)
+        for main_result in main_results:
+            matched_string, attr_list, position = main_result
+            if position == "1":
+                self.rr.phantom.mainc1 = attr_list
+            elif position == "3":
+                self.rr.phantom.mainc3 = attr_list
+            else:  # position == "4" or default
+                self.rr.phantom.mainc4 = attr_list
+            matched_list.append(matched_string)
+        return matched_list
+
     def get_matched_content(self) -> str:
         return ";".join(self.matched_segments)
 
 
 async def change_role_detail(
     role_detail: RoleDetailData, change_list_regex: str
-) -> (RoleDetailData, str):
+) -> tuple[RoleDetailData, str]:
     parser: ChangeParser = ChangeParser(change_list_regex)
     parserResult: ReplaceResult = parser.rr
     if parserResult.role.skill:
@@ -278,14 +375,15 @@ async def change_role_detail(
 
     # 武器
     if parserResult.weapon.weaponId:
-        weapon_detail: WavesWeaponResult = get_weapon_detail(
+        weapon_detail: WavesWeaponResult | None = get_weapon_detail(
             parserResult.weapon.weaponId, 90
         )
-        weapon = role_detail.weaponData.weapon
-        if weapon.weaponType == weapon_detail.type:
-            weapon.weaponId = int(parserResult.weapon.weaponId)
-            weapon.weaponName = weapon_detail.name
-            weapon.weaponStarLevel = weapon_detail.starLevel
+        if weapon_detail:
+            weapon = role_detail.weaponData.weapon
+            if weapon.weaponType == weapon_detail.type:
+                weapon.weaponId = int(parserResult.weapon.weaponId)
+                weapon.weaponName = weapon_detail.name
+                weapon.weaponStarLevel = weapon_detail.starLevel
 
     if parserResult.weapon.level:
         weaponLevel = int(parserResult.weapon.level)
@@ -296,7 +394,7 @@ async def change_role_detail(
         role_detail.weaponData.resonLevel = int(parserResult.weapon.resonLevel)
 
     if parserResult.sonata.sonataName:
-        sonata_result: WavesSonataResult = get_sonata_detail(
+        sonata_result: WavesSonataResult | None = get_sonata_detail(
             parserResult.sonata.sonataName
         )
         if (
@@ -308,12 +406,66 @@ async def change_role_detail(
                 if not ep:
                     continue
                 ep.fetterDetail.name = sonata_result.name
-                if (
-                    index == 0
-                    and ep.phantomProp.phantomId
-                    not in SONATA_FIRST_ID[sonata_result.name]
+                if index == 0 and ep.phantomProp.phantomId not in SONATA_FIRST_ID.get(
+                    sonata_result.name, []
                 ):
-                    ep.phantomProp.phantomId = SONATA_FIRST_ID[sonata_result.name][0]
+                    ep.phantomProp.phantomId = SONATA_FIRST_ID.get(
+                        sonata_result.name, []
+                    )[0]
+
+    logger.debug(
+        f"声骸主词条: c4-{parserResult.phantom.mainc4}， c3-{parserResult.phantom.mainc3}, c1-{parserResult.phantom.mainc1}"
+    )
+    if parserResult.phantom.mainc4:
+        index = 0
+        mainc = parserResult.phantom.mainc4
+        if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
+            for ep in role_detail.phantomData.equipPhantomList:
+                if ep.cost != 4:
+                    continue
+                props = ep.mainProps
+                if not props:
+                    continue
+                if index >= len(mainc):
+                    break
+                props[0].attributeName = mainc[index]
+                props[0].attributeValue = phantom_main_value_map[mainc[index]][2]
+                index += 1
+    if parserResult.phantom.mainc3:
+        index = 0
+        mainc = parserResult.phantom.mainc3
+        if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
+            for ep in role_detail.phantomData.equipPhantomList:
+                if ep.cost != 3:
+                    continue
+                props = ep.mainProps
+                if not props:
+                    continue
+                if index >= len(mainc):
+                    break
+                if mainc[index] == "属性伤害加成":
+                    shuxing = f"{role_detail.role.attributeName}伤害加成"
+                else:
+                    shuxing = f"攻击"
+                props[0].attributeName = shuxing
+                props[0].attributeValue = phantom_main_value_map[mainc[index]][1]
+                index += 1
+
+    if parserResult.phantom.mainc1:
+        index = 0
+        mainc = parserResult.phantom.mainc1
+        if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
+            for ep in role_detail.phantomData.equipPhantomList:
+                if ep.cost != 1:
+                    continue
+                props = ep.mainProps
+                if not props:
+                    continue
+                if index >= len(mainc):
+                    break
+                props[0].attributeName = mainc[index]
+                props[0].attributeValue = phantom_main_value_map[mainc[index]][0]
+                index += 1
 
     return role_detail, parser.get_matched_content()
 
@@ -330,6 +482,15 @@ def test_change_parser():
         "换角色等级70 换武器90级 换角色4命",
         "换武器 换角色",
         "换武器90级 换角色命座6 换人物等级90 额外信息",
+        # 新增测试用例
+        "换声骸主词条4暴击暴伤",
+        "换声骸mainc3双攻击",
+        "换声骸主c1属性",
+        "换合鸣寒冰套装",
+        "换套装寒冰",
+        "换角色90级6命 换武器90级5精炼 换声骸主词条4暴击 换合鸣寒冰",
+        "换声骸主词条4双属性 换合鸣寒冰 换角色90级",
+        "换声骸主词条1双攻击 换声骸主词条3暴击 换声骸主词条4暴伤",
     ]
 
     for _, test_case in enumerate(test_cases):

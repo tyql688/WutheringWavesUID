@@ -2,11 +2,16 @@ import re
 
 from PIL import Image
 
-from gsuid_core.bot import Bot
-from gsuid_core.logger import logger
-from gsuid_core.models import Event
 from gsuid_core.sv import SV
+from gsuid_core.bot import Bot
+from gsuid_core.models import Event
+from gsuid_core.logger import logger
 from gsuid_core.utils.image.convert import convert_img
+
+from ..utils.hint import error_reply
+from ..utils.waves_prefix import PREFIX
+from ..utils.database.models import WavesBind
+from ..utils.error_reply import WAVES_CODE_103
 from .draw_char_card import draw_char_score_img, draw_char_detail_img
 from .upload_card import (
     delete_custom_card,
@@ -14,10 +19,6 @@ from .upload_card import (
     get_custom_card_list,
     delete_all_custom_card,
 )
-from ..utils.database.models import WavesBind
-from ..utils.error_reply import WAVES_CODE_103
-from ..utils.hint import error_reply
-from ..utils.waves_prefix import PREFIX
 
 waves_new_get_char_info = SV("waves新获取面板", priority=3)
 waves_new_char_detail = SV(f"waves新角色面板", priority=4)
@@ -179,7 +180,7 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
 @waves_new_char_detail.on_regex(
     rf"^{PREFIX}(\d+)?[\u4e00-\u9fa5]+(?:权重)$", block=True
 )
-async def send_char_detail_msg2(bot: Bot, ev: Event):
+async def send_char_detail_msg2_weight(bot: Bot, ev: Event):
     match = re.search(
         rf"{PREFIX}(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?:权重)", ev.raw_text
     )
