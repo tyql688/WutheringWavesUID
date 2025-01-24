@@ -501,26 +501,6 @@ async def change_role_detail(
     if parserResult.weapon.resonLevel:
         role_detail.weaponData.resonLevel = int(parserResult.weapon.resonLevel)
 
-    if parserResult.sonata.sonataName:
-        sonata_result: WavesSonataResult | None = get_sonata_detail(
-            parserResult.sonata.sonataName
-        )
-        if (
-            sonata_result
-            and role_detail.phantomData
-            and role_detail.phantomData.equipPhantomList
-        ):
-            for index, ep in enumerate(role_detail.phantomData.equipPhantomList):
-                if not ep:
-                    continue
-                ep.fetterDetail.name = sonata_result.name
-                if index == 0 and ep.phantomProp.phantomId not in SONATA_FIRST_ID.get(
-                    sonata_result.name, []
-                ):
-                    ep.phantomProp.phantomId = SONATA_FIRST_ID.get(
-                        sonata_result.name, []
-                    )[0]
-
     if parserResult.phantom.phantomList:
         for ph_info in parserResult.phantom.phantomList:
             logger.debug(f"[GsCore] 声骸替换：{ph_info}")
@@ -586,6 +566,25 @@ async def change_role_detail(
                 props[0].attributeValue = phantom_main_value_map[mainc[index]][0]
                 index += 1
 
+    if parserResult.sonata.sonataName:
+        sonata_result: WavesSonataResult | None = get_sonata_detail(
+            parserResult.sonata.sonataName
+        )
+        if (
+            sonata_result
+            and role_detail.phantomData
+            and role_detail.phantomData.equipPhantomList
+        ):
+            for index, ep in enumerate(role_detail.phantomData.equipPhantomList):
+                if not ep:
+                    continue
+                ep.fetterDetail.name = sonata_result.name
+                if index == 0 and ep.phantomProp.phantomId not in SONATA_FIRST_ID.get(
+                    sonata_result.name, []
+                ):
+                    ep.phantomProp.phantomId = SONATA_FIRST_ID.get(
+                        sonata_result.name, []
+                    )[0]
     return role_detail, parser.get_matched_content()
 
 
