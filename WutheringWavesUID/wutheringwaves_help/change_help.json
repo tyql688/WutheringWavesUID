@@ -83,6 +83,35 @@
       }
     ]
   },
+  "替换声骸": {
+    "desc": "替换声骸；如【xx面板 换声骸长离】or【xx面板 换声骸uid长离2到2】",
+    "data": [
+      {
+        "name": "替换全部声骸",
+        "desc": "替换全部声骸",
+        "eg": "炽霞面板 换声骸长离",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "替换全部声骸2",
+        "desc": "替换全部声骸2",
+        "eg": "炽霞面板换声骸uid长离",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "替换声骸",
+        "desc": "替换声骸",
+        "eg": "炽霞面板换声骸长离2到2",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
   "进阶1": {
     "desc": "ww长离面板 换角色 90级 满链 技能 10 10 10 10 10",
     "data": []
