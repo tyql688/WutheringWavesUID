@@ -17,6 +17,7 @@ from ..utils.ascension.weapon import (
     get_breach,
     get_weapon_detail,
 )
+from ..utils.calc import WuWaCalc
 from ..utils.calculate import (
     get_calc_map,
     get_max_score,
@@ -28,12 +29,6 @@ from ..utils.calculate import (
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.damage.abstract import DamageDetailRegister
 from ..utils.error_reply import WAVES_CODE_102
-from ..utils.expression_ctx import (
-    prepare_phantom,
-    card_sort_map_to_attribute,
-    enhance_summation_card_value,
-    enhance_summation_phantom_value,
-)
 from ..utils.fonts.waves_fonts import (
     waves_font_16,
     waves_font_18,
@@ -176,24 +171,31 @@ async def ph_card_draw(
 
     ph_0 = Image.open(TEXT_PATH / "ph_0.png")
     ph_1 = Image.open(TEXT_PATH / "ph_1.png")
-    phantom_sum_value = {}
+    #  phantom_sum_value = {}
+    calc = WuWaCalc(role_detail)
     if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
         totalCost = role_detail.phantomData.cost
         equipPhantomList = role_detail.phantomData.equipPhantomList
         phantom_score = 0
 
-        phantom_sum_value = prepare_phantom(equipPhantomList)
-        phantom_sum_value = enhance_summation_phantom_value(
-            char_id,
-            role_detail.role.level,
-            role_detail.role.breach,
-            weaponData.weapon.weaponId,
-            weaponData.level,
-            weaponData.breach,
-            weaponData.resonLevel,
-            phantom_sum_value,
-        )
-        calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
+        calc.phantom_pre = calc.prepare_phantom()
+        calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
+        calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
+
+        # phantom_sum_value = prepare_phantom(equipPhantomList)
+        # phantom_sum_value = enhance_summation_phantom_value(
+        #     char_id,
+        #     role_detail.role.level,
+        #     role_detail.role.breach,
+        #     weaponData.weapon.weaponId,
+        #     weaponData.level,
+        #     weaponData.breach,
+        #     weaponData.resonLevel,
+        #     phantom_sum_value,
+        # )
+        # 这里用的是角色面板重新获取的计算文件
+        # calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
+
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new("RGBA", (350, 550))
             sh_temp_draw = ImageDraw.Draw(sh_temp)
@@ -202,7 +204,7 @@ async def ph_card_draw(
             if _phantom and _phantom.phantomProp:
                 props = _phantom.get_props()
                 _score, _bg = calc_phantom_score(
-                    char_name, props, _phantom.cost, calc_temp
+                    char_name, props, _phantom.cost, calc.calc_temp
                 )
 
                 phantom_score += _score
@@ -267,7 +269,7 @@ async def ph_card_draw(
                     num_color = "white"
                     if index > 1:
                         name_color, num_color = get_valid_color(
-                            _prop.attributeName, _prop.attributeValue, calc_temp
+                            _prop.attributeName, _prop.attributeValue, calc.calc_temp
                         )
                     sh_temp_draw.text(
                         (60, 187 + index * oset),
@@ -293,7 +295,7 @@ async def ph_card_draw(
                 )
 
         if phantom_score > 0:
-            _bg = get_total_score_bg(char_name, phantom_score, calc_temp)
+            _bg = get_total_score_bg(char_name, phantom_score, calc.calc_temp)
             sh_score_bg_c = Image.open(TEXT_PATH / f"sh_score_bg_{_bg}.png")
             score_temp = Image.new("RGBA", sh_score_bg_c.size)
             score_temp.alpha_composite(sh_score_bg_c)
@@ -322,14 +324,14 @@ async def ph_card_draw(
             for ni, name_default in enumerate(m):
                 name, default_value = name_default
                 if name == "属性伤害加成":
-                    value = phantom_sum_value.get(shuxing, default_value)
+                    value = calc.phantom_card.get(shuxing, default_value)
                     prop_img = await get_attribute_prop(shuxing)
-                    name_color, _ = get_valid_color(shuxing, value, calc_temp)
+                    name_color, _ = get_valid_color(shuxing, value, calc.calc_temp)
                     name = shuxing
                 else:
-                    value = phantom_sum_value.get(name, default_value)
+                    value = calc.phantom_card.get(name, default_value)
                     prop_img = await get_attribute_prop(name)
-                    name_color, _ = get_valid_color(name, value, calc_temp)
+                    name_color, _ = get_valid_color(name, value, calc.calc_temp)
                 prop_img = prop_img.resize((40, 40))
                 ph_bg = ph_0.copy() if ni % 2 == 0 else ph_1.copy()
                 ph_bg.alpha_composite(prop_img, (20, 32))
@@ -347,7 +349,7 @@ async def ph_card_draw(
 
         ph_tips_draw.text((20, 50), f"[提示]评分模板", "white", waves_font_24, "lm")
         ph_tips_draw.text(
-            (350, 50), f'{calc_temp["name"]}', (255, 255, 0), waves_font_24, "rm"
+            (350, 50), f'{calc.calc_temp["name"]}', (255, 255, 0), waves_font_24, "rm"
         )
         # phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 100 + 4 * 50))
         phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 45))
@@ -359,7 +361,7 @@ async def ph_card_draw(
             )
 
     img.paste(phantom_temp, (0, 1320 + jineng_len), phantom_temp)
-    return phantom_sum_value
+    return calc
 
 
 async def get_role_need(
@@ -705,23 +707,24 @@ async def draw_char_detail_img(
     img.paste(mz_temp, (0, 1080 + jineng_len), mz_temp)
 
     # 声骸
-    phantom_sum_value = await ph_card_draw(
+    calc: WuWaCalc = await ph_card_draw(
         ph_sum_value, jineng_len, role_detail, img, isDraw, change_command
     )
-    # 面板
-    card_map = enhance_summation_card_value(
-        char_id,
-        role_detail.role.level,
-        role_detail.role.breach,
-        role_detail.role.attributeName,
-        weaponData.weapon.weaponId,
-        weaponData.level,
-        weaponData.breach,
-        weaponData.resonLevel,
-        phantom_sum_value,
-        card_sort_map,
-    )
-    calc_temp = get_calc_map(card_map, role_detail.role.roleName)
+    calc.role_card = calc.enhance_summation_card_value(calc.phantom_card)
+    # # 面板
+    # card_map = enhance_summation_card_value(
+    #     char_id,
+    #     role_detail.role.level,
+    #     role_detail.role.breach,
+    #     role_detail.role.attributeName,
+    #     weaponData.weapon.weaponId,
+    #     weaponData.level,
+    #     weaponData.breach,
+    #     weaponData.resonLevel,
+    #     phantom_sum_value,
+    #     card_sort_map,
+    # )
+    # calc_temp = get_calc_map(card_map, role_detail.role.roleName)
 
     if (
         isDraw
@@ -729,7 +732,8 @@ async def draw_char_detail_img(
         and role_detail.phantomData
         and role_detail.phantomData.equipPhantomList
     ):
-        damageAttribute = card_sort_map_to_attribute(card_map)
+        # damageAttribute = card_sort_map_to_attribute(card_map)
+        calc.damageAttribute = calc.card_sort_map_to_attribute(calc.role_card)
         damage_title_bg = damage_bar1.copy()
         damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
         damage_title_bg_draw.text(
@@ -744,7 +748,7 @@ async def draw_char_detail_img(
         img.alpha_composite(damage_title_bg, dest=(0, 2600 + ph_sum_value + jineng_len))
         for dindex, damage_temp in enumerate(damageDetail):
             damage_title = damage_temp["title"]
-            damageAttributeTemp = copy.deepcopy(damageAttribute)
+            damageAttributeTemp = copy.deepcopy(calc.damageAttribute)
             crit_damage, expected_damage = damage_temp["func"](
                 damageAttributeTemp, role_detail
             )
@@ -782,14 +786,14 @@ async def draw_char_detail_img(
     for index, name_default in enumerate(card_sort_name):
         name, default_value = name_default
         if name == "属性伤害加成":
-            value = card_map.get(shuxing, default_value)
+            value = calc.role_card.get(shuxing, default_value)
             prop_img = await get_attribute_prop(shuxing)
-            name_color, _ = get_valid_color(shuxing, value, calc_temp)
+            name_color, _ = get_valid_color(shuxing, value, calc.calc_temp)
             name = shuxing
         else:
-            value = card_map.get(name, default_value)
+            value = calc.role_card.get(name, default_value)
             prop_img = await get_attribute_prop(name)
-            name_color, _ = get_valid_color(name, value, calc_temp)
+            name_color, _ = get_valid_color(name, value, calc.calc_temp)
 
         prop_img = prop_img.resize((40, 40))
         sh_bg.alpha_composite(prop_img, (60, 40 + index * 55))
@@ -843,8 +847,9 @@ async def draw_char_detail_img(
         and role_detail.phantomData.equipPhantomList
     ):
         damage_title = damage_calc["title"]
-        damageAttribute = card_sort_map_to_attribute(card_map)
-        damageAttributeTemp = copy.deepcopy(damageAttribute)
+        # damageAttribute = card_sort_map_to_attribute(card_map)
+        calc.damageAttribute = calc.card_sort_map_to_attribute(calc.role_card)
+        damageAttributeTemp = copy.deepcopy(calc.damageAttribute)
         crit_damage, expected_damage = damage_calc["func"](
             damageAttributeTemp, role_detail
         )
@@ -963,18 +968,23 @@ async def draw_char_score_img(
         equipPhantomList = role_detail.phantomData.equipPhantomList
         phantom_score = 0
 
-        phantom_sum_value = prepare_phantom(equipPhantomList)
-        phantom_sum_value = enhance_summation_phantom_value(
-            char_id,
-            role_detail.role.level,
-            role_detail.role.breach,
-            weaponData.weapon.weaponId,
-            weaponData.level,
-            weaponData.breach,
-            weaponData.resonLevel,
-            phantom_sum_value,
-        )
-        calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
+        calc: WuWaCalc = WuWaCalc(role_detail)
+        calc.phantom_pre = calc.prepare_phantom()
+        calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
+        calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
+
+        # phantom_sum_value = prepare_phantom(equipPhantomList)
+        # phantom_sum_value = enhance_summation_phantom_value(
+        #     char_id,
+        #     role_detail.role.level,
+        #     role_detail.role.breach,
+        #     weaponData.weapon.weaponId,
+        #     weaponData.level,
+        #     weaponData.breach,
+        #     weaponData.resonLevel,
+        #     phantom_sum_value,
+        # )
+        # calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new("RGBA", (600, 1100))
             sh_temp_draw = ImageDraw.Draw(sh_temp)
@@ -983,7 +993,7 @@ async def draw_char_score_img(
             if _phantom and _phantom.phantomProp:
                 props = _phantom.get_props()
                 _score, _bg = calc_phantom_score(
-                    char_name, props, _phantom.cost, calc_temp
+                    char_name, props, _phantom.cost, calc.calc_temp
                 )
 
                 phantom_score += _score
@@ -1045,7 +1055,7 @@ async def draw_char_score_img(
                     num_color = "white"
                     if index > 1:
                         name_color, num_color = get_valid_color(
-                            _prop.attributeName, _prop.attributeValue, calc_temp
+                            _prop.attributeName, _prop.attributeValue, calc.calc_temp
                         )
                     sh_temp_draw.text(
                         (15, 187 + index * oset),
@@ -1063,7 +1073,7 @@ async def draw_char_score_img(
                     )
 
                     score, final_score = calc_phantom_entry(
-                        index, _prop, _phantom.cost, calc_temp
+                        index, _prop, _phantom.cost, calc.calc_temp
                     )
                     score_color = WAVES_MOONLIT
                     if final_score > 0:
@@ -1076,7 +1086,7 @@ async def draw_char_score_img(
                         "rm",
                     )
 
-                max_score, _ = get_max_score(_phantom.cost, calc_temp)
+                max_score, _ = get_max_score(_phantom.cost, calc.calc_temp)
                 sh_temp_draw.text(
                     (343, 191 + 7 * 55),
                     f"C{_phantom.cost}最高分(未对齐):{max_score}分",
@@ -1090,7 +1100,7 @@ async def draw_char_score_img(
                 )
 
         if phantom_score > 0:
-            _bg = get_total_score_bg(char_name, phantom_score, calc_temp)
+            _bg = get_total_score_bg(char_name, phantom_score, calc.calc_temp)
             sh_score_bg_c = Image.open(TEXT_PATH / f"sh_score_bg_{_bg}.png")
             score_temp = Image.new("RGBA", sh_score_bg_c.size)
             score_temp.alpha_composite(sh_score_bg_c)
@@ -1120,12 +1130,12 @@ async def draw_char_score_img(
                 if name == "属性伤害加成":
                     value = phantom_sum_value.get(shuxing, default_value)
                     prop_img = await get_attribute_prop(shuxing)
-                    name_color, _ = get_valid_color(shuxing, value, calc_temp)
+                    name_color, _ = get_valid_color(shuxing, value, calc.calc_temp)
                     name = shuxing
                 else:
                     value = phantom_sum_value.get(name, default_value)
                     prop_img = await get_attribute_prop(name)
-                    name_color, _ = get_valid_color(name, value, calc_temp)
+                    name_color, _ = get_valid_color(name, value, calc.calc_temp)
                 prop_img = prop_img.resize((40, 40))
                 ph_bg = ph_0.copy() if ni % 2 == 0 else ph_1.copy()
                 ph_bg.alpha_composite(prop_img, (20, 32))
@@ -1144,16 +1154,16 @@ async def draw_char_score_img(
         ph_tips_draw = ImageDraw.Draw(ph_tips)
         ph_tips_draw.text((20, 50), f"[提示]评分模板", "white", waves_font_24, "lm")
         ph_tips_draw.text(
-            (350, 50), f'{calc_temp["name"]}', (255, 255, 0), waves_font_24, "rm"
+            (350, 50), f'{calc.calc_temp["name"]}', (255, 255, 0), waves_font_24, "rm"
         )
         phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 45))
 
         # 简介数据
         weight_list_temp = weight_list.copy()
         entry_type_list = weight_list_temp[0].split(",")[1:]
-        main_props = calc_temp["main_props"]
-        sub_pros = calc_temp["sub_props"]
-        skill_weight = calc_temp["skill_weight"]
+        main_props = calc.calc_temp["main_props"]
+        sub_pros = calc.calc_temp["sub_props"]
+        skill_weight = calc.calc_temp["skill_weight"]
         for i, entry in enumerate(weight_list_temp[1:], start=1):
             entry_list = []
             if entry == "属性伤害加成":
@@ -1188,7 +1198,7 @@ async def draw_char_score_img(
             weight_list_temp[i] = ",".join(entry_list)
 
         await draw_weight(
-            introduce_temp, role_detail.role.roleName, weight_list_temp, calc_temp
+            introduce_temp, role_detail.role.roleName, weight_list_temp, calc.calc_temp
         )
 
     char_bg = Image.open(TEXT_PATH / "char.png")

@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import time
 from pathlib import Path
 from typing import Optional, Union, List
@@ -15,32 +14,52 @@ from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import RoleDetailData, WeaponData
 from ..utils.ascension.char import get_breach
 from ..utils.cache import TimedCache
+from ..utils.calc import WuWaCalc
 from ..utils.calculate import get_calc_map, calc_phantom_score, get_total_score_bg
 from ..utils.damage.abstract import DamageRankRegister
 from ..utils.database.models import WavesBind, WavesUser
-from ..utils.expression_ctx import prepare_phantom, enhance_summation_phantom_value, enhance_summation_card_value, \
-    card_sort_map_to_attribute
-from ..utils.fonts.waves_fonts import waves_font_18, waves_font_34, waves_font_16, waves_font_40, waves_font_30, \
-    waves_font_24, waves_font_20, waves_font_44, waves_font_14
-from ..utils.image import get_waves_bg, add_footer, get_square_avatar, SPECIAL_GOLD, \
-    get_square_weapon, CHAIN_COLOR, get_attribute, get_attribute_effect, \
-    GREY, RED, get_role_pile_old, WEAPON_RESONLEVEL_COLOR, get_qq_avatar
+from ..utils.fonts.waves_fonts import (
+    waves_font_18,
+    waves_font_34,
+    waves_font_16,
+    waves_font_40,
+    waves_font_30,
+    waves_font_24,
+    waves_font_20,
+    waves_font_44,
+    waves_font_14,
+)
+from ..utils.image import (
+    get_waves_bg,
+    add_footer,
+    get_square_avatar,
+    SPECIAL_GOLD,
+    get_square_weapon,
+    CHAIN_COLOR,
+    get_attribute,
+    get_attribute_effect,
+    GREY,
+    RED,
+    get_role_pile_old,
+    WEAPON_RESONLEVEL_COLOR,
+    get_qq_avatar,
+)
 from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
-from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME, card_sort_map
+from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.waves_card_cache import get_card, get_rank, get_self_rank
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 rank_length = 20  # 排行长度
-TEXT_PATH = Path(__file__).parent / 'texture2d'
-TITLE_I = Image.open(TEXT_PATH / 'title.png')
-TITLE_II = Image.open(TEXT_PATH / 'title2.png')
-avatar_mask = Image.open(TEXT_PATH / 'avatar_mask.png')
-weapon_icon_bg_3 = Image.open(TEXT_PATH / 'weapon_icon_bg_3.png')
-weapon_icon_bg_4 = Image.open(TEXT_PATH / 'weapon_icon_bg_4.png')
-weapon_icon_bg_5 = Image.open(TEXT_PATH / 'weapon_icon_bg_5.png')
-promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
-char_mask = Image.open(TEXT_PATH / 'char_mask.png')
-logo_img = Image.open(TEXT_PATH / f'logo_small_2.png')
+TEXT_PATH = Path(__file__).parent / "texture2d"
+TITLE_I = Image.open(TEXT_PATH / "title.png")
+TITLE_II = Image.open(TEXT_PATH / "title2.png")
+avatar_mask = Image.open(TEXT_PATH / "avatar_mask.png")
+weapon_icon_bg_3 = Image.open(TEXT_PATH / "weapon_icon_bg_3.png")
+weapon_icon_bg_4 = Image.open(TEXT_PATH / "weapon_icon_bg_4.png")
+weapon_icon_bg_5 = Image.open(TEXT_PATH / "weapon_icon_bg_5.png")
+promote_icon = Image.open(TEXT_PATH / "promote_icon.png")
+char_mask = Image.open(TEXT_PATH / "char_mask.png")
+logo_img = Image.open(TEXT_PATH / f"logo_small_2.png")
 pic_cache = TimedCache(86400, 200)
 
 
@@ -58,90 +77,127 @@ class RankInfo(BaseModel):
     sonata_name: str  # 合鸣效果
 
 
-CardUseOptions = WutheringWavesConfig.get_config('CardUseOptions').data
+CardUseOptions = WutheringWavesConfig.get_config("CardUseOptions").data
 
 
 async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
     equipPhantomList = role_detail.phantomData.equipPhantomList
     weaponData = role_detail.weaponData
-    phantom_sum_value = prepare_phantom(equipPhantomList)
-    phantom_sum_value = enhance_summation_phantom_value(
-        role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
-        weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
-        phantom_sum_value)
+    # phantom_sum_value = prepare_phantom(equipPhantomList)
+    # phantom_sum_value = enhance_summation_phantom_value(
+    #     role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
+    #     weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
+    #     phantom_sum_value)
+
+    calc: WuWaCalc = WuWaCalc(role_detail)
+    calc.phantom_pre = calc.prepare_phantom()
+    calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
+    calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
 
     # 评分
     phantom_score = 0
-    calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
+    # calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
     for i, _phantom in enumerate(equipPhantomList):
         if _phantom and _phantom.phantomProp:
             props = _phantom.get_props()
-            _score, _bg = calc_phantom_score(role_detail.role.roleName, props, _phantom.cost, calc_temp)
+            _score, _bg = calc_phantom_score(
+                role_detail.role.roleName, props, _phantom.cost, calc.calc_temp
+            )
             phantom_score += _score
 
     if phantom_score == 0:
         return
 
-    phantom_bg = get_total_score_bg(role_detail.role.roleName, phantom_score, calc_temp)
+    phantom_bg = get_total_score_bg(
+        role_detail.role.roleName, phantom_score, calc.calc_temp
+    )
 
     # 面板
-    temp_card_sort_map = copy.deepcopy(card_sort_map)
-    card_map = enhance_summation_card_value(
-        role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
-        role_detail.role.attributeName,
-        weaponData.weapon.weaponId, weaponData.level, weaponData.breach,
-        weaponData.resonLevel,
-        phantom_sum_value, temp_card_sort_map
-    )
-    damageAttribute = card_sort_map_to_attribute(card_map)
+    # temp_card_sort_map = copy.deepcopy(card_sort_map)
+    # card_map = enhance_summation_card_value(
+    #     role_detail.role.roleId,
+    #     role_detail.role.level,
+    #     role_detail.role.breach,
+    #     role_detail.role.attributeName,
+    #     weaponData.weapon.weaponId,
+    #     weaponData.level,
+    #     weaponData.breach,
+    #     weaponData.resonLevel,
+    #     phantom_sum_value,
+    #     temp_card_sort_map,
+    # )
+    # damageAttribute = card_sort_map_to_attribute(card_map)
+
+    calc.role_card = calc.enhance_summation_card_value(calc.phantom_card)
+    calc.damageAttribute = calc.card_sort_map_to_attribute(calc.role_card)
 
     if rankDetail:
-        crit_damage, expected_damage = rankDetail['func'](damageAttribute, role_detail)
+        crit_damage, expected_damage = rankDetail["func"](
+            calc.damageAttribute, role_detail
+        )
     else:
-        expected_damage = '0'
+        expected_damage = "0"
 
-    sonata_name = ''
-    for ph in phantom_sum_value.get('ph_detail', []):
-        if ph['ph_num'] == 5:
-            sonata_name = ph['ph_name']
+    sonata_name = ""
+    for ph in calc.phantom_card.get("ph_detail", []):
+        if ph["ph_num"] == 5:
+            sonata_name = ph["ph_name"]
 
-    rankInfo = RankInfo(**{
-        'roleDetail': role_detail,
-        'qid': user_id,
-        'uid': uid,
-        'level': role_detail.role.level,
-        'chain': role_detail.get_chain_num(),
-        'chainName': role_detail.get_chain_name(),
-        'score': round(phantom_score, 2),
-        'score_bg': phantom_bg,
-        'expected_damage': expected_damage,
-        'expected_damage_int': int(expected_damage.replace(',', '')),
-        'sonata_name': sonata_name,
-    })
+    rankInfo = RankInfo(
+        **{
+            "roleDetail": role_detail,
+            "qid": user_id,
+            "uid": uid,
+            "level": role_detail.role.level,
+            "chain": role_detail.get_chain_num(),
+            "chainName": role_detail.get_chain_name(),
+            "score": round(phantom_score, 2),
+            "score_bg": phantom_bg,
+            "expected_damage": expected_damage,
+            "expected_damage_int": int(expected_damage.replace(",", "")),
+            "sonata_name": sonata_name,
+        }
+    )
     return rankInfo
 
 
-async def find_role_detail(uid: str,
-                           char_id: Union[int, List[int]]) -> Optional[RoleDetailData]:
+async def find_role_detail(
+    uid: str, char_id: Union[int, List[int]]
+) -> Optional[RoleDetailData]:
     role_details = await get_card(uid)
     if role_details is None:
         return None
 
     # 使用生成器来进行过滤
-    return next((role for role in role_details if str(role.role.roleId) in char_id), None)
+    return next(
+        (role for role in role_details if str(role.role.roleId) in char_id), None
+    )
 
 
-async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDetail, tokenLimitFlag,
-                                 wavesTokenUsersMap):
+async def get_rank_info_for_user(
+    user: WavesBind,
+    char_id,
+    find_char_id,
+    rankDetail,
+    tokenLimitFlag,
+    wavesTokenUsersMap,
+):
     rankInfoList = []
     if not user.uid:
         return rankInfoList
 
-    tasks = [find_role_detail(uid, find_char_id) for uid in user.uid.split('_')]
+    tasks = [find_role_detail(uid, find_char_id) for uid in user.uid.split("_")]
     role_details = await asyncio.gather(*tasks)
 
-    for uid, role_detail in zip(user.uid.split('_'), role_details):
-        if tokenLimitFlag and (user.user_id, uid,) not in wavesTokenUsersMap:
+    for uid, role_detail in zip(user.uid.split("_"), role_details):
+        if (
+            tokenLimitFlag
+            and (
+                user.user_id,
+                uid,
+            )
+            not in wavesTokenUsersMap
+        ):
             continue
         if not role_detail:
             continue
@@ -156,18 +212,26 @@ async def get_rank_info_for_user(user: WavesBind, char_id, find_char_id, rankDet
     return rankInfoList
 
 
-async def get_all_rank_info(users: List[WavesBind], char_id, find_char_id, rankDetail, tokenLimitFlag,
-                            wavesTokenUsersMap):
+async def get_all_rank_info(
+    users: List[WavesBind],
+    char_id,
+    find_char_id,
+    rankDetail,
+    tokenLimitFlag,
+    wavesTokenUsersMap,
+):
     semaphore = asyncio.Semaphore(50)
 
     async def process_user(user):
         async with semaphore:
-            return await get_rank_info_for_user(user,
-                                                char_id,
-                                                find_char_id,
-                                                rankDetail,
-                                                tokenLimitFlag,
-                                                wavesTokenUsersMap)
+            return await get_rank_info_for_user(
+                user,
+                char_id,
+                find_char_id,
+                rankDetail,
+                tokenLimitFlag,
+                wavesTokenUsersMap,
+            )
 
     tasks = [process_user(user) for user in users]
     results = await asyncio.gather(*tasks)
@@ -182,15 +246,21 @@ async def get_waves_token_condition(ev, is_bot):
     flag = False
 
     # 群组 不限制token
-    WavesRankUseTokenGroup = WutheringWavesConfig.get_config('WavesRankNoLimitGroup').data
+    WavesRankUseTokenGroup = WutheringWavesConfig.get_config(
+        "WavesRankNoLimitGroup"
+    ).data
     if not is_bot and WavesRankUseTokenGroup and ev.group_id in WavesRankUseTokenGroup:
         return flag, wavesTokenUsersMap
 
     # 群组 自定义的
-    WavesRankUseTokenGroup = WutheringWavesConfig.get_config('WavesRankUseTokenGroup').data
+    WavesRankUseTokenGroup = WutheringWavesConfig.get_config(
+        "WavesRankUseTokenGroup"
+    ).data
     # 全局 主人定义的
-    RankUseToken = WutheringWavesConfig.get_config('RankUseToken').data
-    if (WavesRankUseTokenGroup and ev.group_id in WavesRankUseTokenGroup) or RankUseToken:
+    RankUseToken = WutheringWavesConfig.get_config("RankUseToken").data
+    if (
+        WavesRankUseTokenGroup and ev.group_id in WavesRankUseTokenGroup
+    ) or RankUseToken:
         wavesTokenUsers = await WavesUser.get_waves_all_user()
         wavesTokenUsersMap = {(w.user_id, w.uid): w.cookie for w in wavesTokenUsers}
         flag = True
@@ -201,12 +271,14 @@ async def get_waves_token_condition(ev, is_bot):
 async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: bool):
     char_id = char_name_to_char_id(char)
     if not char_id:
-        return f'[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n'
+        return (
+            f"[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
+        )
     char_name = alias_to_char_name(char)
 
     rankDetail = DamageRankRegister.find_class(char_id)
     if not rankDetail and rank_type == "伤害":
-        return f'[鸣潮] 角色【{char_name}排行】暂未适配伤害计算，请等待作者更新！\n'
+        return f"[鸣潮] 角色【{char_name}排行】暂未适配伤害计算，请等待作者更新！\n"
 
     if char_id in SPECIAL_CHAR:
         find_char_id = SPECIAL_CHAR[char_id]
@@ -214,7 +286,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         find_char_id = char_id
 
     start_time = time.time()
-    logger.info(f'[get_rank_info_for_user] start: {start_time}')
+    logger.info(f"[get_rank_info_for_user] start: {start_time}")
     # 获取群里的所有拥有该角色人的数据
     if is_bot:
         # users = (await user_bind_cache.get_all()).values()
@@ -230,14 +302,16 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     if not users:
         msg = []
         if is_bot:
-            msg.append(f'[鸣潮] bot内暂无【{char}】面板')
+            msg.append(f"[鸣潮] bot内暂无【{char}】面板")
         else:
-            msg.append(f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板')
-        msg.append(f'请使用【{PREFIX}刷新面板】后再使用此功能！')
+            msg.append(f"[鸣潮] 群【{ev.group_id}】暂无【{char}】面板")
+        msg.append(f"请使用【{PREFIX}刷新面板】后再使用此功能！")
         if tokenLimitFlag:
-            msg.append(f'当前排行开启了登录验证，请使用命令【{PREFIX}登录】登录后此功能！')
-        msg.append('')
-        return '\n'.join(msg)
+            msg.append(
+                f"当前排行开启了登录验证，请使用命令【{PREFIX}登录】登录后此功能！"
+            )
+        msg.append("")
+        return "\n".join(msg)
 
     self_uid = None
     role_detail = None
@@ -249,24 +323,34 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     except Exception as _:
         pass
 
-    damage_title = (rankDetail and rankDetail['title']) or "无"
-    rankInfoList = await get_all_rank_info(users, char_id, find_char_id, rankDetail, tokenLimitFlag, wavesTokenUsersMap)
+    damage_title = (rankDetail and rankDetail["title"]) or "无"
+    rankInfoList = await get_all_rank_info(
+        users, char_id, find_char_id, rankDetail, tokenLimitFlag, wavesTokenUsersMap
+    )
     if len(rankInfoList) == 0:
         msg = []
         if is_bot:
-            msg.append(f'[鸣潮] bot内暂无【{char}】面板')
+            msg.append(f"[鸣潮] bot内暂无【{char}】面板")
         else:
-            msg.append(f'[鸣潮] 群【{ev.group_id}】暂无【{char}】面板')
-        msg.append(f'请使用【{PREFIX}刷新面板】后再使用此功能！')
+            msg.append(f"[鸣潮] 群【{ev.group_id}】暂无【{char}】面板")
+        msg.append(f"请使用【{PREFIX}刷新面板】后再使用此功能！")
         if tokenLimitFlag:
-            msg.append(f'当前排行开启了登录验证，请使用命令【{PREFIX}登录】登录后此功能！')
-        msg.append('')
-        return '\n'.join(msg)
+            msg.append(
+                f"当前排行开启了登录验证，请使用命令【{PREFIX}登录】登录后此功能！"
+            )
+        msg.append("")
+        return "\n".join(msg)
 
     if rank_type == "评分":
-        rankInfoList.sort(key=lambda i: (i.score, i.expected_damage_int, i.level, i.chain), reverse=True)
+        rankInfoList.sort(
+            key=lambda i: (i.score, i.expected_damage_int, i.level, i.chain),
+            reverse=True,
+        )
     else:
-        rankInfoList.sort(key=lambda i: (i.expected_damage_int, i.score, i.level, i.chain), reverse=True)
+        rankInfoList.sort(
+            key=lambda i: (i.expected_damage_int, i.score, i.level, i.chain),
+            reverse=True,
+        )
 
     rankId = None
     rankInfo = None
@@ -275,12 +359,19 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         rankId = await get_self_rank(char_id, rank_type, self_uid)
         if rankId:
             rankId = int(rankId) + 1
-            rankInfo = await get_one_rank_info(ev.user_id, self_uid, role_detail, rankDetail)
+            rankInfo = await get_one_rank_info(
+                ev.user_id, self_uid, role_detail, rankDetail
+            )
 
     if not rankId:
         rankId, rankInfo = next(
-            ((rankId, rankInfo) for rankId, rankInfo in enumerate(rankInfoList, start=1) if rankInfo.uid == self_uid),
-            (None, None))
+            (
+                (rankId, rankInfo)
+                for rankId, rankInfo in enumerate(rankInfoList, start=1)
+                if rankInfo.uid == self_uid
+            ),
+            (None, None),
+        )
 
     rankInfoList = rankInfoList[:rank_length]
     if rankId and rankInfo and rankId > rank_length:
@@ -290,10 +381,10 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     title_h = 500
     bar_star_h = 110
     h = title_h + totalNum * bar_star_h + 80
-    card_img = get_waves_bg(1050, h, 'bg3')
+    card_img = get_waves_bg(1050, h, "bg3")
     card_img_draw = ImageDraw.Draw(card_img)
 
-    bar = Image.open(TEXT_PATH / 'bar.png')
+    bar = Image.open(TEXT_PATH / "bar.png")
     total_score = 0
     total_damage = 0
 
@@ -311,8 +402,10 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         # role_avatar = await get_avatar(ev, rank.qid, role_detail.role.roleId)
         bar_bg.paste(role_avatar, (100, 0), role_avatar)
 
-        role_attribute = await get_attribute(role_detail.role.attributeName, is_simple=True)
-        role_attribute = role_attribute.resize((40, 40)).convert('RGBA')
+        role_attribute = await get_attribute(
+            role_detail.role.attributeName, is_simple=True
+        )
+        role_attribute = role_attribute.resize((40, 40)).convert("RGBA")
         bar_bg.alpha_composite(role_attribute, (300, 20))
 
         # 命座
@@ -320,22 +413,28 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         info_block_draw = ImageDraw.Draw(info_block)
         fill = CHAIN_COLOR[rank.chain] + (int(0.9 * 255),)
         info_block_draw.rounded_rectangle([0, 0, 46, 20], radius=6, fill=fill)
-        info_block_draw.text((5, 10), f'{rank.chainName}', 'white', waves_font_18, 'lm')
+        info_block_draw.text((5, 10), f"{rank.chainName}", "white", waves_font_18, "lm")
         bar_bg.alpha_composite(info_block, (190, 30))
 
         # 等级
         info_block = Image.new("RGBA", (60, 20), color=(255, 255, 255, 0))
         info_block_draw = ImageDraw.Draw(info_block)
-        info_block_draw.rounded_rectangle([0, 0, 60, 20], radius=6, fill=(54, 54, 54, int(0.9 * 255)))
-        info_block_draw.text((5, 10), f'Lv.{rank.level}', 'white', waves_font_18, 'lm')
+        info_block_draw.rounded_rectangle(
+            [0, 0, 60, 20], radius=6, fill=(54, 54, 54, int(0.9 * 255))
+        )
+        info_block_draw.text((5, 10), f"Lv.{rank.level}", "white", waves_font_18, "lm")
         bar_bg.alpha_composite(info_block, (240, 30))
 
         # 评分
         if rank.score > 0.0:
-            score_bg = Image.open(TEXT_PATH / f'score_{rank.score_bg}.png')
+            score_bg = Image.open(TEXT_PATH / f"score_{rank.score_bg}.png")
             bar_bg.alpha_composite(score_bg, (320, 2))
-            bar_star_draw.text((466, 45), f'{rank.score.__round__(1)}', 'white', waves_font_34, 'mm')
-            bar_star_draw.text((466, 75), f'声骸分数', SPECIAL_GOLD, waves_font_16, 'mm')
+            bar_star_draw.text(
+                (466, 45), f"{rank.score.__round__(1)}", "white", waves_font_34, "mm"
+            )
+            bar_star_draw.text(
+                (466, 75), f"声骸分数", SPECIAL_GOLD, waves_font_16, "mm"
+            )
 
         # 合鸣效果
         if rank.sonata_name:
@@ -346,15 +445,15 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
             bar_bg.alpha_composite(effect_image, (533, 15))
             sonata_name = rank.sonata_name
         else:
-            sonata_name = '合鸣效果'
+            sonata_name = "合鸣效果"
 
         sonata_font = waves_font_16
         if len(sonata_name) > 4:
             sonata_font = waves_font_14
-        bar_star_draw.text((558, 75), f'{sonata_name}', 'white', sonata_font, 'mm')
+        bar_star_draw.text((558, 75), f"{sonata_name}", "white", sonata_font, "mm")
 
         # 武器
-        weapon_bg_temp = Image.new('RGBA', (600, 300))
+        weapon_bg_temp = Image.new("RGBA", (600, 300))
 
         weaponData: WeaponData = role_detail.weaponData
         weapon_icon = await get_square_weapon(weaponData.weapon.weaponId)
@@ -363,20 +462,32 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         weapon_icon_bg.paste(weapon_icon, (10, 20), weapon_icon)
 
         weapon_bg_temp_draw = ImageDraw.Draw(weapon_bg_temp)
-        weapon_bg_temp_draw.text((200, 30), f'{weaponData.weapon.weaponName[:5]}', SPECIAL_GOLD, waves_font_40, 'lm')
-        weapon_bg_temp_draw.text((203, 75), f'Lv.{weaponData.level}/90', 'white', waves_font_30, 'lm')
+        weapon_bg_temp_draw.text(
+            (200, 30),
+            f"{weaponData.weapon.weaponName[:5]}",
+            SPECIAL_GOLD,
+            waves_font_40,
+            "lm",
+        )
+        weapon_bg_temp_draw.text(
+            (203, 75), f"Lv.{weaponData.level}/90", "white", waves_font_30, "lm"
+        )
 
         _x = 220 + 43 * len(weaponData.weapon.weaponName)
         _y = 37
         wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)
-        weapon_bg_temp_draw.rounded_rectangle([_x - 15, _y - 15, _x + 50, _y + 15], radius=7,
-                                              fill=wrc_fill)
-        weapon_bg_temp_draw.text((_x, _y), f'精{weaponData.resonLevel}', 'white',
-                                 waves_font_24, 'lm')
+        weapon_bg_temp_draw.rounded_rectangle(
+            [_x - 15, _y - 15, _x + 50, _y + 15], radius=7, fill=wrc_fill
+        )
+        weapon_bg_temp_draw.text(
+            (_x, _y), f"精{weaponData.resonLevel}", "white", waves_font_24, "lm"
+        )
 
         weapon_breach = get_breach(weaponData.breach, weaponData.level)
         for i in range(0, weapon_breach):
-            weapon_bg_temp.alpha_composite(promote_icon.copy(), dest=(200 + 40 * i, 100))
+            weapon_bg_temp.alpha_composite(
+                promote_icon.copy(), dest=(200 + 40 * i, 100)
+            )
 
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
@@ -384,10 +495,14 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
 
         # 伤害
         if damage_title == "无":
-            bar_star_draw.text((870, 55), f'等待更新(:', GREY, waves_font_34, 'mm')
+            bar_star_draw.text((870, 55), f"等待更新(:", GREY, waves_font_34, "mm")
         else:
-            bar_star_draw.text((870, 45), f'{rank.expected_damage}', SPECIAL_GOLD, waves_font_34, 'mm')
-            bar_star_draw.text((870, 75), f'{damage_title}', 'white', waves_font_16, 'mm')
+            bar_star_draw.text(
+                (870, 45), f"{rank.expected_damage}", SPECIAL_GOLD, waves_font_34, "mm"
+            )
+            bar_star_draw.text(
+                (870, 75), f"{damage_title}", "white", waves_font_16, "mm"
+            )
 
         # 排名
         rank_color = (54, 54, 54)
@@ -401,8 +516,10 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         def draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30)):
             info_rank = Image.new("RGBA", size, color=(255, 255, 255, 0))
             rank_draw = ImageDraw.Draw(info_rank)
-            rank_draw.rounded_rectangle([0, 0, size[0], size[1]], radius=8, fill=rank_color + (int(0.9 * 255),))
-            rank_draw.text(draw, f'{rank_id}', 'white', waves_font_34, 'mm')
+            rank_draw.rounded_rectangle(
+                [0, 0, size[0], size[1]], radius=8, fill=rank_color + (int(0.9 * 255),)
+            )
+            rank_draw.text(draw, f"{rank_id}", "white", waves_font_34, "mm")
             bar_bg.alpha_composite(info_rank, dest)
 
         rank_id = index + 1
@@ -417,10 +534,10 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
             draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30))
 
         # uid
-        uid_color = 'white'
+        uid_color = "white"
         if rankId == rank_id:
             uid_color = RED
-        bar_star_draw.text((210, 75), f"{rank.uid}", uid_color, waves_font_20, 'lm')
+        bar_star_draw.text((210, 75), f"{rank.uid}", uid_color, waves_font_20, "lm")
 
         # 贴到背景
         card_img.paste(bar_bg, (0, title_h + index * bar_star_h), bar_bg)
@@ -443,21 +560,21 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     # 人物bg
     pile = await get_role_pile_old(char_id)
     title.paste(pile, (450, -120), pile)
-    title_draw.text((200, 335), f'{avg_score}', 'white', waves_font_44, 'mm')
-    title_draw.text((200, 375), f'平均声骸分数', SPECIAL_GOLD, waves_font_20, 'mm')
+    title_draw.text((200, 335), f"{avg_score}", "white", waves_font_44, "mm")
+    title_draw.text((200, 375), f"平均声骸分数", SPECIAL_GOLD, waves_font_20, "mm")
 
     if damage_title != "无":
-        title_draw.text((390, 335), f'{avg_damage}', 'white', waves_font_44, 'mm')
-        title_draw.text((390, 375), f'平均伤害', SPECIAL_GOLD, waves_font_20, 'mm')
+        title_draw.text((390, 335), f"{avg_damage}", "white", waves_font_44, "mm")
+        title_draw.text((390, 375), f"平均伤害", SPECIAL_GOLD, waves_font_20, "mm")
 
     if char_id in SPECIAL_CHAR_NAME:
         char_name = SPECIAL_CHAR_NAME[char_id]
 
     if is_bot:
-        title_name = f'{char_name}{rank_type}bot排行'
+        title_name = f"{char_name}{rank_type}bot排行"
     else:
-        title_name = f'{char_name}{rank_type}群排行'
-    title_draw.text((140, 265), f'{title_name}', 'black', waves_font_30, 'lm')
+        title_name = f"{char_name}{rank_type}群排行"
+    title_draw.text((140, 265), f"{title_name}", "black", waves_font_30, "lm")
 
     # 备注
     rank_row_title = "入榜条件"
@@ -465,33 +582,37 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         rank_row = f"1.使用命令【{PREFIX}刷新面板】刷新过面板"
     else:
         rank_row = f"1.本群内使用命令【{PREFIX}刷新面板】刷新过面板"
-    title_draw.text((20, 420), f'{rank_row_title}', SPECIAL_GOLD, waves_font_16, 'lm')
-    title_draw.text((90, 420), f'{rank_row}', GREY, waves_font_16, 'lm')
+    title_draw.text((20, 420), f"{rank_row_title}", SPECIAL_GOLD, waves_font_16, "lm")
+    title_draw.text((90, 420), f"{rank_row}", GREY, waves_font_16, "lm")
     if tokenLimitFlag:
         rank_row = f"2.使用命令【{PREFIX}登录】登录过的用户"
-        title_draw.text((90, 438), f'{rank_row}', GREY, waves_font_16, 'lm')
+        title_draw.text((90, 438), f"{rank_row}", GREY, waves_font_16, "lm")
 
     if rank_type == "伤害":
-        temp_notes = f"排行标准：以期望伤害（计算暴击率的伤害，不代表实际伤害) 为排序的排名"
+        temp_notes = (
+            f"排行标准：以期望伤害（计算暴击率的伤害，不代表实际伤害) 为排序的排名"
+        )
     else:
         temp_notes = f"排行标准：以声骸分数（声骸评分高，不代表实际伤害高) 为排序的排名"
-    card_img_draw.text((450, 500), f'{temp_notes}', SPECIAL_GOLD, waves_font_16, 'lm')
+    card_img_draw.text((450, 500), f"{temp_notes}", SPECIAL_GOLD, waves_font_16, "lm")
 
-    img_temp = Image.new('RGBA', char_mask.size)
+    img_temp = Image.new("RGBA", char_mask.size)
     img_temp.paste(title, (0, 0), char_mask.copy())
     card_img.alpha_composite(img_temp, (0, 0))
     card_img = add_footer(card_img)
     card_img = await convert_img(card_img)
 
-    logger.info(f'[get_rank_info_for_user] end: {time.time() - start_time}')
+    logger.info(f"[get_rank_info_for_user] end: {time.time() - start_time}")
     return card_img
 
 
 async def get_avatar(
-    ev: Event, qid: Optional[Union[int, str]], char_id: Union[int, str],
+    ev: Event,
+    qid: Optional[Union[int, str]],
+    char_id: Union[int, str],
 ) -> Image.Image:
-    if ev.bot_id == 'onebot':
-        if WutheringWavesConfig.get_config('QQPicCache').data:
+    if ev.bot_id == "onebot":
+        if WutheringWavesConfig.get_config("QQPicCache").data:
             pic = pic_cache.get(qid)
             if not pic:
                 pic = await get_qq_avatar(qid, size=100)
@@ -501,23 +622,23 @@ async def get_avatar(
             pic_cache.set(qid, pic)
         pic_temp = crop_center_img(pic, 120, 120)
 
-        img = Image.new('RGBA', (180, 180))
+        img = Image.new("RGBA", (180, 180))
         avatar_mask_temp = avatar_mask.copy()
         mask_pic_temp = avatar_mask_temp.resize((120, 120))
         img.paste(pic_temp, (0, -5), mask_pic_temp)
     else:
         pic = await get_square_avatar(char_id)
 
-        pic_temp = Image.new('RGBA', pic.size)
+        pic_temp = Image.new("RGBA", pic.size)
         pic_temp.paste(pic.resize((160, 160)), (10, 10))
         pic_temp = pic_temp.resize((160, 160))
 
         avatar_mask_temp = avatar_mask.copy()
-        mask_pic_temp = Image.new('RGBA', avatar_mask_temp.size)
+        mask_pic_temp = Image.new("RGBA", avatar_mask_temp.size)
         mask_pic_temp.paste(avatar_mask_temp, (-20, -45), avatar_mask_temp)
         mask_pic_temp = mask_pic_temp.resize((160, 160))
 
-        img = Image.new('RGBA', (180, 180))
+        img = Image.new("RGBA", (180, 180))
         img.paste(pic_temp, (0, 0), mask_pic_temp)
 
     return img
