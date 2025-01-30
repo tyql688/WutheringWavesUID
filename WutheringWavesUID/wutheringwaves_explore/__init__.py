@@ -5,16 +5,15 @@ from .draw_explore_card import draw_explore_img
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
-from ..utils.waves_prefix import PREFIX
 
-waves_get_explore = SV('waves获取探索度')
+waves_get_explore = SV("waves获取探索度")
 
 
 @waves_get_explore.on_fullmatch(
     (
-        f'{PREFIX}ts',
-        f'{PREFIX}探索',
-        f'{PREFIX}探索度',
+        f"ts",
+        f"探索",
+        f"探索度",
     )
 )
 async def send_card_info(bot: Bot, ev: Event):

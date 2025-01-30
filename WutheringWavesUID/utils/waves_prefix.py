@@ -1,3 +1,3 @@
-from ..wutheringwaves_config.wutheringwaves_config import WutheringWavesConfig
+from gsuid_core.sv import get_plugin_available_prefix
 
-PREFIX = WutheringWavesConfig.get_config('WavesPrefix').data
+PREFIX = get_plugin_available_prefix("WutheringWavesUID")

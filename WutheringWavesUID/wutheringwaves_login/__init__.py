@@ -10,11 +10,13 @@ sv_kuro_login = SV("库洛登录")
 sv_kuro_login_help = SV("库洛登录帮助", pm=0, priority=4)
 
 
-@sv_kuro_login.on_command((
-    f"{PREFIX}登录",
-    f"{PREFIX}登陆",
-    f"{PREFIX}登入",
-))
+@sv_kuro_login.on_command(
+    (
+        f"登录",
+        f"登陆",
+        f"登入",
+    )
+)
 async def get_resp_msg(bot: Bot, ev: Event):
     game_title = "[鸣潮]"
 
@@ -22,7 +24,7 @@ async def get_resp_msg(bot: Bot, ev: Event):
     # if uid_list is None:
     #     return await bot.send(ERROR_CODE[WAVES_CODE_103])
 
-    text = re.sub(r'["\n\t ]+', '', ev.text.strip())
+    text = re.sub(r'["\n\t ]+', "", ev.text.strip())
     text = text.replace("，", ",")
     if text == "":
         return await page_login(bot, ev)
@@ -31,9 +33,12 @@ async def get_resp_msg(bot: Bot, ev: Event):
         return await code_login(bot, ev, text)
 
     at_sender = True if ev.group_id else False
-    return await bot.send(f"{game_title} 账号登录失败\n请重新输入命令【{PREFIX}登录】进行登录\n", at_sender=at_sender)
+    return await bot.send(
+        f"{game_title} 账号登录失败\n请重新输入命令【{PREFIX}登录】进行登录\n",
+        at_sender=at_sender,
+    )
 
 
-@sv_kuro_login_help.on_fullmatch(f"{PREFIX}登录帮助", block=True)
+@sv_kuro_login_help.on_fullmatch(f"登录帮助", block=True)
 async def get_resp_msg(bot: Bot, ev: Event):
     return await bot.send(await login_help())

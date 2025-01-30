@@ -3,31 +3,34 @@ import re
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
-from gsuid_core.sv import SV
+from gsuid_core.sv import SV, get_plugin_available_prefix
 from .set_config import set_config_func, set_push_value, set_waves_user_value
 from .wutheringwaves_config import WutheringWavesConfig
 from ..utils.database.models import WavesBind
 from ..utils.name_convert import alias_to_char_name
 
-sv_self_config = SV('鸣潮配置')
-
-PREFIX = WutheringWavesConfig.get_config('WavesPrefix').data
+sv_self_config = SV("鸣潮配置")
 
 
-@sv_self_config.on_prefix((f'{PREFIX}开启', f'{PREFIX}关闭'))
+PREFIX = get_plugin_available_prefix("WutheringWavesUID")
+
+
+@sv_self_config.on_prefix((f"开启", f"关闭"))
 async def open_switch_func(bot: Bot, ev: Event):
     at_sender = True if ev.group_id else False
     uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
     if uid is None:
-        return await bot.send(f"您还未绑定鸣潮特征码, 请使用【{PREFIX}绑定uid】完成绑定！", at_sender)
+        return await bot.send(
+            f"您还未绑定鸣潮特征码, 请使用【{PREFIX}绑定uid】完成绑定！", at_sender
+        )
 
     from ..utils.waves_api import waves_api
+
     ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
     if not ck:
         from ..utils.error_reply import WAVES_CODE_102, ERROR_CODE
-        return await bot.send(
-            f'当前特征码：{uid}\n'
-            f'{ERROR_CODE[WAVES_CODE_102]}')
+
+        return await bot.send(f"当前特征码：{uid}\n" f"{ERROR_CODE[WAVES_CODE_102]}")
 
     logger.info(f"[{ev.user_id}]尝试[{ev.command[2:]}]了[{ev.text}]功能")
 
@@ -35,66 +38,83 @@ async def open_switch_func(bot: Bot, ev: Event):
     await bot.send(im, at_sender)
 
 
-@sv_self_config.on_prefix(f'{PREFIX}设置')
+@sv_self_config.on_prefix(f"设置")
 async def send_config_ev(bot: Bot, ev: Event):
     at_sender = True if ev.group_id else False
 
     uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
     if uid is None:
-        return await bot.send(f"您还未绑定鸣潮特征码, 请使用【{PREFIX}绑定uid】 完成绑定！\n", at_sender)
+        return await bot.send(
+            f"您还未绑定鸣潮特征码, 请使用【{PREFIX}绑定uid】 完成绑定！\n", at_sender
+        )
 
-    if '阈值' in ev.text:
-        func = ''.join(re.findall('[\u4e00-\u9fa5]', ev.text.replace('阈值', '')))
-        value = re.findall(r'\d+', ev.text)
+    if "阈值" in ev.text:
+        func = "".join(re.findall("[\u4e00-\u9fa5]", ev.text.replace("阈值", "")))
+        value = re.findall(r"\d+", ev.text)
         value = value[0] if value else None
 
         if value is None:
-            return await bot.send('请输入正确的阈值数字...\n', at_sender)
+            return await bot.send("请输入正确的阈值数字...\n", at_sender)
         im = await set_push_value(ev.bot_id, func, uid, int(value))
-    elif '体力背景' in ev.text:
+    elif "体力背景" in ev.text:
         from ..utils.waves_api import waves_api
+
         ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
         if not ck:
             from ..utils.error_reply import WAVES_CODE_102, ERROR_CODE
+
             return await bot.send(
-                f'当前特征码：{uid}\n'
-                f'{ERROR_CODE[WAVES_CODE_102]}', at_sender)
-        func = '体力背景'
-        value = ''.join(re.findall('[\u4e00-\u9fa5]', ev.text.replace(func, '')))
+                f"当前特征码：{uid}\n" f"{ERROR_CODE[WAVES_CODE_102]}", at_sender
+            )
+        func = "体力背景"
+        value = "".join(re.findall("[\u4e00-\u9fa5]", ev.text.replace(func, "")))
         if not value:
-            return await bot.send('[鸣潮] 请输入正确的角色名...\n', at_sender)
+            return await bot.send("[鸣潮] 请输入正确的角色名...\n", at_sender)
         char_name = alias_to_char_name(value)
         if not char_name:
-            return await bot.send(f'[鸣潮] 角色名【{value}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n', at_sender)
+            return await bot.send(
+                f"[鸣潮] 角色名【{value}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n",
+                at_sender,
+            )
         im = await set_waves_user_value(ev, func, uid, char_name)
-    elif '群排行' in ev.text:
+    elif "群排行" in ev.text:
         if ev.user_pm > 3:
-            return await bot.send('[鸣潮] 群排行设置需要群管理才可设置\n', at_sender)
+            return await bot.send("[鸣潮] 群排行设置需要群管理才可设置\n", at_sender)
         if not ev.group_id:
-            return await bot.send('[鸣潮] 请使用群聊进行设置\n', at_sender)
+            return await bot.send("[鸣潮] 请使用群聊进行设置\n", at_sender)
 
-        WavesRankUseTokenGroup = set(WutheringWavesConfig.get_config('WavesRankUseTokenGroup').data)
-        WavesRankNoLimitGroup = set(WutheringWavesConfig.get_config('WavesRankNoLimitGroup').data)
+        WavesRankUseTokenGroup = set(
+            WutheringWavesConfig.get_config("WavesRankUseTokenGroup").data
+        )
+        WavesRankNoLimitGroup = set(
+            WutheringWavesConfig.get_config("WavesRankNoLimitGroup").data
+        )
 
         if "1" in ev.text:
             # 设置为 无限制
             WavesRankNoLimitGroup.add(ev.group_id)
             # 删除token限制
             WavesRankUseTokenGroup.discard(ev.group_id)
-            msg = f'[鸣潮] 【{ev.group_id}】群排行已设置为[无限制上榜]\n'
+            msg = f"[鸣潮] 【{ev.group_id}】群排行已设置为[无限制上榜]\n"
         elif "2" in ev.text:
             # 设置为 token限制
             WavesRankUseTokenGroup.add(ev.group_id)
             # 删除无限制
             WavesRankNoLimitGroup.discard(ev.group_id)
-            msg = f'[鸣潮] 群【{ev.group_id}】群排行已设置为[登录后上榜]\n'
+            msg = f"[鸣潮] 群【{ev.group_id}】群排行已设置为[登录后上榜]\n"
         else:
-            return await bot.send('[鸣潮] 群排行设置参数失效\n1.无限制上榜\2.登录后上榜\n', at_sender)
+            return await bot.send(
+                "[鸣潮] 群排行设置参数失效\n1.无限制上榜\2.登录后上榜\n", at_sender
+            )
 
-        WutheringWavesConfig.set_config('WavesRankUseTokenGroup', list(WavesRankUseTokenGroup))
-        WutheringWavesConfig.set_config('WavesRankNoLimitGroup', list(WavesRankNoLimitGroup))
+        WutheringWavesConfig.set_config(
+            "WavesRankUseTokenGroup", list(WavesRankUseTokenGroup)
+        )
+        WutheringWavesConfig.set_config(
+            "WavesRankNoLimitGroup", list(WavesRankNoLimitGroup)
+        )
         return await bot.send(msg, at_sender)
     else:
-        return await bot.send('请输入正确的设置信息...\n', at_sender)
+        return await bot.send("请输入正确的设置信息...\n", at_sender)
 
     await bot.send(im, at_sender)

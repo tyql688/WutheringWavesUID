@@ -6,36 +6,34 @@ from ..utils import hakush_api
 from ..utils.resource.download_all_resource import download_all_resource
 from ..utils.waves_card_cache import load_all_card
 
-from ..wutheringwaves_config import PREFIX
-
-sv_download_config = SV('资源下载', pm=1)
+sv_download_config = SV("资源下载", pm=1)
 
 
-@sv_download_config.on_fullmatch((f'{PREFIX}下载全部资源', f'{PREFIX}补充资源', f'{PREFIX}刷新补充资源'))
+@sv_download_config.on_fullmatch((f"下载全部资源", f"补充资源", f"刷新补充资源"))
 async def send_download_resource_msg(bot: Bot, ev: Event):
-    await bot.send('[鸣潮] 正在开始下载~可能需要较久的时间!')
+    await bot.send("[鸣潮] 正在开始下载~可能需要较久的时间!")
     await download_all_resource()
 
-    if '补充' in ev.command:
-        isForce = True if '刷新' in ev.command else False
+    if "补充" in ev.command:
+        isForce = True if "刷新" in ev.command else False
         all_char = await hakush_api.get_all_character()
         await hakush_api.download_all_char_pic(all_char, isForce)
 
         all_weapon = await hakush_api.get_all_weapon()
         await hakush_api.download_all_weapon_pic(all_weapon, isForce)
-    await bot.send('[鸣潮] 下载完成！')
+    await bot.send("[鸣潮] 下载完成！")
 
 
 async def startup():
     logger.info(
-        '[鸣潮][资源文件下载] 正在检查与下载缺失的资源文件，可能需要较长时间，请稍等'
+        "[鸣潮][资源文件下载] 正在检查与下载缺失的资源文件，可能需要较长时间，请稍等"
     )
     try:
-        logger.info(f'[鸣潮][资源文件下载] {await download_all_resource()}')
+        logger.info(f"[鸣潮][资源文件下载] {await download_all_resource()}")
     except Exception as e:
         logger.exception(e)
 
     try:
-        logger.info(f'[鸣潮][加载用户面板缓存] 数量: {await load_all_card()}')
+        logger.info(f"[鸣潮][加载用户面板缓存] 数量: {await load_all_card()}")
     except Exception as e:
         logger.exception(e)

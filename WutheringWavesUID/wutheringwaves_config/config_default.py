@@ -46,11 +46,6 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "无限制进排行，群管理可设置",
         [],
     ),
-    "WavesPrefix": GsStrConfig(
-        "插件命令前缀（确认无冲突再修改）",
-        "用于设置WutheringWavesUID前缀的配置",
-        "ww",
-    ),
     "SignTime": GsListStrConfig(
         "每晚签到时间设置",
         "每晚库街区签到时间设置（时，分）",
