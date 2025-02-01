@@ -8,7 +8,7 @@ from gsuid_core.sv import SV
 from .deal import add_cookie, delete_cookie, get_cookie
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.message import send_diff_msg
-from ..utils.waves_prefix import PREFIX
+from ..wutheringwaves_config import PREFIX
 from ..wutheringwaves_config import WutheringWavesConfig
 
 waves_bind_uid = SV("鸣潮绑定特征码", priority=10)
