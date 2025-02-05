@@ -1,9 +1,13 @@
 import asyncio
 import hashlib
 import shutil
+import ssl
 import time
 
+import httpx
+
 from gsuid_core.bot import Bot
+from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
@@ -75,7 +79,18 @@ async def upload_custom_card(bot: Bot, ev: Event, char: str):
 
     code = None
     if not temp_path.exists():
-        code = await download(upload_image, temp_dir, name, tag="[鸣潮]")
+        try:
+            if httpx.__version__ >= "0.28.0":
+                ssl_context = ssl.create_default_context()
+                # ssl_context.set_ciphers("AES128-GCM-SHA256")
+                ssl_context.set_ciphers("DEFAULT")
+                sess = httpx.AsyncClient(verify=ssl_context)
+            else:
+                sess = httpx.AsyncClient()
+        except Exception as e:
+            logger.exception(f"{httpx.__version__} - {e}")
+            sess = None
+        code = await download(upload_image, temp_dir, name, tag="[鸣潮]", sess=sess)
 
     if isinstance(code, int) and code == 200:
         return await bot.send(f"[鸣潮]【{char}】上传面板图成功！\n", at_sender)
