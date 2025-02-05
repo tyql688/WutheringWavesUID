@@ -3,6 +3,7 @@ import hashlib
 import shutil
 import ssl
 import time
+from typing import List, Optional
 
 import httpx
 
@@ -48,21 +49,25 @@ def get_char_id_and_name(char: str) -> (str, str, str):
     return char_id, char, ""
 
 
-async def get_image(ev: Event):
-    if ev.image:
-        return ev.image
-
+async def get_image(ev: Event) -> Optional[List[str]]:
+    res = []
     for content in ev.content:
-        if content.type == "img" and content.data:
-            return content.data
-    return
+        if content.type == "img" and content.data and isinstance(content.data, str) and content.data.startswith("http"):
+            res.append(content.data)
+        elif content.type == "image" and content.data and isinstance(content.data, str) and content.data.startswith("http"):
+            res.append(content.data)
+
+    if not res and ev.image:
+        res.append(ev.image)
+
+    return res
 
 
 async def upload_custom_card(bot: Bot, ev: Event, char: str):
     at_sender = True if ev.group_id else False
 
-    upload_image = await get_image(ev)
-    if not upload_image:
+    upload_images = await get_image(ev)
+    if not upload_images:
         return await bot.send(
             f"[鸣潮] 上传角色面板图失败\n请同时发送图片及其命令\n", at_sender
         )
@@ -74,25 +79,30 @@ async def upload_custom_card(bot: Bot, ev: Event, char: str):
     temp_dir = CUSTOM_CARD_PATH / f"{char_id}"
     temp_dir.mkdir(parents=True, exist_ok=True)
 
-    name = f"{char}_{int(time.time() * 1000)}.jpg"
-    temp_path = temp_dir / name
+    success = True
+    for upload_image in upload_images:
+        name = f"{char}_{int(time.time() * 1000)}.jpg"
+        temp_path = temp_dir / name
 
-    code = None
-    if not temp_path.exists():
-        try:
-            if httpx.__version__ >= "0.28.0":
-                ssl_context = ssl.create_default_context()
-                # ssl_context.set_ciphers("AES128-GCM-SHA256")
-                ssl_context.set_ciphers("DEFAULT")
-                sess = httpx.AsyncClient(verify=ssl_context)
-            else:
-                sess = httpx.AsyncClient()
-        except Exception as e:
-            logger.exception(f"{httpx.__version__} - {e}")
-            sess = None
-        code = await download(upload_image, temp_dir, name, tag="[鸣潮]", sess=sess)
+        if not temp_path.exists():
+            try:
+                if httpx.__version__ >= "0.28.0":
+                    ssl_context = ssl.create_default_context()
+                    # ssl_context.set_ciphers("AES128-GCM-SHA256")
+                    ssl_context.set_ciphers("DEFAULT")
+                    sess = httpx.AsyncClient(verify=ssl_context)
+                else:
+                    sess = httpx.AsyncClient()
+            except Exception as e:
+                logger.exception(f"{httpx.__version__} - {e}")
+                sess = None
+            code = await download(upload_image, temp_dir, name, tag="[鸣潮]", sess=sess)
+            if not isinstance(code, int) or code != 200:
+                # 成功
+                success = False
+                break
 
-    if isinstance(code, int) and code == 200:
+    if success:
         return await bot.send(f"[鸣潮]【{char}】上传面板图成功！\n", at_sender)
     else:
         return await bot.send(f"[鸣潮]【{char}】上传面板图失败！\n", at_sender)
