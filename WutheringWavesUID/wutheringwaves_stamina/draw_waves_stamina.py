@@ -17,6 +17,8 @@ from ..utils.error_reply import WAVES_CODE_103, ERROR_CODE, WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_24, waves_font_26, waves_font_42
 from ..utils.image import add_footer, GREY, GOLD, get_random_waves_role_pile, YELLOW, get_event_avatar, RED, \
     get_small_logo, GREEN
+from ..utils.name_convert import char_name_to_char_id
+from ..utils.resource.constant import SPECIAL_CHAR
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_newsign.bbs_api import bbs_api
 
@@ -145,7 +147,28 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Union[str, Image.Image]:
 
     # 随机获得pile
     user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, 'uid', daily_info.roleId)
-    pile = await get_random_waves_role_pile(user.stamina_bg_value if user else None)
+    pile_id = None
+    if user:
+        char_id = char_name_to_char_id(user.stamina_bg_value)
+        if char_id in SPECIAL_CHAR:
+            ck = await waves_api.get_self_waves_ck(daily_info.roleId, ev.user_id)
+            for char_id in SPECIAL_CHAR[char_id]:
+                succ, role_detail_info = await waves_api.get_role_detail_info(
+                    char_id, daily_info.roleId, ck
+                )
+                if (
+                    not succ
+                    or "role" not in role_detail_info
+                    or role_detail_info["role"] is None
+                    or "level" not in role_detail_info
+                    or role_detail_info["level"] is None
+                ):
+                    continue
+                pile_id = char_id
+                break
+        else:
+            pile_id = char_id
+    pile = await get_random_waves_role_pile(pile_id)
     # pile = pile.crop((0, 0, pile.size[0], pile.size[1] - 155))
 
     base_info_draw = ImageDraw.Draw(base_info_bg)
