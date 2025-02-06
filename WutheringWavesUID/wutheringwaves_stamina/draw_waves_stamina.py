@@ -148,7 +148,7 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Union[str, Image.Image]:
     # 随机获得pile
     user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, 'uid', daily_info.roleId)
     pile_id = None
-    if user:
+    if user and user.stamina_bg_value:
         char_id = char_name_to_char_id(user.stamina_bg_value)
         if char_id in SPECIAL_CHAR:
             ck = await waves_api.get_self_waves_ck(daily_info.roleId, ev.user_id)
