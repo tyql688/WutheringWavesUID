@@ -12,9 +12,9 @@ class WavesRegister(object):
 
     @classmethod
     def register_class(cls, _id, _clz):
-        old_cls = cls.find_class(_id)
-        if old_cls:
-            raise TypeError('%s already register %s for type %s' % (cls, old_cls, _id))
+        # old_cls = cls.find_class(_id)
+        # if old_cls:
+        #     raise TypeError('%s already register %s for type %s' % (cls, old_cls, _id))
         cls._id_cls_map[_id] = _clz
 
 
