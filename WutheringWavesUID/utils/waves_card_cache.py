@@ -69,17 +69,22 @@ async def load_all_card() -> int:
     await load_all_players(PLAYER_PATH, all_card)
     if CardUseOptions == "内存缓存":
         return await save_all_card(all_card)
-    elif CardUseOptions == "redis缓存" and StartServerRedisLoad:
-        from .wwredis import card_cache, rank_cache
+    elif CardUseOptions == "redis缓存":
+        from .wwredis import card_cache
+        await card_cache.delete_all_card()
 
-        total = await card_cache.save_all_card(all_card)
-        a = time.time()
-        logger.info(f"[鸣潮][开始处理排行......]")
-        total = await rank_cache.save_rank_caches(all_card)
-        logger.info(
-            f"[鸣潮][结束处理排行......] 耗时:{time.time() - a:.2f}s 共加载{total}个用户"
-        )
-        return total
+        if StartServerRedisLoad:
+            from .wwredis import rank_cache
+
+            # total = await card_cache.save_all_card(all_card)
+            a = time.time()
+            logger.info(f"[鸣潮][开始处理排行......]")
+            total = await rank_cache.save_rank_caches(all_card)
+            logger.info(
+                f"[鸣潮][结束处理排行......] 耗时:{time.time() - a:.2f}s 共加载{total}个用户"
+            )
+            return total
+
 
 
 async def save_card(uid: str, data: Union[List], user_id: str):
@@ -88,9 +93,9 @@ async def save_card(uid: str, data: Union[List], user_id: str):
     elif CardUseOptions == "内存缓存":
         await save_user_card(uid, data)
     elif CardUseOptions == "redis缓存":
-        from .wwredis import card_cache, rank_cache
+        from .wwredis import rank_cache
 
-        await card_cache.save_user_card(uid, data)
+        # await card_cache.save_user_card(uid, data)
         await rank_cache.save_rank_cache(uid, data, user_id)
 
 
@@ -103,38 +108,37 @@ async def get_card(uid: str):
             return None
         return iter(RoleDetailData(**r) for r in player_data)
     elif CardUseOptions == "redis缓存":
-        from .wwredis import card_cache
-
-        player_data = await card_cache.get_user_card(uid)
-        if not player_data:
-            return None
-        return iter(RoleDetailData(**r) for r in player_data)
+        # from .wwredis import card_cache
+        #
+        # player_data = await card_cache.get_user_card(uid)
+        # if not player_data:
+        #     return None
+        # return iter(RoleDetailData(**r) for r in player_data)
+        return await get_all_role_detail_info_list(uid)
 
 
 async def get_user_all_card():
     if CardUseOptions == "redis缓存":
-        from .wwredis import card_cache
-
-        if StartServerRedisLoad:
-            return await card_cache.get_all_card()
-        else:
-            all_card = {}
-            await load_all_players(PLAYER_PATH, all_card)
-            return all_card
+        # if StartServerRedisLoad:
+        #     return await card_cache.get_all_card()
+        # else:
+        all_card = {}
+        await load_all_players(PLAYER_PATH, all_card)
+        return all_card
     return {}
 
 
 async def refresh_ranks(all_card):
     if CardUseOptions == "redis缓存":
-        from .wwredis import rank_cache, card_cache
+        from .wwredis import rank_cache
 
-        if not StartServerRedisLoad:
-            await card_cache.save_all_card(all_card)
+        # if not StartServerRedisLoad:
+        #     await card_cache.save_all_card(all_card)
 
         return await rank_cache.save_rank_caches(all_card)
 
 
-async def get_rank(char_id: str, rank_type: str, num=50):
+async def get_rank(char_id: str, rank_type: str, num=30):
     if CardUseOptions == "redis缓存":
         from .wwredis import rank_cache
 
