@@ -1,11 +1,11 @@
 import copy
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
-
+from .char_model import CharacterModel
 from ..ascension.constant import fixed_name, sum_percentages
 
 MAP_PATH = Path(__file__).parent.parent / "map/detail_json/char"
@@ -119,3 +119,9 @@ def get_char_id(char_name):
     return next(
         (_id for _id, value in char_id_data.items() if value["name"] == char_name), None
     )
+
+
+def get_char_model(char_id: Union[str, int]) -> Optional[CharacterModel]:
+    if str(char_id) not in char_id_data:
+        return None
+    return CharacterModel(**char_id_data[str(char_id)])

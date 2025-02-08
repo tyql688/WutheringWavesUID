@@ -11,6 +11,7 @@ from gsuid_core.sv import SV
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 from .bilibili import GuideBilibili
+from .draw_char import draw_char_chain, draw_char_skill, draw_char_wiki
 from .main import Guide
 from .tap import GuideTap
 from .wiki import draw_wiki_detail
@@ -59,7 +60,8 @@ async def send_waves_wiki(bot: Bot, ev: Event):
         query_role_type = (
             "天赋" if "技能" in wiki_type or "天赋" in wiki_type else "命座"
         )
-        img = await draw_wiki_detail("共鸣者", name, query_role_type)
+        # img = await draw_wiki_detail("共鸣者", name, query_role_type)
+        img = await draw_char_wiki(char_id, query_role_type)
         if isinstance(img, str):
             msg = f"[鸣潮] wiki【{wiki_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
             return await bot.send(msg, at_sender)
