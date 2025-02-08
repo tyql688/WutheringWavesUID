@@ -275,7 +275,7 @@ async def parse_char_skill(data: Dict[int, Dict[str, Skill]]):
 
         # 分行显示标题
         wrapped_title = textwrap.fill(title, width=10)
-        wrapped_desc = wrap_text_with_manual_newlines(desc, width=80)
+        wrapped_desc = wrap_text_with_manual_newlines(desc, width=65)
 
         # 获取每行的宽度，确保不会超过设定的 image_width
         lines_title = wrapped_title.split("\n")
@@ -286,7 +286,7 @@ async def parse_char_skill(data: Dict[int, Dict[str, Skill]]):
             _type = relate_item.type if relate_item.type else "属性加成"
             relate_title = f"{_type}: {relate_item.name}"
             relate_desc = relate_item.get_desc_detail()
-            wrapped_relate_desc = wrap_text_with_manual_newlines(relate_desc, width=80)
+            wrapped_relate_desc = wrap_text_with_manual_newlines(relate_desc, width=65)
 
             lines_desc.append(relate_title)
             lines_desc.extend(wrapped_relate_desc.split("\n"))
@@ -382,6 +382,7 @@ async def parse_char_skill_rate(skillLevels: Optional[Dict[int, SkillLevel]]):
         row.extend(skillLevel.param[0][5:10])
         rows.append(row)
 
+    font = waves_font_12
     offset = 20
     col_count = len(rows)
     cell_width = 155
@@ -413,7 +414,7 @@ async def parse_char_skill_rate(skillLevels: Optional[Dict[int, SkillLevel]]):
             )
 
             # 计算文本位置以居中
-            bbox = draw.textbbox((0, 0), cell, font=waves_font_12)
+            bbox = draw.textbbox((0, 0), cell, font=font)
             text_width = bbox[2] - bbox[0]
             text_height = bbox[3] - bbox[1]
             if col_index == 0:
@@ -423,7 +424,30 @@ async def parse_char_skill_rate(skillLevels: Optional[Dict[int, SkillLevel]]):
             text_y = y0 + (cell_height - text_height) / 2
 
             # 绘制文本
-            draw.text((text_x, text_y), cell, fill="white", font=waves_font_12)
+            wrapped_cell = textwrap.wrap(cell, width=18)
+            if len(wrapped_cell) > 1:
+                text_y_temp = text_y - font.size
+                for line in wrapped_cell:
+                    bbox = draw.textbbox((0, 0), line, font=font)
+                    text_width = bbox[2] - bbox[0]
+                    if col_index == 0:
+                        text_x = (x0 + first_col_width - text_width) / 2
+                    else:
+                        text_x = x0 + (cell_width - text_width) / 2
+                    draw.text(
+                        (text_x, text_y_temp),
+                        line,
+                        fill="white",
+                        font=font,
+                    )
+                    text_y_temp += font.size + 7
+            else:
+                draw.text(
+                    (text_x, text_y),
+                    cell,
+                    fill="white",
+                    font=font,
+                )
 
     return image
 

@@ -2,8 +2,8 @@ from pathlib import Path
 
 from PIL import ImageFont
 
-FONT_ORIGIN_PATH = Path(__file__).parent / 'waves_fonts.ttf'
-FONT2_ORIGIN_PATH = Path(__file__).parent / 'arial-unicode-ms-bold.ttf'
+FONT_ORIGIN_PATH = Path(__file__).parent / "waves_fonts.ttf"
+FONT2_ORIGIN_PATH = Path(__file__).parent / "arial-unicode-ms-bold.ttf"
 
 
 def waves_font_origin(size: int) -> ImageFont.FreeTypeFont:
@@ -14,6 +14,7 @@ def ww_font_origin(size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(FONT2_ORIGIN_PATH), size=size)
 
 
+waves_font_10 = waves_font_origin(10)
 waves_font_12 = waves_font_origin(12)
 waves_font_14 = waves_font_origin(14)
 waves_font_16 = waves_font_origin(16)
