@@ -5,15 +5,28 @@ from typing import Dict, Optional
 from PIL import Image, ImageDraw
 
 from gsuid_core.utils.image.convert import convert_img
+
 from ..utils.ascension.char import get_char_model
-from ..utils.ascension.char_model import CharacterModel, Stats, Chain, Skill, SkillLevel
-from ..utils.fonts.waves_fonts import (
-    waves_font_70,
-    waves_font_24,
-    waves_font_origin,
-    waves_font_12,
+from ..utils.image import (
+    GREY,
+    SPECIAL_GOLD,
+    add_footer,
+    get_waves_bg,
+    get_role_pile,
 )
-from ..utils.image import get_role_pile, add_footer, get_waves_bg, GREY, SPECIAL_GOLD
+from ..utils.ascension.char_model import (
+    Chain,
+    Skill,
+    Stats,
+    SkillLevel,
+    CharacterModel,
+)
+from ..utils.fonts.waves_fonts import (
+    waves_font_12,
+    waves_font_24,
+    waves_font_70,
+    waves_font_origin,
+)
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -24,9 +37,11 @@ async def draw_char_wiki(char_id: str, query_role_type: str):
     elif query_role_type == "命座":
         return await draw_char_chain(char_id)
 
+    return ""
+
 
 async def draw_char_skill(char_id: str):
-    char_model: CharacterModel = get_char_model(char_id)
+    char_model: Optional[CharacterModel] = get_char_model(char_id)
     if char_model is None:
         return ""
 
@@ -66,7 +81,7 @@ async def draw_char_skill(char_id: str):
 
 
 async def draw_char_chain(char_id: str):
-    char_model: CharacterModel = get_char_model(char_id)
+    char_model: Optional[CharacterModel] = get_char_model(char_id)
     if char_model is None:
         return ""
 
@@ -452,7 +467,10 @@ async def parse_char_skill_rate(skillLevels: Optional[Dict[int, SkillLevel]]):
     return image
 
 
-def wrap_text_with_manual_newlines(text, width):
+def wrap_text_with_manual_newlines(
+    text: str,
+    width: int = 70,
+) -> str:
     """
     处理文本，优先保留原始文本中的 \n，再使用 textwrap 进行换行。
 

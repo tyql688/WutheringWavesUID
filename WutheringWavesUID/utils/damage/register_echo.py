@@ -1,18 +1,18 @@
 from .damage import DamageAttribute
+from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
 from .utils import (
+    CHAR_ATTR_VOID,
+    CHAR_ATTR_MOLTEN,
     CHAR_ATTR_SIERRA,
     CHAR_ATTR_SINKING,
-    CHAR_ATTR_MOLTEN,
-    CHAR_ATTR_VOID,
-    liberation_damage,
-    attack_damage,
+    CHAR_ATTR_FREEZING,
+    CHAR_ATTR_CELESTIAL,
+    temp_atk,
     hit_damage,
     skill_damage,
-    CHAR_ATTR_CELESTIAL,
-    CHAR_ATTR_FREEZING,
-    temp_atk,
+    attack_damage,
+    liberation_damage,
 )
-from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
 
 
 class Echo_390070051(EchoAbstract):
@@ -663,6 +663,31 @@ class Echo_6000092(EchoAbstract):
         return {"衍射伤害加成": "12%"}
 
 
+class Echo_6000093(EchoAbstract):
+    id = 6000093
+    name = "愚金幼岩"
+
+
+class Echo_6000094(EchoAbstract):
+    id = 6000094
+    name = "釉变幼岩"
+
+
+class Echo_6000095(EchoAbstract):
+    id = 6000095
+    name = "气动棱镜"
+
+
+class Echo_6000096(EchoAbstract):
+    id = 6000096
+    name = "重塑雕像的拳砾"
+
+
+class Echo_6000097(EchoAbstract):
+    id = 6000097
+    name = "飓力熊"
+
+
 class Echo_6000145(Echo_6000045):
     id = 6000145
     name = "异相·哀声鸷"
@@ -770,5 +795,10 @@ def register_echo():
     WavesEchoRegister.register_class(Echo_6000090.id, Echo_6000090)
     WavesEchoRegister.register_class(Echo_6000091.id, Echo_6000091)
     WavesEchoRegister.register_class(Echo_6000092.id, Echo_6000092)
+    WavesEchoRegister.register_class(Echo_6000093.id, Echo_6000093)
+    WavesEchoRegister.register_class(Echo_6000094.id, Echo_6000094)
+    WavesEchoRegister.register_class(Echo_6000095.id, Echo_6000095)
+    WavesEchoRegister.register_class(Echo_6000096.id, Echo_6000096)
+    WavesEchoRegister.register_class(Echo_6000097.id, Echo_6000097)
     WavesEchoRegister.register_class(Echo_6000145.id, Echo_6000145)
     WavesEchoRegister.register_class(Echo_6010052.id, Echo_6010052)

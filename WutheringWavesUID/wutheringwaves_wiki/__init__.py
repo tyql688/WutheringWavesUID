@@ -4,26 +4,25 @@ import shutil
 from pathlib import Path
 from typing import List, Union
 
-from gsuid_core.bot import Bot
-from gsuid_core.logger import logger
-from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from gsuid_core.utils.download_resource.download_file import download
+from gsuid_core.bot import Bot
+from gsuid_core.models import Event
+from gsuid_core.logger import logger
 from gsuid_core.utils.image.convert import convert_img
-from .bilibili import GuideBilibili
-from .draw_char import draw_char_chain, draw_char_skill, draw_char_wiki
+from gsuid_core.utils.download_resource.download_file import download
+
 from .main import Guide
 from .tap import GuideTap
 from .wiki import draw_wiki_detail
+from .bilibili import GuideBilibili
+from ..utils.resource.RESOURCE_PATH import GUIDE_CONFIG_MAP
+from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
+from .draw_char import draw_char_wiki, draw_char_chain, draw_char_skill
 from ..utils.name_convert import (
     alias_to_char_name,
-    char_name_to_char_id,
     alias_to_weapon_name,
+    char_name_to_char_id,
 )
-from ..utils.resource.RESOURCE_PATH import (
-    GUIDE_CONFIG_MAP,
-)
-from ..wutheringwaves_config import WutheringWavesConfig, PREFIX
 
 sv_waves_guide = SV("鸣潮攻略")
 sv_waves_wiki = SV("鸣潮wiki")
@@ -34,13 +33,13 @@ sv_waves_wiki = SV("鸣潮wiki")
 )
 async def send_waves_wiki(bot: Bot, ev: Event):
     match = re.search(
-        rf"{PREFIX}(?P<wiki_name>[\u4e00-\u9fa5]+)(?P<wiki_type>共鸣链|命座|天赋|技能|图鉴|wiki|介绍)",
+        rf"(?P<wiki_name>[\u4e00-\u9fa5]+)(?P<wiki_type>共鸣链|命座|天赋|技能|图鉴|wiki|介绍)",
         ev.raw_text,
     )
     if not match:
         return
     ev.regex_dict = match.groupdict()
-    wiki_name = ev.regex_dict.get("wiki_name")
+    wiki_name = ev.regex_dict.get("wiki_name", "")
     wiki_type = ev.regex_dict.get("wiki_type")
 
     at_sender = True if ev.group_id else False
@@ -60,7 +59,6 @@ async def send_waves_wiki(bot: Bot, ev: Event):
         query_role_type = (
             "天赋" if "技能" in wiki_type or "天赋" in wiki_type else "命座"
         )
-        # img = await draw_wiki_detail("共鸣者", name, query_role_type)
         img = await draw_char_wiki(char_id, query_role_type)
         if isinstance(img, str):
             msg = f"[鸣潮] wiki【{wiki_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
@@ -85,12 +83,12 @@ async def send_waves_wiki(bot: Bot, ev: Event):
 
 @sv_waves_guide.on_regex(rf"[\u4e00-\u9fa5]+攻略$", block=True)
 async def send_role_guide_pic(bot: Bot, ev: Event):
-    match = re.search(rf"{PREFIX}(?P<char>[\u4e00-\u9fa5]+)攻略", ev.raw_text)
+    match = re.search(rf"(?P<char>[\u4e00-\u9fa5]+)攻略", ev.raw_text)
     if not match:
         return
     ev.regex_dict = match.groupdict()
 
-    char_name = ev.regex_dict.get("char")
+    char_name = ev.regex_dict.get("char", "")
     char_id = char_name_to_char_id(char_name)
     at_sender = True if ev.group_id else False
     if not char_id:
