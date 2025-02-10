@@ -61,7 +61,7 @@ async def save_card_info(
     await waves_card_cache.save_card(uid, save_data, user_id)
 
     try:
-        async with aiofiles.open(path, "w") as file:
+        async with aiofiles.open(path, "w", encoding="utf-8") as file:
             await file.write(json.dumps(save_data, ensure_ascii=False))
     except Exception as e:
         logger.exception(f"save_card_info save failed {path}:", e)
