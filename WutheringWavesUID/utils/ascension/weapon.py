@@ -1,11 +1,11 @@
 import copy
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
-
+from .char_model import WeaponModel
 from ..ascension.constant import fixed_name
 
 MAP_PATH = Path(__file__).parent.parent / "map/detail_json/weapon"
@@ -129,3 +129,9 @@ def get_weapon_star(weapon_name) -> int:
     if result is None:
         return 4
     return result.starLevel
+
+
+def get_weapon_model(weapon_id: Union[int, str]) -> Optional[WeaponModel]:
+    if str(weapon_id) not in weapon_id_data:
+        return None
+    return WeaponModel(**weapon_id_data[str(weapon_id)])

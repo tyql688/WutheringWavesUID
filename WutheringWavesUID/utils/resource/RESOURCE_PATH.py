@@ -17,6 +17,7 @@ PLAYER_PATH = MAIN_PATH / "players"
 # 游戏素材
 RESOURCE_PATH = MAIN_PATH / "resource"
 PHANTOM_PATH = RESOURCE_PATH / "phantom"
+MATERIAL_PATH = RESOURCE_PATH / "material"
 FETTER_PATH = RESOURCE_PATH / "fetter"
 AVATAR_PATH = RESOURCE_PATH / "waves_avatar"
 WEAPON_PATH = RESOURCE_PATH / "waves_weapon"
@@ -57,6 +58,7 @@ def init_dir():
         PLAYER_PATH,
         RESOURCE_PATH,
         PHANTOM_PATH,
+        MATERIAL_PATH,
         FETTER_PATH,
         AVATAR_PATH,
         WEAPON_PATH,
