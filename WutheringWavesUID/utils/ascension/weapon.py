@@ -29,15 +29,15 @@ read_weapon_json_files(MAP_PATH)
 
 
 class WavesWeaponResult:
-    def __int__(self):
+    def __init__(self):
         self.name: str = ""
         self.starLevel: int = 4
         self.type: int = 0
-        self.stats: list[dict] = []
-        self.param: list[list[int]] = []
+        self.stats = []
+        self.param = []
         self.effect: str = ""
-        self.effectName: str | None = None
-        self.sub_effect: dict[str, str] | None = None
+        self.effectName: str = ""
+        self.sub_effect = {}
         self.resonLevel: int = 1
 
     def get_resonLevel_name(self):
@@ -68,18 +68,18 @@ def get_weapon_detail(
     level: int,
     breach: Union[int, None] = None,
     resonLevel: Union[int, None] = 1,
-) -> Union[WavesWeaponResult, None]:
+) -> WavesWeaponResult:
     """
     breach 突破
     resonLevel 精炼
     """
+    result = WavesWeaponResult()
     if str(weapon_id) not in weapon_id_data:
-        return None
+        return result
 
     breach = get_breach(breach, level)
 
     weapon_data = weapon_id_data[str(weapon_id)]
-    result = WavesWeaponResult()
     result.name = weapon_data["name"]
     result.starLevel = weapon_data["starLevel"]
     result.type = weapon_data["type"]

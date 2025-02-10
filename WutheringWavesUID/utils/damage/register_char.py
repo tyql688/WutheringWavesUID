@@ -1,9 +1,4 @@
 from .damage import DamageAttribute
-from ...utils.damage.abstract import (
-    CharAbstract,
-    WavesCharRegister,
-    WavesWeaponRegister,
-)
 from .utils import (
     CHAR_ATTR_MOLTEN,
     CHAR_ATTR_SINKING,
@@ -15,6 +10,11 @@ from .utils import (
     attack_damage,
     liberation_damage,
 )
+from ...utils.damage.abstract import (
+    CharAbstract,
+    WavesCharRegister,
+    WavesWeaponRegister,
+)
 
 
 class Char_1102(CharAbstract):
@@ -22,7 +22,7 @@ class Char_1102(CharAbstract):
     name = "散华"
     starLevel = 4
 
-    def do_buff(
+    def _do_buff(
         self,
         attr: DamageAttribute,
         chain: int = 0,
@@ -68,7 +68,7 @@ class Char_1105(CharAbstract):
     name = "折枝"
     starLevel = 5
 
-    def do_buff(
+    def _do_buff(
         self,
         attr: DamageAttribute,
         chain: int = 0,
@@ -130,7 +130,7 @@ class Char_1204(CharAbstract):
     name = "莫特斐"
     starLevel = 4
 
-    def do_buff(
+    def _do_buff(
         self,
         attr: DamageAttribute,
         chain: int = 0,
@@ -171,7 +171,7 @@ class Char_1205(CharAbstract):
     name = "长离"
     starLevel = 5
 
-    def do_buff(
+    def _do_buff(
         self,
         attr: DamageAttribute,
         chain: int = 0,
@@ -261,8 +261,21 @@ class Char_1501(CharAbstract):
     name = "漂泊者·衍射"
     starLevel = 5
 
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        """获得buff"""
+        attr.set_env_spectro()
+        title = "光主"
+        msg = "触发光噪效应"
+        attr.add_effect(title, msg)
 
-class Char_1502(CharAbstract):
+
+class Char_1502(Char_1501):
     id = 1502
     name = "漂泊者·衍射"
     starLevel = 5
@@ -273,7 +286,7 @@ class Char_1503(CharAbstract):
     name = "维里奈"
     starLevel = 5
 
-    def do_buff(
+    def _do_buff(
         self,
         attr: DamageAttribute,
         chain: int = 0,
@@ -310,7 +323,7 @@ class Char_1504(CharAbstract):
     name = "灯灯"
     starLevel = 4
 
-    def do_buff(
+    def _do_buff(
         self,
         attr: DamageAttribute,
         chain: int = 0,
@@ -343,7 +356,7 @@ class Char_1505(CharAbstract):
     name = "守岸人"
     starLevel = 5
 
-    def do_buff(
+    def _do_buff(
         self,
         attr: DamageAttribute,
         chain: int = 0,
@@ -388,6 +401,24 @@ class Char_1506(CharAbstract):
     name = "菲比"
     starLevel = 5
 
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        """获得buff"""
+        attr.set_env_spectro()
+        title = "菲比"
+        msg = "触发光噪效应"
+        attr.add_effect(title, msg)
+
+        if attr.char_attr == CHAR_ATTR_CELESTIAL:
+            title = "菲比-延奏技能"
+            msg = "使一定范围内的目标衍射伤害抗性减少10%"
+            attr.add_enemy_resistance(-0.1, title, msg)
+
 
 class Char_1601(CharAbstract):
     id = 1601
@@ -426,7 +457,7 @@ class Char_1606(CharAbstract):
 
     # 下一位登场角色湮灭伤害加深20%，普攻伤害加深25%，效果持续14秒，若切换至其他角色则该效果提前结束。
 
-    def do_buff(
+    def _do_buff(
         self,
         attr: DamageAttribute,
         chain: int = 0,

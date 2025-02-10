@@ -1,12 +1,13 @@
 from .damage import DamageAttribute, calc_percent_expression
-from ..damage.abstract import WeaponAbstract, WavesWeaponRegister
 from .utils import (
+    Spectro_Frazzle_Role_Ids,
     temp_atk,
     hit_damage,
     skill_damage,
     attack_damage,
     liberation_damage,
 )
+from ..damage.abstract import WeaponAbstract, WavesWeaponRegister
 
 
 class Weapon_21010011(WeaponAbstract):
@@ -775,6 +776,31 @@ class Weapon_21050046(WeaponAbstract):
     id = 21050046
     type = 5
     name = "和光回唱"
+
+    def check_1(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.role is None:
+            return False
+        return attr.role.role.roleId not in Spectro_Frazzle_Role_Ids
+
+    def check_2(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.role is None:
+            return False
+        if not isGroup:
+            return False
+        if not attr.teammate_char_ids:
+            return False
+        return any(x in Spectro_Frazzle_Role_Ids for x in attr.teammate_char_ids)
+
+    def env_spectro(self, attr: DamageAttribute, isGroup: bool = False):
+        """光噪效应"""
+        if attr.char_damage != hit_damage and attr.char_damage != attack_damage:
+            return
+
+        # 对附加了【光噪效应】的目标造成伤害时，自身普攻、重击伤害加成提升14%，可以叠加3层。
+        dmg = f"{self.param(1)}*{self.param(2)}"
+        title = self.get_title()
+        msg = f"光噪效应状态下，自身普攻、重击伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21050053(WeaponAbstract):

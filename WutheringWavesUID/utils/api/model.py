@@ -1,7 +1,7 @@
-from typing import List, Union, Optional, Any, Dict, Literal
+from typing import Any, Dict, List, Union, Literal, Optional
 
-from msgspec import UNSET, Struct, UnsetType, field
 from pydantic import BaseModel
+from msgspec import UNSET, Struct, UnsetType, field
 
 
 class GeneralGeetestData(Struct):
@@ -18,6 +18,7 @@ class GeneralV1SendPhoneCodeRequest(Struct):
 
 class EnergyData(BaseModel):
     """结晶波片"""
+
     name: str
     img: str
     refreshTimeStamp: int
@@ -27,6 +28,7 @@ class EnergyData(BaseModel):
 
 class LivenessData(BaseModel):
     """活跃度"""
+
     name: str
     img: str
     cur: int
@@ -35,6 +37,7 @@ class LivenessData(BaseModel):
 
 class BattlePassData(BaseModel):
     """电台"""
+
     name: str
     cur: int
     total: int
@@ -42,6 +45,7 @@ class BattlePassData(BaseModel):
 
 class DailyData(BaseModel):
     """每日数据"""
+
     gameId: int
     userId: int
     serverId: str
@@ -86,6 +90,7 @@ class Box2(BaseModel):
 
 class AccountBaseInfo(BaseModel):
     """账户基本信息"""
+
     name: str  # 名字
     id: int  # 特征码
     creatTime: Optional[int] = None  # 创建时间 ms
@@ -155,9 +160,9 @@ class FetterDetail(BaseModel):
 
 
 class Props(BaseModel):
-    attributeName: Optional[str]
+    attributeName: str
     iconUrl: Optional[str] = None
-    attributeValue: Optional[str]
+    attributeValue: str
 
 
 class EquipPhantom(BaseModel):
@@ -217,9 +222,14 @@ class RoleDetailData(BaseModel):
         n = self.get_chain_num()
         return f'{["零", "一", "二", "三", "四", "五", "六"][n]}链'
 
-    def get_skill_level(self, skill_type: Literal["常态攻击", "共鸣技能", "共鸣解放", "变奏技能", "共鸣回路"]):
+    def get_skill_level(
+        self,
+        skill_type: Literal["常态攻击", "共鸣技能", "共鸣解放", "变奏技能", "共鸣回路"],
+    ):
         skill_level = 1
-        _skill = next((skill for skill in self.skillList if skill.skill.type == skill_type), None)
+        _skill = next(
+            (skill for skill in self.skillList if skill.skill.type == skill_type), None
+        )
         if _skill:
             skill_level = _skill.level - 1
         return skill_level
@@ -231,6 +241,7 @@ class RoleDetailData(BaseModel):
 
 class CalabashData(BaseModel):
     """数据坞"""
+
     level: Optional[int]  # 数据坞等级
     baseCatch: Optional[str]  # 基础吸收概率
     strengthenCatch: Optional[str]  # 强化吸收概率
@@ -243,6 +254,7 @@ class CalabashData(BaseModel):
 
 class KuroRoleInfo(BaseModel):
     """库洛角色信息"""
+
     id: int
     userId: int
     gameId: int
@@ -257,6 +269,7 @@ class KuroRoleInfo(BaseModel):
 
 class GachaLog(BaseModel):
     """抽卡记录"""
+
     cardPoolType: str
     resourceId: int
     qualityLevel: int
@@ -365,5 +378,6 @@ class ExploreArea(BaseModel):
 
 class ExploreList(BaseModel):
     """探索度"""
+
     exploreList: Union[List[ExploreArea], None] = None
     open: bool

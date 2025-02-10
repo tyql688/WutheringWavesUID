@@ -5,6 +5,7 @@ from typing import Union, Optional
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
+
 from .char_model import CharacterModel
 from ..ascension.constant import fixed_name, sum_percentages
 
@@ -29,12 +30,12 @@ read_char_json_files(MAP_PATH)
 
 
 class WavesCharResult:
-    def __int__(self):
-        self.name = None
-        self.starLevel = None
-        self.stats = None
-        self.skillTrees = None
-        self.fixed_skill = None  # 固定技能
+    def __init__(self):
+        self.name = ""
+        self.starLevel = 4
+        self.stats = {"life": 0.0, "atk": 0.0, "def": 0.0}
+        self.skillTrees = {}
+        self.fixed_skill = {}
 
 
 def get_breach(breach: Union[int, None], level: int):
@@ -61,24 +62,23 @@ def get_breach(breach: Union[int, None], level: int):
 
 def get_char_detail(
     char_id: Union[str, int], level: int, breach: Union[int, None] = None
-) -> Union[WavesCharResult, None]:
+) -> WavesCharResult:
     """
     breach 突破
     resonLevel 精炼
     """
+    result = WavesCharResult()
     if str(char_id) not in char_id_data:
         logger.exception(f"get_char_detail char_id: {char_id} not found")
-        return None
+        return result
 
     breach = get_breach(breach, level)
 
     char_data = char_id_data[str(char_id)]
-    result = WavesCharResult()
     result.name = char_data["name"]
     result.starLevel = char_data["starLevel"]
     result.stats = copy.deepcopy(char_data["stats"][str(breach)][str(level)])
     result.skillTrees = char_data["skillTree"]
-    result.fixed_skill = {}
 
     char_data["skillTree"].items()
     for key, value in char_data["skillTree"].items():
@@ -108,7 +108,7 @@ def get_char_detail(
     return result
 
 
-def get_char_detail2(role) -> Union[WavesCharResult, None]:
+def get_char_detail2(role) -> WavesCharResult:
     role_id = role.role.roleId
     role_level = role.role.level
     role_breach = role.role.breach

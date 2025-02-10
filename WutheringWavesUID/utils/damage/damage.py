@@ -1,10 +1,11 @@
-from typing import Dict, List, Union, Literal
+from typing import Any, Dict, List, Union, Literal, Optional
 
+from ...utils.api.model import RoleDetailData
 from ...utils.damage.utils import parse_skill_multi
 
 
 class WavesEffect(object):
-    def __init__(self, element_msg: str, element_value: any):
+    def __init__(self, element_msg: str, element_value: Any):
         self.element_msg = element_msg
         self.element_value = element_value
 
@@ -107,6 +108,7 @@ class DamageBonusPhantom:
 class DamageAttribute:
     def __init__(
         self,
+        role=None,
         char_template: Literal["temp_atk", "temp_life", "temp_def"] = "temp_atk",
         char_atk=0,
         char_life=0,
@@ -130,14 +132,16 @@ class DamageAttribute:
         character_level=0,
         defense_reduction=0,
         enemy_resistance=0.1,
-        dmg_bonus_phantom=None,
+        dmg_bonus_phantom: Optional[DamageBonusPhantom] = None,
         ph_detail=None,
         echo_id=0,
         char_attr=None,
         sync_strike=False,
         energy_regen=0,
-        char_damage=None,
+        char_damage="",
         enemy_level=90,
+        teammate_char_ids: Optional[List[int]] = None,
+        env_spectro=False,
     ):
         """
         初始化 DamageAttribute 类的实例。
@@ -168,6 +172,9 @@ class DamageAttribute:
         :param char_attr: 角色属性 ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
         :param sync_strike: 协同攻击
         """
+        if teammate_char_ids is None:
+            teammate_char_ids = []
+        self.role: Optional[RoleDetailData] = role
         # 角色模版 ["temp_atk", "temp_life", "temp_def"]
         self.char_template = char_template
         # 角色基础攻击力
@@ -215,7 +222,7 @@ class DamageAttribute:
         # 敌人抗性百分比
         self.enemy_resistance = 0
         # 伤害加成百分比 -> DamageBonusPhantom
-        self.dmg_bonus_phantom: DamageBonusPhantom = dmg_bonus_phantom
+        self.dmg_bonus_phantom: Optional[DamageBonusPhantom] = dmg_bonus_phantom
         # 声骸个数和名字 -> List[PhantomDetail]
         self.ph_detail: List[PhantomDetail] = []
         # 声骸技能id
@@ -232,6 +239,10 @@ class DamageAttribute:
         self.effect = []
         # 敌人等级
         self.enemy_level = 0
+        # 队友id
+        self.teammate_char_ids = teammate_char_ids if teammate_char_ids else []
+        # 光噪效应
+        self.env_spectro = env_spectro
 
         if enemy_resistance:
             self.add_enemy_resistance(
@@ -241,7 +252,7 @@ class DamageAttribute:
 
     def __str__(self):
         ph_details_str = "\n".join(str(ph) for ph in self.ph_detail)
-        effect_str = "\n".join(str(e) for e in self.effect)
+        effect_str = "\n" + "\n".join(str(e) for e in self.effect)
         return (
             f"\nDamageAttribute(\n"
             f"  角色模版={self.char_template}, \n"
@@ -276,9 +287,14 @@ class DamageAttribute:
             f"  协同攻击={self.sync_strike}, \n"
             f"  共鸣效率={self.energy_regen}, \n"
             f"  声骸={ph_details_str}, \n"
-            f"  效果={effect_str}\n"
+            f"  效果={effect_str}, \n"
+            f"  队友={self.teammate_char_ids}, \n"
             f")"
         )
+
+    def set_role(self, role: RoleDetailData):
+        self.role = role
+        return self
 
     def add_effect(self, title: str, msg: str):
         effect = WavesEffect.add_effect(title, msg)
@@ -520,9 +536,21 @@ class DamageAttribute:
         self.sync_strike = True
         return self
 
+    def set_env_spectro(self):
+        """光噪效应"""
+        self.env_spectro = True
+        return self
+
     def set_char_damage(self, char_damage):
         """角色伤害"""
         self.char_damage = char_damage
+        return self
+
+    def add_teammate(self, teammate_char_ids: Union[List[int], int]):
+        """队友"""
+        if isinstance(teammate_char_ids, int):
+            teammate_char_ids = [teammate_char_ids]
+        self.teammate_char_ids.extend(teammate_char_ids)
         return self
 
     def set_phantom_dmg_bonus(self, needPhantom=True, needShuxing=True):

@@ -1,23 +1,36 @@
-import copy
 import re
+import copy
 from pathlib import Path
 from typing import Optional
 
 from PIL import Image, ImageDraw, ImageEnhance
 
-from gsuid_core.logger import logger
 from gsuid_core.models import Event
+from gsuid_core.logger import logger
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
-from .role_info_change import change_role_detail
+
 from ..utils import hint
+from ..utils.calc import WuWaCalc
+from ..utils.waves_api import waves_api
+from ..wutheringwaves_config import PREFIX
+from ..utils.error_reply import WAVES_CODE_102
+from .role_info_change import change_role_detail
+from ..utils.resource.constant import SPECIAL_CHAR
+from ..utils.damage.abstract import DamageDetailRegister
+from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.api.model import WeaponData, RoleDetailData, AccountBaseInfo
+from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.ascension.weapon import (
     WavesWeaponResult,
     get_breach,
     get_weapon_detail,
 )
-from ..utils.calc import WuWaCalc
+from ..utils.resource.download_file import (
+    get_chain_img,
+    get_skill_img,
+    get_phantom_img,
+)
 from ..utils.calculate import (
     get_calc_map,
     get_max_score,
@@ -26,9 +39,6 @@ from ..utils.calculate import (
     calc_phantom_score,
     get_total_score_bg,
 )
-from ..utils.char_info_utils import get_all_role_detail_info
-from ..utils.damage.abstract import DamageDetailRegister
-from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import (
     waves_font_16,
     waves_font_18,
@@ -65,15 +75,6 @@ from ..utils.image import (
     get_attribute_effect,
     draw_text_with_shadow,
 )
-from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from ..utils.resource.constant import SPECIAL_CHAR
-from ..utils.resource.download_file import (
-    get_chain_img,
-    get_skill_img,
-    get_phantom_img,
-)
-from ..utils.waves_api import waves_api
-from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -303,18 +304,18 @@ async def ph_card_draw(
             score_temp.alpha_composite(sh_score_c)
             score_temp_draw = ImageDraw.Draw(score_temp)
 
-            score_temp_draw.text((180, 260), f"声骸评级", GREY, waves_font_40, "mm")
+            score_temp_draw.text((180, 260), "声骸评级", GREY, waves_font_40, "mm")
             score_temp_draw.text(
                 (180, 380), f"{phantom_score:.2f}分", "white", waves_font_40, "mm"
             )
-            score_temp_draw.text((180, 440), f"声骸评分", GREY, waves_font_40, "mm")
+            score_temp_draw.text((180, 440), "声骸评分", GREY, waves_font_40, "mm")
         else:
-            abs_bg = Image.open(TEXT_PATH / f"abs.png")
+            abs_bg = Image.open(TEXT_PATH / "abs.png")
             score_temp = Image.new("RGBA", abs_bg.size)
             score_temp.alpha_composite(abs_bg)
             score_temp_draw = ImageDraw.Draw(score_temp)
-            score_temp_draw.text((180, 130), f"暂无", "white", waves_font_40, "mm")
-            score_temp_draw.text((180, 380), f"- 分", "white", waves_font_40, "mm")
+            score_temp_draw.text((180, 130), "暂无", "white", waves_font_40, "mm")
+            score_temp_draw.text((180, 380), "- 分", "white", waves_font_40, "mm")
 
         if is_draw:
             phantom_temp.alpha_composite(score_temp, dest=(30, 120 + ph_sum_value))
@@ -347,7 +348,7 @@ async def ph_card_draw(
         ph_tips = ph_1.copy()
         ph_tips_draw = ImageDraw.Draw(ph_tips)
 
-        ph_tips_draw.text((20, 50), f"[提示]评分模板", "white", waves_font_24, "lm")
+        ph_tips_draw.text((20, 50), "[提示]评分模板", "white", waves_font_24, "lm")
         ph_tips_draw.text(
             (350, 50), f'{calc.calc_temp["name"]}', (255, 255, 0), waves_font_24, "rm"
         )
@@ -598,7 +599,7 @@ async def draw_char_detail_img(
                 uid, ck, role_detail, change_list_regex
             )
         except Exception as e:
-            logger.exception(f"角色数据转换错误", e)
+            logger.exception("角色数据转换错误", e)
             role_detail = temp
     # 创建背景
     img = get_waves_bg(
@@ -737,13 +738,13 @@ async def draw_char_detail_img(
         damage_title_bg = damage_bar1.copy()
         damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
         damage_title_bg_draw.text(
-            (400, 50), f"伤害类型", SPECIAL_GOLD, waves_font_24, "rm"
+            (400, 50), "伤害类型", SPECIAL_GOLD, waves_font_24, "rm"
         )
         damage_title_bg_draw.text(
-            (700, 50), f"暴击伤害", SPECIAL_GOLD, waves_font_24, "mm"
+            (700, 50), "暴击伤害", SPECIAL_GOLD, waves_font_24, "mm"
         )
         damage_title_bg_draw.text(
-            (1000, 50), f"期望伤害", SPECIAL_GOLD, waves_font_24, "mm"
+            (1000, 50), "期望伤害", SPECIAL_GOLD, waves_font_24, "mm"
         )
         img.alpha_composite(damage_title_bg, dest=(0, 2600 + ph_sum_value + jineng_len))
         for dindex, damage_temp in enumerate(damageDetail):
@@ -752,9 +753,9 @@ async def draw_char_detail_img(
             crit_damage, expected_damage = damage_temp["func"](
                 damageAttributeTemp, role_detail
             )
-            # logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
-            # logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
-            # logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
+            logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
+            logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
+            logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
 
             damage_bar = damage_bar2.copy() if dindex % 2 == 0 else damage_bar1.copy()
             damage_bar_draw = ImageDraw.Draw(damage_bar)
@@ -853,9 +854,9 @@ async def draw_char_detail_img(
         crit_damage, expected_damage = damage_calc["func"](
             damageAttributeTemp, role_detail
         )
-        # logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
-        # logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
-        # logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
+        logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
+        logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
+        logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
 
         damage_high = 100 + (len(damageAttributeTemp.effect) + 3) * 60
         damage_img = Image.new("RGBA", (1200, damage_high))
@@ -863,13 +864,13 @@ async def draw_char_detail_img(
         damage_title_bg = damage_bar1.copy()
         damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
         damage_title_bg_draw.text(
-            (400, 50), f"伤害类型", SPECIAL_GOLD, waves_font_24, "rm"
+            (400, 50), "伤害类型", SPECIAL_GOLD, waves_font_24, "rm"
         )
         damage_title_bg_draw.text(
-            (700, 50), f"暴击伤害", SPECIAL_GOLD, waves_font_24, "mm"
+            (700, 50), "暴击伤害", SPECIAL_GOLD, waves_font_24, "mm"
         )
         damage_title_bg_draw.text(
-            (1000, 50), f"期望伤害", SPECIAL_GOLD, waves_font_24, "mm"
+            (1000, 50), "期望伤害", SPECIAL_GOLD, waves_font_24, "mm"
         )
         damage_img.alpha_composite(damage_title_bg, dest=(0, 10))
 
@@ -892,7 +893,7 @@ async def draw_char_detail_img(
 
         damage_title_bg = damage_bar1.copy()
         damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
-        damage_title_bg_draw.text((600, 50), f"buff列表", "white", waves_font_24, "mm")
+        damage_title_bg_draw.text((600, 50), "buff列表", "white", waves_font_24, "mm")
         damage_img.alpha_composite(damage_title_bg, dest=(0, 130))
 
         for dindex, effect in enumerate(damageAttributeTemp.effect):
@@ -1108,18 +1109,18 @@ async def draw_char_score_img(
             score_temp.alpha_composite(sh_score_c)
             score_temp_draw = ImageDraw.Draw(score_temp)
 
-            score_temp_draw.text((180, 260), f"声骸评级", GREY, waves_font_40, "mm")
+            score_temp_draw.text((180, 260), "声骸评级", GREY, waves_font_40, "mm")
             score_temp_draw.text(
                 (180, 380), f"{phantom_score:.2f}分", "white", waves_font_40, "mm"
             )
-            score_temp_draw.text((180, 440), f"声骸评分", GREY, waves_font_40, "mm")
+            score_temp_draw.text((180, 440), "声骸评分", GREY, waves_font_40, "mm")
         else:
-            abs_bg = Image.open(TEXT_PATH / f"abs.png")
+            abs_bg = Image.open(TEXT_PATH / "abs.png")
             score_temp = Image.new("RGBA", abs_bg.size)
             score_temp.alpha_composite(abs_bg)
             score_temp_draw = ImageDraw.Draw(score_temp)
-            score_temp_draw.text((180, 130), f"暂无", "white", waves_font_40, "mm")
-            score_temp_draw.text((180, 380), f"- 分", "white", waves_font_40, "mm")
+            score_temp_draw.text((180, 130), "暂无", "white", waves_font_40, "mm")
+            score_temp_draw.text((180, 380), "- 分", "white", waves_font_40, "mm")
 
         phantom_temp.alpha_composite(score_temp, dest=(30, 120))
 
@@ -1152,7 +1153,7 @@ async def draw_char_score_img(
 
         ph_tips = ph_1.copy()
         ph_tips_draw = ImageDraw.Draw(ph_tips)
-        ph_tips_draw.text((20, 50), f"[提示]评分模板", "white", waves_font_24, "lm")
+        ph_tips_draw.text((20, 50), "[提示]评分模板", "white", waves_font_24, "lm")
         ph_tips_draw.text(
             (350, 50), f'{calc.calc_temp["name"]}', (255, 255, 0), waves_font_24, "rm"
         )
@@ -1264,12 +1265,12 @@ async def draw_weight(image, role_name, weight_list_temp, calc_temp):
     draw.text((start_x, 20), title, font=waves_font_36, fill=SPECIAL_GOLD)
 
     # 添加其他
-    text = f"词条得分：词条数值 * 当前词条权重 / 声骸未对齐最高分 * 对齐分数(50)"
+    text = "词条得分：词条数值 * 当前词条权重 / 声骸未对齐最高分 * 对齐分数(50)"
     draw.text((start_x, 750), text, font=waves_font_24, fill="white")
     s = calc_temp["total_grade"]
     text = f"声骸评分标准：SSS≥{s[-1] * 250:.2f}分/ SS≥{s[-2] * 250:.2f}分／S≥{s[-3] * 250:.2f}分 / A≥{s[-4] * 250:.2f}分 / B≥{s[-5] * 250:.2f}分 / C"
     draw.text((start_x, 800), text, font=waves_font_24, fill="white")
-    text = f"当前角色评分标准仅供参考与娱乐，不代表任何官方或权威的评价。"
+    text = "当前角色评分标准仅供参考与娱乐，不代表任何官方或权威的评价。"
     draw.text((start_x, 850), text, font=waves_font_24, fill="white")
 
 
@@ -1305,4 +1306,5 @@ def get_weapon_icon_bg(star: int = 3) -> Image.Image:
         star = 3
     bg_path = TEXT_PATH / f"weapon_icon_bg_{star}.png"
     bg_img = Image.open(bg_path)
+    return bg_img
     return bg_img
