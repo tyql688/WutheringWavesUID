@@ -146,13 +146,13 @@ class PhantomProp(BaseModel):
     phantomId: int
     quality: int
     cost: int
-    iconUrl: Optional[str]
+    iconUrl: str
     skillDescription: Optional[str]
 
 
 class FetterDetail(BaseModel):
     groupId: int
-    name: Optional[str]
+    name: str
     iconUrl: Optional[str]
     num: int
     firstDescription: Optional[str]
@@ -220,7 +220,7 @@ class RoleDetailData(BaseModel):
 
     def get_chain_name(self):
         n = self.get_chain_num()
-        return f'{["零", "一", "二", "三", "四", "五", "六"][n]}链'
+        return f"{['零', '一', '二', '三', '四', '五', '六'][n]}链"
 
     def get_skill_level(
         self,

@@ -1,7 +1,7 @@
 import re
 import copy
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
 from PIL import Image, ImageDraw, ImageEnhance
 
@@ -162,9 +162,7 @@ async def ph_card_draw(
     is_draw=True,
     change_command="",
 ):
-    char_id = role_detail.role.roleId
     char_name = role_detail.role.roleName
-    weaponData = role_detail.weaponData
 
     phantom_temp = Image.new("RGBA", (1200, 1280 + ph_sum_value))
     banner3 = Image.open(TEXT_PATH / "banner3.png")
@@ -175,27 +173,12 @@ async def ph_card_draw(
     #  phantom_sum_value = {}
     calc = WuWaCalc(role_detail)
     if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
-        totalCost = role_detail.phantomData.cost
         equipPhantomList = role_detail.phantomData.equipPhantomList
         phantom_score = 0
 
         calc.phantom_pre = calc.prepare_phantom()
         calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
         calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
-
-        # phantom_sum_value = prepare_phantom(equipPhantomList)
-        # phantom_sum_value = enhance_summation_phantom_value(
-        #     char_id,
-        #     role_detail.role.level,
-        #     role_detail.role.breach,
-        #     weaponData.weapon.weaponId,
-        #     weaponData.level,
-        #     weaponData.breach,
-        #     weaponData.resonLevel,
-        #     phantom_sum_value,
-        # )
-        # 这里用的是角色面板重新获取的计算文件
-        # calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
 
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new("RGBA", (350, 550))
@@ -350,7 +333,7 @@ async def ph_card_draw(
 
         ph_tips_draw.text((20, 50), "[提示]评分模板", "white", waves_font_24, "lm")
         ph_tips_draw.text(
-            (350, 50), f'{calc.calc_temp["name"]}', (255, 255, 0), waves_font_24, "rm"
+            (350, 50), f"{calc.calc_temp['name']}", (255, 255, 0), waves_font_24, "rm"
         )
         # phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 100 + 4 * 50))
         phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 45))
@@ -398,7 +381,9 @@ async def get_role_need(
                 f"[鸣潮] 特征码[{waves_id}] \n无法获取【{char_name}】角色信息，请在库街区展示此角色！\n",
             )
     else:
-        all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
+        all_role_detail: Optional[
+            Dict[str, RoleDetailData]
+        ] = await get_all_role_detail_info(uid)
 
         if all_role_detail is None or char_name not in all_role_detail:
             return (
@@ -663,19 +648,19 @@ async def draw_char_detail_img(
     stats_main = stats_main.resize((40, 40))
     weapon_bg_temp.alpha_composite(stats_main, (65, 187))
     weapon_bg_temp_draw.text(
-        (130, 207), f'{weapon_detail.stats[0]["name"]}', "white", waves_font_30, "lm"
+        (130, 207), f"{weapon_detail.stats[0]['name']}", "white", waves_font_30, "lm"
     )
     weapon_bg_temp_draw.text(
-        (500, 207), f'{weapon_detail.stats[0]["value"]}', "white", waves_font_30, "rm"
+        (500, 207), f"{weapon_detail.stats[0]['value']}", "white", waves_font_30, "rm"
     )
     stats_sub = await get_attribute_prop(weapon_detail.stats[1]["name"])
     stats_sub = stats_sub.resize((40, 40))
     weapon_bg_temp.alpha_composite(stats_sub, (65, 237))
     weapon_bg_temp_draw.text(
-        (130, 257), f'{weapon_detail.stats[1]["name"]}', "white", waves_font_30, "lm"
+        (130, 257), f"{weapon_detail.stats[1]['name']}", "white", waves_font_30, "lm"
     )
     weapon_bg_temp_draw.text(
-        (500, 257), f'{weapon_detail.stats[1]["value"]}', "white", waves_font_30, "rm"
+        (500, 257), f"{weapon_detail.stats[1]['value']}", "white", waves_font_30, "rm"
     )
 
     right_image_temp.alpha_composite(weapon_bg_temp, dest=(0, 650))
@@ -1155,7 +1140,7 @@ async def draw_char_score_img(
         ph_tips_draw = ImageDraw.Draw(ph_tips)
         ph_tips_draw.text((20, 50), "[提示]评分模板", "white", waves_font_24, "lm")
         ph_tips_draw.text(
-            (350, 50), f'{calc.calc_temp["name"]}', (255, 255, 0), waves_font_24, "rm"
+            (350, 50), f"{calc.calc_temp['name']}", (255, 255, 0), waves_font_24, "rm"
         )
         phantom_temp.alpha_composite(ph_tips, (40 + 2 * 370, 45))
 

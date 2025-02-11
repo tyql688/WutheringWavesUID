@@ -4,16 +4,29 @@ from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage_calc, SkillType, SkillTreeMap, cast_skill, cast_attack, \
-    cast_hit, attack_damage, cast_liberation, liberation_damage
+from ...damage.utils import (
+    skill_damage_calc,
+    SkillType,
+    SkillTreeMap,
+    cast_skill,
+    cast_attack,
+    cast_hit,
+    attack_damage,
+    cast_liberation,
+    liberation_damage,
+)
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False,
-                  isHitCounterattack: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute,
+    role: RoleDetailData,
+    isGroup: bool = False,
+    isHitCounterattack: bool = False,
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_def')
+    attr.set_char_template("temp_def")
 
     role_name = role.role.roleName
     # 获取角色详情
@@ -23,17 +36,23 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "9", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "9", skillLevel
+    )
     title = f"御反之隙第一段伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "10", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "10", skillLevel
+    )
     title = f"御反之隙第二段伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "11", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "11", skillLevel
+    )
     title = f"御反之隙第三段伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -88,12 +107,16 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False,
-                  isHitCounterattack: bool = False) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute,
+    role: RoleDetailData,
+    isGroup: bool = False,
+    isHitCounterattack: bool = False,
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(liberation_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_def')
+    attr.set_char_template("temp_def")
 
     role_name = role.role.roleName
     # 获取角色详情
@@ -103,7 +126,9 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "20", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "20", skillLevel
+    )
     title = f"不动如山"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -155,11 +180,15 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False,
-                  isHitCounterattack: bool = False) -> (str, str):
+def calc_damage_3(
+    attr: DamageAttribute,
+    role: RoleDetailData,
+    isGroup: bool = False,
+    isHitCounterattack: bool = False,
+) -> (str, str):
     damage_func = [cast_attack, cast_skill, cast_hit]
     attr.set_char_damage("")
-    attr.set_char_template('temp_def')
+    attr.set_char_template("temp_def")
 
     role_name = role.role.roleName
     # 获取角色详情
@@ -169,17 +198,23 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "27", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "27", skillLevel
+    )
     title = f"御反之隙第一段护盾"
     msg = f"技能倍率{skill_multi}"
     attr.add_shield_skill_multi(skill_multi, title, msg)
 
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "28", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "28", skillLevel
+    )
     title = f"御反之隙第二段护盾"
     msg = f"技能倍率{skill_multi}"
     attr.add_shield_skill_multi(skill_multi, title, msg)
 
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "29", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "29", skillLevel
+    )
     title = f"御反之隙第三段护盾"
     msg = f"技能倍率{skill_multi}"
     attr.add_shield_skill_multi(skill_multi, title, msg)

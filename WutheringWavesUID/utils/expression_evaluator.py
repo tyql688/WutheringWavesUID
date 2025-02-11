@@ -5,8 +5,8 @@ def convert_wrapper(func):
     def wrapper(a, b):
         def convert(value):
             if isinstance(value, str):
-                if '%' in value:
-                    value.replace('%', '')
+                if "%" in value:
+                    value.replace("%", "")
                 try:
                     value = float(value)
                 except ValueError as _:

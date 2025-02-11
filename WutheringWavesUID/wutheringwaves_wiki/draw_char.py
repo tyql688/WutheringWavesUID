@@ -122,7 +122,7 @@ async def draw_char_chain(char_id: str):
 
 async def parse_char_stats(max_stats: Stats):
     labels = ["基础生命", "基础攻击", "基础防御"]
-    values = [f"{max_stats.life:.0f}", f"{max_stats.atk:.0f}", f"{ max_stats.def_:.0f}"]
+    values = [f"{max_stats.life:.0f}", f"{max_stats.atk:.0f}", f"{max_stats.def_:.0f}"]
     rows = [(label, value) for label, value in zip(labels, values)]
 
     col_count = sum(len(row) for row in rows)

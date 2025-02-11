@@ -11,17 +11,40 @@ from ..utils.ascension.weapon import get_breach
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
 from ..utils.expression_ctx import get_waves_char_rank, WavesCharRank
-from ..utils.fonts.waves_fonts import waves_font_30, waves_font_25, waves_font_26, waves_font_42, waves_font_15, \
-    waves_font_22, waves_font_40, waves_font_24, waves_font_18, waves_font_20, waves_font_16, waves_font_34
+from ..utils.fonts.waves_fonts import (
+    waves_font_30,
+    waves_font_25,
+    waves_font_26,
+    waves_font_42,
+    waves_font_15,
+    waves_font_22,
+    waves_font_40,
+    waves_font_24,
+    waves_font_18,
+    waves_font_20,
+    waves_font_16,
+    waves_font_34,
+)
 from ..utils.hint import error_reply
-from ..utils.image import get_waves_bg, get_event_avatar, add_footer, GOLD, GREY, get_attribute, get_square_avatar, \
-    get_square_weapon, SPECIAL_GOLD, CHAIN_COLOR, WEAPON_RESONLEVEL_COLOR
+from ..utils.image import (
+    get_waves_bg,
+    get_event_avatar,
+    add_footer,
+    GOLD,
+    GREY,
+    get_attribute,
+    get_square_avatar,
+    get_square_weapon,
+    SPECIAL_GOLD,
+    CHAIN_COLOR,
+    WEAPON_RESONLEVEL_COLOR,
+)
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NORMAL_LIST
 from ..utils.resource.download_file import get_skill_img
 from ..utils.waves_api import waves_api
 
-TEXT_PATH = Path(__file__).parent / 'texture2d'
+TEXT_PATH = Path(__file__).parent / "texture2d"
 
 
 async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, bytes]:
@@ -36,7 +59,7 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
 
     # 根据面板数据获取详细信息
     all_role_detail = None
-    if '刷新' in ev.command:
+    if "刷新" in ev.command:
         waves_datas = await refresh_char(uid, user_id, ck=ck)
         if isinstance(waves_datas, str):
             return waves_datas
@@ -53,37 +76,47 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
         return error_reply(WAVES_CODE_107)
 
     waves_char_rank = await get_waves_char_rank(uid, all_role_detail)
-    waves_char_rank.sort(key=lambda i: (i.score, i.starLevel, i.level, i.chain, i.roleId), reverse=True)
+    waves_char_rank.sort(
+        key=lambda i: (i.score, i.starLevel, i.level, i.chain, i.roleId), reverse=True
+    )
 
     avatar_h = 230
     info_bg_h = 260
     bar_star_h = 110
     h = avatar_h + info_bg_h + len(waves_char_rank) * bar_star_h + 80
-    card_img = get_waves_bg(1000, h, 'bg3')
+    card_img = get_waves_bg(1000, h, "bg3")
 
     # 基础信息 名字 特征码
-    base_info_bg = Image.open(TEXT_PATH / 'base_info_bg.png')
+    base_info_bg = Image.open(TEXT_PATH / "base_info_bg.png")
     base_info_draw = ImageDraw.Draw(base_info_bg)
-    base_info_draw.text((275, 120), f'{account_info.name[:7]}', 'white', waves_font_30, 'lm')
-    base_info_draw.text((226, 173), f'特征码:  {account_info.id}', GOLD, waves_font_25, 'lm')
+    base_info_draw.text(
+        (275, 120), f"{account_info.name[:7]}", "white", waves_font_30, "lm"
+    )
+    base_info_draw.text(
+        (226, 173), f"特征码:  {account_info.id}", GOLD, waves_font_25, "lm"
+    )
     card_img.paste(base_info_bg, (15, 20), base_info_bg)
 
     # 头像 头像环
     avatar = await draw_pic_with_ring(ev)
-    avatar_ring = Image.open(TEXT_PATH / 'avatar_ring.png')
+    avatar_ring = Image.open(TEXT_PATH / "avatar_ring.png")
     card_img.paste(avatar, (25, 70), avatar)
     avatar_ring = avatar_ring.resize((180, 180))
     card_img.paste(avatar_ring, (35, 80), avatar_ring)
 
     # 账号基本信息，由于可能会没有，放在一起
     if account_info.is_full:
-        title_bar = Image.open(TEXT_PATH / 'title_bar.png')
+        title_bar = Image.open(TEXT_PATH / "title_bar.png")
         title_bar_draw = ImageDraw.Draw(title_bar)
-        title_bar_draw.text((660, 125), '账号等级', GREY, waves_font_26, 'mm')
-        title_bar_draw.text((660, 78), f'Lv.{account_info.level}', 'white', waves_font_42, 'mm')
+        title_bar_draw.text((660, 125), "账号等级", GREY, waves_font_26, "mm")
+        title_bar_draw.text(
+            (660, 78), f"Lv.{account_info.level}", "white", waves_font_42, "mm"
+        )
 
-        title_bar_draw.text((810, 125), '世界等级', GREY, waves_font_26, 'mm')
-        title_bar_draw.text((810, 78), f'Lv.{account_info.worldLevel}', 'white', waves_font_42, 'mm')
+        title_bar_draw.text((810, 125), "世界等级", GREY, waves_font_26, "mm")
+        title_bar_draw.text(
+            (810, 78), f"Lv.{account_info.worldLevel}", "white", waves_font_42, "mm"
+        )
         card_img.paste(title_bar, (-20, 70), title_bar)
 
     # up角色
@@ -104,55 +137,69 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
     for index, _rank in enumerate(waves_char_rank):
         _rank: WavesCharRank
         role_detail: RoleDetailData = all_role_detail[_rank.roleName]
-        bar_star = Image.open(TEXT_PATH / f'bar_{_rank.starLevel}star.png')
+        bar_star = Image.open(TEXT_PATH / f"bar_{_rank.starLevel}star.png")
         bar_star_draw = ImageDraw.Draw(bar_star)
         role_avatar = await draw_pic(role_detail.role.roleId)
 
         bar_star.paste(role_avatar, (60, 0), role_avatar)
 
-        role_attribute = await get_attribute(role_detail.role.attributeName, is_simple=True)
-        role_attribute = role_attribute.resize((40, 40)).convert('RGBA')
+        role_attribute = await get_attribute(
+            role_detail.role.attributeName, is_simple=True
+        )
+        role_attribute = role_attribute.resize((40, 40)).convert("RGBA")
         bar_star.alpha_composite(role_attribute, (170, 20))
-        bar_star_draw.text((180, 83), f'Lv.{_rank.level}', GREY, waves_font_22, 'mm')
+        bar_star_draw.text((180, 83), f"Lv.{_rank.level}", GREY, waves_font_22, "mm")
 
         # 命座
         info_block = Image.new("RGBA", (40, 20), color=(255, 255, 255, 0))
         info_block_draw = ImageDraw.Draw(info_block)
         fill = CHAIN_COLOR[role_detail.get_chain_num()] + (int(0.9 * 255),)
         info_block_draw.rectangle([0, 0, 40, 20], fill=fill)
-        info_block_draw.text((2, 10), f'{role_detail.get_chain_name()}', 'white', waves_font_18, 'lm')
+        info_block_draw.text(
+            (2, 10), f"{role_detail.get_chain_name()}", "white", waves_font_18, "lm"
+        )
         bar_star.alpha_composite(info_block, (120, 15))
 
         # 评分
         if _rank.score > 0.0:
-            score_bg = Image.open(TEXT_PATH / f'score_{_rank.score_bg}.png')
+            score_bg = Image.open(TEXT_PATH / f"score_{_rank.score_bg}.png")
             bar_star.alpha_composite(score_bg, (200, 2))
-            bar_star_draw.text((348, 45), f'{_rank.score.__round__(1)}', 'white', waves_font_34, 'mm')
-            bar_star_draw.text((348, 75), f'声骸分数', SPECIAL_GOLD, waves_font_16, 'mm')
+            bar_star_draw.text(
+                (348, 45), f"{_rank.score.__round__(1)}", "white", waves_font_34, "mm"
+            )
+            bar_star_draw.text(
+                (348, 75), f"声骸分数", SPECIAL_GOLD, waves_font_16, "mm"
+            )
 
         # 技能
-        skill_img_temp = Image.new('RGBA', (1500, 300))
+        skill_img_temp = Image.new("RGBA", (1500, 300))
         for i, _skill in enumerate(role_detail.get_skill_list()):
-            if _skill.skill.type == '延奏技能':
+            if _skill.skill.type == "延奏技能":
                 continue
-            temp = Image.new('RGBA', (120, 140))
-            skill_bg = Image.open(TEXT_PATH / 'skill_bg.png')
+            temp = Image.new("RGBA", (120, 140))
+            skill_bg = Image.open(TEXT_PATH / "skill_bg.png")
             temp.alpha_composite(skill_bg)
 
-            skill_img = await get_skill_img(role_detail.role.roleId, _skill.skill.name, _skill.skill.iconUrl)
+            skill_img = await get_skill_img(
+                role_detail.role.roleId, _skill.skill.name, _skill.skill.iconUrl
+            )
             skill_img = skill_img.resize((70, 70))
             temp.alpha_composite(skill_img, (25, 25))
 
             temp_draw = ImageDraw.Draw(temp)
-            temp_draw.text((62, 115), f'{_skill.skill.type}', 'white', waves_font_15, 'mm')
-            temp_draw.text((62, 132), f'Lv.{_skill.level}', 'white', waves_font_15, 'mm')
+            temp_draw.text(
+                (62, 115), f"{_skill.skill.type}", "white", waves_font_15, "mm"
+            )
+            temp_draw.text(
+                (62, 132), f"Lv.{_skill.level}", "white", waves_font_15, "mm"
+            )
 
             _x = 100 + i * 65
             skill_img_temp.alpha_composite(temp.resize((70, 82)), dest=(_x, 0))
         bar_star.alpha_composite(skill_img_temp, dest=(300, 10))
 
         # 武器
-        weapon_bg_temp = Image.new('RGBA', (600, 300))
+        weapon_bg_temp = Image.new("RGBA", (600, 300))
 
         weaponData: WeaponData = role_detail.weaponData
         weapon_icon = await get_square_weapon(weaponData.weapon.weaponId)
@@ -161,33 +208,45 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
         weapon_icon_bg.paste(weapon_icon, (10, 20), weapon_icon)
 
         weapon_bg_temp_draw = ImageDraw.Draw(weapon_bg_temp)
-        weapon_bg_temp_draw.text((200, 30), f'{weaponData.weapon.weaponName}', SPECIAL_GOLD, waves_font_40, 'lm')
-        weapon_bg_temp_draw.text((203, 75), f'Lv.{weaponData.level}/90', 'white', waves_font_30, 'lm')
+        weapon_bg_temp_draw.text(
+            (200, 30),
+            f"{weaponData.weapon.weaponName}",
+            SPECIAL_GOLD,
+            waves_font_40,
+            "lm",
+        )
+        weapon_bg_temp_draw.text(
+            (203, 75), f"Lv.{weaponData.level}/90", "white", waves_font_30, "lm"
+        )
 
         _x = 220 + 43 * len(weaponData.weapon.weaponName)
         _y = 37
 
         wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)
-        weapon_bg_temp_draw.rounded_rectangle([_x - 15, _y - 15, _x + 50, _y + 15], radius=7,
-                                              fill=wrc_fill)
-        weapon_bg_temp_draw.text((_x, _y), f'精{weaponData.resonLevel}', 'white',
-                                 waves_font_24, 'lm')
+        weapon_bg_temp_draw.rounded_rectangle(
+            [_x - 15, _y - 15, _x + 50, _y + 15], radius=7, fill=wrc_fill
+        )
+        weapon_bg_temp_draw.text(
+            (_x, _y), f"精{weaponData.resonLevel}", "white", waves_font_24, "lm"
+        )
 
         weapon_breach = get_breach(weaponData.breach, weaponData.level)
         for i in range(0, weapon_breach):
-            promote_icon = Image.open(TEXT_PATH / 'promote_icon.png')
+            promote_icon = Image.open(TEXT_PATH / "promote_icon.png")
             weapon_bg_temp.alpha_composite(promote_icon, dest=(200 + 40 * i, 100))
 
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
         bar_star.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(710, 25))
 
-        card_img.paste(bar_star, (0, avatar_h + info_bg_h + index * bar_star_h), bar_star)
+        card_img.paste(
+            bar_star, (0, avatar_h + info_bg_h + index * bar_star_h), bar_star
+        )
 
         if _rank.starLevel == 5 and _rank.roleName not in NORMAL_LIST:
             up_num += 1
 
-        if _rank.score >= 175 and _rank.score_bg in ['s', 'ss', 'sss']:
+        if _rank.score >= 175 and _rank.score_bg in ["s", "ss", "sss"]:
             level_num += 1
 
         if role_detail.get_chain_num() == 6:
@@ -204,19 +263,25 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
             all_num_5 += 1
 
     # 简单描述
-    info_bg = Image.open(TEXT_PATH / 'info_bg.png')
+    info_bg = Image.open(TEXT_PATH / "info_bg.png")
     info_bg_draw = ImageDraw.Draw(info_bg)
-    info_bg_draw.text((240, 120), f'{up_num}/{all_num}', 'white', waves_font_40, 'mm')
-    info_bg_draw.text((240, 160), f'up角色', 'white', waves_font_20, 'mm')
+    info_bg_draw.text((240, 120), f"{up_num}/{all_num}", "white", waves_font_40, "mm")
+    info_bg_draw.text((240, 160), f"up角色", "white", waves_font_20, "mm")
 
-    info_bg_draw.text((410, 120), f'{level_num}/{all_num}', 'white', waves_font_40, 'mm')
-    info_bg_draw.text((410, 160), f'高练角色', 'white', waves_font_20, 'mm')
+    info_bg_draw.text(
+        (410, 120), f"{level_num}/{all_num}", "white", waves_font_40, "mm"
+    )
+    info_bg_draw.text((410, 160), f"高练角色", "white", waves_font_20, "mm")
 
-    info_bg_draw.text((580, 120), f'{chain_num}/{all_num - all_num_5}', 'white', waves_font_40, 'mm')
-    info_bg_draw.text((580, 160), f'高链4星', 'white', waves_font_20, 'mm')
+    info_bg_draw.text(
+        (580, 120), f"{chain_num}/{all_num - all_num_5}", "white", waves_font_40, "mm"
+    )
+    info_bg_draw.text((580, 160), f"高链4星", "white", waves_font_20, "mm")
 
-    info_bg_draw.text((750, 120), f'{chain_num_5}/{all_num_5}', 'white', waves_font_40, 'mm')
-    info_bg_draw.text((750, 160), f'高链5星', 'white', waves_font_20, 'mm')
+    info_bg_draw.text(
+        (750, 120), f"{chain_num_5}/{all_num_5}", "white", waves_font_40, "mm"
+    )
+    info_bg_draw.text((750, 160), f"高链5星", "white", waves_font_20, "mm")
 
     card_img.paste(info_bg, (0, avatar_h), info_bg)
 
@@ -228,8 +293,8 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
 async def draw_pic_with_ring(ev: Event):
     pic = await get_event_avatar(ev)
 
-    mask_pic = Image.open(TEXT_PATH / 'avatar_mask.png')
-    img = Image.new('RGBA', (180, 180))
+    mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
+    img = Image.new("RGBA", (180, 180))
     mask = mask_pic.resize((160, 160))
     resize_pic = crop_center_img(pic, 160, 160)
     img.paste(resize_pic, (20, 20), mask)
@@ -239,14 +304,14 @@ async def draw_pic_with_ring(ev: Event):
 
 async def draw_pic(roleId):
     pic = await get_square_avatar(roleId)
-    pic_temp = Image.new('RGBA', pic.size)
+    pic_temp = Image.new("RGBA", pic.size)
     pic_temp.paste(pic.resize((160, 160)), (10, 10))
 
-    mask_pic = Image.open(TEXT_PATH / 'avatar_mask.png')
-    mask_pic_temp = Image.new('RGBA', mask_pic.size)
+    mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
+    mask_pic_temp = Image.new("RGBA", mask_pic.size)
     mask_pic_temp.paste(mask_pic, (-20, -45), mask_pic)
 
-    img = Image.new('RGBA', (180, 180))
+    img = Image.new("RGBA", (180, 180))
     mask_pic_temp = mask_pic_temp.resize((160, 160))
     resize_pic = pic_temp.resize((160, 160))
     img.paste(resize_pic, (0, 0), mask_pic_temp)
@@ -257,6 +322,6 @@ async def draw_pic(roleId):
 def get_weapon_icon_bg(star: int = 3) -> Image.Image:
     if star < 3:
         star = 3
-    bg_path = TEXT_PATH / f'weapon_icon_bg_{star}.png'
+    bg_path = TEXT_PATH / f"weapon_icon_bg_{star}.png"
     bg_img = Image.open(bg_path)
     return bg_img

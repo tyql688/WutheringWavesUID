@@ -15,7 +15,7 @@ from .RESOURCE_PATH import (
 
 async def get_skill_img(
     char_id: Union[str, int], skill_name: str, pic_url: str
-) -> Union[Image.Image, str, None]:
+) -> Image.Image:
     _dir = ROLE_DETAIL_SKILL_PATH / str(char_id)
     _dir.mkdir(parents=True, exist_ok=True)
 
@@ -30,7 +30,7 @@ async def get_skill_img(
 
 async def get_chain_img(
     char_id: Union[str, int], order_id: int, pic_url: str
-) -> Union[Image.Image, str, None]:
+) -> Image.Image:
     _dir = ROLE_DETAIL_CHAINS_PATH / str(char_id)
     _dir.mkdir(parents=True, exist_ok=True)
 
@@ -42,9 +42,7 @@ async def get_chain_img(
     return Image.open(_path).convert("RGBA")
 
 
-async def get_phantom_img(
-    phantom_id: int, pic_url: str
-) -> Union[Image.Image, str, None]:
+async def get_phantom_img(phantom_id: int, pic_url: str) -> Image.Image:
     name = f"phantom_{phantom_id}.png"
     _path = PHANTOM_PATH / name
     if not _path.exists():
@@ -53,7 +51,7 @@ async def get_phantom_img(
     return Image.open(_path).convert("RGBA")
 
 
-async def get_fetter_img(name: str, pic_url: str) -> Union[Image.Image, str, None]:
+async def get_fetter_img(name: str, pic_url: str) -> Image.Image:
     name = f"fetter_{name}.png"
     _path = FETTER_PATH / name
     if not _path.exists():

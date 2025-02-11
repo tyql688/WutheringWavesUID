@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 from gsuid_core.logger import logger
 
@@ -14,7 +14,6 @@ from ..ascension.constant import sum_numbers, sum_percentages, percent_to_float
 
 
 class WuWaCalc(object):
-
     def __init__(self, role_detail: RoleDetailData):
         """
         # 声骸预处理 -> 声骸套装，声骸数量，声骸首位id
@@ -42,15 +41,15 @@ class WuWaCalc(object):
         """
         self.role_detail: RoleDetailData = role_detail
         # 声骸预处理 -> 声骸套装，声骸数量，声骸首位id
-        self.phantom_pre = None
+        self.phantom_pre = {}
         # 声骸面板数据
         self.phantom_card = {}
         # 角色评分使用
         self.calc_temp = None
         # 角色面板数据
-        self.role_card = None
+        self.role_card = {}
         # attr
-        self.damageAttribute = None
+        self.damageAttribute: Optional[DamageAttribute] = None
         self.can_calc = False
         if (
             self.role_detail.phantomData

@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Optional, Union
 
 from ...utils.damage.damage import DamageAttribute
 
@@ -150,7 +150,7 @@ class EchoAbstract(object):
 
 class CharAbstract(object):
     name = None
-    id = None
+    id: Optional[int] = None
     starLevel = None
 
     def do_buff(

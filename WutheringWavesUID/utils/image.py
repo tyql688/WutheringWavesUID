@@ -2,13 +2,14 @@ import os
 import random
 from io import BytesIO
 from pathlib import Path
-from typing import Union, Literal, Optional, Tuple
+from typing import Tuple, Union, Literal, Optional
 
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 
 from gsuid_core.models import Event
-from gsuid_core.utils.image.image_tools import crop_center_img
 from gsuid_core.utils.image.utils import sget
+from gsuid_core.utils.image.image_tools import crop_center_img
+
 from ..utils.resource.RESOURCE_PATH import (
     AVATAR_PATH,
     WEAPON_PATH,
@@ -88,7 +89,7 @@ WEAPON_RESONLEVEL_COLOR = {
 }
 
 
-async def get_random_waves_role_pile(char_id: str = None):
+async def get_random_waves_role_pile(char_id: Optional[str] = None):
     if char_id:
         png_name = f"role_pile_{char_id}.png"
         if os.path.exists(f"{ROLE_PILE_PATH}/{png_name}"):
@@ -100,7 +101,7 @@ async def get_random_waves_role_pile(char_id: str = None):
 
 async def get_role_pile(
     resource_id: Union[int, str], custom: bool = False
-) -> (bool, Image.Image):
+) -> tuple[bool, Image.Image]:
     if custom:
         custom_dir = f"{CUSTOM_CARD_PATH}/{resource_id}"
         if os.path.isdir(custom_dir) and len(os.listdir(custom_dir)) > 0:
@@ -111,22 +112,19 @@ async def get_role_pile(
 
     name = f"role_pile_{resource_id}.png"
     path = ROLE_PILE_PATH / name
-    if path.exists():
-        return False, Image.open(path).convert("RGBA")
+    return False, Image.open(path).convert("RGBA")
 
 
 async def get_role_pile_old(resource_id: Union[int, str]) -> Image.Image:
     name = f"role_pile_{resource_id}.png"
     path = ROLE_PILE_PATH / name
-    if path.exists():
-        return Image.open(path).convert("RGBA")
+    return Image.open(path).convert("RGBA")
 
 
 async def get_square_avatar(resource_id: Union[int, str]) -> Image.Image:
     name = f"role_head_{resource_id}.png"
     path = AVATAR_PATH / name
-    if path.exists():
-        return Image.open(path).convert("RGBA")
+    return Image.open(path).convert("RGBA")
 
 
 async def cropped_square_avatar(item_icon: Image.Image, size: int) -> Image.Image:
@@ -156,8 +154,7 @@ async def cropped_square_avatar(item_icon: Image.Image, size: int) -> Image.Imag
 async def get_square_weapon(resource_id: Union[int, str]) -> Image.Image:
     name = f"weapon_{resource_id}.png"
     path = WEAPON_PATH / name
-    if path.exists():
-        return Image.open(path).convert("RGBA")
+    return Image.open(path).convert("RGBA")
 
 
 async def get_attribute(name: str = "", is_simple: bool = False) -> Image.Image:
@@ -290,7 +287,10 @@ def add_footer(
 
 
 async def change_color(
-    chain, color: tuple = (255, 255, 255), w: int = None, h: int = None
+    chain,
+    color: tuple = (255, 255, 255),
+    w: Optional[int] = None,
+    h: Optional[int] = None,
 ):
     # 获取图像数据
     pixels = chain.load()  # 加载像素数据
@@ -326,4 +326,5 @@ def draw_text_with_shadow(
                 (_x + i, _y + j), text, font=font, fill=shadow_color, anchor=anchor
             )
 
+    image.text((_x, _y), text, font=font, fill=fill_color, anchor=anchor)
     image.text((_x, _y), text, font=font, fill=fill_color, anchor=anchor)

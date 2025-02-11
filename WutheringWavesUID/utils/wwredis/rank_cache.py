@@ -8,8 +8,8 @@ from ..waves_api import waves_api
 from ...utils.wwredis.wwredis import wavesRedis
 from ...wutheringwaves_config import WutheringWavesConfig
 
-redis_key_score = 'ww:zset:score_rank:{}'  # 角色id - 分数排行
-redis_key_expected = 'ww:zset:expected_rank:{}'  # 角色id - 期望排行
+redis_key_score = "ww:zset:score_rank:{}"  # 角色id - 分数排行
+redis_key_expected = "ww:zset:expected_rank:{}"  # 角色id - 期望排行
 
 
 async def get_waves_token_map():
@@ -27,9 +27,10 @@ async def get_waves_token_map():
     #             wavesTokenUsersMap.update({uid: "true" for uid in w.uid.split('_')})
 
     # 全局 主人定义的
-    RankUseToken = WutheringWavesConfig.get_config('RankUseToken').data
+    RankUseToken = WutheringWavesConfig.get_config("RankUseToken").data
     if RankUseToken:
         from ..database.models import WavesUser
+
         wavesTokenUsers = await WavesUser.get_waves_all_user()
         wavesTokenUsersMap.update({w.uid: w.cookie for w in wavesTokenUsers})
 
@@ -37,9 +38,10 @@ async def get_waves_token_map():
 
 
 async def check_in_rank(roleId: str, user_id: str):
-    RankUseToken = WutheringWavesConfig.get_config('RankUseToken').data
+    RankUseToken = WutheringWavesConfig.get_config("RankUseToken").data
     if RankUseToken:
         from ..database.models import WavesUser
+
         token = await waves_api.get_self_waves_ck(roleId, user_id)
         if token:
             return True
@@ -82,7 +84,9 @@ async def save_rank_cache(uid: str, player_data: List, user_id: str):
             if rank.score > 0:
                 await pipe.zadd(redis_key_score.format(char_id), {uid: rank.score})
             if rank.expected_damage and rank.expected_damage > 0:
-                await pipe.zadd(redis_key_expected.format(char_id), {uid: rank.expected_damage})
+                await pipe.zadd(
+                    redis_key_expected.format(char_id), {uid: rank.expected_damage}
+                )
         await pipe.execute()
 
 
@@ -98,7 +102,9 @@ async def save_rank_caches(all_card):
             for char_id in score_temp:
                 await pipe.zadd(redis_key_score.format(char_id), score_temp[char_id])
             for char_id in expected_temp:
-                await pipe.zadd(redis_key_expected.format(char_id), expected_temp[char_id])
+                await pipe.zadd(
+                    redis_key_expected.format(char_id), expected_temp[char_id]
+                )
             await pipe.execute()
 
     score = {}
@@ -142,10 +148,14 @@ async def get_rank_cache(char_id: str, rank_type: str, num=50):
     if char_id in SPECIAL_CHAR:
         char_id = SPECIAL_CHAR[char_id][0]
     async with wavesRedis.get_client() as client:
-        if rank_type == '评分':
-            rank_list = await client.zrevrange(redis_key_score.format(char_id), 0, num - 1)
+        if rank_type == "评分":
+            rank_list = await client.zrevrange(
+                redis_key_score.format(char_id), 0, num - 1
+            )
         else:
-            rank_list = await client.zrevrange(redis_key_expected.format(char_id), 0, num - 1)
+            rank_list = await client.zrevrange(
+                redis_key_expected.format(char_id), 0, num - 1
+            )
     return rank_list
 
 
@@ -153,7 +163,7 @@ async def get_self_rank(char_id: str, rank_type: str, user_id: str):
     if char_id in SPECIAL_CHAR:
         char_id = SPECIAL_CHAR[char_id][0]
     async with wavesRedis.get_client() as client:
-        if rank_type == '评分':
+        if rank_type == "评分":
             rank = await client.zrevrank(redis_key_score.format(char_id), user_id)
         else:
             rank = await client.zrevrank(redis_key_expected.format(char_id), user_id)

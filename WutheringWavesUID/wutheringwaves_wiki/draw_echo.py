@@ -63,16 +63,22 @@ async def draw_wiki_echo(name, raw_data: Dict):
         skill_data = next(
             (i for i in base_data["components"] if i["title"] == "声骸技能"), None
         )
+    if not skill_data:
+        return "暂无该声骸wiki"
     card_img = get_crop_waves_bg(950, 420, "bg2")
 
     # 声骸展示
     echo_show_data = next(
         (i for i in base_data["components"] if i["title"] == "声骸展示"), None
     )
+    if not echo_show_data:
+        return "暂无该声骸wiki"
     # 声骸信息
     echo_data = next(
         (i for i in base_data["components"] if i["title"] == "声骸信息"), None
     )
+    if not echo_data:
+        return "暂无该声骸wiki"
 
     echo_image = Image.new("RGBA", (350, 400), (255, 255, 255, 0))
     echo_image_draw = ImageDraw.Draw(echo_image)

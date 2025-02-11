@@ -30,15 +30,18 @@ class WavesRedisClient:
             client = self._instances[current_loop]
             yield client
         except RuntimeError:
-            raise RuntimeError("No running event loop - Redis client must be accessed within an async context")
+            raise RuntimeError(
+                "No running event loop - Redis client must be accessed within an async context"
+            )
         finally:
             logger.debug(f" [鸣潮][Redis连接关闭] - Loop ID: {current_loop}")
 
     async def _initialize_redis_connection(self, loop_id: int):
         """初始化 Redis 连接"""
         from ...wutheringwaves_config import WutheringWavesConfig
-        REDIS_FROM_URL = WutheringWavesConfig.get_config('RedisFromUrl').data
-        is_cluster = WutheringWavesConfig.get_config('IsRedisCluster').data
+
+        REDIS_FROM_URL = WutheringWavesConfig.get_config("RedisFromUrl").data
+        is_cluster = WutheringWavesConfig.get_config("IsRedisCluster").data
 
         try:
             if is_cluster:

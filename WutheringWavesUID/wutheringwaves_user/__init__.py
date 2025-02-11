@@ -5,11 +5,11 @@ from gsuid_core.gss import gss
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from .deal import add_cookie, delete_cookie, get_cookie
+
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.message import send_diff_msg
-from ..wutheringwaves_config import PREFIX
-from ..wutheringwaves_config import WutheringWavesConfig
+from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
+from .deal import add_cookie, delete_cookie, get_cookie
 
 waves_bind_uid = SV("鸣潮绑定特征码", priority=10)
 waves_add_ck = SV("鸣潮添加token", priority=5)
@@ -20,7 +20,7 @@ waves_del_all_invalid_ck = SV("鸣潮删除无效token", priority=1, pm=1)
 
 
 @waves_add_ck.on_prefix(
-    (f"添加CK", f"添加ck", f"添加Token", f"添加token", f"添加TOKEN"), block=True
+    ("添加CK", "添加ck", "添加Token", "添加token", "添加TOKEN"), block=True
 )
 async def send_waves_add_ck_msg(bot: Bot, ev: Event):
     ck = ev.text.strip()
@@ -29,7 +29,7 @@ async def send_waves_add_ck_msg(bot: Bot, ev: Event):
 
 
 @waves_del_ck.on_command(
-    (f"删除ck", f"删除CK", f"删除Token", f"删除token", f"删除TOKEN"), block=True
+    ("删除ck", "删除CK", "删除Token", "删除token", "删除TOKEN"), block=True
 )
 async def send_waves_del_ck_msg(bot: Bot, ev: Event):
     at_sender = True if ev.group_id else False
@@ -43,13 +43,13 @@ async def send_waves_del_ck_msg(bot: Bot, ev: Event):
 
 
 @waves_get_ck.on_fullmatch(
-    (f"获取ck", f"获取CK", f"获取Token", f"获取token", f"获取TOKEN"), block=True
+    ("获取ck", "获取CK", "获取Token", "获取token", "获取TOKEN"), block=True
 )
 async def send_waves_get_ck_msg(bot: Bot, ev: Event):
     await bot.send(await get_cookie(bot, ev))
 
 
-@waves_del_group_ck.on_command((f"删除自动签到"), block=True)
+@waves_del_group_ck.on_command(("删除自动签到"), block=True)
 async def delete_group_cookie(bot: Bot, ev: Event):
     at_sender = True if ev.group_id else False
 
@@ -62,7 +62,7 @@ async def delete_group_cookie(bot: Bot, ev: Event):
     await bot.send(f"[鸣潮] 已删除【{param_id}】自动签到【{del_len}】个\n", at_sender)
 
 
-@waves_del_all_invalid_ck.on_fullmatch((f"删除无效token"), block=True)
+@waves_del_all_invalid_ck.on_fullmatch(("删除无效token"), block=True)
 async def delete_all_invalid_cookie(bot: Bot, ev: Event):
     at_sender = True if ev.group_id else False
     del_len = await WavesUser.delete_all_invalid_cookie()
@@ -96,12 +96,12 @@ async def auto_delete_all_invalid_cookie():
 
 @waves_bind_uid.on_command(
     (
-        f"绑定",
-        f"切换",
-        f"删除全部特征码",
-        f"删除全部UID",
-        f"删除",
-        f"查看",
+        "绑定",
+        "切换",
+        "删除全部特征码",
+        "删除全部UID",
+        "删除",
+        "查看",
     ),
     block=True,
 )
@@ -136,9 +136,12 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
         retcode = await WavesBind.switch_uid_by_game(qid, ev.bot_id, uid)
         if retcode == 0:
             uid_list = await WavesBind.get_uid_list_by_game(qid, ev.bot_id)
-            return await bot.send(
-                f"[鸣潮] 切换特征码[{uid_list[0]}]成功！\n", at_sender
-            )
+            if uid_list:
+                return await bot.send(
+                    f"[鸣潮] 切换特征码[{uid_list[0]}]成功！\n", at_sender
+                )
+            else:
+                return await bot.send("[鸣潮] 尚未绑定任何特征码\n", at_sender)
         else:
             return await bot.send(f"[鸣潮] 尚未绑定该特征码[{uid}]\n", at_sender)
     elif "查看" in ev.command:
@@ -147,7 +150,7 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
             uids = "\n".join(uid_list)
             return await bot.send(f"[鸣潮] 绑定的特征码列表为：\n{uids}\n", at_sender)
         else:
-            return await bot.send(f"[鸣潮] 尚未绑定任何特征码\n", at_sender)
+            return await bot.send("[鸣潮] 尚未绑定任何特征码\n", at_sender)
     elif "删除全部" in ev.command:
         retcode = await WavesBind.update_data(
             user_id=qid,
@@ -155,9 +158,9 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
             **{WavesBind.get_gameid_name(None): None},
         )
         if retcode == 0:
-            return await bot.send(f"[鸣潮] 删除全部特征码成功！\n", at_sender)
+            return await bot.send("[鸣潮] 删除全部特征码成功！\n", at_sender)
         else:
-            return await bot.send(f"[鸣潮] 尚未绑定任何特征码\n", at_sender)
+            return await bot.send("[鸣潮] 尚未绑定任何特征码\n", at_sender)
     else:
         if not uid:
             return await bot.send(

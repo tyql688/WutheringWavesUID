@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import Any, Dict, Union, Literal, Optional
 
 import httpx
-from sqlalchemy import exc
 from aiohttp import (
     FormData,
     TCPConnector,
@@ -16,7 +15,6 @@ from aiohttp import (
 
 from gsuid_core.logger import logger
 
-from .api import *
 from ..hint import error_reply
 from ..database.models import WavesUser
 from ..util import get_public_ip, generate_random_string
@@ -27,6 +25,33 @@ from ..error_reply import (
     WAVES_CODE_107,
     WAVES_CODE_109,
     WAVES_CODE_999,
+)
+from .api import (
+    GAME_ID,
+    LOGIN_URL,
+    SERVER_ID,
+    SIGNIN_URL,
+    REFRESH_URL,
+    BASE_DATA_URL,
+    GACHA_LOG_URL,
+    GAME_DATA_URL,
+    KURO_ROLE_URL,
+    ROLE_DATA_URL,
+    SERVER_ID_NET,
+    WIKI_HOME_URL,
+    WIKI_TREE_URL,
+    ROLE_DETAIL_URL,
+    TOWER_INDEX_URL,
+    WIKI_DETAIL_URL,
+    EXPLORE_DATA_URL,
+    QUERY_USERID_URL,
+    TOWER_DETAIL_URL,
+    CALABASH_DATA_URL,
+    GACHA_NET_LOG_URL,
+    CHALLENGE_DATA_URL,
+    CHALLENGE_INDEX_URL,
+    SIGNIN_TASK_LIST_URL,
+    WIKI_ENTRY_DETAIL_URL,
 )
 
 
@@ -455,7 +480,6 @@ class WavesApi:
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[FormData, Dict[str, Any]]] = None,
     ) -> Union[Dict, int]:
-
         if header is None:
             header = await get_headers()
 
@@ -484,7 +508,7 @@ class WavesApi:
                         try:
                             des_data = j.loads(raw_data["data"])
                             raw_data["data"] = des_data
-                        except:
+                        except Exception:
                             pass
                     logger.debug(f"url:[{url}] raw_data:{raw_data}")
                     return raw_data
@@ -510,7 +534,6 @@ class KuroLogin:
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[FormData, Dict[str, Any]]] = None,
     ) -> Union[Dict, int]:
-
         if header is None:
             header = await get_headers()
 

@@ -546,8 +546,10 @@ class DamageAttribute:
         self.char_damage = char_damage
         return self
 
-    def add_teammate(self, teammate_char_ids: Union[List[int], int]):
+    def add_teammate(self, teammate_char_ids: Union[List[int], int, None]):
         """队友"""
+        if teammate_char_ids is None:
+            return self
         if isinstance(teammate_char_ids, int):
             teammate_char_ids = [teammate_char_ids]
         self.teammate_char_ids.extend(teammate_char_ids)

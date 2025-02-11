@@ -41,7 +41,7 @@ class WavesWeaponResult:
         self.resonLevel: int = 1
 
     def get_resonLevel_name(self):
-        return f'谐振{["一", "二", "三", "四", "五"][self.resonLevel - 1]}阶'
+        return f"谐振{['一', '二', '三', '四', '五'][self.resonLevel - 1]}阶"
 
 
 def get_breach(breach: Union[int, None], level: int):
@@ -97,11 +97,11 @@ def get_weapon_detail(
 
     for stat in result.stats:
         if stat["isPercent"]:
-            stat["value"] = f'{stat["value"] / 100:.1f}%'
+            stat["value"] = f"{stat['value'] / 100:.1f}%"
         elif stat["isRatio"]:
-            stat["value"] = f'{stat["value"] * 100:.1f}%'
+            stat["value"] = f"{stat['value'] * 100:.1f}%"
         else:
-            stat["value"] = f'{int(stat["value"])}'
+            stat["value"] = f"{int(stat['value'])}"
 
     result.sub_effect = {}
     for i, v in enumerate(fixed_name):

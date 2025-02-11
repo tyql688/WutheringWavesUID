@@ -5,11 +5,19 @@ from .damage import weapon_damage, echo_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage_calc, hit_damage, cast_skill, cast_hit, \
-    liberation_damage, cast_liberation
+from ...damage.utils import (
+    skill_damage_calc,
+    hit_damage,
+    cast_skill,
+    cast_hit,
+    liberation_damage,
+    cast_liberation,
+)
 
 
-def calc_damage(attr: DamageAttribute, role: RoleDetailData, damage_func, isGroup: bool = False):
+def calc_damage(
+    attr: DamageAttribute, role: RoleDetailData, damage_func, isGroup: bool = False
+):
     role_name = role.role.roleName
     role_id = role.role.roleId
     role_level = role.role.level
@@ -68,9 +76,12 @@ def calc_damage(attr: DamageAttribute, role: RoleDetailData, damage_func, isGrou
     weapon_damage(attr, role.weaponData, damage_func, isGroup)
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False,
-                  skill_type: Union[str, List[str]] = "满能缭乱") -> (
-    str, str):
+def calc_damage_1(
+    attr: DamageAttribute,
+    role: RoleDetailData,
+    isGroup: bool = False,
+    skill_type: Union[str, List[str]] = "满能缭乱",
+) -> (str, str):
     """
     满能缭乱伤害
     """
@@ -116,7 +127,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_4(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     绯红绽放
     """
@@ -168,7 +181,9 @@ damage_detail = [
     },
     {
         "title": "满能z尾刀",
-        "func": lambda attr, role: calc_damage_1(attr, role, skill_type=["满能缭乱", "满能纷落"]),
+        "func": lambda attr, role: calc_damage_1(
+            attr, role, skill_type=["满能缭乱", "满能纷落"]
+        ),
     },
     {
         "title": "绯红绽放",

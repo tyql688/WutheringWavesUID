@@ -4,21 +4,51 @@ from ...api.model import WeaponData, RoleDetailData
 from ...ascension.sonata import get_sonata_detail
 from ...damage.abstract import WavesWeaponRegister, WavesEchoRegister
 from ...damage.damage import DamageAttribute
-from ...damage.utils import SONATA_CELESTIAL, SONATA_SINKING, SONATA_MOLTEN, SONATA_VOID, \
-    SONATA_FREEZING, SONATA_SIERRA, SONATA_REJUVENATING, cast_hit, cast_attack, cast_skill, SONATA_FROSTY, \
-    cast_liberation, skill_damage, CHAR_ATTR_FREEZING, CHAR_ATTR_MOLTEN, CHAR_ATTR_VOID, CHAR_ATTR_SIERRA, \
-    CHAR_ATTR_CELESTIAL, CHAR_ATTR_SINKING, SONATA_MOONLIT, SONATA_LINGERING, SONATA_EMPYREAN, SONATA_MIDNIGHT, \
-    SONATA_ETERNAL, SONATA_TIDEBREAKING, Spectro_Frazzle_Role_Ids
+from ...damage.utils import (
+    SONATA_CELESTIAL,
+    SONATA_SINKING,
+    SONATA_MOLTEN,
+    SONATA_VOID,
+    SONATA_FREEZING,
+    SONATA_SIERRA,
+    SONATA_REJUVENATING,
+    cast_hit,
+    cast_attack,
+    cast_skill,
+    SONATA_FROSTY,
+    cast_liberation,
+    skill_damage,
+    CHAR_ATTR_FREEZING,
+    CHAR_ATTR_MOLTEN,
+    CHAR_ATTR_VOID,
+    CHAR_ATTR_SIERRA,
+    CHAR_ATTR_CELESTIAL,
+    CHAR_ATTR_SINKING,
+    SONATA_MOONLIT,
+    SONATA_LINGERING,
+    SONATA_EMPYREAN,
+    SONATA_MIDNIGHT,
+    SONATA_ETERNAL,
+    SONATA_TIDEBREAKING,
+    Spectro_Frazzle_Role_Ids,
+)
 
 
-def weapon_damage(attr: DamageAttribute, weapon_data: WeaponData, damage_func: Union[List[str], str], isGroup: bool):
+def weapon_damage(
+    attr: DamageAttribute,
+    weapon_data: WeaponData,
+    damage_func: Union[List[str], str],
+    isGroup: bool,
+):
     # 武器谐振
     weapon_clz = WavesWeaponRegister.find_class(weapon_data.weapon.weaponId)
     if weapon_clz:
-        w = weapon_clz(weapon_data.weapon.weaponId,
-                       weapon_data.level,
-                       weapon_data.breach,
-                       weapon_data.resonLevel)
+        w = weapon_clz(
+            weapon_data.weapon.weaponId,
+            weapon_data.level,
+            weapon_data.breach,
+            weapon_data.resonLevel,
+        )
         w.do_action(damage_func, attr, isGroup)
 
 
@@ -34,9 +64,14 @@ def check_if_ph_5(ph_name: str, ph_num: int, check_name: str):
     return ph_name == check_name and ph_num == 5
 
 
-def phase_damage(attr: DamageAttribute, role: RoleDetailData, damage_func: Union[List[str], str], isGroup: bool = False,
-                 isHealing: bool = False):
-    phase_name = '合鸣效果'
+def phase_damage(
+    attr: DamageAttribute,
+    role: RoleDetailData,
+    damage_func: Union[List[str], str],
+    isGroup: bool = False,
+    isHealing: bool = False,
+):
+    phase_name = "合鸣效果"
 
     if not attr.ph_detail:
         return
@@ -103,8 +138,10 @@ def phase_damage(attr: DamageAttribute, role: RoleDetailData, damage_func: Union
                 attr.add_dmg_bonus(0.3, title, msg)
 
         # 隐世回光
-        elif isHealing and check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_REJUVENATING):
-            if attr.char_template != 'temp_atk':
+        elif isHealing and check_if_ph_5(
+            ph_detail.ph_name, ph_detail.ph_num, SONATA_REJUVENATING
+        ):
+            if attr.char_template != "temp_atk":
                 return
             title = f"{phase_name}-{ph_detail.ph_name}"
             msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
@@ -157,7 +194,7 @@ def phase_damage(attr: DamageAttribute, role: RoleDetailData, damage_func: Union
         if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_TIDEBREAKING):
             # 角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%
             title = f"{phase_name}-{ph_detail.ph_name}"
-            if attr.char_template == 'temp_atk':
+            if attr.char_template == "temp_atk":
                 msg = f"角色攻击提升15%"
                 attr.add_atk_percent(0.15, title, msg)
 

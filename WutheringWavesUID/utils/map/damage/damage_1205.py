@@ -6,8 +6,18 @@ from .damage import weapon_damage, echo_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage_calc, skill_damage, liberation_damage, \
-    cast_skill, hit_damage, cast_liberation, cast_attack, add_comma_separated_numbers, SkillType, SkillTreeMap
+from ...damage.utils import (
+    skill_damage_calc,
+    skill_damage,
+    liberation_damage,
+    cast_skill,
+    hit_damage,
+    cast_liberation,
+    cast_attack,
+    add_comma_separated_numbers,
+    SkillType,
+    SkillTreeMap,
+)
 
 
 def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False):
@@ -52,7 +62,9 @@ def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = Fals
         attr.add_defense_reduction(0.4, title, msg)
 
 
-def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_0(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     焚身以火
     """
@@ -67,7 +79,9 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
+    )
 
     title = f"焚身以火"
     msg = f"技能倍率{skill_multi}"
@@ -104,7 +118,9 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     离火照丹心
     """
@@ -120,7 +136,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
+    )
 
     title = f"离火照丹心"
     msg = f"技能倍率{skill_multi}"
@@ -157,7 +175,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     attr1 = copy.deepcopy(attr)
     crit_damage1, expected_damage1 = calc_damage_0(attr1, role, isGroup)
 
@@ -168,18 +188,22 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     crit_damage3, expected_damage3 = calc_damage_0(attr3, role, isGroup)
 
     crit_damage = add_comma_separated_numbers(crit_damage1, crit_damage2, crit_damage3)
-    expected_damage = add_comma_separated_numbers(expected_damage1, expected_damage2, expected_damage3)
+    expected_damage = add_comma_separated_numbers(
+        expected_damage1, expected_damage2, expected_damage3
+    )
 
-    attr.add_effect(' ', ' ')
+    attr.add_effect(" ", " ")
     attr.effect.extend(attr1.effect[2:])
-    attr.add_effect(' ', ' ')
+    attr.add_effect(" ", " ")
     attr.effect.extend(attr2.effect[2:])
-    attr.add_effect(' ', ' ')
+    attr.add_effect(" ", " ")
     attr.effect.extend(attr3.effect[2:])
     return crit_damage, expected_damage
 
 
-def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_3(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     attr.set_char_damage(skill_damage)
     attr.set_char_template("temp_atk")
 
@@ -208,7 +232,7 @@ damage_detail = [
     {
         "title": "0+1守/6散/焚身以火",
         "func": lambda attr, role: calc_damage_3(attr, role),
-    }
+    },
 ]
 
 rank = damage_detail[2]

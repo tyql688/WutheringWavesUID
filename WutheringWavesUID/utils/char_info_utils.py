@@ -1,11 +1,12 @@
 import json
-from typing import Union, Any, Generator, Dict
+from typing import Any, Dict, Union, Generator
 
 import aiofiles
 
 from gsuid_core.logger import logger
-from .resource.RESOURCE_PATH import PLAYER_PATH
+
 from ..utils.api.model import RoleDetailData
+from .resource.RESOURCE_PATH import PLAYER_PATH
 
 
 async def get_all_role_detail_info_list(

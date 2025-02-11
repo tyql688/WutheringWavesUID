@@ -1,44 +1,42 @@
 from pathlib import Path
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
-from .expression_evaluator import find_first_matching_expression
-from .image import SPECIAL_GOLD, WAVES_VOID, WAVES_SIERRA, WAVES_MOLTEN
-from .map.calc_score_script import phantom_sub_value_map as ph_sub_map
+
 from ..utils.api.model import Props
+from .expression_evaluator import find_first_matching_expression
+from .map.calc_score_script import phantom_sub_value_map as ph_sub_map
+from .image import WAVES_VOID, SPECIAL_GOLD, WAVES_MOLTEN, WAVES_SIERRA
 
 MAP_PATH = Path(__file__).parent / "map/character"
 
-score_interval = [
-    "c",
-    "b",
-    "a",
-    "s",
-    "ss",
-    "sss"
-]
+score_interval = ["c", "b", "a", "s", "ss", "sss"]
 fix_max_score = 50
 
 
 def get_calc_map(ctx: Dict, char_name: str):
     char_path = MAP_PATH / char_name
     if not char_path.is_dir():
-        char_path = MAP_PATH / 'default'
+        char_path = MAP_PATH / "default"
 
     def check_conditions(file_name):
         condition_path = char_path / file_name
         if condition_path.exists():
-            with open(condition_path, 'r', encoding='utf-8') as f:
+            with open(condition_path, "r", encoding="utf-8") as f:
                 expressions = msgjson.decode(f.read())
             return find_first_matching_expression(ctx, expressions)
         return None
 
     # 先检查用户条件，然后是默认条件
-    calc_json_path = check_conditions('condition-user.json') or check_conditions('condition.json') or 'calc.json'
+    calc_json_path = (
+        check_conditions("condition-user.json")
+        or check_conditions("condition.json")
+        or "calc.json"
+    )
     logger.debug(f"{char_name} [匹配文件]: {char_path.name}/{calc_json_path}")
-    with open(char_path / calc_json_path, 'r', encoding='utf-8') as f:
+    with open(char_path / calc_json_path, "r", encoding="utf-8") as f:
         return msgjson.decode(f.read())
 
 
@@ -47,8 +45,8 @@ def calc_phantom_entry(index, prop, cost: int, calc_map):
     if not skill_weight:
         skill_weight = [0, 0, 0, 0]
     score = 0
-    main_props = calc_map['main_props']
-    sub_pros = calc_map['sub_props']
+    main_props = calc_map["main_props"]
+    sub_pros = calc_map["sub_props"]
     if index < 2:
         # 主属性
         pros_temp = main_props.get(str(cost))
@@ -96,19 +94,21 @@ def calc_phantom_entry(index, prop, cost: int, calc_map):
 
 def get_max_score(cost, calc_map):
     if cost == 1:
-        max_score = calc_map['score_max'][0]
-        props_grade = calc_map['props_grade'][0]
+        max_score = calc_map["score_max"][0]
+        props_grade = calc_map["props_grade"][0]
     elif cost == 3:
-        max_score = calc_map['score_max'][1]
-        props_grade = calc_map['props_grade'][1]
+        max_score = calc_map["score_max"][1]
+        props_grade = calc_map["props_grade"][1]
     else:
-        max_score = calc_map['score_max'][2]
-        props_grade = calc_map['props_grade'][2]
+        max_score = calc_map["score_max"][2]
+        props_grade = calc_map["props_grade"][2]
 
     return max_score, props_grade
 
 
-def calc_phantom_score(char_name: str, prop_list: List[Props], cost: int, calc_map: Union[Dict, None]) -> (int, str):
+def calc_phantom_score(
+    char_name: str, prop_list: List[Props], cost: int, calc_map: Union[Dict, None]
+) -> tuple[int, str]:
     if not calc_map:
         return 0, "c"
 
@@ -137,11 +137,13 @@ def get_total_score_bg(char_name: str, score: int, calc_map: Union[Dict, None]):
 
     ratio = score / 250
     _temp = 0
-    for index, _score in enumerate(calc_map['total_grade']):
+    for index, _score in enumerate(calc_map["total_grade"]):
         if ratio >= _score:
             _temp = index
     score_level = score_interval[_temp]
-    logger.debug(f"{char_name} [声骸评分]: {score} [总声骸评分等级]: {score_level} [总声骸评分系数]: {ratio:.2f}")
+    logger.debug(
+        f"{char_name} [声骸评分]: {score} [总声骸评分等级]: {score_level} [总声骸评分系数]: {ratio:.2f}"
+    )
     return score_level
 
 
@@ -151,7 +153,7 @@ def get_valid_color(name, value, calc_map: Union[Dict, None]):
     name = name.replace("百分比", "")
     if not calc_map:
         return name_color, num_color
-    _temp = calc_map['grade']
+    _temp = calc_map["grade"]
     flag = False
     if "valid_s" in _temp and name in _temp["valid_s"]:
         name_color = SPECIAL_GOLD
@@ -169,7 +171,8 @@ def get_valid_color(name, value, calc_map: Union[Dict, None]):
     if flag:
         if name in ph_sub_map and ph_sub_map[name][-1] == value:
             num_color = WAVES_MOLTEN
-        elif name + '%' in ph_sub_map and ph_sub_map[name + '%'][-1] == value:
+        elif name + "%" in ph_sub_map and ph_sub_map[name + "%"][-1] == value:
             num_color = WAVES_MOLTEN
 
+    return name_color, num_color
     return name_color, num_color

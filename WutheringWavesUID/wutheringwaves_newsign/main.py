@@ -251,9 +251,12 @@ async def auto_sign_task():
     ):
         _user_list: List[WavesUser] = await WavesUser.get_waves_all_user2()
         logger.info(f"[鸣潮] [定时签到] 需要处理token总人数 {len(_user_list)}")
-        bbs_expiregid2uid, sign_expiregid2uid, bbs_user_list, sign_user_list = (
-            await process_all_users(_user_list)
-        )
+        (
+            bbs_expiregid2uid,
+            sign_expiregid2uid,
+            bbs_user_list,
+            sign_user_list,
+        ) = await process_all_users(_user_list)
 
     sign_success = 0
     sign_fail = 0
@@ -621,7 +624,7 @@ async def do_sign_task(bot: Bot, ev: Event):
         msg_list.append("")
         if "游戏签到" in temp:
             msg_list.append(f"======= 游戏签到 =======")
-            msg_list.append(f'[游戏签到] {temp["游戏签到"]}')
+            msg_list.append(f"[游戏签到] {temp['游戏签到']}")
             temp.pop("游戏签到")
             msg_list.append("")
 
