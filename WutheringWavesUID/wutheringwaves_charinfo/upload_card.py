@@ -52,9 +52,19 @@ def get_char_id_and_name(char: str) -> (str, str, str):
 async def get_image(ev: Event) -> Optional[List[str]]:
     res = []
     for content in ev.content:
-        if content.type == "img" and content.data and isinstance(content.data, str) and content.data.startswith("http"):
+        if (
+            content.type == "img"
+            and content.data
+            and isinstance(content.data, str)
+            and content.data.startswith("http")
+        ):
             res.append(content.data)
-        elif content.type == "image" and content.data and isinstance(content.data, str) and content.data.startswith("http"):
+        elif (
+            content.type == "image"
+            and content.data
+            and isinstance(content.data, str)
+            and content.data.startswith("http")
+        ):
             res.append(content.data)
 
     if not res and ev.image:

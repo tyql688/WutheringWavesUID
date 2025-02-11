@@ -1,7 +1,20 @@
 from .damage import DamageAttribute
-from .utils import CHAR_ATTR_CELESTIAL, CHAR_ATTR_FREEZING, attack_damage, skill_damage, hit_damage, CHAR_ATTR_MOLTEN, \
-    liberation_damage, temp_atk, CHAR_ATTR_SINKING
-from ...utils.damage.abstract import CharAbstract, WavesCharRegister, WavesWeaponRegister
+from .utils import (
+    CHAR_ATTR_MOLTEN,
+    CHAR_ATTR_SINKING,
+    CHAR_ATTR_FREEZING,
+    CHAR_ATTR_CELESTIAL,
+    temp_atk,
+    hit_damage,
+    skill_damage,
+    attack_damage,
+    liberation_damage,
+)
+from ...utils.damage.abstract import (
+    CharAbstract,
+    WavesCharRegister,
+    WavesWeaponRegister,
+)
 
 
 class Char_1102(CharAbstract):
@@ -9,7 +22,13 @@ class Char_1102(CharAbstract):
     name = "散华"
     starLevel = 4
 
-    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
         """获得buff"""
         if attr.char_template == temp_atk:
             if chain >= 6:
@@ -49,7 +68,13 @@ class Char_1105(CharAbstract):
     name = "折枝"
     starLevel = 5
 
-    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
         if attr.char_template == temp_atk:
             if chain >= 4:
                 title = f"{self.name}-四链"
@@ -105,7 +130,13 @@ class Char_1204(CharAbstract):
     name = "莫特斐"
     starLevel = 4
 
-    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
         """获得buff"""
         if attr.char_template == temp_atk:
             if chain >= 6:
@@ -131,11 +162,8 @@ class Char_1204(CharAbstract):
         weapon_id = 21030015
         weapon_clz = WavesWeaponRegister.find_class(weapon_id)
         if weapon_clz:
-            w = weapon_clz(weapon_id,
-                           90,
-                           6,
-                           resonLevel)
-            w.do_action('buff', attr, isGroup)
+            w = weapon_clz(weapon_id, 90, 6, resonLevel)
+            w.do_action("buff", attr, isGroup)
 
 
 class Char_1205(CharAbstract):
@@ -143,7 +171,13 @@ class Char_1205(CharAbstract):
     name = "长离"
     starLevel = 5
 
-    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
         """获得buff"""
         if attr.char_template == temp_atk:
             if chain >= 4:
@@ -160,6 +194,12 @@ class Char_1205(CharAbstract):
             title = "长离-延奏技能"
             msg = "下一位登场角色共鸣解放伤害加深25%"
             attr.add_dmg_deepen(0.25, title, msg)
+
+
+class Char_1206(CharAbstract):
+    id = 1206
+    name = "布兰特"
+    starLevel = 5
 
 
 class Char_1301(CharAbstract):
@@ -221,8 +261,21 @@ class Char_1501(CharAbstract):
     name = "漂泊者·衍射"
     starLevel = 5
 
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        """获得buff"""
+        attr.set_env_spectro()
+        title = "光主"
+        msg = "触发光噪效应"
+        attr.add_effect(title, msg)
 
-class Char_1502(CharAbstract):
+
+class Char_1502(Char_1501):
     id = 1502
     name = "漂泊者·衍射"
     starLevel = 5
@@ -233,7 +286,13 @@ class Char_1503(CharAbstract):
     name = "维里奈"
     starLevel = 5
 
-    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
         """获得buff"""
         if attr.char_template == temp_atk:
             title = "维里奈-固有技能-自然的献礼"
@@ -264,7 +323,13 @@ class Char_1504(CharAbstract):
     name = "灯灯"
     starLevel = 4
 
-    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
         if attr.char_template == temp_atk:
             if chain >= 6:
                 title = f"{self.name}-六链"
@@ -291,7 +356,13 @@ class Char_1505(CharAbstract):
     name = "守岸人"
     starLevel = 5
 
-    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
         """获得buff"""
         if attr.char_template == temp_atk:
             if chain >= 2:
@@ -306,11 +377,8 @@ class Char_1505(CharAbstract):
         # 星序协响
         weapon_clz = WavesWeaponRegister.find_class(21050036)
         if weapon_clz:
-            w = weapon_clz(21050036,
-                           90,
-                           6,
-                           resonLevel)
-            w.do_action('skill_create_healing', attr, isGroup)
+            w = weapon_clz(21050036, 90, 6, resonLevel)
+            w.do_action("skill_create_healing", attr, isGroup)
 
         if attr.char_template == temp_atk:
             title = "守岸人-声骸技能-无归的谬误"
@@ -326,6 +394,30 @@ class Char_1505(CharAbstract):
         title = "守岸人-延奏技能"
         msg = "队伍中的角色全伤害加深15%"
         attr.add_dmg_deepen(0.15, title, msg)
+
+
+class Char_1506(CharAbstract):
+    id = 1506
+    name = "菲比"
+    starLevel = 5
+
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        """获得buff"""
+        attr.set_env_spectro()
+        title = "菲比"
+        msg = "触发光噪效应"
+        attr.add_effect(title, msg)
+
+        if attr.char_attr == CHAR_ATTR_CELESTIAL:
+            title = "菲比-延奏技能"
+            msg = "使一定范围内的目标衍射伤害抗性减少10%"
+            attr.add_enemy_resistance(-0.1, title, msg)
 
 
 class Char_1601(CharAbstract):
@@ -365,7 +457,13 @@ class Char_1606(CharAbstract):
 
     # 下一位登场角色湮灭伤害加深20%，普攻伤害加深25%，效果持续14秒，若切换至其他角色则该效果提前结束。
 
-    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
         """获得buff"""
         if attr.char_template == temp_atk:
             title = "洛可可-共鸣解放"
@@ -414,6 +512,7 @@ def register_char():
     WavesCharRegister.register_class(Char_1203.id, Char_1203)
     WavesCharRegister.register_class(Char_1204.id, Char_1204)
     WavesCharRegister.register_class(Char_1205.id, Char_1205)
+    WavesCharRegister.register_class(Char_1206.id, Char_1206)
     WavesCharRegister.register_class(Char_1301.id, Char_1301)
     WavesCharRegister.register_class(Char_1302.id, Char_1302)
     WavesCharRegister.register_class(Char_1303.id, Char_1303)
@@ -428,6 +527,7 @@ def register_char():
     WavesCharRegister.register_class(Char_1503.id, Char_1503)
     WavesCharRegister.register_class(Char_1504.id, Char_1504)
     WavesCharRegister.register_class(Char_1505.id, Char_1505)
+    WavesCharRegister.register_class(Char_1506.id, Char_1506)
     WavesCharRegister.register_class(Char_1601.id, Char_1601)
     WavesCharRegister.register_class(Char_1602.id, Char_1602)
     WavesCharRegister.register_class(Char_1603.id, Char_1603)

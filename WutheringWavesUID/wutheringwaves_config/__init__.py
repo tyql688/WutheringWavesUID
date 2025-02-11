@@ -30,7 +30,7 @@ async def open_switch_func(bot: Bot, ev: Event):
     if not ck:
         from ..utils.error_reply import WAVES_CODE_102, ERROR_CODE
 
-        return await bot.send(f"当前特征码：{uid}\n" f"{ERROR_CODE[WAVES_CODE_102]}")
+        return await bot.send(f"当前特征码：{uid}\n{ERROR_CODE[WAVES_CODE_102]}")
 
     logger.info(f"[{ev.user_id}]尝试[{ev.command[2:]}]了[{ev.text}]功能")
 
@@ -64,7 +64,7 @@ async def send_config_ev(bot: Bot, ev: Event):
             from ..utils.error_reply import WAVES_CODE_102, ERROR_CODE
 
             return await bot.send(
-                f"当前特征码：{uid}\n" f"{ERROR_CODE[WAVES_CODE_102]}", at_sender
+                f"当前特征码：{uid}\n{ERROR_CODE[WAVES_CODE_102]}", at_sender
             )
         func = "体力背景"
         value = "".join(re.findall("[\u4e00-\u9fa5]", ev.text.replace(func, "")))

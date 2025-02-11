@@ -3,15 +3,25 @@ from .damage import echo_damage, weapon_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import cast_skill, skill_damage_calc, heal_bonus, SkillTreeMap, SkillType, cast_attack, \
-    cast_liberation, cast_hit
+from ...damage.utils import (
+    cast_skill,
+    skill_damage_calc,
+    heal_bonus,
+    SkillTreeMap,
+    SkillType,
+    cast_attack,
+    cast_liberation,
+    cast_hit,
+)
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(heal_bonus)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -23,7 +33,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "5", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "5", skillLevel
+    )
     title = "星星花绽放"
     msg = f"技能倍率{skill_multi}"
     attr.add_healing_skill_multi(skill_multi, title, msg)
@@ -57,11 +69,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return None, crit_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(heal_bonus)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -73,7 +87,9 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "2", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "2", skillLevel
+    )
     title = "草木生长"
     msg = f"技能倍率{skill_multi}"
     attr.add_healing_skill_multi(skill_multi, title, msg)
@@ -108,11 +124,13 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return None, crit_damage
 
 
-def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_3(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(heal_bonus)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -124,7 +142,9 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "4", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "4", skillLevel
+    )
     title = "协同攻击"
     msg = f"技能倍率{skill_multi}"
     attr.add_healing_skill_multi(skill_multi, title, msg)
@@ -176,7 +196,7 @@ damage_detail = [
     {
         "title": "协同攻击治疗量",
         "func": lambda attr, role: calc_damage_3(attr, role),
-    }
+    },
 ]
 
 rank = damage_detail[2]

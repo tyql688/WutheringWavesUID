@@ -1,11 +1,11 @@
 import copy
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
-
+from .char_model import WeaponModel
 from ..ascension.constant import fixed_name
 
 MAP_PATH = Path(__file__).parent.parent / "map/detail_json/weapon"
@@ -29,19 +29,19 @@ read_weapon_json_files(MAP_PATH)
 
 
 class WavesWeaponResult:
-    def __int__(self):
+    def __init__(self):
         self.name: str = ""
         self.starLevel: int = 4
         self.type: int = 0
-        self.stats: list[dict] = []
-        self.param: list[list[int]] = []
+        self.stats = []
+        self.param = []
         self.effect: str = ""
-        self.effectName: str | None = None
-        self.sub_effect: dict[str, str] | None = None
+        self.effectName: str = ""
+        self.sub_effect = {}
         self.resonLevel: int = 1
 
     def get_resonLevel_name(self):
-        return f'谐振{["一", "二", "三", "四", "五"][self.resonLevel - 1]}阶'
+        return f"谐振{['一', '二', '三', '四', '五'][self.resonLevel - 1]}阶"
 
 
 def get_breach(breach: Union[int, None], level: int):
@@ -68,18 +68,18 @@ def get_weapon_detail(
     level: int,
     breach: Union[int, None] = None,
     resonLevel: Union[int, None] = 1,
-) -> Union[WavesWeaponResult, None]:
+) -> WavesWeaponResult:
     """
     breach 突破
     resonLevel 精炼
     """
+    result = WavesWeaponResult()
     if str(weapon_id) not in weapon_id_data:
-        return None
+        return result
 
     breach = get_breach(breach, level)
 
     weapon_data = weapon_id_data[str(weapon_id)]
-    result = WavesWeaponResult()
     result.name = weapon_data["name"]
     result.starLevel = weapon_data["starLevel"]
     result.type = weapon_data["type"]
@@ -97,11 +97,11 @@ def get_weapon_detail(
 
     for stat in result.stats:
         if stat["isPercent"]:
-            stat["value"] = f'{stat["value"] / 100:.1f}%'
+            stat["value"] = f"{stat['value'] / 100:.1f}%"
         elif stat["isRatio"]:
-            stat["value"] = f'{stat["value"] * 100:.1f}%'
+            stat["value"] = f"{stat['value'] * 100:.1f}%"
         else:
-            stat["value"] = f'{int(stat["value"])}'
+            stat["value"] = f"{int(stat['value'])}"
 
     result.sub_effect = {}
     for i, v in enumerate(fixed_name):
@@ -129,3 +129,9 @@ def get_weapon_star(weapon_name) -> int:
     if result is None:
         return 4
     return result.starLevel
+
+
+def get_weapon_model(weapon_id: Union[int, str]) -> Optional[WeaponModel]:
+    if str(weapon_id) not in weapon_id_data:
+        return None
+    return WeaponModel(**weapon_id_data[str(weapon_id)])

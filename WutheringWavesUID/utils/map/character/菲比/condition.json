@@ -1,0 +1,20 @@
+[
+  {
+    "choose": "calc-新光套.json",
+    "key": "ph",
+    "op": "=",
+    "value": "此间永驻之光"
+  },
+  {
+    "choose": "calc-主c.json",
+    "key": "ph",
+    "op": "=",
+    "value": "啸谷长风"
+  },
+  {
+    "choose": "calc.json",
+    "key": "ph",
+    "op": "=",
+    "value": "轻云出月"
+  }
+]

@@ -4,11 +4,20 @@ from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage_calc, attack_damage, cast_attack, \
-    liberation_damage, cast_liberation, SkillType, SkillTreeMap
+from ...damage.utils import (
+    skill_damage_calc,
+    attack_damage,
+    cast_attack,
+    liberation_damage,
+    cast_liberation,
+    SkillType,
+    SkillTreeMap,
+)
 
 
-def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_0(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     一日花
     """
@@ -26,7 +35,9 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
+    )
 
     title = f"一日花"
     msg = f"技能倍率{skill_multi}"
@@ -79,7 +90,9 @@ def calc_damage_0(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     芳华绽烬
     """
@@ -97,7 +110,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
+    )
 
     title = f"芳华绽烬"
     msg = f"技能倍率{skill_multi}"
@@ -147,7 +162,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     attr.set_char_damage(attack_damage)
     attr.set_char_template("temp_atk")
 
@@ -160,7 +177,9 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     return calc_damage_0(attr, role, isGroup)
 
 
-def calc_damage_10(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_10(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     attr.set_char_damage(attack_damage)
     attr.set_char_template("temp_atk")
 
@@ -173,7 +192,9 @@ def calc_damage_10(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = 
     return calc_damage_0(attr, role, isGroup)
 
 
-def calc_damage_12(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_12(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     attr.set_char_damage(attack_damage)
     attr.set_char_template("temp_atk")
 
@@ -206,7 +227,7 @@ damage_detail = [
     {
         "title": "6+5守/2洛/一日花",
         "func": lambda attr, role: calc_damage_12(attr, role),
-    }
+    },
 ]
 
 rank = damage_detail[0]

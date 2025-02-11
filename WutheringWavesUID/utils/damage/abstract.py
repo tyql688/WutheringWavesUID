@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import List, Optional, Union
 
 from ...utils.damage.damage import DamageAttribute
 
@@ -48,22 +48,36 @@ class WeaponAbstract(object):
         weapon_id: Union[str, int],
         weapon_level: int,
         weapon_breach: Union[int, None] = None,
-        weapon_reson_level: Union[int, None] = 1
+        weapon_reson_level: int = 1,
     ):
-        from ...utils.ascension.weapon import WavesWeaponResult, get_weapon_detail
-        weapon_detail: WavesWeaponResult = get_weapon_detail(weapon_id, weapon_level, weapon_breach, weapon_reson_level)
+        from ...utils.ascension.weapon import (
+            WavesWeaponResult,
+            get_weapon_detail,
+        )
+
+        weapon_detail: WavesWeaponResult = get_weapon_detail(
+            weapon_id, weapon_level, weapon_breach, weapon_reson_level
+        )
         self.weapon_id = weapon_id
         self.weapon_level = weapon_level
         self.weapon_breach = weapon_breach
         self.weapon_reson_level = weapon_reson_level
         self.weapon_detail: WavesWeaponResult = weapon_detail
 
-    def do_action(self, func_list: Union[List[str], str], attr: DamageAttribute, isGroup: bool = False):
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
         if isinstance(func_list, str):
             func_list = [func_list]
 
         if isGroup:
-            func_list.append('cast_variation')
+            func_list.append("cast_variation")
+
+        if attr.env_spectro:
+            func_list.append("env_spectro")
 
         for func_name in func_list:
             method = getattr(self, func_name, None)
@@ -113,6 +127,10 @@ class WeaponAbstract(object):
         """共鸣技能造成治疗"""
         pass
 
+    def env_spectro(self, attr: DamageAttribute, isGroup: bool = False):
+        """光噪效应"""
+        pass
+
 
 class EchoAbstract(object):
     name = None
@@ -132,10 +150,35 @@ class EchoAbstract(object):
 
 class CharAbstract(object):
     name = None
-    id = None
+    id: Optional[int] = None
     starLevel = None
 
-    def do_buff(self, attr: DamageAttribute, chain: int = 0, resonLevel: int = 1, isGroup: bool = True):
+    def do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        """
+        获得buff
+
+        :param attr: 人物伤害属性
+        :param chain: 命座
+        :param resonLevel: 武器谐振
+        :param isGroup: 是否组队
+
+        """
+        attr.add_teammate(self.id)
+        self._do_buff(attr, chain, resonLevel, isGroup)
+
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
         """
         获得buff
 

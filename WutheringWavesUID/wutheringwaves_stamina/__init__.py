@@ -3,23 +3,24 @@ from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from .draw_waves_stamina import draw_stamina_img
-from .notice_stamina import get_notice_list
+
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_103
 from ..utils.waves_send_msg import send_board_cast_msg
+from .draw_waves_stamina import draw_stamina_img
+from .notice_stamina import get_notice_list
 
 waves_daily_info = SV("waves查询体力")
 
 
 @waves_daily_info.on_fullmatch(
     (
-        f"每日",
-        f"mr",
-        f"实时便笺",
-        f"便笺",
-        f"便签",
-        f"体力",
+        "每日",
+        "mr",
+        "实时便笺",
+        "便笺",
+        "便签",
+        "体力",
     )
 )
 async def send_daily_info_pic(bot: Bot, ev: Event):

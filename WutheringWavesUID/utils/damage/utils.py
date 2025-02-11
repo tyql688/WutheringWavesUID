@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Literal
+from typing import Dict, Literal, Optional
 
 SONATA_FREEZING = "凝夜白霜"
 SONATA_MOLTEN = "熔山裂谷"
@@ -73,12 +73,12 @@ SkillTreeMap = {
 }
 
 # 光噪效应
-Spectro_Frazzle_Role_Ids = [
-    1501, 1502
-]
+Spectro_Frazzle_Role_Ids = [1501, 1502, 1506]
 
 
-def skill_damage_calc(skillTree: Dict, skillTreeId: str, skillParamId: str, skillLevel: int) -> str:
+def skill_damage_calc(
+    skillTree: Optional[Dict], skillTreeId: str, skillParamId: str, skillLevel: int
+) -> str:
     """
     获取技能伤害
     :param skillTree: 技能树
@@ -87,14 +87,18 @@ def skill_damage_calc(skillTree: Dict, skillTreeId: str, skillParamId: str, skil
     :param skillLevel: 技能等级
     :return: 技能伤害
     """
-    return skillTree[skillTreeId]["skill"]["level"][skillParamId]["param"][0][skillLevel]
+    if skillTree is None:
+        return "0"
+    return skillTree[skillTreeId]["skill"]["level"][skillParamId]["param"][0][
+        skillLevel
+    ]
 
 
 def parse_skill_multi(temp):
     """
     解析 "1313+5.97%"
     """
-    match = re.match(r'([0-9.]+)(\+([0-9.]+)%?)', temp)
+    match = re.match(r"([0-9.]+)(\+([0-9.]+)%?)", temp)
     if match:
         value = float(match.group(1))  # 获取数字部分
         percent = float(match.group(3))  # 获取百分比部分
@@ -107,9 +111,9 @@ def add_comma_separated_numbers(*nums: str) -> str:
     接受多个带逗号的数字字符串，去除逗号后进行加法计算，并返回结果，结果也带逗号。
     :return: 计算后的整数和，格式化为带逗号的字符串
     """
-    total = sum(float(num.replace(',', '')) for num in nums)
+    total = sum(float(num.replace(",", "")) for num in nums)
     return f"{total:,.0f}"
 
 
 def comma_separated_number(num: str):
-    return float(num.replace(',', ''))
+    return float(num.replace(",", ""))

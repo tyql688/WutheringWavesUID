@@ -1,21 +1,22 @@
-from typing import Union, List
+from typing import List, Union
 
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
+
 from ..utils import hint
 from ..utils.api.model import KuroRoleInfo
-from ..utils.database.models import WavesUser, WavesBind
-from ..utils.error_reply import WAVES_CODE_101, ERROR_CODE, WAVES_CODE_103
+from ..utils.database.models import WavesBind, WavesUser
+from ..utils.error_reply import ERROR_CODE, WAVES_CODE_101, WAVES_CODE_103
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 
 
-async def add_cookie(ev: Event, ck: str):
+async def add_cookie(ev: Event, ck: str) -> str:
     succ, game_info = await waves_api.get_game_role_info(ck)
     if not succ:
         return hint.error_reply(code=WAVES_CODE_101)
-    data = KuroRoleInfo(**game_info)
+    data = KuroRoleInfo.model_validate(game_info)
 
     platform_list = ["h5", "ios"]
     for platform in platform_list:
@@ -66,7 +67,7 @@ async def delete_cookie(ev: Event, uid: str) -> str:
 async def get_cookie(bot: Bot, ev: Event) -> Union[List[str], str]:
     uid_list = await WavesBind.get_uid_list_by_game(ev.user_id, ev.bot_id)
     if uid_list is None:
-        return await bot.send(ERROR_CODE[WAVES_CODE_103])
+        return ERROR_CODE[WAVES_CODE_103]
 
     msg = []
     for uid in uid_list:

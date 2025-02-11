@@ -71,6 +71,7 @@ async def load_all_card() -> int:
         return await save_all_card(all_card)
     elif CardUseOptions == "redis缓存":
         from .wwredis import card_cache
+
         await card_cache.delete_all_card()
 
         if StartServerRedisLoad:
@@ -84,7 +85,6 @@ async def load_all_card() -> int:
                 f"[鸣潮][结束处理排行......] 耗时:{time.time() - a:.2f}s 共加载{total}个用户"
             )
             return total
-
 
 
 async def save_card(uid: str, data: Union[List], user_id: str):

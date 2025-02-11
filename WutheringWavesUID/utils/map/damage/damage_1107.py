@@ -6,11 +6,22 @@ from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute, calc_percent_expression
-from ...damage.utils import skill_damage_calc, SkillType, SkillTreeMap, cast_skill, cast_attack, \
-    cast_hit, skill_damage, cast_liberation, add_comma_separated_numbers
+from ...damage.utils import (
+    skill_damage_calc,
+    SkillType,
+    SkillTreeMap,
+    cast_skill,
+    cast_attack,
+    cast_hit,
+    skill_damage,
+    cast_liberation,
+    add_comma_separated_numbers,
+)
 
 
-def calc_damage(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     title = "默认手法"
     if isGroup:
         msg = "变奏入场 ee aa aaa z qr aaaaa"
@@ -24,31 +35,41 @@ def calc_damage(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = Fal
     attr1.add_effect("r伤害", f"期望伤害:{crit_damage1}; 暴击伤害:{expected_damage1}")
 
     attr2 = copy.deepcopy(attr)
-    crit_damage2, expected_damage2 = calc_damage_3(attr2, role, isGroup, trigger_times=4)
-    attr2.add_effect("死兆*4伤害", f"期望伤害:{crit_damage2}; 暴击伤害:{expected_damage2}")
+    crit_damage2, expected_damage2 = calc_damage_3(
+        attr2, role, isGroup, trigger_times=4
+    )
+    attr2.add_effect(
+        "死兆*4伤害", f"期望伤害:{crit_damage2}; 暴击伤害:{expected_damage2}"
+    )
 
     attr3 = copy.deepcopy(attr)
     crit_damage3, expected_damage3 = calc_damage_2(attr3, role, isGroup)
-    attr3.add_effect("r尾刀伤害", f"期望伤害:{crit_damage3}; 暴击伤害:{expected_damage3}")
+    attr3.add_effect(
+        "r尾刀伤害", f"期望伤害:{crit_damage3}; 暴击伤害:{expected_damage3}"
+    )
 
     crit_damage = add_comma_separated_numbers(crit_damage1, crit_damage2, crit_damage3)
-    expected_damage = add_comma_separated_numbers(expected_damage1, expected_damage2, expected_damage3)
+    expected_damage = add_comma_separated_numbers(
+        expected_damage1, expected_damage2, expected_damage3
+    )
 
-    attr.add_effect(' ', ' ')
-    attr.effect.extend(attr1.effect[init_len + 1:])
-    attr.add_effect(' ', ' ')
-    attr.effect.extend(attr2.effect[init_len + 1:])
-    attr.add_effect(' ', ' ')
-    attr.effect.extend(attr3.effect[init_len + 1:])
+    attr.add_effect(" ", " ")
+    attr.effect.extend(attr1.effect[init_len + 1 :])
+    attr.add_effect(" ", " ")
+    attr.effect.extend(attr2.effect[init_len + 1 :])
+    attr.add_effect(" ", " ")
+    attr.effect.extend(attr3.effect[init_len + 1 :])
 
     return crit_damage, expected_damage
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     title = "默认手法"
     if isGroup:
@@ -65,7 +86,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
+    )
     title = f"末路见行"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -122,11 +145,13 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     title = "默认手法"
     if isGroup:
@@ -143,7 +168,9 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "4", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "4", skillLevel
+    )
     title = f"致死以终"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -205,11 +232,13 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False, trigger_times=1) -> (str, str):
+def calc_damage_3(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False, trigger_times=1
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     title = "默认手法"
     if isGroup:
@@ -226,7 +255,9 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "2", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "2", skillLevel
+    )
     title = f"死兆"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -288,11 +319,13 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_33(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False, trigger_times=1) -> (str, str):
+def calc_damage_33(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False, trigger_times=1
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     title = "默认手法"
     if isGroup:
@@ -354,7 +387,9 @@ def calc_damage_33(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = 
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "2", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "2", skillLevel
+    )
 
     title = f"死兆"
     msg = f"技能倍率{skill_multi}"
@@ -396,11 +431,13 @@ def calc_damage_33(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = 
     return crit_damage, expected_damage
 
 
-def calc_damage_r(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_r(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     title = "默认手法"
     if isGroup:
@@ -417,7 +454,9 @@ def calc_damage_r(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
+    )
     title = f"新浪潮时代"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -474,7 +513,9 @@ def calc_damage_r(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_10(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_10(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     """
     0+1守/0折枝/致死以终伤害
     """
@@ -490,7 +531,9 @@ def calc_damage_10(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = 
     return calc_damage_2(attr, role, isGroup)
 
 
-def calc_damage_11(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_11(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     """
     6+5守/6折/致死以终伤害
     """
@@ -530,7 +573,7 @@ damage_detail = [
     {
         "title": "6+5守/6折/致死以终伤害",
         "func": lambda attr, role: calc_damage_11(attr, role),
-    }
+    },
 ]
 
 rank = damage_detail[3]

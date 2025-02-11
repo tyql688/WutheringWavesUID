@@ -1,19 +1,19 @@
 import copy
-from typing import Dict, Union, List
+from typing import Any, Dict, List, Union, Optional
 
 from gsuid_core.logger import logger
-from ..ascension.char import get_char_detail, WavesCharResult
-from ..ascension.constant import percent_to_float, sum_percentages, sum_numbers
-from ..ascension.sonata import WavesSonataResult, get_sonata_detail
-from ..ascension.weapon import get_weapon_detail, WavesWeaponResult
-from ..damage.abstract import WavesEchoRegister
+
 from ..damage.damage import DamageAttribute
+from ..damage.abstract import WavesEchoRegister
+from ...utils.api.model import Props, RoleDetailData
+from ..ascension.char import WavesCharResult, get_char_detail
+from ..ascension.sonata import WavesSonataResult, get_sonata_detail
+from ..ascension.weapon import WavesWeaponResult, get_weapon_detail
 from ..resource.constant import card_sort_map as card_sort_map_back
-from ...utils.api.model import RoleDetailData, Props
+from ..ascension.constant import sum_numbers, sum_percentages, percent_to_float
 
 
 class WuWaCalc(object):
-
     def __init__(self, role_detail: RoleDetailData):
         """
         # 声骸预处理 -> 声骸套装，声骸数量，声骸首位id
@@ -41,15 +41,15 @@ class WuWaCalc(object):
         """
         self.role_detail: RoleDetailData = role_detail
         # 声骸预处理 -> 声骸套装，声骸数量，声骸首位id
-        self.phantom_pre = None
+        self.phantom_pre = {}
         # 声骸面板数据
         self.phantom_card = {}
         # 角色评分使用
         self.calc_temp = None
         # 角色面板数据
-        self.role_card = None
+        self.role_card = {}
         # attr
-        self.damageAttribute = None
+        self.damageAttribute: Optional[DamageAttribute] = None
         self.can_calc = False
         if (
             self.role_detail.phantomData
@@ -83,9 +83,12 @@ class WuWaCalc(object):
         return result
 
     def prepare_phantom(self):
-        equipPhantomList = self.role_detail.phantomData.equipPhantomList
-
         result = {"ph_detail": [], "echo_id": 0}
+        if not self.role_detail.phantomData:
+            return result
+        equipPhantomList = self.role_detail.phantomData.equipPhantomList
+        if not equipPhantomList:
+            return result
         temp_result = {}
         for i, _phantom in enumerate(equipPhantomList):
             if _phantom and _phantom.phantomProp:
@@ -195,9 +198,11 @@ class WuWaCalc(object):
                     if key not in result:
                         result[key] = value
                     else:
-                        old = float(result[key].replace("%", ""))
-                        new = float(value.replace("%", ""))
-                        result[key] = f"{old + new:.1f}%"
+                        _value = result[key]
+                        if isinstance(_value, str):
+                            old = float(_value.replace("%", ""))
+                            new = float(value.replace("%", ""))
+                            result[key] = f"{old + new:.1f}%"
 
         return result
 
@@ -216,7 +221,7 @@ class WuWaCalc(object):
         weapon_reson_level = weaponData.resonLevel
 
         shuxing = f"{role_attr}伤害加成"
-        card_sort_map = copy.deepcopy(card_sort_map_back)
+        card_sort_map: Dict[str, Any] = copy.deepcopy(card_sort_map_back)
         char_result: WavesCharResult = get_char_detail(role_id, role_level, role_breach)
         weapon_result: WavesWeaponResult = get_weapon_detail(
             weapon_id, weapon_level, weapon_breach, weapon_reson_level
@@ -372,4 +377,5 @@ class WuWaCalc(object):
         if card_sort_map.get("ph_detail"):
             for ph_detail in card_sort_map["ph_detail"]:
                 attr.add_ph_detail(ph_detail)
+        attr.set_role(self.role_detail)
         return attr

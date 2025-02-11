@@ -3,11 +3,19 @@ from .damage import weapon_damage, echo_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage_calc, skill_damage, cast_skill, liberation_damage, \
-    cast_hit, cast_liberation
+from ...damage.utils import (
+    skill_damage_calc,
+    skill_damage,
+    cast_skill,
+    liberation_damage,
+    cast_hit,
+    cast_liberation,
+)
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     审判之雷
     """
@@ -71,7 +79,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     破天雷灭击
     """
@@ -144,7 +154,7 @@ damage_detail = [
     {
         "title": "破天雷灭击",
         "func": lambda attr, role: calc_damage_2(attr, role),
-    }
+    },
 ]
 
 rank = damage_detail[0]

@@ -10,6 +10,7 @@ from .RESOURCE_PATH import (
     ROLE_DETAIL_SKILL_PATH,
     ROLE_DETAIL_CHAINS_PATH,
     PHANTOM_PATH,
+    MATERIAL_PATH,
 )
 
 
@@ -23,6 +24,7 @@ async def download_all_resource():
             "resource/role_detail/skill": ROLE_DETAIL_SKILL_PATH,
             "resource/role_detail/chains": ROLE_DETAIL_CHAINS_PATH,
             "resource/phantom": PHANTOM_PATH,
+            "resource/material": MATERIAL_PATH,
             "resource/guide/XMu": XMU_GUIDE_PATH,
             "resource/guide/Moealkyne": MOEALKYNE_GUIDE_PATH,
             "resource/guide/JinLingZi": JINLINGZI_GUIDE_PATH,

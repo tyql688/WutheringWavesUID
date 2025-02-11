@@ -4,15 +4,24 @@ from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage_calc, SkillType, SkillTreeMap, cast_skill, cast_attack, \
-    cast_liberation, attack_damage
+from ...damage.utils import (
+    skill_damage_calc,
+    SkillType,
+    SkillTreeMap,
+    cast_skill,
+    cast_attack,
+    cast_liberation,
+    attack_damage,
+)
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     title = "默认手法"
     msg = "qre潜行跳a"
@@ -26,7 +35,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "6", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "6", skillLevel
+    )
     title = f"空中攻击"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -84,7 +95,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     attr.set_char_damage(attack_damage)
     attr.set_char_template("temp_atk")
     # 守岸人buff
@@ -104,7 +117,7 @@ damage_detail = [
     {
         "title": "0+1守/6散/空中攻击",
         "func": lambda attr, role: calc_damage_2(attr, role),
-    }
+    },
 ]
 
 rank = damage_detail[1]

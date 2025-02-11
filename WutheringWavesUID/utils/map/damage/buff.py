@@ -63,3 +63,11 @@ def luokeke_buff(attr, chain, resonLevel, isGroup):
     if char_clz:
         s = char_clz()
         s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)
+
+
+def guangzhu_buff(attr, chain, resonLevel, isGroup):
+    # 光主buff
+    char_clz = WavesCharRegister.find_class(1501)
+    if char_clz:
+        s = char_clz()
+        s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)

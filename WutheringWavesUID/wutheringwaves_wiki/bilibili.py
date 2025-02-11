@@ -21,23 +21,25 @@ class GuideBilibili:
 
     async def get_bbs_list(self, auther_id: int, page: int, offset: str = None):
         headers = copy.deepcopy(self._headers)
-        headers['content-type'] = "application/json; charset=utf-8"
+        headers["content-type"] = "application/json; charset=utf-8"
         params = {
             "host_mid": auther_id,
             "page": page,
             "wts": int(time.time()),
             "w_webid": w_webid,
             "web_location": web_location,
-            "w_rid": generate_random_string()
+            "w_rid": generate_random_string(),
         }
         if offset:
-            params['offset'] = offset
+            params["offset"] = offset
         async with httpx.AsyncClient(timeout=None) as client:
-            return await client.get(BBS_LIST, headers=headers, params=params, timeout=10)
+            return await client.get(
+                BBS_LIST, headers=headers, params=params, timeout=10
+            )
 
     async def get_bbs_detail(self, jump_url):
         headers = copy.deepcopy(self._headers)
-        headers['content-type'] = "text/html,application/xhtml+xml,application/xml"
+        headers["content-type"] = "text/html,application/xhtml+xml,application/xml"
         async with httpx.AsyncClient(timeout=None) as client:
             return await client.get(jump_url, headers=headers, timeout=10)
 
@@ -51,17 +53,17 @@ class GuideBilibili:
                 return None
 
             data = res.json()
-            if not data['data']['items']:
+            if not data["data"]["items"]:
                 return None
 
-            for item in data['data']['items']:
-                jump_url = item['jump_url']
-                if jump_url.startswith('//'):
-                    jump_url = 'https:' + jump_url
-                result.append((item['content'], jump_url))
+            for item in data["data"]["items"]:
+                jump_url = item["jump_url"]
+                if jump_url.startswith("//"):
+                    jump_url = "https:" + jump_url
+                result.append((item["content"], jump_url))
 
-            has_more = data['data']['has_more']
-            offset = data['data']['offset']
+            has_more = data["data"]["has_more"]
+            offset = data["data"]["offset"]
             page += 1
             if not has_more or not offset:
                 break
@@ -71,7 +73,7 @@ class GuideBilibili:
     async def get_ann_detail_pic(self, href: str, auther_id: int):
         response = await self.get_bbs_detail(href)
 
-        soup = BeautifulSoup(response.text, 'html.parser')
+        soup = BeautifulSoup(response.text, "html.parser")
         # 查找所有具有特定类名的div标签
         div_tags = soup.find_all("div", class_="bili-album__preview__picture")
 
@@ -79,12 +81,12 @@ class GuideBilibili:
         image_urls = []
         for div_tag in div_tags:
             if (img_tag := div_tag.find("img")) and img_tag.get("src"):
-                url = img_tag["src"].split('@')[0]
-                if img_tag["src"].startswith('//'):
-                    url = 'https:' + url
+                url = img_tag["src"].split("@")[0]
+                if img_tag["src"].startswith("//"):
+                    url = "https:" + url
                 image_urls.append(url)
         result = []
-        if auther_id == GUIDE_CONFIG_MAP['金铃子攻略组'][1]:
+        if auther_id == GUIDE_CONFIG_MAP["金铃子攻略组"][1]:
             for url in image_urls:
                 img = await get_pic(url)
                 if img.size[1] < 6000:
@@ -98,13 +100,13 @@ class GuideBilibili:
         all_moment = await self.get_guide_all_moment(auther_id)
         monent = None
         for title, monent_temp in all_moment:
-            if '·' in role_name:
-                name_split = role_name.split('·')
+            if "·" in role_name:
+                name_split = role_name.split("·")
                 if all(fragment in title for fragment in name_split):
                     monent = monent_temp
                     break
-            elif role_name in title and '一图流' in title:
-                if '忌炎' == role_name and '吟霖' in title:
+            elif role_name in title and "一图流" in title:
+                if "忌炎" == role_name and "吟霖" in title:
                     # 暂时 fix 屏蔽一下 蓝瘦（
                     continue
                 monent = monent_temp

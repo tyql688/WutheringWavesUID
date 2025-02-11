@@ -1,8 +1,8 @@
 import asyncio
-from pathlib import Path
+import json
 from typing import List, Union, Dict
 
-from msgspec import json as msgjson
+import aiofiles
 
 from gsuid_core.logger import logger
 from . import waves_card_cache
@@ -14,7 +14,9 @@ from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
 
 
-async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None, user_id=''):
+async def save_card_info(
+    uid: str, waves_data: List, waves_map: Dict = None, user_id=""
+):
     if len(waves_data) == 0:
         return
     _dir = PLAYER_PATH / uid
@@ -23,15 +25,19 @@ async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None, use
 
     old_data = {}
     if path.exists():
-        with Path.open(path, "rb") as file:
-            old = msgjson.decode(file.read())
-            old_data = {d['role']['roleId']: d for d in old}
+        try:
+            async with aiofiles.open(path, mode="r", encoding="utf-8") as f:
+                old = json.loads(await f.read())
+                old_data = {d["role"]["roleId"]: d for d in old}
+        except Exception as e:
+            logger.exception(f"save_card_info get failed {path}:", e)
+            path.unlink(missing_ok=True)
 
     #
     refresh_update = {}
     refresh_unchanged = {}
     for item in waves_data:
-        role_id = item['role']['roleId']
+        role_id = item["role"]["roleId"]
 
         if role_id in SPECIAL_CHAR_INT:
             # 漂泊者预处理
@@ -54,15 +60,20 @@ async def save_card_info(uid: str, waves_data: List, waves_map: Dict = None, use
 
     await waves_card_cache.save_card(uid, save_data, user_id)
 
-    with Path.open(path, "wb") as file:
-        file.write(msgjson.format(msgjson.encode(save_data)))
+    try:
+        async with aiofiles.open(path, "w", encoding="utf-8") as file:
+            await file.write(json.dumps(save_data, ensure_ascii=False))
+    except Exception as e:
+        logger.exception(f"save_card_info save failed {path}:", e)
 
     if waves_map:
-        waves_map['refresh_update'] = refresh_update
-        waves_map['refresh_unchanged'] = refresh_unchanged
+        waves_map["refresh_update"] = refresh_update
+        waves_map["refresh_unchanged"] = refresh_unchanged
 
 
-async def refresh_char(uid: str, user_id, ck: str = '', waves_map: Dict = None) -> Union[str, List]:
+async def refresh_char(
+    uid: str, user_id, ck: str = "", waves_map: Dict = None
+) -> Union[str, List]:
     waves_datas = []
     if not ck:
         ck = await waves_api.get_ck(uid, user_id)
@@ -75,7 +86,7 @@ async def refresh_char(uid: str, user_id, ck: str = '', waves_map: Dict = None) 
     try:
         role_info = RoleList(**role_info)
     except Exception as e:
-        logger.exception(f'{uid} 角色信息解析失败', e)
+        logger.exception(f"{uid} 角色信息解析失败", e)
         msg = f"鸣潮特征码[{uid}]获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据"
         return msg
 
@@ -87,17 +98,19 @@ async def refresh_char(uid: str, user_id, ck: str = '', waves_map: Dict = None) 
 
     # 处理返回的数据
     for succ, role_detail_info in results:
-        if (not succ
-            or 'role' not in role_detail_info
-            or role_detail_info['role'] is None
-            or 'level' not in role_detail_info
-            or role_detail_info['level'] is None):
+        if (
+            not succ
+            or "role" not in role_detail_info
+            or role_detail_info["role"] is None
+            or "level" not in role_detail_info
+            or role_detail_info["level"] is None
+        ):
             continue
-        if role_detail_info['phantomData']['cost'] == 0:
-            role_detail_info['phantomData']['equipPhantomList'] = None
+        if role_detail_info["phantomData"]["cost"] == 0:
+            role_detail_info["phantomData"]["equipPhantomList"] = None
         try:
             # 扰我道心 难道谐振几阶还算不明白吗
-            del role_detail_info['weaponData']['weapon']['effectDescription']
+            del role_detail_info["weaponData"]["weapon"]["effectDescription"]
         except Exception as _:
             pass
         waves_datas.append(role_detail_info)

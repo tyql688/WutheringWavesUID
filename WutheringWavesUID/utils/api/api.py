@@ -4,35 +4,35 @@ GAME_ID = 3
 SERVER_ID = "76402e5b20be2c39f095a152090afddc"
 SERVER_ID_NET = "919752ae5ea09c1ced910dd668a63ffb"
 
-MAIN_URL = 'https://api.kurobbs.com'
-KURO_GET_CODE_URL = 'https://api.kurobbs.com/user/getSmsCode'
-GACHA_LOG_URL = 'https://gmserver-api.aki-game2.com/gacha/record/query'
-GACHA_NET_LOG_URL = 'https://gmserver-api.aki-game2.net/gacha/record/query'
+MAIN_URL = "https://api.kurobbs.com"
+KURO_GET_CODE_URL = "https://api.kurobbs.com/user/getSmsCode"
+GACHA_LOG_URL = "https://gmserver-api.aki-game2.com/gacha/record/query"
+GACHA_NET_LOG_URL = "https://gmserver-api.aki-game2.net/gacha/record/query"
 
-LOGIN_URL = f'{MAIN_URL}/user/sdkLoginForH5'
-KURO_ROLE_URL = f'{MAIN_URL}/gamer/role/default'
-QUERY_USERID_URL = f'{MAIN_URL}/gamer/role/queryUserId'
-REFRESH_URL = f'{MAIN_URL}/aki/roleBox/akiBox/refreshData'
-GAME_DATA_URL = f'{MAIN_URL}/gamer/widget/game3/refresh'
-BASE_DATA_URL = f'{MAIN_URL}/aki/roleBox/akiBox/baseData'
-ROLE_DATA_URL = f'{MAIN_URL}/aki/roleBox/akiBox/roleData'
-CALABASH_DATA_URL = f'{MAIN_URL}/aki/roleBox/akiBox/calabashData'
-CHALLENGE_DATA_URL = f'{MAIN_URL}/aki/roleBox/akiBox/challengeDetails'
-CHALLENGE_INDEX_URL = f'{MAIN_URL}/aki/roleBox/akiBox/challengeIndex'
-EXPLORE_DATA_URL = f'{MAIN_URL}/aki/roleBox/akiBox/exploreIndex'
-SIGNIN_URL = f'{MAIN_URL}/encourage/signIn/v2'
-SIGNIN_TASK_LIST_URL = f'{MAIN_URL}/encourage/signIn/initSignInV2'
-ROLE_DETAIL_URL = f'{MAIN_URL}/aki/roleBox/akiBox/getRoleDetail'
-ANN_CONTENT_URL = f'{MAIN_URL}/forum/getPostDetail'
-BBS_LIST = f'{MAIN_URL}/forum/getMinePost'
-ANN_LIST_URL = f'{MAIN_URL}/forum/companyEvent/findEventList'
-TOWER_INDEX_URL = f'{MAIN_URL}/aki/roleBox/akiBox/towerIndex'
-TOWER_DETAIL_URL = f'{MAIN_URL}/aki/roleBox/akiBox/towerDataDetail'
-HOME_WIKI_DETAIL_URL = f'{MAIN_URL}/wiki/core/homepage/getPage'
-WIKI_TREE_URL = f'{MAIN_URL}/wiki/core/catalogue/config/getTree'
-WIKI_HOME_URL = f'{MAIN_URL}/wiki/core/homepage/getPage'
-WIKI_DETAIL_URL = f'{MAIN_URL}/wiki/core/catalogue/item/getPage'
-WIKI_ENTRY_DETAIL_URL = f'{MAIN_URL}/wiki/core/catalogue/item/getEntryDetail'
+LOGIN_URL = f"{MAIN_URL}/user/sdkLoginForH5"
+KURO_ROLE_URL = f"{MAIN_URL}/gamer/role/default"
+QUERY_USERID_URL = f"{MAIN_URL}/gamer/role/queryUserId"
+REFRESH_URL = f"{MAIN_URL}/aki/roleBox/akiBox/refreshData"
+GAME_DATA_URL = f"{MAIN_URL}/gamer/widget/game3/refresh"
+BASE_DATA_URL = f"{MAIN_URL}/aki/roleBox/akiBox/baseData"
+ROLE_DATA_URL = f"{MAIN_URL}/aki/roleBox/akiBox/roleData"
+CALABASH_DATA_URL = f"{MAIN_URL}/aki/roleBox/akiBox/calabashData"
+CHALLENGE_DATA_URL = f"{MAIN_URL}/aki/roleBox/akiBox/challengeDetails"
+CHALLENGE_INDEX_URL = f"{MAIN_URL}/aki/roleBox/akiBox/challengeIndex"
+EXPLORE_DATA_URL = f"{MAIN_URL}/aki/roleBox/akiBox/exploreIndex"
+SIGNIN_URL = f"{MAIN_URL}/encourage/signIn/v2"
+SIGNIN_TASK_LIST_URL = f"{MAIN_URL}/encourage/signIn/initSignInV2"
+ROLE_DETAIL_URL = f"{MAIN_URL}/aki/roleBox/akiBox/getRoleDetail"
+ANN_CONTENT_URL = f"{MAIN_URL}/forum/getPostDetail"
+BBS_LIST = f"{MAIN_URL}/forum/getMinePost"
+ANN_LIST_URL = f"{MAIN_URL}/forum/companyEvent/findEventList"
+TOWER_INDEX_URL = f"{MAIN_URL}/aki/roleBox/akiBox/towerIndex"
+TOWER_DETAIL_URL = f"{MAIN_URL}/aki/roleBox/akiBox/towerDataDetail"
+HOME_WIKI_DETAIL_URL = f"{MAIN_URL}/wiki/core/homepage/getPage"
+WIKI_TREE_URL = f"{MAIN_URL}/wiki/core/catalogue/config/getTree"
+WIKI_HOME_URL = f"{MAIN_URL}/wiki/core/homepage/getPage"
+WIKI_DETAIL_URL = f"{MAIN_URL}/wiki/core/catalogue/item/getPage"
+WIKI_ENTRY_DETAIL_URL = f"{MAIN_URL}/wiki/core/catalogue/item/getEntryDetail"
 
 WIKI_CATALOGUE_MAP = {
     "共鸣者": "1105",
@@ -46,5 +46,5 @@ WIKI_CATALOGUE_MAP = {
     "资源": "1161",
     "素材": "1218",
     "特殊道具": "1223",
-    "活动": "1293"
+    "活动": "1293",
 }

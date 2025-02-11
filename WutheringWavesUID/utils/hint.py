@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .error_reply import ERROR_CODE
 from ..wutheringwaves_config import PREFIX
 
@@ -7,7 +9,7 @@ WAVES_ERROR_CODE = {}
 WAVES_ERROR_CODE.update(ERROR_CODE)
 
 
-def error_reply(code: int = None, msg: str = "") -> str:
+def error_reply(code: Optional[int] = None, msg: str = "") -> str:
     msg_list = []
     if isinstance(code, int):
         msg_list.append(f"❌错误代码为: {code}")

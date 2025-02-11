@@ -7,9 +7,11 @@ from ...utils.wwredis.wwredis import wavesRedis
 
 redis_key = "ww:hash:playerCache"
 
+
 async def delete_all_card():
     async with wavesRedis.get_client() as client:
         await client.delete(redis_key)
+
 
 async def save_all_card(raw_data: Dict, max_concurrent_batches=10):
     async with wavesRedis.get_client() as client:

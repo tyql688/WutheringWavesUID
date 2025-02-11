@@ -3,13 +3,21 @@ from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail
 from ...damage.damage import DamageAttribute
-from ...damage.utils import cast_skill, skill_damage_calc, heal_bonus, cast_variation, liberation_damage
+from ...damage.utils import (
+    cast_skill,
+    skill_damage_calc,
+    heal_bonus,
+    cast_variation,
+    liberation_damage,
+)
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     damage_func = [cast_skill]
     attr.set_char_damage(heal_bonus)
-    attr.set_char_template('temp_life')
+    attr.set_char_template("temp_life")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -46,10 +54,12 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return None, crit_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     damage_func = [cast_skill]
     attr.set_char_damage(heal_bonus)
-    attr.set_char_template('temp_life')
+    attr.set_char_template("temp_life")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -86,9 +96,11 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return None, crit_damage
 
 
-def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_3(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     attr.set_char_damage(liberation_damage)
-    attr.set_char_template('temp_life')
+    attr.set_char_template("temp_life")
 
     role_name = role.role.roleName
     role_id = role.role.roleId
@@ -149,7 +161,7 @@ damage_detail = [
     {
         "title": "洞悉伤害",
         "func": lambda attr, role: calc_damage_3(attr, role),
-    }
+    },
 ]
 
 rank = damage_detail[2]

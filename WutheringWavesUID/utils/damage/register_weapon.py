@@ -1,5 +1,12 @@
 from .damage import DamageAttribute, calc_percent_expression
-from .utils import hit_damage, skill_damage, attack_damage, liberation_damage, temp_atk
+from .utils import (
+    Spectro_Frazzle_Role_Ids,
+    temp_atk,
+    hit_damage,
+    skill_damage,
+    attack_damage,
+    liberation_damage,
+)
 from ..damage.abstract import WeaponAbstract, WavesWeaponRegister
 
 
@@ -288,6 +295,12 @@ class Weapon_21020034(WeaponAbstract):
     id = 21020034
     type = 2
     name = "瞬斩刀-18型"
+
+
+class Weapon_21020036(WeaponAbstract):
+    id = 21020036
+    type = 2
+    name = "不灭航路"
 
 
 class Weapon_21020043(WeaponAbstract):
@@ -720,6 +733,12 @@ class Weapon_21050026(WeaponAbstract):
             attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
+class Weapon_21050027(WeaponAbstract):
+    id = 21050027
+    type = 5
+    name = "大海的馈赠"
+
+
 class Weapon_21050034(WeaponAbstract):
     id = 21050034
     type = 5
@@ -751,6 +770,37 @@ class Weapon_21050044(WeaponAbstract):
     id = 21050044
     type = 5
     name = "今州守望"
+
+
+class Weapon_21050046(WeaponAbstract):
+    id = 21050046
+    type = 5
+    name = "和光回唱"
+
+    def check_1(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.role is None:
+            return False
+        return attr.role.role.roleId not in Spectro_Frazzle_Role_Ids
+
+    def check_2(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.role is None:
+            return False
+        if not isGroup:
+            return False
+        if not attr.teammate_char_ids:
+            return False
+        return any(x in Spectro_Frazzle_Role_Ids for x in attr.teammate_char_ids)
+
+    def env_spectro(self, attr: DamageAttribute, isGroup: bool = False):
+        """光噪效应"""
+        if attr.char_damage != hit_damage and attr.char_damage != attack_damage:
+            return
+
+        # 对附加了【光噪效应】的目标造成伤害时，自身普攻、重击伤害加成提升14%，可以叠加3层。
+        dmg = f"{self.param(1)}*{self.param(2)}"
+        title = self.get_title()
+        msg = f"光噪效应状态下，自身普攻、重击伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21050053(WeaponAbstract):
@@ -837,6 +887,7 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21030023.id, Weapon_21030023)
     WavesWeaponRegister.register_class(Weapon_21030024.id, Weapon_21030024)
     WavesWeaponRegister.register_class(Weapon_21030034.id, Weapon_21030034)
+    WavesWeaponRegister.register_class(Weapon_21020036.id, Weapon_21020036)
     WavesWeaponRegister.register_class(Weapon_21030043.id, Weapon_21030043)
     WavesWeaponRegister.register_class(Weapon_21030044.id, Weapon_21030044)
     WavesWeaponRegister.register_class(Weapon_21030053.id, Weapon_21030053)
@@ -869,10 +920,12 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21050023.id, Weapon_21050023)
     WavesWeaponRegister.register_class(Weapon_21050024.id, Weapon_21050024)
     WavesWeaponRegister.register_class(Weapon_21050026.id, Weapon_21050026)
+    WavesWeaponRegister.register_class(Weapon_21050027.id, Weapon_21050027)
     WavesWeaponRegister.register_class(Weapon_21050034.id, Weapon_21050034)
     WavesWeaponRegister.register_class(Weapon_21050036.id, Weapon_21050036)
     WavesWeaponRegister.register_class(Weapon_21050043.id, Weapon_21050043)
     WavesWeaponRegister.register_class(Weapon_21050044.id, Weapon_21050044)
+    WavesWeaponRegister.register_class(Weapon_21050046.id, Weapon_21050046)
     WavesWeaponRegister.register_class(Weapon_21050053.id, Weapon_21050053)
     WavesWeaponRegister.register_class(Weapon_21050064.id, Weapon_21050064)
     WavesWeaponRegister.register_class(Weapon_21050074.id, Weapon_21050074)

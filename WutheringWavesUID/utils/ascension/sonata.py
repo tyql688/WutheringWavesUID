@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union
+from typing import Optional
 
 from msgspec import json as msgjson
 
@@ -26,18 +26,18 @@ read_sonata_json_files(MAP_PATH)
 
 
 class WavesSonataResult:
-    def __int__(self):
+    def __init__(self):
         self.name: str = ""
         self.set: int = 0
 
 
-def get_sonata_detail(sonata_name: str) -> Union[WavesSonataResult, None]:
-    if str(sonata_name) not in sonata_id_data:
+def get_sonata_detail(sonata_name: Optional[str]) -> WavesSonataResult:
+    result = WavesSonataResult()
+    if sonata_name is None or str(sonata_name) not in sonata_id_data:
         logger.exception(f"get_sonata_detail sonata_name: {sonata_name} not found")
-        return None
+        return result
 
     char_data = sonata_id_data[sonata_name]
-    result = WavesSonataResult()
     result.name = char_data["name"]
     result.set = char_data["set"]
     return result

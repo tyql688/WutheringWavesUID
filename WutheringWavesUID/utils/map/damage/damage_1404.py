@@ -7,7 +7,9 @@ from ...damage.damage import DamageAttribute
 from ...damage.utils import skill_damage_calc, hit_damage, cast_liberation, cast_hit
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     破阵之枪第一段
     """
@@ -87,7 +89,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     重击·破阵之枪
     """
@@ -177,7 +181,9 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_3(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     苍躣八荒·后动
     """
@@ -263,7 +269,9 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_5(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_5(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     """
     0维/6+1莫/重击·破阵之枪
     """
@@ -295,7 +303,7 @@ damage_detail = [
     {
         "title": "0维/6+1莫/重击·破阵之枪",
         "func": lambda attr, role: calc_damage_5(attr, role),
-    }
+    },
 ]
 
 rank = damage_detail[1]

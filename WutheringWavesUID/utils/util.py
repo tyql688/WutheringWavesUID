@@ -29,12 +29,12 @@ def timed_async_cache(expiration):
 
 # 使用示例
 @timed_async_cache(86400)
-async def get_public_ip(host='127.0.0.1'):
+async def get_public_ip(host="127.0.0.1"):
     # 尝试从 ipify 获取 IP 地址
     try:
         async with httpx.AsyncClient() as client:
-            r = await client.get('https://api.ipify.org/?format=json', timeout=4)
-            ip = r.json()['ip']
+            r = await client.get("https://api.ipify.org/?format=json", timeout=4)
+            ip = r.json()["ip"]
             return ip
     except:  # noqa:E722, B001
         pass
@@ -42,8 +42,8 @@ async def get_public_ip(host='127.0.0.1'):
     # 尝试从 httpbin.org 获取 IP 地址
     try:
         async with httpx.AsyncClient() as client:
-            r = await client.get('https://httpbin.org/ip', timeout=4)
-            ip = r.json()['origin']
+            r = await client.get("https://httpbin.org/ip", timeout=4)
+            ip = r.json()["origin"]
             return ip
     except:
         pass
@@ -55,5 +55,5 @@ def generate_random_string(length=32):
     # 定义可能的字符集合
     characters = string.ascii_letters + string.digits + string.punctuation
     # 使用random.choice随机选择字符，并连接成字符串
-    random_string = ''.join(random.choice(characters) for i in range(length))
+    random_string = "".join(random.choice(characters) for i in range(length))
     return random_string

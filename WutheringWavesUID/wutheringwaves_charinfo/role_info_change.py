@@ -91,7 +91,6 @@ class ReplaceSonata:
 
 
 class PhantomInfo:
-
     def __init__(self):
         self.uid: str | None = None  # 谁的
         self.charName: str | None = None  # 哪个角色身上的
@@ -330,7 +329,6 @@ def get_breach(level: int):
 
 
 class ChangeParser:
-
     def __init__(self, content: str):
         self.rr: ReplaceResult = ReplaceResult()
         self.matched_segments: list[str] = []

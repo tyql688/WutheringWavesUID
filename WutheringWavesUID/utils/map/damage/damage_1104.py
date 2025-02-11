@@ -6,11 +6,22 @@ from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage_calc, SkillType, SkillTreeMap, liberation_damage, cast_liberation, \
-    attack_damage, cast_attack, cast_skill, skill_damage
+from ...damage.utils import (
+    skill_damage_calc,
+    SkillType,
+    SkillTreeMap,
+    liberation_damage,
+    cast_liberation,
+    attack_damage,
+    cast_attack,
+    cast_skill,
+    skill_damage,
+)
 
 
-def calc_damage(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     attr1 = copy.deepcopy(attr)
     crit_damage1, expected_damage1 = calc_damage_1(attr1, role, isGroup)
 
@@ -24,28 +35,32 @@ def calc_damage(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = Fal
     crit_damage4, expected_damage4 = calc_damage_ea(attr4, role, isGroup)
 
     crit_damage = crit_damage1 + crit_damage2 + crit_damage3 + crit_damage4
-    expected_damage = expected_damage1 + expected_damage2 + expected_damage3 + expected_damage4
+    expected_damage = (
+        expected_damage1 + expected_damage2 + expected_damage3 + expected_damage4
+    )
     # 暴击伤害
     crit_damage = f"{crit_damage:,.0f}"
     # 期望伤害
     expected_damage = f"{expected_damage:,.0f}"
 
-    attr.add_effect(' ', ' ')
+    attr.add_effect(" ", " ")
     attr.effect.extend(attr1.effect[2:])
-    attr.add_effect(' ', ' ')
+    attr.add_effect(" ", " ")
     attr.effect.extend(attr2.effect[2:])
-    attr.add_effect(' ', ' ')
+    attr.add_effect(" ", " ")
     attr.effect.extend(attr3.effect[2:])
-    attr.add_effect(' ', ' ')
+    attr.add_effect(" ", " ")
     attr.effect.extend(attr4.effect[2:])
     return crit_damage, expected_damage
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(liberation_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     # 获取角色详情
@@ -55,7 +70,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
+    )
     title = f"共鸣解放"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -93,17 +110,21 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 期望伤害
     expected_damage = attr.calculate_expected_damage()
 
-    attr.add_effect("r伤害", f"期望伤害:{crit_damage:,.0f}; 暴击伤害:{expected_damage:,.0f}")
+    attr.add_effect(
+        "r伤害", f"期望伤害:{crit_damage:,.0f}; 暴击伤害:{expected_damage:,.0f}"
+    )
 
     logger.debug(f"{role_name}- 属性值: {attr}")
     return crit_damage, expected_damage
 
 
-def calc_damage_a(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_a(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     # 获取角色详情
@@ -113,7 +134,9 @@ def calc_damage_a(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "3", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "3", skillLevel
+    )
     title = f"a第一段"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -153,17 +176,21 @@ def calc_damage_a(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 期望伤害
     expected_damage = attr.calculate_expected_damage()
 
-    attr.add_effect("a第一段伤害", f"期望伤害:{crit_damage:,.0f}; 暴击伤害:{expected_damage:,.0f}")
+    attr.add_effect(
+        "a第一段伤害", f"期望伤害:{crit_damage:,.0f}; 暴击伤害:{expected_damage:,.0f}"
+    )
 
     logger.debug(f"{role_name}- 属性值: {attr}")
     return crit_damage, expected_damage
 
 
-def calc_damage_ea(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_ea(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     # 获取角色详情
@@ -173,13 +200,17 @@ def calc_damage_ea(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = 
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "3", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "3", skillLevel
+    )
     skill_multi = f"({skill_multi})*2"
     title = f"a第一段"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "4", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "4", skillLevel
+    )
     skill_multi = f"({skill_multi})*2"
     title = f"a第二段"
     msg = f"技能倍率{skill_multi}"
@@ -225,17 +256,21 @@ def calc_damage_ea(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = 
     # 期望伤害
     expected_damage = attr.calculate_expected_damage()
 
-    attr.add_effect("4a总伤害", f"期望伤害:{crit_damage:,.0f}; 暴击伤害:{expected_damage:,.0f}")
+    attr.add_effect(
+        "4a总伤害", f"期望伤害:{crit_damage:,.0f}; 暴击伤害:{expected_damage:,.0f}"
+    )
 
     logger.debug(f"{role_name}- 属性值: {attr}")
     return crit_damage, expected_damage
 
 
-def calc_damage_e(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_e(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
-    attr.set_char_template('temp_atk')
+    attr.set_char_template("temp_atk")
 
     role_name = role.role.roleName
     # 获取角色详情
@@ -245,7 +280,9 @@ def calc_damage_e(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    skill_multi = skill_damage_calc(char_result.skillTrees, SkillTreeMap[skill_type], "5", skillLevel)
+    skill_multi = skill_damage_calc(
+        char_result.skillTrees, SkillTreeMap[skill_type], "5", skillLevel
+    )
     skill_multi = f"({skill_multi})*5"
     title = f"e"
     msg = f"技能倍率{skill_multi}"
@@ -288,7 +325,9 @@ def calc_damage_e(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     # 期望伤害
     expected_damage = attr.calculate_expected_damage()
 
-    attr.add_effect("5e总伤害", f"期望伤害:{crit_damage:,.0f}; 暴击伤害:{expected_damage:,.0f}")
+    attr.add_effect(
+        "5e总伤害", f"期望伤害:{crit_damage:,.0f}; 暴击伤害:{expected_damage:,.0f}"
+    )
 
     logger.debug(f"{role_name}- 属性值: {attr}")
     return crit_damage, expected_damage

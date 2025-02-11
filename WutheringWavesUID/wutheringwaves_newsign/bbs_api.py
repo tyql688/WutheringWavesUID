@@ -155,7 +155,6 @@ class KuroBBS:
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[FormData, Dict[str, Any]]] = None,
     ) -> Union[Dict, int]:
-
         if header is None:
             header = await get_headers()
 

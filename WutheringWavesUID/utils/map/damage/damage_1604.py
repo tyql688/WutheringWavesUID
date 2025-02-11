@@ -4,11 +4,18 @@ from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage_calc, liberation_damage, cast_liberation, \
-    cast_attack, cast_hit
+from ...damage.utils import (
+    skill_damage_calc,
+    liberation_damage,
+    cast_liberation,
+    cast_attack,
+    cast_hit,
+)
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     临渊死寂
     """

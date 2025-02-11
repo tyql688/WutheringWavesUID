@@ -11,36 +11,31 @@ from gsuid_core.sv import SV
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 from .bilibili import GuideBilibili
-from .draw_char import draw_char_chain, draw_char_skill, draw_char_wiki
+from .draw_char import draw_char_wiki
+from .draw_echo import draw_wiki_detail
+from .draw_weapon import draw_wiki_weapon
 from .main import Guide
 from .tap import GuideTap
-from .wiki import draw_wiki_detail
-from ..utils.name_convert import (
-    alias_to_char_name,
-    char_name_to_char_id,
-    alias_to_weapon_name,
-)
-from ..utils.resource.RESOURCE_PATH import (
-    GUIDE_CONFIG_MAP,
-)
-from ..wutheringwaves_config import WutheringWavesConfig, PREFIX
+from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
+from ..utils.resource.RESOURCE_PATH import GUIDE_CONFIG_MAP
+from ..wutheringwaves_config import WutheringWavesConfig
 
 sv_waves_guide = SV("鸣潮攻略")
 sv_waves_wiki = SV("鸣潮wiki")
 
 
 @sv_waves_guide.on_regex(
-    rf"^[\u4e00-\u9fa5]+(?:共鸣链|命座|天赋|技能|图鉴|wiki|介绍)$", block=True
+    r"^[\u4e00-\u9fa5]+(?:共鸣链|命座|天赋|技能|图鉴|wiki|介绍)$", block=True
 )
 async def send_waves_wiki(bot: Bot, ev: Event):
     match = re.search(
-        rf"{PREFIX}(?P<wiki_name>[\u4e00-\u9fa5]+)(?P<wiki_type>共鸣链|命座|天赋|技能|图鉴|wiki|介绍)",
+        r"(?P<wiki_name>[\u4e00-\u9fa5]+)(?P<wiki_type>共鸣链|命座|天赋|技能|图鉴|wiki|介绍)",
         ev.raw_text,
     )
     if not match:
         return
     ev.regex_dict = match.groupdict()
-    wiki_name = ev.regex_dict.get("wiki_name")
+    wiki_name = ev.regex_dict.get("wiki_name", "")
     wiki_type = ev.regex_dict.get("wiki_type")
 
     at_sender = True if ev.group_id else False
@@ -60,37 +55,33 @@ async def send_waves_wiki(bot: Bot, ev: Event):
         query_role_type = (
             "天赋" if "技能" in wiki_type or "天赋" in wiki_type else "命座"
         )
-        # img = await draw_wiki_detail("共鸣者", name, query_role_type)
         img = await draw_char_wiki(char_id, query_role_type)
         if isinstance(img, str):
             msg = f"[鸣潮] wiki【{wiki_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
             return await bot.send(msg, at_sender)
         await bot.send(img)
     else:
-
-        weapon_name = alias_to_weapon_name(wiki_name)
-        await bot.logger.info(f"[鸣潮] 开始获取{weapon_name}wiki")
-        img = await draw_wiki_detail("武器", weapon_name)
-        if isinstance(img, str):
+        img = await draw_wiki_weapon(wiki_name)
+        if isinstance(img, str) or not img:
             echo_name = wiki_name
             await bot.logger.info(f"[鸣潮] 开始获取{echo_name}wiki")
             img = await draw_wiki_detail("声骸", echo_name)
 
-        if isinstance(img, str):
+        if isinstance(img, str) or not img:
             msg = f"[鸣潮] wiki【{wiki_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
             return await bot.send(msg, at_sender)
 
         await bot.send(img)
 
 
-@sv_waves_guide.on_regex(rf"[\u4e00-\u9fa5]+攻略$", block=True)
+@sv_waves_guide.on_regex(r"[\u4e00-\u9fa5]+攻略$", block=True)
 async def send_role_guide_pic(bot: Bot, ev: Event):
-    match = re.search(rf"{PREFIX}(?P<char>[\u4e00-\u9fa5]+)攻略", ev.raw_text)
+    match = re.search(r"(?P<char>[\u4e00-\u9fa5]+)攻略", ev.raw_text)
     if not match:
         return
     ev.regex_dict = match.groupdict()
 
-    char_name = ev.regex_dict.get("char")
+    char_name = ev.regex_dict.get("char", "")
     char_id = char_name_to_char_id(char_name)
     at_sender = True if ev.group_id else False
     if not char_id:
@@ -181,7 +172,7 @@ async def fetch_urls(auth_id, name, source_type) -> Union[List[str], None]:
             urls = await GuideTap().get(name, auth_id)
         elif source_type == "bilibili":
             urls = await GuideBilibili().get(name, auth_id)
-    except Exception as e:
+    except Exception:
         return None
 
     return urls if urls else None
@@ -205,4 +196,5 @@ def force_delete_dir(_dir: Path):
         if _dir.exists() and _dir.is_dir():
             shutil.rmtree(_dir)
     except Exception as e:
+        print(f"Error deleting directory {_dir}: {e}")
         print(f"Error deleting directory {_dir}: {e}")

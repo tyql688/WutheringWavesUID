@@ -4,11 +4,18 @@ from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import get_char_detail, WavesCharResult
 from ...damage.damage import DamageAttribute
-from ...damage.utils import skill_damage_calc, skill_damage, cast_skill, \
-    liberation_damage, cast_liberation
+from ...damage.utils import (
+    skill_damage_calc,
+    skill_damage,
+    cast_skill,
+    liberation_damage,
+    cast_liberation,
+)
 
 
-def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_1(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     惊龙破空·炳星
     """
@@ -85,7 +92,9 @@ def calc_damage_1(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False) -> (str, str):
+def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> (str, str):
     """
     移岁诛邪
     """
@@ -147,7 +156,9 @@ def calc_damage_2(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = F
     return crit_damage, expected_damage
 
 
-def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_3(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     """
     0维/0折枝/惊龙破空·炳星
     """
@@ -163,7 +174,9 @@ def calc_damage_3(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     return calc_damage_1(attr, role, isGroup)
 
 
-def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_4(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     """
     0+1守/0折枝/惊龙破空·炳星
     """
@@ -179,7 +192,9 @@ def calc_damage_4(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
     return calc_damage_1(attr, role, isGroup)
 
 
-def calc_damage_5(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True) -> (str, str):
+def calc_damage_5(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> (str, str):
     """
     6+5守/6灯灯/惊龙破空·炳星
     """
@@ -196,10 +211,7 @@ def calc_damage_5(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = T
 
 
 damage_detail = [
-    {
-        "title": "惊龙破空·炳星",
-        "func": lambda attr, role: calc_damage_1(attr, role)
-    },
+    {"title": "惊龙破空·炳星", "func": lambda attr, role: calc_damage_1(attr, role)},
     {
         "title": "移岁诛邪",
         "func": lambda attr, role: calc_damage_2(attr, role),
@@ -215,7 +227,7 @@ damage_detail = [
     {
         "title": "6+5守/6灯灯/惊龙破空·炳星",
         "func": lambda attr, role: calc_damage_5(attr, role),
-    }
+    },
 ]
 
 rank = damage_detail[0]

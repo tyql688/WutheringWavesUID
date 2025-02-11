@@ -1,3 +1,5 @@
+from typing import Union
+
 fixed_name = [
     "暴击提升",
     "暴击伤害提升",
@@ -15,8 +17,7 @@ fixed_name = [
     "全属性伤害加成提升",
     "普攻伤害加成提升",
     "重击伤害加成提升",
-    "共鸣技能伤害加成提升"
-    "共鸣解放伤害加成提升"
+    "共鸣技能伤害加成提升共鸣解放伤害加成提升",
 ]
 
 
@@ -44,5 +45,7 @@ def sum_numbers(*args):
     return f"{total}"
 
 
-def percent_to_float(value: str) -> float:
-    return float(value.rstrip("%")) * 0.01
+def percent_to_float(value: Union[str, float]) -> float:
+    if isinstance(value, str):
+        return float(value.rstrip("%")) * 0.01
+    return value
