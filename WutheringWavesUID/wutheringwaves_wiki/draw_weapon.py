@@ -8,12 +8,10 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
 from ..utils.ascension.char_model import WeaponModel
-from ..utils.name_convert import alias_to_weapon_name
-from ..utils.resource.download_file import get_material_img
 from ..utils.ascension.weapon import (
     get_weapon_id,
-    get_weapon_star,
     get_weapon_model,
+    get_weapon_star,
 )
 from ..utils.fonts.waves_fonts import (
     waves_font_30,
@@ -23,11 +21,13 @@ from ..utils.fonts.waves_fonts import (
 from ..utils.image import (
     SPECIAL_GOLD,
     add_footer,
-    get_weapon_type,
+    get_attribute_prop,
     get_crop_waves_bg,
     get_square_weapon,
-    get_attribute_prop,
+    get_weapon_type,
 )
+from ..utils.name_convert import alias_to_weapon_name
+from ..utils.resource.download_file import get_material_img
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -184,7 +184,7 @@ async def create_image(weapon_id, weapon_model: WeaponModel):
     await parse_weapon_detail_content(weapon_model, card_img)
     await parse_weapon_material_content(weapon_model, card_img)
     card_img.alpha_composite(weapon_image, (0, 0))
-    card_img = add_footer(card_img, 600, 20)
+    card_img = add_footer(card_img, 800, 20, color="hakush")
     card_img = await convert_img(card_img)
     return card_img
 
@@ -209,5 +209,4 @@ async def draw_wiki_weapon(weapon_name: str):
         return f"[鸣潮] 暂无【{weapon_name}】对应wiki"
 
     card_img = await create_image(weapon_id, weapon_model)
-    return card_img
     return card_img

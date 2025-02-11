@@ -1,22 +1,33 @@
 import asyncio
 import random
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Union
 
 from PIL import Image, ImageDraw
+from PIL.ImageFile import ImageFile
 
 from gsuid_core.models import Event
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
-from .calendar_model import SpecialImages, VersionActivity
+
 from ..utils.api.requests import Wiki
 from ..utils.ascension.char import get_char_id
 from ..utils.ascension.weapon import get_weapon_id
-from ..utils.fonts.waves_fonts import waves_font_20, waves_font_30, waves_font_24
-from ..utils.image import get_square_avatar, get_square_weapon, add_footer, SPECIAL_GOLD
+from ..utils.fonts.waves_fonts import (
+    waves_font_20,
+    waves_font_24,
+    waves_font_30,
+)
+from ..utils.image import (
+    SPECIAL_GOLD,
+    add_footer,
+    get_square_avatar,
+    get_square_weapon,
+)
 from ..utils.resource.RESOURCE_PATH import CALENDAR_PATH
+from .calendar_model import SpecialImages, VersionActivity
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 time_icon = Image.open(TEXT_PATH / "time_icon.png")
@@ -62,7 +73,7 @@ async def draw_calendar_img(ev: Event, uid: str):
         wiki_home.get("data", {}).get("contentJson", {}).get("sideModules", [])
     )
     for side_module in side_modules:
-        if side_module["title"] == "角色唤取活动":
+        if side_module["title"] == "角色活动唤取":
             gacha_char_list = await draw_calendar_gacha(side_module, "角色")
 
         elif side_module["title"] == "武器活动唤取":
@@ -130,10 +141,10 @@ async def draw_calendar_img(ev: Event, uid: str):
 
     if gacha_weapon_list:
         _high += temp_high
-        weapon_bar = Image.open(TEXT_PATH / "weapon_bar.png")
-        if gacha_char_list[0]["dateRange"]:
+        weapon_bar: ImageFile = Image.open(TEXT_PATH / "weapon_bar.png")
+        if gacha_weapon_list[0]["dateRange"]:
             weapon_bar_draw = ImageDraw.Draw(weapon_bar)
-            dateRange = gacha_char_list[0]["dateRange"]
+            dateRange = gacha_weapon_list[0]["dateRange"]
             status, left, color = get_date_range(dateRange, now)
             if left:
                 status = f"{status}: "
@@ -209,10 +220,7 @@ async def draw_calendar_gacha(side_module, gacha_type):
     tabs = side_module["content"]["tabs"]
 
     for tab in tabs:
-        if "name" not in tab or not tab.get("name", ""):
-            continue
-
-        special_images = SpecialImages(**tab)
+        special_images = SpecialImages.model_validate(tab)
         res = {
             "title": side_module["title"],
             "dateRange": tab["countDown"]["dateRange"],
