@@ -2,19 +2,19 @@ import os
 import random
 from io import BytesIO
 from pathlib import Path
-from typing import Tuple, Union, Literal, Optional
+from typing import Literal, Optional, Tuple, Union
 
-from PIL import Image, ImageOps, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from gsuid_core.models import Event
-from gsuid_core.utils.image.utils import sget
 from gsuid_core.utils.image.image_tools import crop_center_img
+from gsuid_core.utils.image.utils import sget
 
 from ..utils.resource.RESOURCE_PATH import (
     AVATAR_PATH,
-    WEAPON_PATH,
-    ROLE_PILE_PATH,
     CUSTOM_CARD_PATH,
+    ROLE_PILE_PATH,
+    WEAPON_PATH,
 )
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -253,7 +253,7 @@ def get_small_logo(logo_num=1):
     return Image.open(TEXT_PATH / f"logo_small_{logo_num}.png")
 
 
-def get_footer(color: Literal["white", "black"] = "white"):
+def get_footer(color: Literal["white", "black", "hakush"] = "white"):
     return Image.open(TEXT_PATH / f"footer_{color}.png")
 
 
@@ -262,7 +262,7 @@ def add_footer(
     w: int = 0,
     offset_y: int = 0,
     is_invert: bool = False,
-    color: Literal["white", "black"] = "white",
+    color: Literal["white", "black", "hakush"] = "white",
 ):
     footer = get_footer(color)
     if is_invert:

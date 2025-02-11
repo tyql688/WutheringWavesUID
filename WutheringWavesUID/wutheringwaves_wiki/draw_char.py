@@ -7,25 +7,25 @@ from PIL import Image, ImageDraw
 from gsuid_core.utils.image.convert import convert_img
 
 from ..utils.ascension.char import get_char_model
-from ..utils.image import (
-    GREY,
-    SPECIAL_GOLD,
-    add_footer,
-    get_waves_bg,
-    get_role_pile,
-)
 from ..utils.ascension.char_model import (
     Chain,
-    Skill,
-    Stats,
-    SkillLevel,
     CharacterModel,
+    Skill,
+    SkillLevel,
+    Stats,
 )
 from ..utils.fonts.waves_fonts import (
     waves_font_12,
     waves_font_24,
     waves_font_70,
     waves_font_origin,
+)
+from ..utils.image import (
+    GREY,
+    SPECIAL_GOLD,
+    add_footer,
+    get_role_pile,
+    get_waves_bg,
 )
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -75,7 +75,7 @@ async def draw_char_skill(char_id: str):
     card_img.paste(char_bg, (0, -5), char_bg)
     card_img.alpha_composite(char_skill, (0, 600))
 
-    card_img = add_footer(card_img, 600, 20)
+    card_img = add_footer(card_img, 800, 20, color="hakush")
     card_img = await convert_img(card_img)
     return card_img
 
@@ -115,7 +115,7 @@ async def draw_char_chain(char_id: str):
     card_img.paste(char_bg, (0, -5), char_bg)
     card_img.alpha_composite(char_chain, (0, 600))
 
-    card_img = add_footer(card_img, 600, 20)
+    card_img = add_footer(card_img, 800, 20, color="hakush")
     card_img = await convert_img(card_img)
     return card_img
 
