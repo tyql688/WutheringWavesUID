@@ -1,6 +1,6 @@
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, List, Optional, Tuple, Union
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
 
 class Stats(BaseModel):
@@ -54,8 +54,9 @@ class AscensionMaterial(BaseModel):
 class CharacterModel(BaseModel):
     name: str
     starLevel: int
+    attributeId: int
+    weaponTypeId: int
     stats: Dict[str, Dict[str, Stats]]
-    levelExp: List[int]
     skillTree: Dict[int, Dict[str, Skill]]
     chains: Dict[int, Chain]
     ascensions: Dict[str, List[AscensionMaterial]]
