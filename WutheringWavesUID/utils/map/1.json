@@ -117,7 +117,7 @@
           "level": 25,
           "mainProps": [
             {
-              "attributeName": "热熔伤害加成",
+              "attributeName": "攻击",
               "attributeValue": "30%",
               "iconUrl": ""
             },
@@ -152,8 +152,8 @@
           "phantomProp": {
             "cost": 3,
             "iconUrl": "",
-            "name": "绿熔蜥",
-            "phantomId": 390077028,
+            "name": "紫羽鹭",
+            "phantomId": 390077004,
             "phantomPropId": 0,
             "quality": 5,
             "skillDescription": ""
@@ -173,7 +173,7 @@
           "level": 25,
           "mainProps": [
             {
-              "attributeName": "热熔伤害加成",
+              "attributeName": "攻击",
               "attributeValue": "30%",
               "iconUrl": ""
             },
@@ -208,8 +208,8 @@
           "phantomProp": {
             "cost": 3,
             "iconUrl": "",
-            "name": "惊蛰猎手",
-            "phantomId": 390070053,
+            "name": "暗鬃狼",
+            "phantomId": 390077033,
             "phantomPropId": 0,
             "quality": 5,
             "skillDescription": ""
