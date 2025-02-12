@@ -1,29 +1,20 @@
 
-from gsuid_core.bot import Bot
-from gsuid_core.sv import SL, SV
-from gsuid_core.models import Event
-from gsuid_core.logger import logger
-from gsuid_core.utils.download_resource.download_file import download
-from PIL import Image
-
-import asyncio
+# 标准库 (按字符数排序)
 import ssl
-import time
+import asyncio
+from pathlib import Path
+
+# 第三方库 (按字符数排序)
 import httpx
 import easyocr
 import numpy as np
+from PIL import Image
 
-
-import os
-import random
-from io import BytesIO
-from pathlib import Path
-from typing import Union, Literal, Optional, Tuple
-
-from PIL import Image, ImageOps, ImageDraw, ImageFont
-
-from gsuid_core.utils.image.image_tools import crop_center_img
-from gsuid_core.utils.image.utils import sget
+# 项目内部模块 (按字符数排序)
+from gsuid_core.bot import Bot
+from gsuid_core.models import Event
+from gsuid_core.logger import logger
+from gsuid_core.utils.download_resource.download_file import download
 
 
 SRC_PATH = Path(__file__).parent / "src"
@@ -36,7 +27,7 @@ async def async_ocr(bot: Bot, ev: Event):
     异步OCR识别函数
     """
     await upload_discord_bot_card(bot, ev)
-    await cut_card()
+    await cut_card_ocr()
 
 async def get_image(ev: Event):
     """
@@ -68,6 +59,7 @@ async def upload_discord_bot_card(bot: Bot, ev: Event):
             f"[鸣潮] 上传bot卡片失败\n", at_sender
         )
 
+    logger.info(f"[鸣潮]卡片分析上传链接{upload_images}")
     success = True
     for upload_image in upload_images:
         # name = f"card_{int(time.time() * 1000)}.jpg"
@@ -95,15 +87,16 @@ async def upload_discord_bot_card(bot: Bot, ev: Event):
     else:
         return await bot.send(f"[鸣潮]上传卡片图失败！\n", at_sender)
 
-async def cut_card():
+async def cut_card_ocr():
     """
-    裁切卡片：角色，技能树*5，声骸*5，武器（按比例适配任意分辨率）
+    裁切卡片：角色，技能树*5，声骸*5，武器
+        （按比例适配任意分辨率，1920*1080识别效果优良）
     """
     # 原始参考分辨率
     REF_WIDTH = 1072
     REF_HEIGHT = 602
     
-    # 裁切区域比例（左、上、右、下）
+    # 裁切区域比例（左、上、右、下），数字来自src/example_card_2.png
     crop_ratios = [
         (  0/REF_WIDTH,   0/REF_HEIGHT, 420/REF_WIDTH, 350/REF_HEIGHT), # 角色
         (583/REF_WIDTH,  30/REF_HEIGHT, 653/REF_WIDTH, 130/REF_HEIGHT), # 技能树1
@@ -168,11 +161,11 @@ async def cut_card():
             text, confidence = data[1], data[2]
             print(f"OCR Result for image_{i}: 置信度: {confidence:.2f}, 文本: {text}")
 
-    return cropped_images
+    return ocr_results
 
 
 
 
 if __name__ == "__main__":
     # 图片的绝对路径
-    asyncio.run(cut_card())  # 运行异步函数
+    asyncio.run(cut_card_ocr())  # 运行异步函数

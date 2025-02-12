@@ -28,11 +28,9 @@ async def analyze_card(bot: Bot, ev: Event):
     :param ev: 事件对象，包含用户信息和上传的图片信息。
     """
 
-    await bot.send(f"[鸣潮] 执行中")
     resp = await bot.receive_resp(
-        f'请发送dc官方bot生成的卡片',
+        f'[鸣潮] 请发送dc官方bot生成的卡片图\n(分辨率尽可能为1920*1080，过低可能导致识别置信率降低)',
     )
     if resp is not None:
-        logger.info(f"消息接收:{resp.content} ")
         await bot.send(f'分析中...')
         await async_ocr(bot, resp)
