@@ -15,11 +15,7 @@ from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.requests import Wiki
 from ..utils.ascension.char import get_char_id
 from ..utils.ascension.weapon import get_weapon_id
-from ..utils.fonts.waves_fonts import (
-    waves_font_20,
-    waves_font_24,
-    waves_font_30,
-)
+from ..utils.fonts.waves_fonts import ww_font_20, ww_font_24, ww_font_30
 from ..utils.image import (
     SPECIAL_GOLD,
     add_footer,
@@ -94,7 +90,7 @@ async def draw_calendar_img(ev: Event, uid: str):
     temp_high = 20
     footer_high = 70
 
-    content_total_row = 1 + (len(content.content) - 1) // 2
+    content_total_row = 1 + (len(content.content) - 1) // 2 if content else 0
     total_high = (
         title_high
         + banner_high
@@ -132,8 +128,8 @@ async def draw_calendar_img(ev: Event, uid: str):
             status, left, color = get_date_range(dateRange, now)
             if left:
                 status = f"{status}: "
-                char_bar_draw.text((310, 110), f"{left}", color, waves_font_24, "lm")
-            char_bar_draw.text((220, 110), f"{status}", "white", waves_font_24, "lm")
+                char_bar_draw.text((310, 110), f"{left}", color, ww_font_24, "lm")
+            char_bar_draw.text((220, 110), f"{status}", "white", ww_font_24, "lm")
 
         img.paste(char_bar, (0, _high), char_bar)
         _high += char_bar_high
@@ -148,8 +144,8 @@ async def draw_calendar_img(ev: Event, uid: str):
             status, left, color = get_date_range(dateRange, now)
             if left:
                 status = f"{status}: "
-                weapon_bar_draw.text((310, 110), f"{left}", color, waves_font_24, "lm")
-            weapon_bar_draw.text((220, 110), f"{status}", "white", waves_font_24, "lm")
+                weapon_bar_draw.text((310, 110), f"{left}", color, ww_font_24, "lm")
+            weapon_bar_draw.text((220, 110), f"{status}", "white", ww_font_24, "lm")
 
         img.paste(weapon_bar, (0, _high), weapon_bar)
         _high += weapon_bar_high
@@ -174,7 +170,7 @@ async def draw_calendar_img(ev: Event, uid: str):
 
             status, left, color = get_date_range(dateRange, now)
             if left:
-                event_bg_draw.text((260, 130), f"{left}", color, waves_font_20, "lm")
+                event_bg_draw.text((260, 130), f"{left}", color, ww_font_20, "lm")
                 status = f"{status}: "
 
             # 格式化
@@ -184,12 +180,12 @@ async def draw_calendar_img(ev: Event, uid: str):
             # 起止时间
             formatted_date_range = f"{formatted_start} ~ {formatted_end}"
             event_bg_draw.text(
-                (160, 95), f"{formatted_date_range}", "white", waves_font_20, "lm"
+                (160, 95), f"{formatted_date_range}", "white", ww_font_20, "lm"
             )
             # 时间小图标
             event_bg.alpha_composite(time_icon, (155, 115))
             # 状态
-            event_bg_draw.text((190, 130), f"{status}", "white", waves_font_20, "lm")
+            event_bg_draw.text((190, 130), f"{status}", "white", ww_font_20, "lm")
 
         if "http" in cont.contentUrl:
             # linkUrl = Image.open(
@@ -202,9 +198,7 @@ async def draw_calendar_img(ev: Event, uid: str):
             linkUrl = Image.open(TEXT_PATH / cont.contentUrl)
         linkUrl = linkUrl.resize((100, 100))
         event_bg.paste(linkUrl, (40, 40), linkUrl)
-        event_bg_draw.text(
-            (160, 60), f"{cont.title}", SPECIAL_GOLD, waves_font_30, "lm"
-        )
+        event_bg_draw.text((160, 60), f"{cont.title}", SPECIAL_GOLD, ww_font_30, "lm")
 
         img.alpha_composite(event_bg, (70 + (i % 2) * 540, _high))
         if i % 2 == 1:
@@ -238,9 +232,13 @@ async def draw_calendar_gacha(side_module, gacha_type):
             name = item_detail["data"]["name"]
             if gacha_type == "角色":
                 id = get_char_id(name)
+                if id is None:
+                    return None
                 pic = await get_square_avatar(id)
             else:
                 id = get_weapon_id(name)
+                if id is None:
+                    return None
                 pic = await get_square_weapon(id)
 
             pic = pic.resize((180, 180))
@@ -306,14 +304,14 @@ def draw_gacha(gacha_list, img, _high):
                 rank_draw.rectangle(
                     [0, 0, 60, 25], fill=(255, 255, 255) + (int(0.9 * 255),)
                 )
-                rank_draw.text((30, 12), f"{gacha_name}", "black", waves_font_20, "mm")
+                rank_draw.text((30, 12), f"{gacha_name}", "black", ww_font_20, "mm")
             else:
                 name_bg = Image.new("RGBA", (80, 25), color=(255, 255, 255, 0))
                 rank_draw = ImageDraw.Draw(name_bg)
                 rank_draw.rectangle(
                     [0, 0, 80, 25], fill=(255, 255, 255) + (int(0.9 * 255),)
                 )
-                rank_draw.text((40, 12), f"{gacha_name}", "black", waves_font_20, "mm")
+                rank_draw.text((40, 12), f"{gacha_name}", "black", ww_font_20, "mm")
 
             gacha_bg.paste(star_bg_temp, (80 + j * 260, 0))
             gacha_bg.alpha_composite(star_fg, (80 + j * 260, 0))
