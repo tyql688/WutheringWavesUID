@@ -1,15 +1,16 @@
-from typing import Optional, Literal, Dict
+from typing import Dict, Literal, Optional
 
 from httpx import AsyncClient
 
 from gsuid_core.utils.api.types import AnyDict
 from gsuid_core.utils.download_resource.download_file import download
+
 from ..utils.resource.RESOURCE_PATH import (
     AVATAR_PATH,
+    ROLE_DETAIL_CHAINS_PATH,
+    ROLE_DETAIL_SKILL_PATH,
     ROLE_PILE_PATH,
     WEAPON_PATH,
-    ROLE_DETAIL_SKILL_PATH,
-    ROLE_DETAIL_CHAINS_PATH,
 )
 
 _HEADER = {
@@ -104,7 +105,11 @@ async def download_one_chains(role_detail_temp, resource_id, is_force: bool = Fa
         )
 
 
-async def download_all_char_pic(all_character: Dict, is_force: bool = False):
+async def download_all_char_pic(
+    all_character: Optional[Dict] = None, is_force: bool = False
+):
+    if not all_character:
+        return
     for resource_id, _ in all_character.items():
         role_detail_temp = await get_character_detail("character", resource_id)
 
@@ -121,7 +126,11 @@ async def download_all_char_pic(all_character: Dict, is_force: bool = False):
         await download_one_chains(role_detail_temp, resource_id, is_force)
 
 
-async def download_all_weapon_pic(all_weapon: Dict, is_force: bool = False):
+async def download_all_weapon_pic(
+    all_weapon: Optional[Dict] = None, is_force: bool = False
+):
+    if not all_weapon:
+        return
     for resource_id, temp in all_weapon.items():
         weapon_name = temp["zh-Hans"]
         name = f"weapon_{resource_id}.png"

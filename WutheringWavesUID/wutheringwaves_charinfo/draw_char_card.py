@@ -1,44 +1,34 @@
-import re
 import copy
+import re
 from pathlib import Path
 from typing import Dict, Optional
 
 from PIL import Image, ImageDraw, ImageEnhance
 
-from gsuid_core.models import Event
 from gsuid_core.logger import logger
+from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import get_qq_avatar, crop_center_img
+from gsuid_core.utils.image.image_tools import crop_center_img, get_qq_avatar
 
 from ..utils import hint
-from ..utils.calc import WuWaCalc
-from ..utils.waves_api import waves_api
-from ..wutheringwaves_config import PREFIX
-from ..utils.error_reply import WAVES_CODE_102
-from .role_info_change import change_role_detail
-from ..utils.resource.constant import SPECIAL_CHAR
-from ..utils.damage.abstract import DamageDetailRegister
-from ..utils.char_info_utils import get_all_role_detail_info
-from ..utils.api.model import WeaponData, RoleDetailData, AccountBaseInfo
-from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
+from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
 from ..utils.ascension.weapon import (
     WavesWeaponResult,
     get_breach,
     get_weapon_detail,
 )
-from ..utils.resource.download_file import (
-    get_chain_img,
-    get_skill_img,
-    get_phantom_img,
-)
+from ..utils.calc import WuWaCalc
 from ..utils.calculate import (
-    get_calc_map,
-    get_max_score,
-    get_valid_color,
     calc_phantom_entry,
     calc_phantom_score,
+    get_calc_map,
+    get_max_score,
     get_total_score_bg,
+    get_valid_color,
 )
+from ..utils.char_info_utils import get_all_role_detail_info
+from ..utils.damage.abstract import DamageDetailRegister
+from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import (
     waves_font_16,
     waves_font_18,
@@ -57,24 +47,34 @@ from ..utils.image import (
     GOLD,
     GREY,
     SPECIAL_GOLD,
-    WAVES_MOONLIT,
     WAVES_FREEZING,
+    WAVES_MOONLIT,
     WAVES_SHUXING_MAP,
     WEAPON_RESONLEVEL_COLOR,
     add_footer,
     change_color,
-    get_waves_bg,
+    draw_text_with_shadow,
     get_attribute,
+    get_attribute_effect,
+    get_attribute_prop,
+    get_event_avatar,
     get_role_pile,
     get_small_logo,
-    get_weapon_type,
-    get_event_avatar,
     get_square_avatar,
     get_square_weapon,
-    get_attribute_prop,
-    get_attribute_effect,
-    draw_text_with_shadow,
+    get_waves_bg,
+    get_weapon_type,
 )
+from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
+from ..utils.resource.constant import SPECIAL_CHAR
+from ..utils.resource.download_file import (
+    get_chain_img,
+    get_phantom_img,
+    get_skill_img,
+)
+from ..utils.waves_api import waves_api
+from ..wutheringwaves_config import PREFIX
+from .role_info_change import change_role_detail
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -141,6 +141,10 @@ weight_list = [
 
 damage_bar1 = Image.open(TEXT_PATH / "damage_bar1.png")
 damage_bar2 = Image.open(TEXT_PATH / "damage_bar2.png")
+
+
+def is_limit_user(uid):
+    return uid == "1"
 
 
 def parse_text_and_number(text):
@@ -349,7 +353,14 @@ async def ph_card_draw(
 
 
 async def get_role_need(
-    ev, char_id, ck, uid, char_name, waves_id=None, is_force_avatar=False
+    ev,
+    char_id,
+    ck,
+    uid,
+    char_name,
+    waves_id=None,
+    is_force_avatar=False,
+    force_resource_id=None,
 ):
     if waves_id:
         query_list = [char_id]
@@ -371,7 +382,7 @@ async def get_role_need(
             if role_detail_info["phantomData"]["cost"] == 0:
                 role_detail_info["phantomData"]["equipPhantomList"] = None
 
-            role_detail = RoleDetailData(**role_detail_info)
+            role_detail = RoleDetailData.model_validate(role_detail_info)
 
             avatar = await draw_char_with_ring(char_id)
             break
@@ -381,9 +392,9 @@ async def get_role_need(
                 f"[鸣潮] 特征码[{waves_id}] \n无法获取【{char_name}】角色信息，请在库街区展示此角色！\n",
             )
     else:
-        all_role_detail: Optional[
-            Dict[str, RoleDetailData]
-        ] = await get_all_role_detail_info(uid)
+        all_role_detail: Optional[Dict[str, RoleDetailData]] = (
+            await get_all_role_detail_info(uid)
+        )
 
         if all_role_detail is None or char_name not in all_role_detail:
             return (
@@ -392,7 +403,7 @@ async def get_role_need(
             )
 
         role_detail: RoleDetailData = all_role_detail[char_name]
-        avatar = await draw_pic_with_ring(ev, is_force_avatar)
+        avatar = await draw_pic_with_ring(ev, is_force_avatar, force_resource_id)
 
     return avatar, role_detail
 
@@ -565,13 +576,27 @@ async def draw_char_detail_img(
     # 账户数据
     if waves_id:
         uid = waves_id
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info
-    account_info = AccountBaseInfo(**account_info)
+
+    if not is_limit_user(uid):
+        succ, account_info = await waves_api.get_base_info(uid, ck)
+        if not succ:
+            return account_info
+        account_info = AccountBaseInfo.model_validate(account_info)
+        force_resource_id = None
+    else:
+        account_info = AccountBaseInfo.model_validate(
+            {
+                "name": "库洛交个朋友",
+                "id": 1,
+                "level": 100,
+                "worldLevel": 10,
+                "creatTime": 1739375719,
+            }
+        )
+        force_resource_id = char_id
     # 获取数据
     avatar, role_detail = await get_role_need(
-        ev, char_id, ck, uid, char_name, waves_id, is_force_avatar
+        ev, char_id, ck, uid, char_name, waves_id, is_force_avatar, force_resource_id
     )
     if isinstance(role_detail, str):
         return role_detail
@@ -697,20 +722,6 @@ async def draw_char_detail_img(
         ph_sum_value, jineng_len, role_detail, img, isDraw, change_command
     )
     calc.role_card = calc.enhance_summation_card_value(calc.phantom_card)
-    # # 面板
-    # card_map = enhance_summation_card_value(
-    #     char_id,
-    #     role_detail.role.level,
-    #     role_detail.role.breach,
-    #     role_detail.role.attributeName,
-    #     weaponData.weapon.weaponId,
-    #     weaponData.level,
-    #     weaponData.breach,
-    #     weaponData.resonLevel,
-    #     phantom_sum_value,
-    #     card_sort_map,
-    # )
-    # calc_temp = get_calc_map(card_map, role_detail.role.roleName)
 
     if (
         isDraw
@@ -926,7 +937,7 @@ async def draw_char_score_img(
     succ, account_info = await waves_api.get_base_info(uid, ck)
     if not succ:
         return account_info
-    account_info = AccountBaseInfo(**account_info)
+    account_info = AccountBaseInfo.model_validate(account_info)
     # 获取数据
     avatar, role_detail = await get_role_need(ev, char_id, ck, uid, char_name, waves_id)
     if isinstance(role_detail, str):
@@ -1259,8 +1270,10 @@ async def draw_weight(image, role_name, weight_list_temp, calc_temp):
     draw.text((start_x, 850), text, font=waves_font_24, fill="white")
 
 
-async def draw_pic_with_ring(ev: Event, is_force_avatar=False):
-    if not is_force_avatar:
+async def draw_pic_with_ring(ev: Event, is_force_avatar=False, force_resource_id=None):
+    if force_resource_id:
+        pic = await get_square_avatar(force_resource_id)
+    elif not is_force_avatar:
         pic = await get_event_avatar(ev)
     else:
         pic = await get_qq_avatar(ev.user_id)

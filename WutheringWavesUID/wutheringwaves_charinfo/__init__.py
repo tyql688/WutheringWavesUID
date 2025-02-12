@@ -7,33 +7,34 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.image.convert import convert_img
-from .draw_char_card import draw_char_score_img, draw_char_detail_img
-from .upload_card import (
-    delete_custom_card,
-    upload_custom_card,
-    get_custom_card_list,
-    delete_all_custom_card,
-)
+
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
+from .draw_char_card import draw_char_detail_img, draw_char_score_img
+from .upload_card import (
+    delete_all_custom_card,
+    delete_custom_card,
+    get_custom_card_list,
+    upload_custom_card,
+)
 
 waves_new_get_char_info = SV("waves新获取面板", priority=3)
-waves_new_char_detail = SV(f"waves新角色面板", priority=4)
-waves_char_detail = SV(f"waves角色面板", priority=5)
-waves_upload_char = SV(f"waves上传面板图", priority=5, pm=1)
-waves_char_card_list = SV(f"waves面板图列表", priority=5, pm=1)
-waves_delete_char_card = SV(f"waves删除面板图", priority=5, pm=1)
-waves_delete_all_card = SV(f"waves删除全部面板图", priority=5, pm=1)
+waves_new_char_detail = SV("waves新角色面板", priority=4)
+waves_char_detail = SV("waves角色面板", priority=5)
+waves_upload_char = SV("waves上传面板图", priority=5, pm=1)
+waves_char_card_list = SV("waves面板图列表", priority=5, pm=1)
+waves_delete_char_card = SV("waves删除面板图", priority=5, pm=1)
+waves_delete_all_card = SV("waves删除全部面板图", priority=5, pm=1)
 
 
 @waves_new_get_char_info.on_fullmatch(
     (
-        f"刷新面板",
-        f"刷新面包",
-        f"更新面板",
-        f"更新面包",
-        f"强制刷新",
+        "刷新面板",
+        "刷新面包",
+        "更新面板",
+        "更新面包",
+        "强制刷新",
     ),
     block=True,
 )
@@ -50,7 +51,7 @@ async def send_card_info(bot: Bot, ev: Event):
     return await bot.send(msg)
 
 
-@waves_char_detail.on_prefix((f"角色面板", f"查询"))
+@waves_char_detail.on_prefix(("角色面板", "查询"))
 async def send_char_detail_msg(bot: Bot, ev: Event):
     char = ev.text.strip(" ")
     logger.debug(f"[鸣潮] [角色面板] CHAR: {char}")
@@ -66,22 +67,13 @@ async def send_char_detail_msg(bot: Bot, ev: Event):
     return await bot.send(im)
 
 
-# @waves_new_char_detail.on_regex(
-#     rf"^(\d+)?[\u4e00-\u9fa5]+(?:面板|伤害(\d+)?)(?:pk|对比|PK|比|比较)?((?:换[^换]*)*)?$",
-#     block=True,
-# )
-# async def send_char_detail_msg2(bot: Bot, ev: Event):
-#     match = re.search(
-#         rf"(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?P<query_type>面板|伤害(?P<damage>(\d+)?))(?P<is_pk>pk|对比|PK|比|比较)?(?P<change_list>(?:换[^换]*)*)?",
-#         ev.raw_text,
-#     )
 @waves_new_char_detail.on_regex(
-    rf"^(\d+)?[\u4e00-\u9fa5]+(面板|伤害(\d+)?)(pk|对比|PK|比|比较)?(?:\s*)((换[^换]*)*)?$",
+    r"^(\d+)?[\u4e00-\u9fa5]+(面板|面包|伤害(\d+)?)(pk|对比|PK|比|比较)?(?:\s*)((换[^换]*)*)?$",
     block=True,
 )
 async def send_char_detail_msg2(bot: Bot, ev: Event):
     match = re.search(
-        rf"(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?P<query_type>面板|伤害(?P<damage>(\d+)?))(?P<is_pk>pk|对比|PK|比|比较)?(\s*)?(?P<change_list>((换[^换]*)*)?)",
+        r"(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?P<query_type>面板|面包|伤害(?P<damage>(\d+)?))(?P<is_pk>pk|对比|PK|比|比较)?(\s*)?(?P<change_list>((换[^换]*)*)?)",
         ev.raw_text,
     )
     if not match:
@@ -97,14 +89,24 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
     if waves_id and len(waves_id) != 9:
         return
 
-    if "伤害" in query_type and not damage:
+    if isinstance(query_type, str) and "伤害" in query_type and not damage:
         damage = "1"
+
+    isLimitCard = False
+    if isinstance(char, str) and "极限" in char:
+        isLimitCard = True
+        char = char.replace("极限", "")
 
     if damage:
         char = f"{char}{damage}"
     if not char:
         return
     logger.debug(f"[鸣潮] [角色面板] CHAR: {char} {ev.regex_dict}")
+
+    if isLimitCard:
+        uid = "1"
+        im = await draw_char_detail_img(ev, uid, char, ev.user_id)
+        return await bot.send(im)
 
     at_sender = True if ev.group_id else False
     if is_pk:
@@ -114,21 +116,9 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
                 f"[鸣潮] [角色面板] 角色【{char}】PK需要指定目标玩家!\n", at_sender
             )
 
-        # if ev.at and ev.at == ev.user_id:
-        #     return await bot.send(
-        #         f"[鸣潮] [角色面板] 角色【{char}】请勿PK自己，请指定目标玩家!\n",
-        #         at_sender,
-        #     )
-
         uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
         if not uid:
             return await bot.send(error_reply(WAVES_CODE_103))
-
-        # if f"{waves_id}" == uid:
-        #     return await bot.send(
-        #         f"[鸣潮] [角色面板] 角色【{char}】请勿PK自己，请指定目标玩家!\n",
-        #         at_sender,
-        #     )
 
         im1 = await draw_char_detail_img(
             ev,
@@ -177,10 +167,10 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         return await bot.send(im)
 
 
-@waves_new_char_detail.on_regex(rf"^(\d+)?[\u4e00-\u9fa5]+(?:权重)$", block=True)
+@waves_new_char_detail.on_regex(r"^(\d+)?[\u4e00-\u9fa5]+(?:权重)$", block=True)
 async def send_char_detail_msg2_weight(bot: Bot, ev: Event):
     match = re.search(
-        rf"(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?:权重)", ev.raw_text
+        r"(?P<waves_id>\d+)?(?P<char>[\u4e00-\u9fa5]+)(?:权重)", ev.raw_text
     )
     if not match:
         return
@@ -205,9 +195,9 @@ async def send_char_detail_msg2_weight(bot: Bot, ev: Event):
     return await bot.send(im, at_sender)
 
 
-@waves_upload_char.on_regex(rf"^上传[\u4e00-\u9fa5]+面板图$", block=True)
+@waves_upload_char.on_regex(r"^上传[\u4e00-\u9fa5]+面板图$", block=True)
 async def upload_char_img(bot: Bot, ev: Event):
-    match = re.search(rf"上传(?P<char>[\u4e00-\u9fa5]+)面板图", ev.raw_text)
+    match = re.search(r"上传(?P<char>[\u4e00-\u9fa5]+)面板图", ev.raw_text)
     if not match:
         return
     ev.regex_dict = match.groupdict()
@@ -215,9 +205,9 @@ async def upload_char_img(bot: Bot, ev: Event):
     await upload_custom_card(bot, ev, char)
 
 
-@waves_char_card_list.on_regex(rf"^[\u4e00-\u9fa5]+面板图列表$", block=True)
+@waves_char_card_list.on_regex(r"^[\u4e00-\u9fa5]+面板图列表$", block=True)
 async def get_char_card_list(bot: Bot, ev: Event):
-    match = re.search(rf"(?P<char>[\u4e00-\u9fa5]+)面板图列表", ev.raw_text)
+    match = re.search(r"(?P<char>[\u4e00-\u9fa5]+)面板图列表", ev.raw_text)
     if not match:
         return
     ev.regex_dict = match.groupdict()
@@ -226,11 +216,11 @@ async def get_char_card_list(bot: Bot, ev: Event):
 
 
 @waves_delete_char_card.on_regex(
-    rf"^删除[\u4e00-\u9fa5]+面板图[a-zA-Z0-9]+$", block=True
+    r"^删除[\u4e00-\u9fa5]+面板图[a-zA-Z0-9]+$", block=True
 )
 async def delete_char_card(bot: Bot, ev: Event):
     match = re.search(
-        rf"删除(?P<char>[\u4e00-\u9fa5]+)面板图(?P<hash_id>[a-zA-Z0-9]+)",
+        r"删除(?P<char>[\u4e00-\u9fa5]+)面板图(?P<hash_id>[a-zA-Z0-9]+)",
         ev.raw_text,
     )
     if not match:
@@ -241,9 +231,9 @@ async def delete_char_card(bot: Bot, ev: Event):
     await delete_custom_card(bot, ev, char, hash_id)
 
 
-@waves_delete_all_card.on_regex(rf"^删除全部[\u4e00-\u9fa5]+面板图$", block=True)
+@waves_delete_all_card.on_regex(r"^删除全部[\u4e00-\u9fa5]+面板图$", block=True)
 async def delete_all_char_card(bot: Bot, ev: Event):
-    match = re.search(rf"删除全部(?P<char>[\u4e00-\u9fa5]+)面板图", ev.raw_text)
+    match = re.search(r"删除全部(?P<char>[\u4e00-\u9fa5]+)面板图", ev.raw_text)
     if not match:
         return
     ev.regex_dict = match.groupdict()
