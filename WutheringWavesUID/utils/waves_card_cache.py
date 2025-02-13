@@ -2,16 +2,21 @@ import asyncio
 import json
 import time
 from pathlib import Path
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 import aiofiles
 
 from gsuid_core.logger import logger
+
+from ..wutheringwaves_config import WutheringWavesConfig
 from .api.model import RoleDetailData
 from .char_info_utils import get_all_role_detail_info_list
 from .resource.RESOURCE_PATH import PLAYER_PATH
-from .waves_card_local_cache import save_all_card, save_user_card, get_user_card
-from ..wutheringwaves_config import WutheringWavesConfig
+from .waves_card_local_cache import (
+    get_user_card,
+    save_all_card,
+    save_user_card,
+)
 
 CardUseOptions = WutheringWavesConfig.get_config("CardUseOptions").data
 StartServerRedisLoad = WutheringWavesConfig.get_config("StartServerRedisLoad").data
@@ -79,7 +84,7 @@ async def load_all_card() -> int:
 
             # total = await card_cache.save_all_card(all_card)
             a = time.time()
-            logger.info(f"[鸣潮][开始处理排行......]")
+            logger.info("[鸣潮][开始处理排行......]")
             total = await rank_cache.save_rank_caches(all_card)
             logger.info(
                 f"[鸣潮][结束处理排行......] 耗时:{time.time() - a:.2f}s 共加载{total}个用户"
@@ -145,8 +150,8 @@ async def get_rank(char_id: str, rank_type: str, num=30):
         return await rank_cache.get_rank_cache(char_id, rank_type, num)
 
 
-async def get_self_rank(char_id: str, rank_type: str, user_id: str):
+async def get_self_rank(char_id: str, rank_type: str, uid: str):
     if CardUseOptions == "redis缓存":
         from .wwredis import rank_cache
 
-        return await rank_cache.get_self_rank(char_id, rank_type, user_id)
+        return await rank_cache.get_self_rank(char_id, rank_type, uid)
