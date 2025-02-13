@@ -1,20 +1,20 @@
 # 菲比
-from .buff import shouanren_buff, guangzhu_buff
-from .damage import echo_damage, phase_damage, weapon_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
 from ...damage.utils import (
-    SkillType,
     SkillTreeMap,
+    SkillType,
+    cast_attack,
     cast_hit,
+    cast_liberation,
     cast_skill,
     hit_damage,
-    cast_attack,
-    cast_liberation,
     liberation_damage,
     skill_damage_calc,
 )
+from .buff import guangzhu_buff, shouanren_buff
+from .damage import echo_damage, phase_damage, weapon_damage
 
 
 def calc_damage_1(
@@ -272,7 +272,7 @@ def calc_damage_3(
 
 def calc_damage_10(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
-) -> (str, str):
+) -> tuple[str, str]:
     attr.set_char_damage(hit_damage)
     attr.set_char_template("temp_atk")
     # 守岸人buff
