@@ -1,12 +1,12 @@
 import json
-from typing import List, Dict
+from typing import Dict, List
 
+from ...utils.wwredis.wwredis import wavesRedis
+from ...wutheringwaves_config import WutheringWavesConfig
 from ..expression_ctx import get_waves_char_rank
 from ..name_convert import get_all_char_id
 from ..resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_INT
 from ..waves_api import waves_api
-from ...utils.wwredis.wwredis import wavesRedis
-from ...wutheringwaves_config import WutheringWavesConfig
 
 redis_key_score = "ww:zset:score_rank:{}"  # 角色id - 分数排行
 redis_key_expected = "ww:zset:expected_rank:{}"  # 角色id - 期望排行
@@ -37,12 +37,11 @@ async def get_waves_token_map():
     return wavesTokenUsersMap
 
 
-async def check_in_rank(roleId: str, user_id: str):
+async def check_in_rank(uid: str, user_id: str):
     RankUseToken = WutheringWavesConfig.get_config("RankUseToken").data
     if RankUseToken:
-        from ..database.models import WavesUser
 
-        token = await waves_api.get_self_waves_ck(roleId, user_id)
+        token = await waves_api.get_self_waves_ck(uid, user_id)
         if token:
             return True
 
@@ -118,7 +117,7 @@ async def save_rank_caches(all_card):
         try:
             if isinstance(player_data, str):
                 player_data = json.loads(player_data)
-        except Exception as e:
+        except Exception:
             continue
         waves_char_rank = await get_waves_char_rank(user_id, player_data, True)
         for rank in waves_char_rank:
@@ -159,12 +158,12 @@ async def get_rank_cache(char_id: str, rank_type: str, num=50):
     return rank_list
 
 
-async def get_self_rank(char_id: str, rank_type: str, user_id: str):
+async def get_self_rank(char_id: str, rank_type: str, uid: str):
     if char_id in SPECIAL_CHAR:
         char_id = SPECIAL_CHAR[char_id][0]
     async with wavesRedis.get_client() as client:
         if rank_type == "评分":
-            rank = await client.zrevrank(redis_key_score.format(char_id), user_id)
+            rank = await client.zrevrank(redis_key_score.format(char_id), uid)
         else:
-            rank = await client.zrevrank(redis_key_expected.format(char_id), user_id)
+            rank = await client.zrevrank(redis_key_expected.format(char_id), uid)
     return rank

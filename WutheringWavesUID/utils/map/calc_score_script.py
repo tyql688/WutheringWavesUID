@@ -1,11 +1,29 @@
+import copy
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from loguru import logger
 from msgspec import json as msgjson
 
-MAP_PATH = Path(__file__).parents[1] / "map/character"
+SCRIPT_PATH = Path(__file__).parents[0]
+print(SCRIPT_PATH)
+MAP_PATH = SCRIPT_PATH / "character"
+DETAIL_PATH = SCRIPT_PATH / "detail_json"
+CHAR_DETAIL_PATH = DETAIL_PATH / "char"
+WEAPON_DETAIL_PATH = DETAIL_PATH / "weapon"
+SONATA_DETAIL_PATH = DETAIL_PATH / "sonata"
+
+
+LIMIT_DATA_PATH = SCRIPT_PATH / "limit.json"
+TEMPLATE_DATA_PATH = SCRIPT_PATH / "templata.json"
+ROLE_LIMIT_PATH = SCRIPT_PATH / "1.json"
+ID_NAME_PATH = SCRIPT_PATH / "id2name.json"
+
+limit_data = json.loads(LIMIT_DATA_PATH.read_text(encoding="utf-8"))
+template_data = json.loads(TEMPLATE_DATA_PATH.read_text(encoding="utf-8"))
+id2Name = json.loads(ID_NAME_PATH.read_text(encoding="utf-8"))
+
 
 # 声骸副词条
 phantom_sub_value = [
@@ -158,7 +176,7 @@ phantom_main_value_map = {i["name"]: i["values"] for i in phantom_main_value}
 
 
 def calc_sub_max_score(
-    _temp, sub_props, jineng: float = None, skill_weight: List = None
+    _temp, sub_props, jineng: Optional[List] = None, skill_weight: Optional[List] = None
 ):
     score = 0
     jineng_list = [
@@ -172,7 +190,8 @@ def calc_sub_max_score(
         if jineng is not None and i == "技能伤害加成":
             ratio = jineng
         elif i in jineng_list:
-            ratio = skill_weight[jineng_list.index(i)]
+            if skill_weight is not None:
+                ratio = skill_weight[jineng_list.index(i)]
         _phantom_value = phantom_sub_value_map[i][-1]
         if "%" in _phantom_value:
             _phantom_value = _phantom_value.replace("%", "")
@@ -208,6 +227,7 @@ def calc_main_max_score(_temp, main_props):
 def read_calc_json_files(directory):
     files = directory.rglob("calc*.json")
 
+    char_limit_cards = []
     for file in files:
         try:
             with open(file, "r", encoding="utf-8") as f:
@@ -238,8 +258,160 @@ def read_calc_json_files(directory):
             with open(file, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
 
+            char_name = f"{file.parents[0].name}"
+            char_limit = next(
+                (
+                    i
+                    for i in limit_data["charList"]
+                    if i["name"] == char_name and i["calcFile"] == file.name
+                ),
+                None,
+            )
+            if char_limit is None:
+                continue
+            card_limit = calc_char_limit(char_limit, data)
+            if card_limit:
+                char_limit_cards.append(card_limit)
         except Exception as e:
             logger.exception(f"Error decoding {file}", e)
+
+    with open(ROLE_LIMIT_PATH, "w", encoding="utf-8") as f:
+        json.dump(char_limit_cards, f, ensure_ascii=False, indent=2)
+
+
+def calc_char_limit(char_limit, calc_file_dict):
+    sonata_lib = next(
+        (i for i in limit_data["sonataLib"] if i["libId"] == char_limit["sonataLibId"]),
+        None,
+    )
+    if sonata_lib is None:
+        return
+    char_detail_path = CHAR_DETAIL_PATH / f"{char_limit['charId']}.json"
+    if not char_detail_path.exists():
+        return
+    weapon_detail_path = WEAPON_DETAIL_PATH / f"{char_limit['weaponId']}.json"
+    if not weapon_detail_path.exists():
+        return
+    sonata_detail_path = SONATA_DETAIL_PATH / f"{sonata_lib['fetterDetailName']}.json"
+    if not sonata_detail_path.exists():
+        return
+    char_detail = json.loads(char_detail_path.read_text(encoding="utf-8"))
+    weapon_detail = json.loads(weapon_detail_path.read_text(encoding="utf-8"))
+    sonata_detail = json.loads(sonata_detail_path.read_text(encoding="utf-8"))
+
+    char_template_data = copy.deepcopy(template_data)
+
+    # 命座
+    for i, j in zip(char_detail["chains"].values(), char_template_data["chainList"]):
+        j["name"] = i["name"]
+        j["description"] = i["desc"].format(*i["param"])
+        j["iconUrl"] = ""
+        j["unlocked"] = True
+
+    # 技能
+    skill_map = {
+        "常态攻击": "1",
+        "共鸣技能": "2",
+        "共鸣回路": "7",
+        "共鸣解放": "3",
+        "变奏技能": "6",
+        "延奏技能": "8",
+    }
+    for i in char_template_data["skillList"]:
+        temp_skill = i["skill"]
+        skill_type = temp_skill["type"]
+        skill_detail = char_detail["skillTree"][skill_map[skill_type]]["skill"]
+
+        temp_skill["name"] = skill_detail["name"]
+        temp_skill["description"] = skill_detail["desc"].format(*skill_detail["param"])
+        temp_skill["iconUrl"] = ""
+
+    # role
+    attributeIdMap = {1: "冷凝", 2: "热熔", 3: "导电", 4: "气动", 5: "衍射", 6: "湮灭"}
+    weaponTypeIdMap = {1: "长刃", 2: "迅刀", 3: "佩枪", 4: "臂铠", 5: "音感仪"}
+    temp_role = char_template_data["role"]
+    temp_role["roleName"] = char_detail["name"]
+    temp_role["iconUrl"] = ""
+    temp_role["roleId"] = char_limit["charId"]
+    temp_role["starLevel"] = char_detail["starLevel"]
+    temp_role["weaponTypeId"] = char_detail["weaponTypeId"]
+    temp_role["weaponTypeName"] = weaponTypeIdMap[char_detail["weaponTypeId"]]
+    temp_role["attributeId"] = char_detail["attributeId"]
+    temp_role["attributeName"] = attributeIdMap[char_detail["attributeId"]]
+
+    # 武器
+    temp_weapon = char_template_data["weaponData"]["weapon"]
+    temp_weapon["weaponEffectName"] = weapon_detail["effect"].format(
+        *[i[-1] for i in weapon_detail["param"]]
+    )
+    temp_weapon["weaponIcon"] = ""
+    temp_weapon["weaponId"] = char_limit["weaponId"]
+    temp_weapon["weaponName"] = weapon_detail["name"]
+    temp_weapon["weaponStarLevel"] = weapon_detail["starLevel"]
+    temp_weapon["weaponType"] = weapon_detail["type"]
+
+    # 声骸
+    temp_fetter_detail = {
+        "firstDescription": sonata_detail["set"]["2"]["desc"],
+        "groupId": 0,
+        "iconUrl": "",
+        "name": sonata_detail["name"],
+        "num": 5,
+        "secondDescription": sonata_detail["set"]["5"]["desc"],
+    }
+
+    attribute = char_template_data["role"]["attributeName"]
+    for i, j in zip(
+        char_template_data["phantomData"]["equipPhantomList"],
+        sonata_lib["equipPhantomList"],
+    ):
+        cost = j["cost"]
+        i["fetterDetail"] = temp_fetter_detail
+        i["cost"] = cost
+        phantomProp = i["phantomProp"]
+        phantomProp["phantomId"] = j["phantomId"]
+        phantomProp["name"] = id2Name[str(j["phantomId"])]
+        phantomProp["cost"] = cost
+
+        mainProps = i["mainProps"]
+        for main_props_name in calc_file_dict["max_main_props"][f"{cost}.1"]:
+            if cost == 4:
+                index = 2
+            elif cost == 3:
+                index = 1
+            else:
+                index = 0
+            _phantom_value = phantom_main_value_map[main_props_name][index]
+            if main_props_name.startswith("属性"):
+                main_props_name = f"{attribute}伤害加成"
+            res = {
+                "attributeName": main_props_name.replace("%", ""),
+                "attributeValue": _phantom_value,
+                "iconUrl": "",
+            }
+            mainProps.append(res)
+
+        skill_weight = calc_file_dict["skill_weight"]
+        jineng_index = skill_weight.index(max(skill_weight))
+        jineng_name = [
+            "普攻伤害加成",
+            "重击伤害加成",
+            "共鸣技能伤害加成",
+            "共鸣解放伤害加成",
+        ][jineng_index]
+
+        subProps = i["subProps"]
+        for sub_props_name in calc_file_dict["max_sub_props"]:
+            _phantom_value = phantom_sub_value_map[sub_props_name][-1]
+            if sub_props_name.startswith("技能"):
+                sub_props_name = jineng_name
+            res = {
+                "attributeName": sub_props_name.replace("%", ""),
+                "attributeValue": _phantom_value,
+            }
+            subProps.append(res)
+
+    return char_template_data
 
 
 if __name__ == "__main__":

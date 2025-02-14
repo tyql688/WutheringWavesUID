@@ -1,7 +1,7 @@
 import asyncio
 import time
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 from PIL import Image, ImageDraw
 from pydantic import BaseModel
@@ -11,40 +11,45 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
+
 from ..utils.api.model import RoleDetailData, WeaponData
 from ..utils.ascension.char import get_breach
 from ..utils.cache import TimedCache
 from ..utils.calc import WuWaCalc
-from ..utils.calculate import get_calc_map, calc_phantom_score, get_total_score_bg
+from ..utils.calculate import (
+    calc_phantom_score,
+    get_calc_map,
+    get_total_score_bg,
+)
 from ..utils.damage.abstract import DamageRankRegister
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.fonts.waves_fonts import (
-    waves_font_18,
-    waves_font_34,
-    waves_font_16,
-    waves_font_40,
-    waves_font_30,
-    waves_font_24,
-    waves_font_20,
-    waves_font_44,
     waves_font_14,
+    waves_font_16,
+    waves_font_18,
+    waves_font_20,
+    waves_font_24,
+    waves_font_30,
+    waves_font_34,
+    waves_font_40,
+    waves_font_44,
 )
 from ..utils.image import (
-    get_waves_bg,
-    add_footer,
-    get_square_avatar,
-    SPECIAL_GOLD,
-    get_square_weapon,
     CHAIN_COLOR,
-    get_attribute,
-    get_attribute_effect,
     GREY,
     RED,
-    get_role_pile_old,
+    SPECIAL_GOLD,
     WEAPON_RESONLEVEL_COLOR,
+    add_footer,
+    get_attribute,
+    get_attribute_effect,
     get_qq_avatar,
+    get_role_pile_old,
+    get_square_avatar,
+    get_square_weapon,
+    get_waves_bg,
 )
-from ..utils.name_convert import char_name_to_char_id, alias_to_char_name
+from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.waves_card_cache import get_card, get_rank, get_self_rank
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
@@ -59,7 +64,7 @@ weapon_icon_bg_4 = Image.open(TEXT_PATH / "weapon_icon_bg_4.png")
 weapon_icon_bg_5 = Image.open(TEXT_PATH / "weapon_icon_bg_5.png")
 promote_icon = Image.open(TEXT_PATH / "promote_icon.png")
 char_mask = Image.open(TEXT_PATH / "char_mask.png")
-logo_img = Image.open(TEXT_PATH / f"logo_small_2.png")
+logo_img = Image.open(TEXT_PATH / "logo_small_2.png")
 pic_cache = TimedCache(86400, 200)
 
 
@@ -355,23 +360,23 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     rankId = None
     rankInfo = None
 
-    if is_bot and self_uid and role_detail:
+    if not rankId:
+        rankId, rankInfo = next(
+            (
+                (rankId, rankInfo)
+                for rankId, rankInfo in enumerate(rankInfoList, start=1)
+                if rankInfo.uid == self_uid and ev.user_id == rankInfo.qid
+            ),
+            (None, None),
+        )
+
+    if not rankId and is_bot and self_uid and role_detail:
         rankId = await get_self_rank(char_id, rank_type, self_uid)
         if rankId:
             rankId = int(rankId) + 1
             rankInfo = await get_one_rank_info(
                 ev.user_id, self_uid, role_detail, rankDetail
             )
-
-    if not rankId:
-        rankId, rankInfo = next(
-            (
-                (rankId, rankInfo)
-                for rankId, rankInfo in enumerate(rankInfoList, start=1)
-                if rankInfo.uid == self_uid
-            ),
-            (None, None),
-        )
 
     rankInfoList = rankInfoList[:rank_length]
     if rankId and rankInfo and rankId > rank_length:
@@ -432,9 +437,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
             bar_star_draw.text(
                 (466, 45), f"{rank.score.__round__(1)}", "white", waves_font_34, "mm"
             )
-            bar_star_draw.text(
-                (466, 75), f"声骸分数", SPECIAL_GOLD, waves_font_16, "mm"
-            )
+            bar_star_draw.text((466, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
 
         # 合鸣效果
         if rank.sonata_name:
@@ -495,7 +498,7 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
 
         # 伤害
         if damage_title == "无":
-            bar_star_draw.text((870, 55), f"等待更新(:", GREY, waves_font_34, "mm")
+            bar_star_draw.text((870, 55), "等待更新(:", GREY, waves_font_34, "mm")
         else:
             bar_star_draw.text(
                 (870, 45), f"{rank.expected_damage}", SPECIAL_GOLD, waves_font_34, "mm"
@@ -561,11 +564,11 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
     pile = await get_role_pile_old(char_id)
     title.paste(pile, (450, -120), pile)
     title_draw.text((200, 335), f"{avg_score}", "white", waves_font_44, "mm")
-    title_draw.text((200, 375), f"平均声骸分数", SPECIAL_GOLD, waves_font_20, "mm")
+    title_draw.text((200, 375), "平均声骸分数", SPECIAL_GOLD, waves_font_20, "mm")
 
     if damage_title != "无":
         title_draw.text((390, 335), f"{avg_damage}", "white", waves_font_44, "mm")
-        title_draw.text((390, 375), f"平均伤害", SPECIAL_GOLD, waves_font_20, "mm")
+        title_draw.text((390, 375), "平均伤害", SPECIAL_GOLD, waves_font_20, "mm")
 
     if char_id in SPECIAL_CHAR_NAME:
         char_name = SPECIAL_CHAR_NAME[char_id]
@@ -590,10 +593,10 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
 
     if rank_type == "伤害":
         temp_notes = (
-            f"排行标准：以期望伤害（计算暴击率的伤害，不代表实际伤害) 为排序的排名"
+            "排行标准：以期望伤害（计算暴击率的伤害，不代表实际伤害) 为排序的排名"
         )
     else:
-        temp_notes = f"排行标准：以声骸分数（声骸评分高，不代表实际伤害高) 为排序的排名"
+        temp_notes = "排行标准：以声骸分数（声骸评分高，不代表实际伤害高) 为排序的排名"
     card_img_draw.text((450, 500), f"{temp_notes}", SPECIAL_GOLD, waves_font_16, "lm")
 
     img_temp = Image.new("RGBA", char_mask.size)

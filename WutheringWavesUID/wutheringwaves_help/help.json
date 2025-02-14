@@ -195,6 +195,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "角色养成",
+        "desc": "角色养成",
+        "eg": "菲比养成",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },

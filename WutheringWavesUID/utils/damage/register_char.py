@@ -1,19 +1,19 @@
-from .damage import DamageAttribute
-from .utils import (
-    CHAR_ATTR_MOLTEN,
-    CHAR_ATTR_SINKING,
-    CHAR_ATTR_FREEZING,
-    CHAR_ATTR_CELESTIAL,
-    temp_atk,
-    hit_damage,
-    skill_damage,
-    attack_damage,
-    liberation_damage,
-)
 from ...utils.damage.abstract import (
     CharAbstract,
     WavesCharRegister,
     WavesWeaponRegister,
+)
+from .damage import DamageAttribute
+from .utils import (
+    CHAR_ATTR_CELESTIAL,
+    CHAR_ATTR_FREEZING,
+    CHAR_ATTR_MOLTEN,
+    CHAR_ATTR_SINKING,
+    attack_damage,
+    hit_damage,
+    liberation_damage,
+    skill_damage,
+    temp_atk,
 )
 
 
@@ -273,6 +273,20 @@ class Char_1501(CharAbstract):
         title = "光主"
         msg = "触发光噪效应"
         attr.add_effect(title, msg)
+        if chain >= 6:
+            title = "光主-六链"
+            msg = "施放共鸣技能时，目标衍射伤害抗性降低10%"
+            attr.add_enemy_resistance(-0.1, title, msg)
+
+        if attr.char_template == temp_atk:
+            title = "光主-合鸣效果-轻云出月"
+            msg = "下一个登场的共鸣者攻击提升22.5%"
+            attr.add_atk_percent(0.225, title, msg)
+
+        # 无常凶鹭
+        title = "光主-声骸技能-无常凶鹭"
+        msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
+        attr.add_dmg_bonus(0.12, title, msg)
 
 
 class Char_1502(Char_1501):
