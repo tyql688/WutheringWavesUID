@@ -14,10 +14,10 @@ from ..utils.api.model import (
     OnlineRoleList,
     OnlineWeapon,
     OnlineWeaponList,
+    OwnedRoleList,
     RoleCostDetail,
     RoleCultivateStatusList,
     RoleDetailData,
-    RoleList,
 )
 from ..utils.char_info_utils import get_all_role_detail_info_list
 from ..utils.database.models import WavesBind
@@ -147,6 +147,10 @@ async def calc_develop_cost(ev: Event, develop_list: List[str], is_flush=False):
     if len(alias_char_ids) > 2:
         return "暂不支持查询两个以上角色养成"
 
+    succ, _ = await waves_api.calculator_refresh_data(uid, token)
+    if not succ:
+        return "养成刷新失败"
+
     # 获取所有角色
     succ, online_list_role = await waves_api.get_online_list_role(token)
     if not succ or isinstance(online_list_role, str):
@@ -160,16 +164,11 @@ async def calc_develop_cost(ev: Event, develop_list: List[str], is_flush=False):
     online_list_weapon_model = OnlineWeaponList.model_validate(online_list_weapon)
     online_weapon_map = {str(i.weaponId): i for i in online_list_weapon_model}
     # 获取拥有的角色
-    # succ, owned_role = await waves_api.get_owned_role(uid, token)
-    # if not succ or isinstance(owned_role, str):
-    #     return owned_role
-    # owned_char_ids_model = OwnedRoleList.model_validate(owned_role)
-    # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(uid, token)
-    if not succ:
-        return role_info
-    owned_role_model = RoleList.model_validate(role_info)
-    owned_char_ids = [str(i.roleId) for i in owned_role_model.roleList]
+    succ, owned_role = await waves_api.get_owned_role(uid, token)
+    if not succ or isinstance(owned_role, str):
+        return owned_role
+    owned_char_ids_model = OwnedRoleList.model_validate(owned_role)
+    owned_char_ids = [str(i) for i in owned_char_ids_model]
 
     owneds = []
     not_owneds = []

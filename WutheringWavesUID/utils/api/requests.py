@@ -30,6 +30,7 @@ from .api import (
     BASE_DATA_URL,
     BATCH_ROLE_COST,
     CALABASH_DATA_URL,
+    CALCULATOR_REFRESH_DATA_URL,
     CHALLENGE_DATA_URL,
     CHALLENGE_INDEX_URL,
     EXPLORE_DATA_URL,
@@ -428,6 +429,23 @@ class WavesApi:
             "roleId": roleId,
         }
         return await self._waves_request(TOWER_INDEX_URL, "POST", header, data=data)
+
+    async def calculator_refresh_data(
+        self,
+        roleId: str,
+        token: str,
+        serverId: Optional[str] = None,
+    ) -> tuple[bool, Union[Dict, str]]:
+        header = copy.deepcopy(await get_headers(token))
+        header.update({"token": token})
+        data = {
+            "serverId": self.get_server_id(roleId, serverId),
+            "roleId": roleId,
+        }
+        raw_data = await self._waves_request(
+            CALCULATOR_REFRESH_DATA_URL, "POST", header, data=data
+        )
+        return await _check_response(raw_data, roleId)
 
     @timed_async_cache(86400)
     async def get_online_list_role(self, token: str) -> tuple[bool, Union[Dict, str]]:

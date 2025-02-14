@@ -34,6 +34,9 @@ WIKI_HOME_URL = f"{MAIN_URL}/wiki/core/homepage/getPage"
 WIKI_DETAIL_URL = f"{MAIN_URL}/wiki/core/catalogue/item/getPage"
 WIKI_ENTRY_DETAIL_URL = f"{MAIN_URL}/wiki/core/catalogue/item/getEntryDetail"
 
+
+# refresh
+CALCULATOR_REFRESH_DATA_URL = f"{MAIN_URL}/aki/calculator/refreshData"
 # 角色列表 - 已经上线的角色列表
 ONLINE_LIST_ROLE = f"{MAIN_URL}/aki/calculator/listRole"
 # 武器列表 - 已经上线的武器列表
