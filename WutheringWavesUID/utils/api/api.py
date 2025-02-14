@@ -34,6 +34,25 @@ WIKI_HOME_URL = f"{MAIN_URL}/wiki/core/homepage/getPage"
 WIKI_DETAIL_URL = f"{MAIN_URL}/wiki/core/catalogue/item/getPage"
 WIKI_ENTRY_DETAIL_URL = f"{MAIN_URL}/wiki/core/catalogue/item/getEntryDetail"
 
+# 角色列表 - 已经上线的角色列表
+ONLINE_LIST_ROLE = f"{MAIN_URL}/aki/calculator/listRole"
+# 武器列表 - 已经上线的武器列表
+ONLINE_LIST_WEAPON = f"{MAIN_URL}/aki/calculator/listWeapon"
+# 声骸列表 - 已经上线的声骸列表
+ONLINE_LIST_PHANTOM = f"{MAIN_URL}/aki/calculator/listPhantom"
+
+# 角色培养状态
+ROLE_CULTIVATE_STATUS = f"{MAIN_URL}/aki/calculator/roleCultivateStatus"
+# 角色培养成本
+BATCH_ROLE_COST = f"{MAIN_URL}/aki/calculator/batchRoleCost"
+# 武器培养成本
+BATCH_WEAPON_COST = f"{MAIN_URL}/aki/calculator/batchWeaponCost"
+# 声骸培养成本
+BATCH_PHANTOM_COST = f"{MAIN_URL}/aki/calculator/batchPhantomCost"
+# 已拥有角色
+QUERY_OWNED_ROLE = f"{MAIN_URL}/aki/calculator/queryOwnedRole"
+
+
 WIKI_CATALOGUE_MAP = {
     "共鸣者": "1105",
     "武器": "1106",

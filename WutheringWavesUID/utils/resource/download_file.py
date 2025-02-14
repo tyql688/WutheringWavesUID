@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Optional, Union
 
 from PIL import Image
 
@@ -6,10 +6,10 @@ from gsuid_core.utils.download_resource.download_file import download
 
 from .RESOURCE_PATH import (
     FETTER_PATH,
-    PHANTOM_PATH,
     MATERIAL_PATH,
-    ROLE_DETAIL_SKILL_PATH,
+    PHANTOM_PATH,
     ROLE_DETAIL_CHAINS_PATH,
+    ROLE_DETAIL_SKILL_PATH,
 )
 
 
@@ -60,8 +60,7 @@ async def get_fetter_img(name: str, pic_url: str) -> Image.Image:
     return Image.open(_path).convert("RGBA")
 
 
-async def get_material_img(material_id: int) -> Optional[Image.Image]:
+async def get_material_img(material_id: Union[str, int]) -> Image.Image:
     name = f"material_{material_id}.png"
     _path = MATERIAL_PATH / name
-    if _path.exists():
-        return Image.open(_path).convert("RGBA")
+    return Image.open(_path).convert("RGBA")

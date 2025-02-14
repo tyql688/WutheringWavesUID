@@ -13,13 +13,19 @@ def timed_async_cache(expiration):
         @wraps(func)
         async def wrapper(*args):
             current_time = time.time()
-            if args in cache:
-                value, timestamp = cache[args]
+            # 如果是类方法，args[0]是实例，我们获取类名
+            if args and hasattr(args[0], "__class__"):
+                cache_key = f"{args[0].__class__.__name__}.{func.__name__}"
+            else:
+                cache_key = func.__name__
+
+            if cache_key in cache:
+                value, timestamp = cache[cache_key]
                 if current_time - timestamp < expiration:
                     return value
 
             value = await func(*args)
-            cache[args] = (value, current_time)
+            cache[cache_key] = (value, current_time)
             return value
 
         return wrapper

@@ -1,24 +1,22 @@
 import copy
-import random
 import json as j
+import random
 from datetime import datetime
-from typing import Any, Dict, Union, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import httpx
 from aiohttp import (
-    FormData,
-    TCPConnector,
     ClientSession,
     ClientTimeout,
     ContentTypeError,
+    FormData,
+    TCPConnector,
 )
 
 from gsuid_core.logger import logger
 
-from ..hint import error_reply
-from ..database.models import WavesUser
-from ..util import get_public_ip, generate_random_string
 from ...wutheringwaves_config import WutheringWavesConfig
+from ..database.models import WavesUser
 from ..error_reply import (
     WAVES_CODE_100,
     WAVES_CODE_101,
@@ -26,32 +24,40 @@ from ..error_reply import (
     WAVES_CODE_109,
     WAVES_CODE_999,
 )
+from ..hint import error_reply
+from ..util import generate_random_string, get_public_ip, timed_async_cache
 from .api import (
-    GAME_ID,
-    LOGIN_URL,
-    SERVER_ID,
-    SIGNIN_URL,
-    REFRESH_URL,
     BASE_DATA_URL,
-    GACHA_LOG_URL,
-    GAME_DATA_URL,
-    KURO_ROLE_URL,
-    ROLE_DATA_URL,
-    SERVER_ID_NET,
-    WIKI_HOME_URL,
-    WIKI_TREE_URL,
-    ROLE_DETAIL_URL,
-    TOWER_INDEX_URL,
-    WIKI_DETAIL_URL,
-    EXPLORE_DATA_URL,
-    QUERY_USERID_URL,
-    TOWER_DETAIL_URL,
+    BATCH_ROLE_COST,
     CALABASH_DATA_URL,
-    GACHA_NET_LOG_URL,
     CHALLENGE_DATA_URL,
     CHALLENGE_INDEX_URL,
+    EXPLORE_DATA_URL,
+    GACHA_LOG_URL,
+    GACHA_NET_LOG_URL,
+    GAME_DATA_URL,
+    GAME_ID,
+    KURO_ROLE_URL,
+    LOGIN_URL,
+    ONLINE_LIST_PHANTOM,
+    ONLINE_LIST_ROLE,
+    ONLINE_LIST_WEAPON,
+    QUERY_OWNED_ROLE,
+    QUERY_USERID_URL,
+    REFRESH_URL,
+    ROLE_CULTIVATE_STATUS,
+    ROLE_DATA_URL,
+    ROLE_DETAIL_URL,
+    SERVER_ID,
+    SERVER_ID_NET,
     SIGNIN_TASK_LIST_URL,
+    SIGNIN_URL,
+    TOWER_DETAIL_URL,
+    TOWER_INDEX_URL,
+    WIKI_DETAIL_URL,
     WIKI_ENTRY_DETAIL_URL,
+    WIKI_HOME_URL,
+    WIKI_TREE_URL,
 )
 
 
@@ -422,6 +428,97 @@ class WavesApi:
             "roleId": roleId,
         }
         return await self._waves_request(TOWER_INDEX_URL, "POST", header, data=data)
+
+    @timed_async_cache(86400)
+    async def get_online_list_role(self, token: str) -> tuple[bool, Union[Dict, str]]:
+        """所有的角色列表"""
+        header = copy.deepcopy(await get_headers())
+        header.update({"token": token})
+        data = {}
+        raw_data = await self._waves_request(
+            ONLINE_LIST_ROLE, "POST", header, data=data
+        )
+        return await _check_response(raw_data)
+
+    @timed_async_cache(86400)
+    async def get_online_list_weapon(self, token: str) -> tuple[bool, Union[Dict, str]]:
+        """所有的武器列表"""
+        header = copy.deepcopy(await get_headers())
+        header.update({"token": token})
+        data = {}
+        raw_data = await self._waves_request(
+            ONLINE_LIST_WEAPON, "POST", header, data=data
+        )
+        return await _check_response(raw_data)
+
+    @timed_async_cache(86400)
+    async def get_online_list_phantom(
+        self, token: str
+    ) -> tuple[bool, Union[Dict, str]]:
+        """所有的声骸列表"""
+        header = copy.deepcopy(await get_headers())
+        header.update({"token": token})
+        data = {}
+        raw_data = await self._waves_request(
+            ONLINE_LIST_PHANTOM, "POST", header, data=data
+        )
+        return await _check_response(raw_data)
+
+    async def get_owned_role(
+        self,
+        roleId: str,
+        token: str,
+        serverId: Optional[str] = None,
+    ) -> tuple[bool, Union[Dict, str]]:
+        """已拥有角色"""
+        header = copy.deepcopy(await get_headers(token))
+        header.update({"token": token})
+        data = {
+            "serverId": self.get_server_id(roleId, serverId),
+            "roleId": roleId,
+        }
+        raw_data = await self._waves_request(
+            QUERY_OWNED_ROLE, "POST", header, data=data
+        )
+        return await _check_response(raw_data)
+
+    async def get_develop_role_cultivate_status(
+        self,
+        roleId: str,
+        token: str,
+        char_ids: List[str],
+        serverId: Optional[str] = None,
+    ) -> tuple[bool, Union[Dict, str]]:
+        """角色培养状态"""
+        header = copy.deepcopy(await get_headers(token))
+        header.update({"token": token})
+        data = {
+            "serverId": self.get_server_id(roleId, serverId),
+            "roleId": roleId,
+            "ids": ",".join(char_ids),
+        }
+        raw_data = await self._waves_request(
+            ROLE_CULTIVATE_STATUS, "POST", header, data=data
+        )
+        return await _check_response(raw_data, roleId)
+
+    async def get_batch_role_cost(
+        self,
+        roleId: str,
+        token: str,
+        content: List[Any],
+        serverId: Optional[str] = None,
+    ) -> tuple[bool, Union[Dict, str]]:
+        """角色培养成本"""
+        header = copy.deepcopy(await get_headers(token))
+        header.update({"token": token})
+        data = {
+            "serverId": self.get_server_id(roleId, serverId),
+            "roleId": roleId,
+            "content": j.dumps(content),
+        }
+        raw_data = await self._waves_request(BATCH_ROLE_COST, "POST", header, data=data)
+        return await _check_response(raw_data, roleId)
 
     async def sign_in(
         self, roleId: str, token: str, serverId: Optional[str] = None
