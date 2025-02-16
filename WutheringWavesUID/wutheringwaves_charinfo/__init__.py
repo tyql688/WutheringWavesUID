@@ -48,7 +48,8 @@ async def send_card_info(bot: Bot, ev: Event):
     from .draw_refresh_char_card import draw_refresh_char_detail_img
 
     msg = await draw_refresh_char_detail_img(bot, ev, user_id, uid)
-    return await bot.send(msg)
+    if isinstance(msg, str) or isinstance(msg, bytes):
+        return await bot.send(msg)
 
 
 @waves_char_detail.on_prefix(("角色面板", "查询"))
@@ -64,7 +65,8 @@ async def send_char_detail_msg(bot: Bot, ev: Event):
         return
 
     im = await draw_char_detail_img(ev, uid, char, user_id)
-    return await bot.send(im)
+    if isinstance(im, str) or isinstance(im, bytes):
+        return await bot.send(im)
 
 
 @waves_new_char_detail.on_regex(
@@ -106,7 +108,10 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
     if isLimitCard:
         uid = "1"
         im = await draw_char_detail_img(ev, uid, char, ev.user_id)
-        return await bot.send(im)
+        if isinstance(im, str) or isinstance(im, bytes):
+            return await bot.send(im)
+        else:
+            return
 
     at_sender = True if ev.group_id else False
     if is_pk:
@@ -133,6 +138,9 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         if isinstance(im1, str):
             return await bot.send(im1, at_sender)
 
+        if not isinstance(im1, Image.Image):
+            return
+
         user_id = ev.at if ev.at else ev.user_id
         uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
         if not uid:
@@ -142,6 +150,9 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         )
         if isinstance(im2, str):
             return await bot.send(im2, at_sender)
+
+        if not isinstance(im2, Image.Image):
+            return
 
         # 创建一个新的图片对象
         new_im = Image.new(
@@ -162,9 +173,8 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
             ev, uid, char, user_id, waves_id, change_list_regex=change_list_regex
         )
         at_sender = False
-        if isinstance(im, str):
+        if isinstance(im, str) or isinstance(im, bytes):
             return await bot.send(im, at_sender)
-        return await bot.send(im)
 
 
 @waves_new_char_detail.on_regex(r"^(\d+)?[\u4e00-\u9fa5]+(?:权重)$", block=True)
@@ -192,7 +202,8 @@ async def send_char_detail_msg2_weight(bot: Bot, ev: Event):
     at_sender = False
     if isinstance(im, str) and ev.group_id:
         at_sender = True
-    return await bot.send(im, at_sender)
+    if isinstance(im, str) or isinstance(im, bytes):
+        return await bot.send(im, at_sender)
 
 
 @waves_upload_char.on_regex(r"^上传[\u4e00-\u9fa5]+面板图$", block=True)
@@ -202,6 +213,8 @@ async def upload_char_img(bot: Bot, ev: Event):
         return
     ev.regex_dict = match.groupdict()
     char = ev.regex_dict.get("char")
+    if not char:
+        return
     await upload_custom_card(bot, ev, char)
 
 
@@ -212,6 +225,8 @@ async def get_char_card_list(bot: Bot, ev: Event):
         return
     ev.regex_dict = match.groupdict()
     char = ev.regex_dict.get("char")
+    if not char:
+        return
     await get_custom_card_list(bot, ev, char)
 
 
@@ -228,6 +243,8 @@ async def delete_char_card(bot: Bot, ev: Event):
     ev.regex_dict = match.groupdict()
     char = ev.regex_dict.get("char")
     hash_id = ev.regex_dict.get("hash_id")
+    if not char or not hash_id:
+        return
     await delete_custom_card(bot, ev, char, hash_id)
 
 
@@ -238,4 +255,6 @@ async def delete_all_char_card(bot: Bot, ev: Event):
         return
     ev.regex_dict = match.groupdict()
     char = ev.regex_dict.get("char")
+    if not char:
+        return
     await delete_all_custom_card(bot, ev, char)
