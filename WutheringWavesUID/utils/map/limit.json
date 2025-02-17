@@ -105,6 +105,34 @@
                     "cost": 1
                 }
             ]
+        },
+        {
+            "libId": 5,
+            "fetterDetailName": "浮星祛暗",
+            "equipPhantomList":[
+                {
+                    "phantomId": 6000059,
+                    "mainPropName": "暴击伤害",
+                    "cost": 4
+                },
+                {
+                    "phantomId": 6000045,
+                    "mainPropName": "暴击伤害",
+                    "cost": 4
+                },
+                {
+                    "phantomId": 6000051,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 390070074,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 390070076,
+                    "cost": 1
+                }
+            ]
         }
     ],
     "charList":[
@@ -135,6 +163,13 @@
             "name": "布兰特",
             "weaponId": 21020036,
             "sonataLibId": 4
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1304,
+            "name": "今汐",
+            "weaponId": 21010026,
+            "sonataLibId": 5
         }
     ]
  }
