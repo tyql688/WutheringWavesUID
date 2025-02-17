@@ -1001,12 +1001,12 @@ async def draw_char_score_img(
 
     ph_0 = Image.open(TEXT_PATH / "ph_0.png")
     ph_1 = Image.open(TEXT_PATH / "ph_1.png")
-    phantom_sum_value = {}
+    # phantom_sum_value = {}
+    calc: WuWaCalc = WuWaCalc(role_detail)
     if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
         equipPhantomList = role_detail.phantomData.equipPhantomList
         phantom_score = 0
 
-        calc: WuWaCalc = WuWaCalc(role_detail)
         calc.phantom_pre = calc.prepare_phantom()
         calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
         calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
@@ -1154,12 +1154,12 @@ async def draw_char_score_img(
             for ni, name_default in enumerate(m):
                 name, default_value = name_default
                 if name == "属性伤害加成":
-                    value = phantom_sum_value.get(shuxing, default_value)
+                    value = calc.phantom_card.get(shuxing, default_value)
                     prop_img = await get_attribute_prop(shuxing)
                     name_color, _ = get_valid_color(shuxing, value, calc.calc_temp)
                     name = shuxing
                 else:
-                    value = phantom_sum_value.get(name, default_value)
+                    value = calc.phantom_card.get(name, default_value)
                     prop_img = await get_attribute_prop(name)
                     name_color, _ = get_valid_color(name, value, calc.calc_temp)
                 prop_img = prop_img.resize((40, 40))
