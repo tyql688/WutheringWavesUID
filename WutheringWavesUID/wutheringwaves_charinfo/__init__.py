@@ -35,6 +35,9 @@ waves_delete_all_card = SV("waves删除全部面板图", priority=5, pm=1)
         "更新面板",
         "更新面包",
         "强制刷新",
+        "面板刷新",
+        "面包刷新",
+        "面板更新",
     ),
     block=True,
 )
