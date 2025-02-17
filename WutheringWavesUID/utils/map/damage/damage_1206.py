@@ -80,7 +80,7 @@ def calc_damage_1(
     if chain_num >= 3:
         title = f"{role_name}-三链"
         msg = "火焰归亡曲伤害倍率提升42%。"
-        attr.add_skill_multi(0.42, title, msg)
+        attr.add_skill_ratio(0.42, title, msg)
 
     if chain_num >= 5:
         title = f"{role_name}-五链"
