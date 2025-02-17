@@ -52,6 +52,13 @@ OTHER_PATH = MAIN_PATH / "other"
 CALENDAR_PATH = OTHER_PATH / "calendar"
 
 
+# 别名
+ALIAS_PATH = MAIN_PATH / "alias"
+CUSTOM_CHAR_ALIAS_PATH = ALIAS_PATH / "char_alias.json"
+CUSTOM_SONATA_ALIAS_PATH = ALIAS_PATH / "sonata_alias.json"
+CUSTOM_WEAPON_ALIAS_PATH = ALIAS_PATH / "weapon_alias.json"
+
+
 def init_dir():
     for i in [
         MAIN_PATH,
@@ -74,6 +81,7 @@ def init_dir():
         CUSTOM_CARD_PATH,
         OTHER_PATH,
         CALENDAR_PATH,
+        ALIAS_PATH,
     ]:
         i.mkdir(parents=True, exist_ok=True)
 
