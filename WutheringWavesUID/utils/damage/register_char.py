@@ -201,6 +201,25 @@ class Char_1206(CharAbstract):
     name = "布兰特"
     starLevel = 5
 
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        """获得buff"""
+        # 下一位登场角色热熔伤害加深20%，共鸣技能伤害加深25%
+        if attr.char_attr == CHAR_ATTR_MOLTEN:
+            title = "布兰特-延奏技能"
+            msg = "下一位登场角色热熔伤害加深20%"
+            attr.add_dmg_deepen(0.2, title, msg)
+
+        if skill_damage == attr.char_damage:
+            title = "布兰特-延奏技能"
+            msg = "下一位登场角色共鸣解放伤害加深25%"
+            attr.add_dmg_deepen(0.25, title, msg)
+
 
 class Char_1301(CharAbstract):
     id = 1301

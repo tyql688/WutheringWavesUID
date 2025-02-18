@@ -54,6 +54,30 @@ def tower_node(now: datetime):
     }
 
 
+def shenhai_node(now: datetime):
+    start_time = datetime(2025, 2, 13, 4, 0)
+    date_range = 86400 * 32  # 32天为一周期（秒）
+    # 将秒数转为 timedelta 对象
+    date_range_td = timedelta(seconds=date_range)
+
+    # 计算周期编号
+    elapsed_time = (now - start_time).total_seconds()  # 当前时间与开始时间的差值（秒）
+    period_index = int(elapsed_time // date_range)  # 周期编号（从 0 开始）
+
+    # 当前周期的起始和结束时间
+    period_start = start_time + period_index * date_range_td
+    period_end = period_start + date_range_td
+
+    start_date_str = period_start.strftime("%Y-%m-%d %H:%M")
+    end_date_str = period_end.strftime("%Y-%m-%d %H:%M")
+
+    return {
+        "title": "冥歌海墟",
+        "contentUrl": "shenhai.png",
+        "countDown": {"dateRange": [start_date_str, end_date_str]},
+    }
+
+
 async def draw_calendar_img(ev: Event, uid: str):
     wiki_home = await wiki.get_wiki_home()
     if wiki_home["code"] != 200:
@@ -77,6 +101,7 @@ async def draw_calendar_img(ev: Event, uid: str):
 
         elif side_module["title"] == "版本活动":
             side_module["content"].insert(0, tower_node(now))
+            side_module["content"].insert(1, shenhai_node(now))
             content = VersionActivity(**side_module)
 
     title_high = 150
@@ -157,7 +182,7 @@ async def draw_calendar_img(ev: Event, uid: str):
 
     img.paste(bar2, (0, _high), bar2)
     _high += bar2_high
-    for i, cont in enumerate(content.content):
+    for i, cont in enumerate(content.content):  # type: ignore
         event_bg = Image.open(TEXT_PATH / "event_bg.png")
         event_bg_draw = ImageDraw.Draw(event_bg)
         dateRange = []
@@ -196,7 +221,7 @@ async def draw_calendar_img(ev: Event, uid: str):
 
         else:
             linkUrl = Image.open(TEXT_PATH / cont.contentUrl)
-        linkUrl = linkUrl.resize((100, 100))
+        linkUrl = linkUrl.resize((100, 100))  # type: ignore
         event_bg.paste(linkUrl, (40, 40), linkUrl)
         event_bg_draw.text((160, 60), f"{cont.title}", SPECIAL_GOLD, ww_font_30, "lm")
 
@@ -257,14 +282,17 @@ async def draw_banner(wiki_home, img):
     banners = wiki_home.get("data", {}).get("contentJson", {}).get("banner", [])
     banner_bg = banners[0]["url"]
     for banner in banners:
-        if "版本" in banner["describe"]:
+        if "版本PV" in banner["describe"]:
+            banner_bg = banner["url"]
+            break
+        elif "版本" in banner["describe"]:
             banner_bg = banner["url"]
             break
 
     # banner_bg = Image.open(BytesIO((await sget(banner_bg)).content)).convert("RGBA")
     banner_bg = await get_calendar_pic(banner_bg)
 
-    banner_bg = banner_bg.resize((1200, 675))
+    banner_bg = banner_bg.resize((1200, 675))  # type: ignore
     banner_mask = Image.open(TEXT_PATH / "banner_mask.png")
     banner_bg = crop_center_img(banner_bg, banner_mask.size[0], banner_mask.size[1])
 

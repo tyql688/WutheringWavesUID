@@ -11,11 +11,19 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img, get_qq_avatar
 
 from ..utils import hint
-from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
+from ..utils.api.model import (
+    AccountBaseInfo,
+    OnlineRoleList,
+    RoleDetailData,
+    WeaponData,
+)
+from ..utils.ascension.char import get_char_model
+from ..utils.ascension.template import get_template_data
 from ..utils.ascension.weapon import (
     WavesWeaponResult,
     get_breach,
     get_weapon_detail,
+    get_weapon_model,
 )
 from ..utils.calc import WuWaCalc
 from ..utils.calculate import (
@@ -66,7 +74,12 @@ from ..utils.image import (
     get_weapon_type,
 )
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from ..utils.resource.constant import SPECIAL_CHAR
+from ..utils.resource.constant import (
+    ATTRIBUTE_ID_MAP,
+    DEAFAULT_WEAPON_ID,
+    SPECIAL_CHAR,
+    WEAPON_TYPE_ID_MAP,
+)
 from ..utils.resource.download_file import (
     get_chain_img,
     get_phantom_img,
@@ -367,6 +380,7 @@ async def get_role_need(
     waves_id=None,
     is_force_avatar=False,
     force_resource_id=None,
+    is_online_user=True,
 ):
     if waves_id:
         query_list = [char_id]
@@ -379,6 +393,7 @@ async def get_role_need(
             )
             if (
                 not succ
+                or not isinstance(role_detail_info, Dict)
                 or "role" not in role_detail_info
                 or role_detail_info["role"] is None
                 or "level" not in role_detail_info
@@ -398,18 +413,28 @@ async def get_role_need(
                 f"[鸣潮] 特征码[{waves_id}] \n无法获取【{char_name}】角色信息，请在库街区展示此角色！\n",
             )
     else:
+        avatar = await draw_pic_with_ring(ev, is_force_avatar, force_resource_id)
         all_role_detail: Optional[Dict[str, RoleDetailData]] = (
             await get_all_role_detail_info(uid)
         )
 
-        if all_role_detail is None or char_name not in all_role_detail:
-            return (
-                None,
-                f"[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n",
-            )
-
-        role_detail: RoleDetailData = all_role_detail[char_name]
-        avatar = await draw_pic_with_ring(ev, is_force_avatar, force_resource_id)
+        if all_role_detail and char_name in all_role_detail:
+            role_detail: RoleDetailData = all_role_detail[char_name]
+        else:
+            if is_online_user:
+                return (
+                    None,
+                    f"[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n",
+                )
+            else:
+                # 未上线的角色，构造一个数据
+                gen_role_detail = await generate_online_role_detail(char_id)
+                if not gen_role_detail:
+                    return (
+                        None,
+                        f"[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n",
+                    )
+                role_detail = gen_role_detail
 
     return avatar, role_detail
 
@@ -553,6 +578,7 @@ async def draw_char_detail_img(
         return (
             f"[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
         )
+
     char_name = alias_to_char_name(char)
 
     damageDetail = DamageDetailRegister.find_class(char_id)
@@ -566,8 +592,8 @@ async def draw_char_detail_img(
 
     damage_calc = None
     if not isDraw:
-        for dindex, dd in enumerate(damageDetail):
-            if dindex + 1 == int(damageId):
+        for dindex, dd in enumerate(damageDetail):  # type: ignore
+            if dindex + 1 == int(damageId):  # type: ignore
                 damage_calc = dd
                 break
         else:
@@ -579,6 +605,15 @@ async def draw_char_detail_img(
     ck = await waves_api.get_ck(uid, user_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
+
+    is_online_user = False
+    succ, online_list = await waves_api.get_online_list_role(ck)
+    if succ and online_list:
+        online_list_role_model = OnlineRoleList.model_validate(online_list)
+        online_role_map = {str(i.roleId): i for i in online_list_role_model}
+        if char_id in online_role_map:
+            is_online_user = True
+
     # 账户数据
     if waves_id:
         uid = waves_id
@@ -613,7 +648,15 @@ async def draw_char_detail_img(
         force_resource_id = char_id
     # 获取数据
     avatar, role_detail = await get_role_need(
-        ev, char_id, ck, uid, char_name, waves_id, is_force_avatar, force_resource_id
+        ev,
+        char_id,
+        ck,
+        uid,
+        char_name,
+        waves_id,
+        is_force_avatar,
+        force_resource_id,
+        is_online_user,
     )
     if isinstance(role_detail, str):
         return role_detail
@@ -664,7 +707,7 @@ async def draw_char_detail_img(
 
     _x = 220 + 43 * len(weaponData.weapon.weaponName)
     _y = 37
-    wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)
+    wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)  # type: ignore
     weapon_bg_temp_draw.rounded_rectangle(
         [_x - 15, _y - 15, _x + 50, _y + 15], radius=7, fill=wrc_fill
     )
@@ -674,7 +717,7 @@ async def draw_char_detail_img(
     )
 
     weapon_breach = get_breach(weaponData.breach, weaponData.level)
-    for i in range(0, weapon_breach):
+    for i in range(0, weapon_breach):  # type: ignore
         promote_icon = Image.open(TEXT_PATH / "promote_icon.png")
         weapon_bg_temp.alpha_composite(promote_icon, dest=(200 + 40 * i, 100))
 
@@ -710,19 +753,19 @@ async def draw_char_detail_img(
     # 命座部分
     mz_temp = Image.new("RGBA", (1200, 300))
 
-    shuxing_color = WAVES_SHUXING_MAP[role_detail.role.attributeName]
+    shuxing_color = WAVES_SHUXING_MAP[role_detail.role.attributeName]  # type: ignore
     for i, _mz in enumerate(role_detail.chainList):
         mz_bg = Image.open(TEXT_PATH / "mz_bg.png")
         mz_bg_temp = Image.new("RGBA", mz_bg.size)
         mz_bg_temp_draw = ImageDraw.Draw(mz_bg_temp)
-        chain = await get_chain_img(role_detail.role.roleId, _mz.order, _mz.iconUrl)
+        chain = await get_chain_img(role_detail.role.roleId, _mz.order, _mz.iconUrl)  # type: ignore
         chain = chain.resize((100, 100))
         mz_bg.paste(chain, (95, 75), chain)
         mz_bg_temp.alpha_composite(mz_bg, dest=(0, 0))
         if _mz.unlocked:
             mz_bg_temp = await change_color(mz_bg_temp, shuxing_color)
 
-        name = re.sub(r'[",，]+', "", _mz.name)
+        name = re.sub(r'[",，]+', "", _mz.name) if _mz.name else ""
         if len(name) >= 8:
             mz_bg_temp_draw.text((147, 230), f"{name}", "white", waves_font_16, "mm")
         else:
@@ -968,7 +1011,6 @@ async def draw_char_score_img(
     # 声骸属性
     char_id = role_detail.role.roleId
     char_name = role_detail.role.roleName
-    weaponData = role_detail.weaponData
 
     phantom_temp = Image.new("RGBA", (1200, 1380))
     right_image_temp = Image.new("RGBA", (600, 1100))
@@ -976,29 +1018,16 @@ async def draw_char_score_img(
 
     ph_0 = Image.open(TEXT_PATH / "ph_0.png")
     ph_1 = Image.open(TEXT_PATH / "ph_1.png")
-    phantom_sum_value = {}
+    # phantom_sum_value = {}
+    calc: WuWaCalc = WuWaCalc(role_detail)
     if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
-        totalCost = role_detail.phantomData.cost
         equipPhantomList = role_detail.phantomData.equipPhantomList
         phantom_score = 0
 
-        calc: WuWaCalc = WuWaCalc(role_detail)
         calc.phantom_pre = calc.prepare_phantom()
         calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
         calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
 
-        # phantom_sum_value = prepare_phantom(equipPhantomList)
-        # phantom_sum_value = enhance_summation_phantom_value(
-        #     char_id,
-        #     role_detail.role.level,
-        #     role_detail.role.breach,
-        #     weaponData.weapon.weaponId,
-        #     weaponData.level,
-        #     weaponData.breach,
-        #     weaponData.resonLevel,
-        #     phantom_sum_value,
-        # )
-        # calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new("RGBA", (600, 1100))
             sh_temp_draw = ImageDraw.Draw(sh_temp)
@@ -1142,12 +1171,12 @@ async def draw_char_score_img(
             for ni, name_default in enumerate(m):
                 name, default_value = name_default
                 if name == "属性伤害加成":
-                    value = phantom_sum_value.get(shuxing, default_value)
+                    value = calc.phantom_card.get(shuxing, default_value)
                     prop_img = await get_attribute_prop(shuxing)
                     name_color, _ = get_valid_color(shuxing, value, calc.calc_temp)
                     name = shuxing
                 else:
-                    value = phantom_sum_value.get(name, default_value)
+                    value = calc.phantom_card.get(name, default_value)
                     prop_img = await get_attribute_prop(name)
                     name_color, _ = get_valid_color(name, value, calc.calc_temp)
                 prop_img = prop_img.resize((40, 40))
@@ -1188,7 +1217,7 @@ async def draw_char_score_img(
                 entry_list.append(entry)
             for entry_type in entry_type_list:
                 if "主词条权重" in entry_type:
-                    cost = re.search(r"C(\d+)主词条权重", entry_type).group(1)
+                    cost = re.search(r"C(\d+)主词条权重", entry_type).group(1)  # type: ignore
                     pros_temp = main_props.get(str(cost))
                 else:
                     pros_temp = sub_pros
@@ -1322,4 +1351,72 @@ def get_weapon_icon_bg(star: int = 3) -> Image.Image:
     bg_path = TEXT_PATH / f"weapon_icon_bg_{star}.png"
     bg_img = Image.open(bg_path)
     return bg_img
-    return bg_img
+
+
+async def generate_online_role_detail(char_id: str):
+    char_model = get_char_model(char_id)
+    if not char_model:
+        return
+
+    weapon_id = DEAFAULT_WEAPON_ID.get(char_model.weaponTypeId)
+    if not weapon_id:
+        return
+
+    weapon_model = get_weapon_model(weapon_id)
+    if not weapon_model:
+        return
+
+    char_template_data = copy.deepcopy(await get_template_data())
+
+    # 命座
+    for i, j in zip(char_model.chains.values(), char_template_data["chainList"]):
+        j["name"] = i.name
+        j["description"] = i.desc.format(*i.param)
+        j["iconUrl"] = ""
+        j["unlocked"] = False
+
+    # 技能
+    skill_map = {
+        "常态攻击": "1",
+        "共鸣技能": "2",
+        "共鸣回路": "7",
+        "共鸣解放": "3",
+        "变奏技能": "6",
+        "延奏技能": "8",
+    }
+    for i in char_template_data["skillList"]:
+        temp_skill = i["skill"]
+        skill_type = temp_skill["type"]
+        skill_detail = char_model.skillTree[int(skill_map[skill_type])]["skill"]
+
+        temp_skill["name"] = skill_detail.name
+        temp_skill["description"] = skill_detail.desc.format(*skill_detail.param)
+        temp_skill["iconUrl"] = ""
+
+    # role
+    temp_role = char_template_data["role"]
+    temp_role["roleName"] = char_model.name
+    temp_role["iconUrl"] = ""
+    temp_role["roleId"] = char_id
+    temp_role["starLevel"] = char_model.starLevel
+    temp_role["weaponTypeId"] = char_model.weaponTypeId
+    temp_role["weaponTypeName"] = WEAPON_TYPE_ID_MAP[char_model.weaponTypeId]
+    temp_role["attributeId"] = char_model.attributeId
+    temp_role["attributeName"] = ATTRIBUTE_ID_MAP[char_model.attributeId]
+
+    # 武器
+    char_template_data["weaponData"]["resonLevel"] = 1
+    temp_weapon = char_template_data["weaponData"]["weapon"]
+    temp_weapon["weaponEffectName"] = weapon_model.effect.format(
+        *[i[-1] for i in weapon_model.param]
+    )
+    temp_weapon["weaponIcon"] = ""
+    temp_weapon["weaponId"] = weapon_id
+    temp_weapon["weaponName"] = weapon_model.name
+    temp_weapon["weaponStarLevel"] = weapon_model.starLevel
+    temp_weapon["weaponType"] = weapon_model.type
+
+    # 声骸
+    char_template_data["phantomData"] = {"cost": 0, "equipPhantomList": None}
+
+    return RoleDetailData.model_validate(char_template_data)

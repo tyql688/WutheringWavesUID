@@ -1,36 +1,36 @@
-from typing import Union, List
+from typing import List, Union
 
-from ...api.model import WeaponData, RoleDetailData
+from ...api.model import RoleDetailData, WeaponData
 from ...ascension.sonata import get_sonata_detail
-from ...damage.abstract import WavesWeaponRegister, WavesEchoRegister
+from ...damage.abstract import WavesEchoRegister, WavesWeaponRegister
 from ...damage.damage import DamageAttribute
 from ...damage.utils import (
-    SONATA_CELESTIAL,
-    SONATA_SINKING,
-    SONATA_MOLTEN,
-    SONATA_VOID,
-    SONATA_FREEZING,
-    SONATA_SIERRA,
-    SONATA_REJUVENATING,
-    cast_hit,
-    cast_attack,
-    cast_skill,
-    SONATA_FROSTY,
-    cast_liberation,
-    skill_damage,
+    CHAR_ATTR_CELESTIAL,
     CHAR_ATTR_FREEZING,
     CHAR_ATTR_MOLTEN,
-    CHAR_ATTR_VOID,
     CHAR_ATTR_SIERRA,
-    CHAR_ATTR_CELESTIAL,
     CHAR_ATTR_SINKING,
-    SONATA_MOONLIT,
-    SONATA_LINGERING,
+    CHAR_ATTR_VOID,
+    SONATA_CELESTIAL,
     SONATA_EMPYREAN,
-    SONATA_MIDNIGHT,
     SONATA_ETERNAL,
+    SONATA_FREEZING,
+    SONATA_FROSTY,
+    SONATA_LINGERING,
+    SONATA_MIDNIGHT,
+    SONATA_MOLTEN,
+    SONATA_MOONLIT,
+    SONATA_REJUVENATING,
+    SONATA_SIERRA,
+    SONATA_SINKING,
     SONATA_TIDEBREAKING,
+    SONATA_VOID,
     Spectro_Frazzle_Role_Ids,
+    cast_attack,
+    cast_hit,
+    cast_liberation,
+    cast_skill,
+    skill_damage,
 )
 
 
@@ -100,11 +100,11 @@ def phase_damage(
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_VOID):
             if cast_skill in damage_func and attr.char_attr == CHAR_ATTR_VOID:
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = f"使用共鸣技能时，获得一层导电伤害提升15%"
+                msg = "使用共鸣技能时，获得一层导电伤害提升15%"
                 attr.add_dmg_bonus(0.15, title, msg)
             if cast_hit in damage_func and attr.char_attr == CHAR_ATTR_VOID:
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = f"使用重击时，获得一层导电伤害提升15%"
+                msg = "使用重击时，获得一层导电伤害提升15%"
                 attr.add_dmg_bonus(0.15, title, msg)
 
         # 啸谷长风
@@ -157,18 +157,18 @@ def phase_damage(
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_FROSTY):
             if cast_skill in damage_func and attr.char_attr == CHAR_ATTR_FREEZING:
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = f"施放共鸣技能时，自身冷凝伤害提升22.5%"
+                msg = "施放共鸣技能时，自身冷凝伤害提升22.5%"
                 attr.add_dmg_bonus(0.225, title, msg)
             if cast_liberation in damage_func and attr.char_damage == skill_damage:
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = f"施放共鸣解放时，自身共鸣技能伤害提升18%*2"
+                msg = "施放共鸣解放时，自身共鸣技能伤害提升18%*2"
                 attr.add_dmg_bonus(0.18 * 2, title, msg)
 
         # 高天共奏之曲 -协同
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_EMPYREAN):
             if attr.sync_strike:
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = f"当前角色协同攻击造成的伤害提升80%"
+                msg = "当前角色协同攻击造成的伤害提升80%"
                 attr.add_dmg_bonus(0.8, title, msg)
 
                 # 协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%
@@ -184,10 +184,10 @@ def phase_damage(
                 return
             # 角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒。
             title = f"{phase_name}-{ph_detail.ph_name}"
-            msg = f"角色为敌人添加【光噪效应】时，自身暴击提升20%"
+            msg = "角色为敌人添加【光噪效应】时，自身暴击提升20%"
             attr.add_crit_rate(0.2, title, msg)
             if attr.char_attr == CHAR_ATTR_CELESTIAL:
-                msg = f"攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%"
+                msg = "攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%"
                 attr.add_dmg_bonus(0.15, title, msg)
 
         # 无惧浪涛之勇
@@ -195,9 +195,15 @@ def phase_damage(
             # 角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%
             title = f"{phase_name}-{ph_detail.ph_name}"
             if attr.char_template == "temp_atk":
-                msg = f"角色攻击提升15%"
-                attr.add_atk_percent(0.15, title, msg)
+                msg = "角色攻击提升15%"
+                if attr.ph_result:
+                    attr.add_effect(title, msg)
+                else:
+                    attr.add_dmg_bonus(0.15, title, msg)
 
             if attr.energy_regen >= 2.5:
-                msg = f"共鸣效率达到250%后，当前角色全属性伤害提升30%"
-                attr.add_dmg_bonus(0.3, title, msg)
+                msg = "共鸣效率达到250%后，当前角色全属性伤害提升30%"
+                if attr.ph_result:
+                    attr.add_effect(title, msg)
+                else:
+                    attr.add_dmg_bonus(0.3, title, msg)

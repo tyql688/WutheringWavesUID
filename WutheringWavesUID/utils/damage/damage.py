@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from ...utils.api.model import RoleDetailData
 from ...utils.damage.utils import parse_skill_multi
@@ -243,6 +243,8 @@ class DamageAttribute:
         self.teammate_char_ids = teammate_char_ids if teammate_char_ids else []
         # 光噪效应
         self.env_spectro = env_spectro
+        # 声骸结果
+        self.ph_result = False
 
         if enemy_resistance:
             self.add_enemy_resistance(
@@ -524,6 +526,11 @@ class DamageAttribute:
         if not ph_detail:
             return self
         self.ph_detail.append(PhantomDetail.dict2Object(ph_detail))
+        return self
+
+    def set_ph_result(self, ph_result: bool):
+        """设置声骸结果"""
+        self.ph_result = ph_result
         return self
 
     def set_echo_id(self, echo_id: int):

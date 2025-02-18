@@ -1,13 +1,13 @@
+from ..damage.abstract import WavesWeaponRegister, WeaponAbstract
 from .damage import DamageAttribute, calc_percent_expression
 from .utils import (
     Spectro_Frazzle_Role_Ids,
-    temp_atk,
-    hit_damage,
-    skill_damage,
     attack_damage,
+    hit_damage,
     liberation_damage,
+    skill_damage,
+    temp_atk,
 )
-from ..damage.abstract import WeaponAbstract, WavesWeaponRegister
 
 
 class Weapon_21010011(WeaponAbstract):
@@ -301,6 +301,27 @@ class Weapon_21020036(WeaponAbstract):
     id = 21020036
     type = 2
     name = "不灭航路"
+
+    # 施放共鸣解放后，普攻伤害加成提高48%，持续10秒。造成普攻伤害时，普攻伤害加成提升48%
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成普攻伤害"""
+        if attr.char_damage != attack_damage:
+            return
+
+        dmg = f"{self.param(3)}"
+        title = self.get_title()
+        msg = f"造成普攻伤害时，普攻伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣解放"""
+        if attr.char_damage != attack_damage:
+            return
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放共鸣解放后，普攻伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
 
 
 class Weapon_21020043(WeaponAbstract):

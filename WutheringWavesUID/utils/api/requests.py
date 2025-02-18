@@ -635,7 +635,7 @@ class WavesApi:
 class KuroLogin:
     ssl_verify = True
 
-    async def login(self, mobile: int, code: str):
+    async def login(self, mobile: int | str, code: str):
         header = copy.deepcopy(await get_headers())
         data = {"mobile": mobile, "code": code}
         return await self._kuro_request(LOGIN_URL, "POST", header, data=data)

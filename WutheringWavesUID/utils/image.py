@@ -299,6 +299,9 @@ async def change_color(
     if h is None:
         h = chain.size[1]
 
+    if not isinstance(h, int) or not isinstance(w, int):
+        return chain
+
     # 遍历图像的每个像素
     for y in range(h):  # 图像高度
         for x in range(w):  # 图像宽度
@@ -309,13 +312,13 @@ async def change_color(
 
 
 def draw_text_with_shadow(
-    image: ImageDraw,
+    image: ImageDraw.ImageDraw,
     text: str,
     _x: int,
     _y: int,
-    font: ImageFont,
+    font: ImageFont.FreeTypeFont,
     fill_color: str = "white",
-    shadow_color: str = "black",
+    shadow_color: Union[float, tuple[int, ...], str] = "black",
     offset: Tuple[int, int] = (2, 2),
     anchor="rm",
 ):
