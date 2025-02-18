@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Union
 
 import httpx
-from PIL import ImageDraw
 from async_timeout import timeout
+from PIL import ImageDraw
 from pydantic import BaseModel
 from starlette.responses import HTMLResponse
 
@@ -18,15 +18,16 @@ from gsuid_core.segment import MessageSegment
 from gsuid_core.utils.cookie_manager.qrlogin import get_qrcode_base64
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.web_app import app
+
 from ..utils.cache import TimedCache
-from ..utils.database.models import WavesUser, WavesBind
-from ..utils.fonts.waves_fonts import waves_font_40, waves_font_25
-from ..utils.image import get_waves_bg, add_footer
+from ..utils.database.models import WavesBind, WavesUser
+from ..utils.fonts.waves_fonts import waves_font_25, waves_font_40
+from ..utils.image import add_footer, get_waves_bg
 from ..utils.kuro_api import kuro_api
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.RESOURCE_PATH import waves_templates
 from ..utils.util import get_public_ip
-from ..wutheringwaves_config import WutheringWavesConfig, PREFIX
+from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 from ..wutheringwaves_user import deal
 
 cache = TimedCache(timeout=600, maxsize=10)
@@ -92,9 +93,9 @@ async def send_login(bot: Bot, ev: Event, url):
         im = [
             f"{game_title}",
             f"您的id为【{ev.user_id}】",
-            f"请复制地址到浏览器打开",
+            "请复制地址到浏览器打开",
             f" {url}",
-            f"登录地址10分钟内有效",
+            "登录地址10分钟内有效",
         ]
 
         if WutheringWavesConfig.get_config("WavesLoginForward").data:
@@ -171,7 +172,7 @@ async def page_login_other(bot: Bot, ev: Event, url):
                         "登录服务请求失败! 请稍后再试\n", at_sender=at_sender
                     )
 
-                result = await client.post(url + f"/waves/get", json={"token": token})
+                result = await client.post(url + "/waves/get", json={"token": token})
                 if result.status_code != 200:
                     times -= 1
                     await asyncio.sleep(5)
@@ -185,7 +186,7 @@ async def page_login_other(bot: Bot, ev: Event, url):
                 if waves_user:
                     msg = [
                         f"[鸣潮] 特征码[{waves_user.uid}]登录成功! ",
-                        f"当前账号已进入托管状态，请勿登录相似程序，导致token失效",
+                        "当前账号已进入托管状态，请勿登录相似程序，导致token失效",
                         "",
                         f">使用【{PREFIX}mr】查看体力数据",
                         f">使用【{PREFIX}签到】获取游戏签到及其社区签到奖励",
@@ -237,7 +238,7 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
         if isPage:
             msg = [
                 f"[鸣潮] 特征码[{waves_user.uid}]登录成功! ",
-                f"当前账号已进入托管状态，请勿登录相似程序，导致token失效",
+                "当前账号已进入托管状态，请勿登录相似程序，导致token失效",
                 "",
                 f">使用【{PREFIX}mr】查看体力数据",
                 f">使用【{PREFIX}查看】查看已绑定的特征码",
@@ -256,7 +257,7 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
 
 
 async def login_help():
-    card_img = get_waves_bg(900, 800)
+    card_img = get_waves_bg(900, 1020)
     card_draw = ImageDraw.Draw(card_img)
 
     card_draw.text((20, 50), "登录帮助", "white", waves_font_40, "lm")
@@ -264,6 +265,8 @@ async def login_help():
         "1. 直接暴露服务器公网ip给用户（云服务器）",
         "   1.1 gscore控制台将HOST设置为 0.0.0.0",
         "   1.2 服务器开放gscore的端口，默认为8765（注意及时修改账号或者密码",
+        "   1.3 在ww配置`鸣潮登录url`中填写`http://<云服务器公网ip>:8765`",
+        "   1.4 在ww配置`强制【鸣潮登录url】为自己的域名`开关开启",
         "2. 使用自己的域名",
         "   2.1 在ww配置`鸣潮登录url`中填写自己的域名",
         "   2.2 在ww配置`强制【鸣潮登录url】为自己的域名`开关开启",
@@ -272,9 +275,11 @@ async def login_help():
         "       http://域名:port",
         "       https://域名",
         "       https://域名:port",
-        "3. 家里云或者不想暴露公网ip",
-        "   3.1 询要域名地址请加群: 76436110",
-        "   3.2 在ww配置`鸣潮登录url`中填写提供的域名",
+        "3. 家里云",
+        "   3.1 樱花FRP 或者 Cloudflare Tunnel",
+        "   3.2 在ww配置`鸣潮登录url`中填写提供的域名 or FRP地址",
+        "   3.3 在ww配置`强制【鸣潮登录url】为自己的域名`开关开启",
+        "wiki地址: wiki.wavesuid.top",
     ]
     for i, t in enumerate(text):
         card_draw.text((20, 100 + i * 50), t, "white", waves_font_25, "lm")

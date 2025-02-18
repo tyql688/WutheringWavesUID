@@ -3,8 +3,9 @@ import re
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from .login import page_login, code_login, login_help
+
 from ..wutheringwaves_config import PREFIX
+from .login import code_login, login_help, page_login
 
 sv_kuro_login = SV("库洛登录")
 sv_kuro_login_help = SV("库洛登录帮助", pm=0, priority=4)
@@ -12,12 +13,12 @@ sv_kuro_login_help = SV("库洛登录帮助", pm=0, priority=4)
 
 @sv_kuro_login.on_command(
     (
-        f"登录",
-        f"登陆",
-        f"登入",
+        "登录",
+        "登陆",
+        "登入",
     )
 )
-async def get_resp_msg(bot: Bot, ev: Event):
+async def get_login_msg(bot: Bot, ev: Event):
     game_title = "[鸣潮]"
 
     # uid_list = await WavesBind.get_uid_list_by_game(ev.user_id, ev.bot_id)
@@ -39,6 +40,6 @@ async def get_resp_msg(bot: Bot, ev: Event):
     )
 
 
-@sv_kuro_login_help.on_fullmatch(f"登录帮助", block=True)
+@sv_kuro_login_help.on_fullmatch("登录帮助", block=True)
 async def get_resp_msg(bot: Bot, ev: Event):
     return await bot.send(await login_help())

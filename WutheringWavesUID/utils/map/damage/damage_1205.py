@@ -1,23 +1,23 @@
 # 长离
 import copy
 
-from .buff import shouanren_buff, sanhua_buff
-from .damage import weapon_damage, echo_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
 from ...damage.utils import (
-    skill_damage_calc,
-    skill_damage,
-    liberation_damage,
+    SkillTreeMap,
+    SkillType,
+    add_comma_separated_numbers,
+    cast_attack,
+    cast_liberation,
     cast_skill,
     hit_damage,
-    cast_liberation,
-    cast_attack,
-    add_comma_separated_numbers,
-    SkillType,
-    SkillTreeMap,
+    liberation_damage,
+    skill_damage,
+    skill_damage_calc,
 )
+from .buff import bulante_buff, shouanren_buff
+from .damage import echo_damage, phase_damage, weapon_damage
 
 
 def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False):
@@ -26,13 +26,13 @@ def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = Fals
     if chain_num >= 1 and attr.char_damage in [skill_damage, hit_damage]:
         # 1命
         title = f"{role_name}-一链"
-        msg = f"施放共鸣技能赫羽三相或重击焚身以火, 伤害提升10%"
+        msg = "施放共鸣技能赫羽三相或重击焚身以火, 伤害提升10%"
         attr.add_dmg_bonus(0.1, title, msg)
 
     if chain_num >= 2:
         # 2命
         title = f"{role_name}-二链"
-        msg = f"获得【离火】时，长离的暴击提升25%"
+        msg = "获得【离火】时，长离的暴击提升25%"
         attr.add_crit_rate(0.25, title, msg)
 
     if chain_num >= 3 and attr.char_damage in [liberation_damage]:
@@ -44,7 +44,7 @@ def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = Fals
     if chain_num >= 4 and isGroup:
         # 4命 变奏入场
         title = f"{role_name}-四链"
-        msg = f"施放变奏技能后，队伍中的角色攻击提升20%"
+        msg = "施放变奏技能后，队伍中的角色攻击提升20%"
         attr.add_atk_percent(0.2, title, msg)
 
     if chain_num >= 5 and attr.char_damage in [skill_damage]:
@@ -64,7 +64,7 @@ def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = Fals
 
 def calc_damage_0(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[str, str]:
     """
     焚身以火
     """
@@ -83,7 +83,7 @@ def calc_damage_0(
         char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
     )
 
-    title = f"焚身以火"
+    title = "焚身以火"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
@@ -97,7 +97,7 @@ def calc_damage_0(
     if role_breach and role_breach >= 3:
         # 固2(散势) 0.2
         title = f"{role_name}-固有技能-散势"
-        msg = f"长离的热熔伤害加成提升20%，攻击造成伤害时忽视目标15%防御"
+        msg = "长离的热熔伤害加成提升20%，攻击造成伤害时忽视目标15%防御"
         attr.add_dmg_bonus(0.2)
         attr.add_defense_reduction(0.15)
         attr.add_effect(title, msg)
@@ -120,7 +120,7 @@ def calc_damage_0(
 
 def calc_damage_1(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[str, str]:
     """
     离火照丹心
     """
@@ -140,7 +140,7 @@ def calc_damage_1(
         char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
     )
 
-    title = f"离火照丹心"
+    title = "离火照丹心"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
@@ -154,7 +154,7 @@ def calc_damage_1(
     if role_breach and role_breach >= 3:
         # 固2(散势) 0.2
         title = f"{role_name}-固有技能-散势"
-        msg = f"长离的热熔伤害加成提升20%，攻击造成伤害时忽视目标15%防御"
+        msg = "长离的热熔伤害加成提升20%，攻击造成伤害时忽视目标15%防御"
         attr.add_dmg_bonus(0.2)
         attr.add_defense_reduction(0.15)
         attr.add_effect(title, msg)
@@ -177,7 +177,7 @@ def calc_damage_1(
 
 def calc_damage_2(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
-) -> (str, str):
+) -> tuple[str, str]:
     attr1 = copy.deepcopy(attr)
     crit_damage1, expected_damage1 = calc_damage_0(attr1, role, isGroup)
 
@@ -201,17 +201,62 @@ def calc_damage_2(
     return crit_damage, expected_damage
 
 
-def calc_damage_3(
+def calc_damage_10(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
-) -> (str, str):
+) -> tuple[str, str]:
+    attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 船长buff
+    bulante_buff(attr, 0, 1, isGroup)
+
+    return calc_damage_1(attr, role, isGroup)
+
+
+def calc_damage_11(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 6, 5, isGroup)
+
+    # 船长buff
+    bulante_buff(attr, 0, 1, isGroup)
+
+    return calc_damage_1(attr, role, isGroup)
+
+
+def calc_damage_12(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
     attr.set_char_damage(skill_damage)
     attr.set_char_template("temp_atk")
 
     # 守岸人buff
     shouanren_buff(attr, 0, 1, isGroup)
 
-    # 散华buff
-    sanhua_buff(attr, 6, 1, isGroup)
+    # 船长buff
+    bulante_buff(attr, 0, 1, isGroup)
+
+    return calc_damage_0(attr, role, isGroup)
+
+
+def calc_damage_13(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 6, 5, isGroup)
+
+    # 船长buff
+    bulante_buff(attr, 0, 1, isGroup)
 
     return calc_damage_0(attr, role, isGroup)
 
@@ -230,8 +275,20 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_2(attr, role),
     },
     {
-        "title": "0+1守/6散/焚身以火",
-        "func": lambda attr, role: calc_damage_3(attr, role),
+        "title": "0+1守/0船/焚身以火",
+        "func": lambda attr, role: calc_damage_12(attr, role),
+    },
+    {
+        "title": "6+5守/0船/焚身以火",
+        "func": lambda attr, role: calc_damage_13(attr, role),
+    },
+    {
+        "title": "0+1守/0船/离火照丹心",
+        "func": lambda attr, role: calc_damage_10(attr, role),
+    },
+    {
+        "title": "6+5守/0船/离火照丹心",
+        "func": lambda attr, role: calc_damage_11(attr, role),
     },
 ]
 

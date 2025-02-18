@@ -7,28 +7,29 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
+
 from ..utils.api.model import AccountBaseInfo, RoleDetailData
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import WAVES_CODE_102
-from ..utils.expression_ctx import get_waves_char_rank, WavesCharRank
+from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
 from ..utils.fonts.waves_fonts import (
-    waves_font_30,
     waves_font_25,
     waves_font_26,
-    waves_font_42,
+    waves_font_30,
     waves_font_40,
+    waves_font_42,
     waves_font_60,
 )
 from ..utils.hint import error_reply
 from ..utils.image import (
-    get_waves_bg,
-    add_footer,
+    CHAIN_COLOR,
     GOLD,
     GREY,
+    add_footer,
+    draw_text_with_shadow,
     get_event_avatar,
     get_square_avatar,
-    CHAIN_COLOR,
-    draw_text_with_shadow,
+    get_waves_bg,
 )
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NAME_ALIAS
@@ -61,17 +62,12 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     succ, account_info = await waves_api.get_base_info(uid, ck)
     if not succ:
         return account_info
-    account_info = AccountBaseInfo(**account_info)
+    account_info = AccountBaseInfo.model_validate(account_info)
     # 更新group id
     await WavesBind.insert_waves_uid(
         user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9
     )
 
-    # at_sender = True if ev.group_id else False
-    # await bot.send(
-    #     f'[鸣潮]{uid}开始执行[{ev.command}], 需要一定时间...请勿重复触发！',
-    #     at_sender=at_sender
-    # )
     waves_map = {"refresh_update": {}, "refresh_unchanged": {}}
     waves_datas = await refresh_char(uid, user_id, ck, waves_map=waves_map)
     if isinstance(waves_datas, str):
@@ -127,7 +123,7 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     name = role_detail_list[0].role.roleName
     name = NAME_ALIAS.get(name, name)
     title2 = f"{PREFIX}{name}面板"
-    title3 = f"来查询该角色的具体面板"
+    title3 = "来查询该角色的具体面板"
     info_block = Image.new("RGBA", (980, 50), color=(255, 255, 255, 0))
     info_block_draw = ImageDraw.Draw(info_block)
     info_block_draw.rounded_rectangle(
@@ -149,7 +145,7 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     waves_char_rank = await get_waves_char_rank(uid, role_detail_list)
     for rIndex, char_rank in enumerate(waves_char_rank):
         isUpdate = True if char_rank.roleId in waves_map["refresh_update"] else False
-        pic = await draw_pic(char_rank, isUpdate)
+        pic = await draw_pic(char_rank, isUpdate)  # type: ignore
         img.alpha_composite(pic, (80 + 300 * (rIndex % 6), 470 + (rIndex // 6) * 330))
 
     # 基础信息 名字 特征码

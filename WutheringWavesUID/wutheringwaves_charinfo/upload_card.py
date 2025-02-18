@@ -12,16 +12,17 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
+
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from ..utils.resource.RESOURCE_PATH import CUSTOM_CARD_PATH
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_ID
+from ..utils.resource.RESOURCE_PATH import CUSTOM_CARD_PATH
 
 
 def get_hash_id(name):
     return hashlib.sha256(name.encode()).hexdigest()[:8]
 
 
-def get_char_id_and_name(char: str) -> (str, str, str):
+def get_char_id_and_name(char: str) -> tuple[Optional[str], str, str]:
     char_id = None
     msg = f"[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
     sex = ""
@@ -79,7 +80,7 @@ async def upload_custom_card(bot: Bot, ev: Event, char: str):
     upload_images = await get_image(ev)
     if not upload_images:
         return await bot.send(
-            f"[鸣潮] 上传角色面板图失败\n请同时发送图片及其命令\n", at_sender
+            "[鸣潮] 上传角色面板图失败\n请同时发送图片及其命令\n", at_sender
         )
 
     char_id, char, msg = get_char_id_and_name(char)
@@ -176,7 +177,7 @@ async def delete_custom_card(bot: Bot, ev: Event, char: str, hash_id: str):
         return await bot.send(
             f"[鸣潮] 删除角色【{char}】的id为【{hash_id}】的面板图成功！\n", at_sender
         )
-    except Exception as e:
+    except Exception:
         return
 
 
@@ -203,7 +204,7 @@ async def delete_all_custom_card(bot: Bot, ev: Event, char: str):
     try:
         if temp_dir.exists() and temp_dir.is_dir():
             shutil.rmtree(temp_dir)
-    except Exception as e:
+    except Exception:
         pass
 
     return await bot.send(f"[鸣潮] 删除角色【{char}】的所有面板图成功！\n", at_sender)

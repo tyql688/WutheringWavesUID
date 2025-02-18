@@ -373,14 +373,20 @@ def calc_char_limit(char_limit, calc_file_dict):
         phantomProp["name"] = id2Name[str(j["phantomId"])]
         phantomProp["cost"] = cost
 
+        custom_main_shuxing = j.get("mainPropName")
+
         mainProps = i["mainProps"]
-        for main_props_name in calc_file_dict["max_main_props"][f"{cost}.1"]:
+        for flag, main_props_name in enumerate(
+            calc_file_dict["max_main_props"][f"{cost}.1"]
+        ):
             if cost == 4:
                 index = 2
             elif cost == 3:
                 index = 1
             else:
                 index = 0
+            if flag == 0 and custom_main_shuxing:
+                main_props_name = custom_main_shuxing
             _phantom_value = phantom_main_value_map[main_props_name][index]
             if main_props_name.startswith("属性"):
                 main_props_name = f"{attribute}伤害加成"

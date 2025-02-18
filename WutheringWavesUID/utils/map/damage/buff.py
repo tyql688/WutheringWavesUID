@@ -71,3 +71,11 @@ def guangzhu_buff(attr, chain, resonLevel, isGroup):
     if char_clz:
         s = char_clz()
         s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)
+
+
+def bulante_buff(attr, chain, resonLevel, isGroup):
+    # 布兰特buff
+    char_clz = WavesCharRegister.find_class(1206)
+    if char_clz:
+        s = char_clz()
+        s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)

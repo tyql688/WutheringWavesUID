@@ -1,16 +1,18 @@
 import copy
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from gsuid_core.logger import logger
 
-from ..damage.damage import DamageAttribute
-from ..damage.abstract import WavesEchoRegister
 from ...utils.api.model import Props, RoleDetailData
+from ...utils.damage.utils import SONATA_TIDEBREAKING
+from ...utils.map.damage.damage import check_if_ph_5
 from ..ascension.char import WavesCharResult, get_char_detail
+from ..ascension.constant import percent_to_float, sum_numbers, sum_percentages
 from ..ascension.sonata import WavesSonataResult, get_sonata_detail
 from ..ascension.weapon import WavesWeaponResult, get_weapon_detail
+from ..damage.abstract import WavesEchoRegister
+from ..damage.damage import DamageAttribute
 from ..resource.constant import card_sort_map as card_sort_map_back
-from ..ascension.constant import sum_numbers, sum_percentages, percent_to_float
 
 
 class WuWaCalc(object):
@@ -260,6 +262,31 @@ class WuWaCalc(object):
                 card_sort_map[name] = "0%"
             card_sort_map[name] = sum_percentages(value, card_sort_map[name])
 
+        char_regen = "100%"
+        card_sort_map["共鸣效率"] = sum_percentages(
+            char_regen, result.get("共鸣效率", "0%"), card_sort_map["共鸣效率"]
+        )
+        card_sort_map["energy_regen"] = percent_to_float(card_sort_map["共鸣效率"])
+
+        card_sort_map["ph_detail"] = result.get("ph_detail", [])
+
+        card_sort_map["ph_result"] = False
+        for ph_detail in card_sort_map.get("ph_detail", []):
+            if not ph_detail:
+                continue
+            # 无惧浪涛之勇
+            if check_if_ph_5(
+                ph_detail["ph_name"], ph_detail["ph_num"], SONATA_TIDEBREAKING
+            ):
+                # 角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%
+                result["atk_percent"] += 0.15
+                if card_sort_map["energy_regen"] >= 2.5:
+                    card_sort_map["属性伤害加成"] = sum_percentages(
+                        "30%",
+                        card_sort_map["属性伤害加成"],
+                    )
+                card_sort_map["ph_result"] = True
+
         base_atk = float(sum_numbers(_atk, _weapon_atk))
         # 各种攻击百分比 = 武器副词条+武器谐振+固有技能
         per_temp = percent_to_float(card_sort_map["攻击"])
@@ -301,12 +328,6 @@ class WuWaCalc(object):
             char_crit_dmg, result.get("暴击伤害", "0%"), card_sort_map["暴击伤害"]
         )
         card_sort_map["crit_dmg"] = percent_to_float(card_sort_map["暴击伤害"])
-
-        char_regen = "100%"
-        card_sort_map["共鸣效率"] = sum_percentages(
-            char_regen, result.get("共鸣效率", "0%"), card_sort_map["共鸣效率"]
-        )
-        card_sort_map["energy_regen"] = percent_to_float(card_sort_map["共鸣效率"])
 
         card_sort_map[shuxing] = sum_percentages(
             result.get(shuxing, "0%"),
@@ -350,7 +371,6 @@ class WuWaCalc(object):
         )
         card_sort_map["heal_bonus"] = percent_to_float(card_sort_map["治疗效果加成"])
 
-        card_sort_map["ph_detail"] = result.get("ph_detail")
         card_sort_map["echo_id"] = result.get("echo_id")
         # logger.debug(f"面板数据: {card_sort_map}")
         return card_sort_map
@@ -377,5 +397,6 @@ class WuWaCalc(object):
         if card_sort_map.get("ph_detail"):
             for ph_detail in card_sort_map["ph_detail"]:
                 attr.add_ph_detail(ph_detail)
+        attr.set_ph_result(card_sort_map["ph_result"])
         attr.set_role(self.role_detail)
         return attr
