@@ -133,6 +133,34 @@
                     "cost": 1
                 }
             ]
+        },
+        {
+            "libId": 6,
+            "fetterDetailName": "沉日劫明",
+            "equipPhantomList":[
+                {
+                    "phantomId": 6000090,
+                    "mainPropName": "暴击伤害",
+                    "cost": 4
+                },
+                {
+                    "phantomId": 390077029,
+                    "mainPropName": "攻击%",
+                    "cost": 3
+                },
+                {
+                    "phantomId": 390077023,
+                    "cost": 3
+                },
+                {
+                    "phantomId": 390070079,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 390070077,
+                    "cost": 1
+                }
+            ]
         }
     ],
     "charList":[
@@ -170,6 +198,20 @@
             "name": "今汐",
             "weaponId": 21010026,
             "sonataLibId": 5
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1604,
+            "name": "漂泊者·湮灭",
+            "weaponId": 21020016,
+            "sonataLibId": 6
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1605,
+            "name": "漂泊者·湮灭",
+            "weaponId": 21020016,
+            "sonataLibId": 6
         }
     ]
  }

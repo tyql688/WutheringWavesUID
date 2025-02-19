@@ -464,6 +464,26 @@ class Char_1602(CharAbstract):
     name = "丹瑾"
     starLevel = 4
 
+    # 下一位登场角色湮灭伤害加深23%，效果持续14秒，若切换至其他角色则该效果提前结束。
+
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        """获得buff"""
+        if CHAR_ATTR_SINKING == attr.char_attr:
+            title = "丹瑾-延奏技能"
+            msg = "下一位登场角色湮灭伤害加深23%"
+            attr.add_dmg_deepen(0.23, title, msg)
+
+            # 幽夜隐匿之帷
+            title = "丹瑾-合鸣效果-幽夜隐匿之帷"
+            msg = "下一位登场角色湮灭伤害加成提升15%"
+            attr.add_dmg_bonus(0.15, title, msg)
+
 
 class Char_1603(CharAbstract):
     id = 1603
