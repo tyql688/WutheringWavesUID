@@ -310,13 +310,13 @@
         "weaponData": {
             "breach": 0,
             "level": 3,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "咏叹之音",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031400502.png",
                 "weaponId": 21020024,
                 "weaponName": "行进序曲",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 2
             }
         }
@@ -566,13 +566,13 @@
         "weaponData": {
             "breach": 0,
             "level": 20,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "咏叹之音",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031400502.png",
                 "weaponId": 21020024,
                 "weaponName": "行进序曲",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 2
             }
         }
@@ -723,7 +723,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716030959775.png",
                 "weaponId": 21030043,
                 "weaponName": "远行者佩枪·洞察",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 3
             }
         }
@@ -1061,13 +1061,13 @@
         "weaponData": {
             "breach": 1,
             "level": 40,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "咏叹之音",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031270788.png",
                 "weaponId": 21050024,
                 "weaponName": "奇幻变奏",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 5
             }
         }
@@ -1389,13 +1389,13 @@
         "weaponData": {
             "breach": 1,
             "level": 40,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "咏叹之音",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716030859677.png",
                 "weaponId": 21030024,
                 "weaponName": "华彩乐段",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 3
             }
         }
@@ -1711,13 +1711,13 @@
         "weaponData": {
             "breach": 4,
             "level": 70,
-            "resonLevel": 2,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "扬波无止",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716030640150.png",
                 "weaponId": 21010015,
                 "weaponName": "浩境粼光",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 1
             }
         }
@@ -2103,13 +2103,13 @@
         "weaponData": {
             "breach": 4,
             "level": 70,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "咏叹之音",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031266433.png",
                 "weaponId": 21010024,
                 "weaponName": "异响空灵",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 1
             }
         }
@@ -2299,7 +2299,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031345385.png",
                 "weaponId": 21040011,
                 "weaponName": "教学臂铠",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 4
             }
         }
@@ -2621,7 +2621,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716030818527.png",
                 "weaponId": 21020011,
                 "weaponName": "教学迅刀",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 2
             }
         }
@@ -3053,7 +3053,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716030559210.png",
                 "weaponId": 21010016,
                 "weaponName": "苍鳞千嶂",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 1
             }
         }
@@ -3479,13 +3479,13 @@
         "weaponData": {
             "breach": 4,
             "level": 70,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "咏叹之音",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031270788.png",
                 "weaponId": 21050024,
                 "weaponName": "奇幻变奏",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 5
             }
         }
@@ -3819,7 +3819,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716030833239.png",
                 "weaponId": 21040074,
                 "weaponName": "金掌",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 4
             }
         }
@@ -4141,13 +4141,13 @@
         "weaponData": {
             "breach": 4,
             "level": 70,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "咏叹之音",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031400502.png",
                 "weaponId": 21020024,
                 "weaponName": "行进序曲",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 2
             }
         }
@@ -4370,7 +4370,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031174703.png",
                 "weaponId": 21030011,
                 "weaponName": "教学佩枪",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 3
             }
         }
@@ -4802,7 +4802,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716030757882.png",
                 "weaponId": 21050016,
                 "weaponName": "掣傀之手",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 5
             }
         }
@@ -5228,13 +5228,13 @@
         "weaponData": {
             "breach": 6,
             "level": 90,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "承天之祐",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1719544657375.png",
                 "weaponId": 21010026,
                 "weaponName": "时和岁稔",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 1
             }
         }
@@ -5566,7 +5566,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716030952109.png",
                 "weaponId": 21050011,
                 "weaponName": "教学音感仪",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 5
             }
         }
@@ -5992,13 +5992,13 @@
         "weaponData": {
             "breach": 6,
             "level": 90,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "丹煌灼羽",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1719564025927.png",
                 "weaponId": 21020016,
                 "weaponName": "赫奕流明",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 2
             }
         }
@@ -6356,7 +6356,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1725446299983.png",
                 "weaponId": 21050026,
                 "weaponName": "琼枝冰绡",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 5
             }
         }
@@ -6684,7 +6684,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031345385.png",
                 "weaponId": 21040011,
                 "weaponName": "教学臂铠",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 4
             }
         }
@@ -7110,13 +7110,13 @@
         "weaponData": {
             "breach": 6,
             "level": 90,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "群星迭律",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1727419179542.png",
                 "weaponId": 21050036,
                 "weaponName": "星序协响",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 5
             }
         }
@@ -7267,7 +7267,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031345385.png",
                 "weaponId": 21040011,
                 "weaponName": "教学臂铠",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 4
             }
         }
@@ -7693,13 +7693,13 @@
         "weaponData": {
             "breach": 6,
             "level": 90,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "终始之外",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1731399381159.png",
                 "weaponId": 21020026,
                 "weaponName": "裁春",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 2
             }
         }
@@ -7988,7 +7988,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031345385.png",
                 "weaponId": 21040011,
                 "weaponName": "教学臂铠",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 4
             }
         }
@@ -8139,7 +8139,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1716031228478.png",
                 "weaponId": 21010011,
                 "weaponName": "教学长刃",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 1
             }
         }
@@ -8565,13 +8565,13 @@
         "weaponData": {
             "breach": 6,
             "level": 90,
-            "resonLevel": 5,
+            "resonLevel": 1,
             "weapon": {
                 "weaponEffectName": "缄默悼词",
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1735780666098.png",
                 "weaponId": 21030016,
                 "weaponName": "死与舞",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 3
             }
         }
@@ -8973,7 +8973,7 @@
                 "weaponIcon": "https://web-static.kurobbs.com/adminConfig/29/weapon_icon/1737600293858.png",
                 "weaponId": 21040026,
                 "weaponName": "悲喜剧",
-                "weaponStarLevel": 1,
+                "weaponStarLevel": 5,
                 "weaponType": 4
             }
         }

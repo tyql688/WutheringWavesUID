@@ -159,9 +159,9 @@ damage_bar2 = Image.open(TEXT_PATH / "damage_bar2.png")
 def is_limit_user(uid):
     """
     uid == 1 : [返回值:1] 极限面板
-    uid > 199999999 ：[返回值:2] 国际服用户(可绑定后使用本地rawData数据查询面板，不支持刷新面板)
+    uid > 200000000 ：[返回值:2] 国际服用户(可绑定后使用本地rawData数据查询面板，不支持刷新面板)
     """
-    if int(uid) > 199999999:
+    if waves_api.is_net(uid):
         return 2
     return uid == "1"
 
