@@ -148,4 +148,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "刷新面板通知文案",
         True,
     ),
+    "HideUid": GsBoolConfig(
+        "隐藏uid",
+        "隐藏uid",
+        False,
+    ),
 }
