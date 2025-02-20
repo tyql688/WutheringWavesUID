@@ -375,6 +375,7 @@ async def get_role_need(
     is_force_avatar=False,
     force_resource_id=None,
     is_online_user=True,
+    is_limit_query=False,
 ):
     if waves_id:
         query_list = [char_id]
@@ -408,6 +409,8 @@ async def get_role_need(
             )
     else:
         avatar = await draw_pic_with_ring(ev, is_force_avatar, force_resource_id)
+        if is_limit_query:
+            uid = "1"
         all_role_detail: Optional[Dict[str, RoleDetailData]] = (
             await get_all_role_detail_info(uid)
         )
@@ -564,6 +567,7 @@ async def draw_char_detail_img(
     need_convert_img=True,
     is_force_avatar=False,
     change_list_regex=None,
+    is_limit_query=False,
 ):
     char, damageId = parse_text_and_number(char)
 
@@ -612,7 +616,7 @@ async def draw_char_detail_img(
     if waves_id:
         uid = waves_id
 
-    if not is_limit_user(uid):
+    if not is_limit_query:
         succ, account_info = await waves_api.get_base_info(uid, ck)
         if not succ:
             return account_info
@@ -640,6 +644,7 @@ async def draw_char_detail_img(
         is_force_avatar,
         force_resource_id,
         is_online_user,
+        is_limit_query,
     )
     if isinstance(role_detail, str):
         return role_detail

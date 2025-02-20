@@ -97,9 +97,9 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
     if isinstance(query_type, str) and "伤害" in query_type and not damage:
         damage = "1"
 
-    isLimitCard = False
+    is_limit_query = False
     if isinstance(char, str) and "极限" in char:
-        isLimitCard = True
+        is_limit_query = True
         char = char.replace("极限", "")
 
     if damage:
@@ -108,9 +108,13 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         return
     logger.debug(f"[鸣潮] [角色面板] CHAR: {char} {ev.regex_dict}")
 
-    if isLimitCard:
-        uid = "1"
-        im = await draw_char_detail_img(ev, uid, char, ev.user_id)
+    if is_limit_query:
+        uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
+        if not uid:
+            return await bot.send(error_reply(WAVES_CODE_103))
+        im = await draw_char_detail_img(
+            ev, uid, char, ev.user_id, is_limit_query=is_limit_query
+        )
         if isinstance(im, str) or isinstance(im, bytes):
             return await bot.send(im)
         else:
