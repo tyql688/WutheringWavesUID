@@ -32,7 +32,7 @@ async def async_ocr(bot: Bot, ev: Event):
     异步OCR识别函数
     """
     if not await upload_discord_bot_card(bot, ev):
-        await bot.send(f"[鸣潮]分析停止。")
+        await bot.send(f"[鸣潮]卡片分析已停止。")
         return False
     # 获取dc卡片识别结果
     final_result = await cut_card_ocr()
@@ -108,13 +108,14 @@ async def cut_card_ocr():
     REF_HEIGHT = 602
     
     # 裁切区域比例（左、上、右、下），数字来自src/example_card_2.png
+    # 技能树扫描顺序：普攻、共鸣技能、共鸣解放、变奏技能、共鸣回路(json_skillList顺序)
     crop_ratios = [
         (  0/REF_WIDTH,   0/REF_HEIGHT, 420/REF_WIDTH, 350/REF_HEIGHT), # 角色
-        (583/REF_WIDTH,  30/REF_HEIGHT, 653/REF_WIDTH, 130/REF_HEIGHT), # 技能树1
-        (456/REF_WIDTH, 115/REF_HEIGHT, 526/REF_WIDTH, 215/REF_HEIGHT), # 技能树2
-        (694/REF_WIDTH, 115/REF_HEIGHT, 764/REF_WIDTH, 215/REF_HEIGHT), # 技能树3
-        (501/REF_WIDTH, 250/REF_HEIGHT, 571/REF_WIDTH, 350/REF_HEIGHT), # 技能树4
-        (650/REF_WIDTH, 250/REF_HEIGHT, 720/REF_WIDTH, 350/REF_HEIGHT), # 技能树5
+        (583/REF_WIDTH,  30/REF_HEIGHT, 653/REF_WIDTH, 130/REF_HEIGHT), # 普攻
+        (456/REF_WIDTH, 115/REF_HEIGHT, 526/REF_WIDTH, 215/REF_HEIGHT), # 共鸣技能
+        (694/REF_WIDTH, 115/REF_HEIGHT, 764/REF_WIDTH, 215/REF_HEIGHT), # 共鸣解放
+        (650/REF_WIDTH, 250/REF_HEIGHT, 720/REF_WIDTH, 350/REF_HEIGHT), # 变奏技能
+        (501/REF_WIDTH, 250/REF_HEIGHT, 571/REF_WIDTH, 350/REF_HEIGHT), # 共鸣回路
         ( 10/REF_WIDTH, 350/REF_HEIGHT, 220/REF_WIDTH, 590/REF_HEIGHT), # 声骸1
         (220/REF_WIDTH, 350/REF_HEIGHT, 430/REF_WIDTH, 590/REF_HEIGHT), # 声骸2
         (430/REF_WIDTH, 350/REF_HEIGHT, 640/REF_WIDTH, 590/REF_HEIGHT), # 声骸3
@@ -180,6 +181,7 @@ async def is_valid_prop(entry):
 async def ocr_results_to_dict(ocr_results):
     # 将识别结果转换为字典
     final_result = {
+        "用户信息": {},
         "角色信息": {},
         "技能等级": [],
         "装备数据": [],
@@ -241,12 +243,12 @@ async def ocr_results_to_dict(ocr_results):
             # 匹配英文UID
             uid_match = patterns["uid"][0].search(text)
             if uid_match and conf >= patterns["uid"][1]:
-                final_result["角色信息"]["UID"] = uid_match.group(1)
+                final_result["用户信息"]["UID"] = uid_match.group(1)
             
             # 匹配中文UID
             uid_cn_match = patterns["uid_cn"][0].search(text)
             if uid_cn_match and conf >= patterns["uid_cn"][1]:
-                final_result["角色信息"]["UID"] = uid_cn_match.group(1)
+                final_result["用户信息"]["UID"] = uid_cn_match.group(1)
 
         # 处理技能等级的逻辑优化
         for idx in range(1, 6):
