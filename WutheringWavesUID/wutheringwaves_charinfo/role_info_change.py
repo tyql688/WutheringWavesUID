@@ -2,7 +2,8 @@ import re
 from typing import List
 
 from gsuid_core.logger import logger
-from ..utils.api.model import RoleDetailData, EquipPhantomData
+
+from ..utils.api.model import EquipPhantomData, RoleDetailData
 from ..utils.ascension.sonata import WavesSonataResult, get_sonata_detail
 from ..utils.ascension.weapon import WavesWeaponResult, get_weapon_detail
 from ..utils.name_convert import (
@@ -11,7 +12,7 @@ from ..utils.name_convert import (
     char_name_to_char_id,
     weapon_name_to_weapon_id,
 )
-from ..utils.resource.constant import SPECIAL_CHAR, SONATA_FIRST_ID
+from ..utils.resource.constant import SONATA_FIRST_ID, SPECIAL_CHAR
 from ..utils.waves_api import waves_api
 from ..utils.waves_card_cache import get_card
 
@@ -222,6 +223,11 @@ def parse_main(content: str) -> list[tuple[str, list[str], str]]:
         "爆": "暴击伤害",
         "防": "防御",
         "生": "生命",
+        "效率": "共鸣效率",
+        "共鸣效率": "共鸣效率",
+        "共鸣": "共鸣效率",
+        "充能": "共鸣效率",
+        "充": "共鸣效率",
     }
 
     content = re.sub(r"^(?:主词条|主词|主|main)\s*", "", content)
@@ -541,7 +547,7 @@ async def change_role_detail(
                 if mainc[index] == "属性伤害加成":
                     shuxing = f"{role_detail.role.attributeName}伤害加成"
                 else:
-                    shuxing = f"攻击"
+                    shuxing = mainc[index]
                 props[0].attributeName = shuxing
                 props[0].attributeValue = phantom_main_value_map[mainc[index]][1]
                 index += 1
