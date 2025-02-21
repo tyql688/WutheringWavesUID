@@ -122,9 +122,7 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
             difference_uid_list = set(uid_list).difference(set(cookie_uid_list))
             max_bind_num: int = WutheringWavesConfig.get_config("MaxBindNum").data
             if len(difference_uid_list) >= max_bind_num:
-                return await bot.send(
-                    "[鸣潮] 绑定特征码达到上线，请联系管理员或者自行解绑\n", at_sender
-                )
+                return await bot.send("[鸣潮] 绑定特征码达到上限\n", at_sender)
 
         code = await WavesBind.insert_waves_uid(
             qid, ev.bot_id, uid, ev.group_id, lenth_limit=9
