@@ -153,4 +153,7 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "隐藏uid",
         False,
     ),
+    "MaxBindNum": GsIntConfig(
+        "绑定特征码限制数量（未登录）", "绑定特征码限制数量（未登录）", 2, 100
+    ),
 }
