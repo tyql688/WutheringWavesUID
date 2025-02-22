@@ -116,6 +116,14 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
             return await bot.send(
                 f"该命令需要带上正确的uid!\n{PREFIX}绑定uid\n", at_sender
             )
+        uid_list = await WavesBind.get_uid_list_by_game(qid, ev.bot_id)
+        cookie_uid_list = await WavesUser.select_user_cookie_uids(qid)
+        if uid_list and cookie_uid_list:
+            difference_uid_list = set(uid_list).difference(set(cookie_uid_list))
+            max_bind_num: int = WutheringWavesConfig.get_config("MaxBindNum").data
+            if len(difference_uid_list) >= max_bind_num:
+                return await bot.send("[鸣潮] 绑定特征码达到上限\n", at_sender)
+
         code = await WavesBind.insert_waves_uid(
             qid, ev.bot_id, uid, ev.group_id, lenth_limit=9
         )

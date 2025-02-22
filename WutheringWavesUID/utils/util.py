@@ -51,7 +51,7 @@ async def get_public_ip(host="127.0.0.1"):
             r = await client.get("https://httpbin.org/ip", timeout=4)
             ip = r.json()["origin"]
             return ip
-    except:
+    except Exception:
         pass
 
     return host
@@ -63,3 +63,14 @@ def generate_random_string(length=32):
     # 使用random.choice随机选择字符，并连接成字符串
     random_string = "".join(random.choice(characters) for i in range(length))
     return random_string
+
+
+def hide_uid(uid: str) -> str:
+    from ..wutheringwaves_config import WutheringWavesConfig
+
+    HideUid = WutheringWavesConfig.get_config("HideUid").data
+    if not HideUid:
+        return uid
+    if len(uid) < 2:
+        return uid
+    return uid[:2] + "*" * 4 + uid[-2:]

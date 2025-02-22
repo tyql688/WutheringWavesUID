@@ -154,7 +154,10 @@ async def cropped_square_avatar(item_icon: Image.Image, size: int) -> Image.Imag
 async def get_square_weapon(resource_id: Union[int, str]) -> Image.Image:
     name = f"weapon_{resource_id}.png"
     path = WEAPON_PATH / name
-    return Image.open(path).convert("RGBA")
+    if os.path.exists(path):
+        return Image.open(path).convert("RGBA")
+    else:
+        return Image.open(WEAPON_PATH / "weapon_21010063.png").convert("RGBA")
 
 
 async def get_attribute(name: str = "", is_simple: bool = False) -> Image.Image:

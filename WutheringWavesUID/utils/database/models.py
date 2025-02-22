@@ -168,6 +168,25 @@ class WavesUser(User, table=True):
 
     @classmethod
     @with_session
+    async def select_user_cookie_uids(
+        cls: Type[T_WavesUser],
+        session: AsyncSession,
+        user_id: str,
+    ) -> List[str]:
+        sql = select(cls).where(
+            and_(
+                cls.user_id == user_id,
+                cls.cookie != null(),
+                cls.cookie != "",
+                or_(cls.status == null(), cls.status == ""),
+            )
+        )
+        result = await session.execute(sql)
+        data = result.scalars().all()
+        return [i.uid for i in data] if data else []
+
+    @classmethod
+    @with_session
     async def select_data_by_cookie(
         cls: Type[T_WavesUser], session: AsyncSession, cookie: str
     ) -> Optional[T_WavesUser]:

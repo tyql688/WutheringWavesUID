@@ -51,6 +51,7 @@ from ..utils.image import (
 )
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
+from ..utils.util import hide_uid
 from ..utils.waves_card_cache import get_card, get_rank, get_self_rank
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
@@ -540,7 +541,9 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: 
         uid_color = "white"
         if rankId == rank_id:
             uid_color = RED
-        bar_star_draw.text((210, 75), f"{rank.uid}", uid_color, waves_font_20, "lm")
+        bar_star_draw.text(
+            (210, 75), f"{hide_uid(rank.uid)}", uid_color, waves_font_20, "lm"
+        )
 
         # 贴到背景
         card_img.paste(bar_bg, (0, title_h + index * bar_star_h), bar_bg)
