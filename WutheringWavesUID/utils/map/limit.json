@@ -62,10 +62,12 @@
                 },
                 {
                     "phantomId": 390077029,
+                    "mainPropName": "属性伤害加成",
                     "cost": 3
                 },
                 {
                     "phantomId": 390077023,
+                    "mainPropName": "属性伤害加成",
                     "cost": 3
                 },
                 {
@@ -133,6 +135,91 @@
                     "cost": 1
                 }
             ]
+        },
+        {
+            "libId": 6,
+            "fetterDetailName": "沉日劫明",
+            "equipPhantomList":[
+                {
+                    "phantomId": 6000090,
+                    "mainPropName": "暴击伤害",
+                    "cost": 4
+                },
+                {
+                    "phantomId": 390077029,
+                    "mainPropName": "攻击%",
+                    "cost": 3
+                },
+                {
+                    "phantomId": 390077023,
+                    "mainPropName": "属性伤害加成",
+                    "cost": 3
+                },
+                {
+                    "phantomId": 390070079,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 390070077,
+                    "cost": 1
+                }
+            ]
+        },
+        {
+            "libId": 7,
+            "fetterDetailName": "凌冽决断之心",
+            "equipPhantomList":[
+                {
+                    "phantomId": 6000083,
+                    "cost": 4
+                },
+                {
+                    "phantomId": 6000076,
+                    "mainPropName": "攻击%",
+                    "cost": 3
+                },
+                {
+                    "phantomId": 6000078,
+                    "mainPropName": "属性伤害加成",
+                    "cost": 3
+                },
+                {
+                    "phantomId": 6000065,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 6000066,
+                    "cost": 1
+                }
+            ]
+        },
+        {
+            "libId": 8,
+            "fetterDetailName": "啸谷长风",
+            "equipPhantomList":[
+                {
+                    "phantomId": 6000086,
+                    "cost": 4
+                },
+                {
+                    "phantomId": 390077005,
+                    "mainPropName": "攻击%",
+                    "cost": 3
+                },
+                {
+                    "phantomId": 6000040,
+                    "mainPropName": "属性伤害加成",
+                    "cost": 3
+                },
+                {
+                    "phantomId": 6000038,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 6000055,
+                    "cost": 1
+                }
+            ]
         }
     ],
     "charList":[
@@ -170,6 +257,41 @@
             "name": "今汐",
             "weaponId": 21010026,
             "sonataLibId": 5
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1604,
+            "name": "漂泊者·湮灭",
+            "weaponId": 21020016,
+            "sonataLibId": 6
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1605,
+            "name": "漂泊者·湮灭",
+            "weaponId": 21020016,
+            "sonataLibId": 6
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1107,
+            "name": "珂莱塔",
+            "weaponId": 21030016,
+            "sonataLibId": 7
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1603,
+            "name": "椿",
+            "weaponId": 21020026,
+            "sonataLibId": 6
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1404,
+            "name": "忌炎",
+            "weaponId": 21010016,
+            "sonataLibId": 8
         }
     ]
  }

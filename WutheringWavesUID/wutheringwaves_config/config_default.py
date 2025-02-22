@@ -2,12 +2,12 @@ from typing import Dict
 
 from gsuid_core.utils.plugins_config.models import (
     GSC,
-    GsStrConfig,
-    GsListStrConfig,
     GsBoolConfig,
     GsDictConfig,
-    GsListConfig,
     GsIntConfig,
+    GsListConfig,
+    GsListStrConfig,
+    GsStrConfig,
 )
 
 CONFIG_DEFAULT: Dict[str, GSC] = {
@@ -142,5 +142,18 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     ),
     "AnnMinuteCheck": GsIntConfig(
         "公告推送时间检测（单位min）", "公告推送时间检测（单位min）", 10, 60
+    ),
+    "RefreshNotify": GsBoolConfig(
+        "刷新面板通知文案",
+        "刷新面板通知文案",
+        True,
+    ),
+    "HideUid": GsBoolConfig(
+        "隐藏uid",
+        "隐藏uid",
+        False,
+    ),
+    "MaxBindNum": GsIntConfig(
+        "绑定特征码限制数量（未登录）", "绑定特征码限制数量（未登录）", 2, 100
     ),
 }

@@ -123,17 +123,17 @@ async def parse_weapon_detail_content(weapon_model: WeaponModel, card_img):
     detail_font_size = 14
     detail_font = waves_font_origin(detail_font_size)
 
-    image = Image.new("RGBA", (600, 270), (255, 255, 255, 0))
+    image = Image.new("RGBA", (650, 270), (255, 255, 255, 0))
     image_draw = ImageDraw.Draw(image)
     image_draw.rounded_rectangle(
-        [20, 20, 580, 250], radius=20, fill=(0, 0, 0, int(0.3 * 255))
+        [20, 20, 630, 250], radius=20, fill=(0, 0, 0, int(0.3 * 255))
     )
     title = weapon_model.effectName
     desc = weapon_model.get_effect_detail()
 
     # 分行显示标题
     wrapped_title = textwrap.fill(title, width=10)
-    wrapped_desc = textwrap.fill(desc, width=40)
+    wrapped_desc = textwrap.fill(desc, width=44)
 
     # 获取每行的宽度，确保不会超过设定的 image_width
     lines_title = wrapped_title.split("\n")
@@ -178,7 +178,7 @@ async def parse_weapon_detail_content(weapon_model: WeaponModel, card_img):
 async def create_image(weapon_id, weapon_model: WeaponModel):
     weapon_image = Image.new("RGBA", (350, 400), (255, 255, 255, 0))
 
-    card_img = get_crop_waves_bg(950, 420, "bg5")
+    card_img = get_crop_waves_bg(1000, 420, "bg5")
     await parse_weapon_base_content(weapon_id, weapon_model, weapon_image, card_img)
     await parse_weapon_statistic_content(weapon_model, weapon_image)
     await parse_weapon_detail_content(weapon_model, card_img)

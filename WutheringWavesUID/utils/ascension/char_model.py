@@ -103,7 +103,9 @@ class WeaponModel(BaseModel):
         return rets
 
     def get_effect_detail(self):
-        return self.effect.format(*["(" + "/".join(i) + ")" for i in self.param])
+        return self.effect.format(
+            *["(" + "/".join(i) + ")" if len(set(i)) > 1 else i[0] for i in self.param]
+        )
 
     def get_ascensions_max_list(self):
         for i in ["5", "4", "3", "2"]:

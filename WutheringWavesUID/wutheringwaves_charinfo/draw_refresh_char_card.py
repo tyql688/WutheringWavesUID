@@ -25,6 +25,7 @@ from ..utils.image import (
     CHAIN_COLOR,
     GOLD,
     GREY,
+    RED,
     add_footer,
     draw_text_with_shadow,
     get_event_avatar,
@@ -34,7 +35,7 @@ from ..utils.image import (
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NAME_ALIAS
 from ..utils.waves_api import waves_api
-from ..wutheringwaves_config import PREFIX
+from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -46,12 +47,58 @@ refresh_roleShare_02 = Image.open(TEXT_PATH / "refresh_roleShare_02.png")
 refresh_roleShare_02 = refresh_roleShare_02.crop((560, 300, 2560, 650))
 refresh_roleShare_08 = Image.open(TEXT_PATH / "refresh_roleShare_08.png")
 refresh_roleShare_08 = refresh_roleShare_08.crop((200, 300, 2200, 650))
+refresh_roleShare_12 = Image.open(TEXT_PATH / "refresh_roleShare_12.png")
+refresh_roleShare_12 = refresh_roleShare_12.crop((0, 320, 2000, 670))
+refresh_roleShare_17 = Image.open(TEXT_PATH / "refresh_roleShare_17.png")
+refresh_roleShare_17 = refresh_roleShare_17.crop((200, 120, 2200, 470))
 
-refresh_role_list = [refresh_roleShare_02, refresh_roleShare_08]
+refresh_role_list = [
+    refresh_roleShare_02,
+    refresh_roleShare_08,
+    refresh_roleShare_17,
+    refresh_roleShare_12,
+]
 
 
 def get_refresh_role_img():
     return random.choice(refresh_role_list)
+
+
+async def send_notify(bot: Bot, ev: Event, user_id: str, uid: str, self_ck: bool):
+    RefreshNotify = WutheringWavesConfig.get_config("RefreshNotify").data
+    if not RefreshNotify:
+        return
+    at_sender = True if ev.group_id else False
+    if self_ck:
+        msg = [
+            "[鸣潮]",
+            ">当前暂无数据更新",
+            ">游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟，请耐心等待",
+            "",
+        ]
+    else:
+        cookie = await WavesUser.select_cookie(user_id, uid)
+        if cookie:
+            msg = [
+                "[鸣潮]",
+                ">您当前登录状态已失效",
+                f">使用命令【{PREFIX}登录】重新登录",
+                ">游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟，请耐心等待",
+                "",
+            ]
+        else:
+            msg = [
+                "[鸣潮]",
+                ">您当前为仅绑定鸣潮特征码且当前暂无数据更新",
+                ">游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟",
+                f">请确认库街区[鸣潮]数据更新后再进行【{PREFIX}刷新面板】",
+                "",
+                "自动同步（推荐）",
+                f">使用命令【{PREFIX}登录】后，直接同步库街区数据，不必手动确认",
+                "",
+            ]
+    if msg:
+        await bot.send("\n".join(msg), at_sender=at_sender)
 
 
 async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: str):
@@ -83,37 +130,13 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     role_len = len(role_detail_list)
     # 刷新个数
     role_update = len(waves_map["refresh_update"])
+    shadow_title = "刷新成功!"
+    shadow_color = GOLD
     if role_update == 0:
-        at_sender = True if ev.group_id else False
-        if self_ck:
-            msg = [
-                "[鸣潮]",
-                ">当前暂无数据更新",
-                ">游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟，请耐心等待",
-                "",
-            ]
-        else:
-            cookie = await WavesUser.select_cookie(user_id, uid)
-            if cookie:
-                msg = [
-                    "[鸣潮]",
-                    ">您当前登录状态已失效",
-                    f">使用命令【{PREFIX}登录】重新登录",
-                    ">游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟，请耐心等待",
-                    "",
-                ]
-            else:
-                msg = [
-                    "[鸣潮]",
-                    ">您当前为仅绑定鸣潮特征码且当前暂无数据更新",
-                    ">游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟",
-                    f">请确认库街区[鸣潮]数据更新后再进行【{PREFIX}刷新面板】",
-                    "",
-                    "自动同步（推荐）",
-                    f">使用命令【{PREFIX}登录】后，直接同步库街区数据，不必手动确认",
-                    "",
-                ]
-        await bot.send("\n".join(msg), at_sender=at_sender)
+        await send_notify(bot, ev, user_id, uid, self_ck)
+        shadow_title = "数据未更新"
+        shadow_color = RED
+
     role_high = role_len // 6 + (0 if role_len % 6 == 0 else 1)
     img = get_waves_bg(2000, 470 + 50 + role_high * 330, "bg3")
     img.alpha_composite(get_refresh_role_img(), (0, 0))
@@ -186,12 +209,12 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     refresh_bar_draw = ImageDraw.Draw(refresh_bar)
     draw_text_with_shadow(
         refresh_bar_draw,
-        "刷新成功!",
+        f"{shadow_title}",
         1010,
         40,
         waves_font_60,
-        shadow_color=GOLD,
-        offset=(1, 1),
+        shadow_color=shadow_color,
+        offset=(2, 2),
         anchor="mm",
     )
     img.paste(refresh_bar, (0, 300), refresh_bar)
