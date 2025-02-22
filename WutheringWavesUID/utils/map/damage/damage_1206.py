@@ -12,7 +12,7 @@ from ...damage.utils import (
     liberation_damage,
     skill_damage_calc,
 )
-from .buff import changli_buff, shouanren_buff
+from .buff import sanhua_buff, shouanren_buff
 from .damage import echo_damage, phase_damage, weapon_damage
 
 
@@ -188,8 +188,8 @@ def calc_damage_10(
     # 守岸人buff
     shouanren_buff(attr, 0, 1, isGroup)
 
-    # 长离buff
-    changli_buff(attr, 0, 1, isGroup)
+    # 散华buff
+    sanhua_buff(attr, 6, 1, isGroup)
 
     return calc_damage_1(attr, role, isGroup)
 
@@ -208,7 +208,7 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_2(attr, role),
     },
     {
-        "title": "0+1守/0长离/火焰归亡曲伤害",
+        "title": "0+1守/6散/火焰归亡曲伤害",
         "func": lambda attr, role: calc_damage_10(attr, role),
     },
 ]
