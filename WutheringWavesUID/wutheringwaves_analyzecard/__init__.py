@@ -18,7 +18,8 @@ sv_discord_bot_card_analyze = SV(f"discord_bot卡片分析")
         f"dc卡片",
         f"识别卡片",
         f"分析",
-    )
+    ),
+    block=True
 )
 async def analyze_card(bot: Bot, ev: Event):
     """
