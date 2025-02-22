@@ -1,7 +1,10 @@
-
+import json
 from pathlib import Path
+from ..utils.resource.constant import SONATA_FIRST_ID
+
 PLUGIN_PATH =  Path(__file__).parent.parent
-FETTERDETAIL_PATH = MAIN_PATH / "utils/map/detail_json/sonata"
+FETTERDETAIL_PATH = PLUGIN_PATH / "utils/map/detail_json/sonata"
+
 
 DETAIL = {
     "今汐": {
@@ -134,14 +137,16 @@ DETAIL = {
     }
 }
 
-async def get_fetterDetail_from_sonata(char_name):
+async def get_fetterDetail_from_sonata(char_name) -> tuple[str, dict]:
     
     path = FETTERDETAIL_PATH / f"{DETAIL[char_name]['fetterDetail']}.json"
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
+    first_echo_id = SONATA_FIRST_ID[data["name"]][0]
+
     echo = {
-        "cost": 0,
+        "cost": 1,
         "level": 25,
         "quality": 5,
         "fetterDetail": {
@@ -153,7 +158,7 @@ async def get_fetterDetail_from_sonata(char_name):
             "secondDescription": data["set"]["5"]["desc"]
         },
         "phantomProp": {
-            "cost": 0,
+            "cost": 1,
             "iconUrl": "",
             "name": data["name"],
             "phantomId": 391070105,
@@ -162,4 +167,4 @@ async def get_fetterDetail_from_sonata(char_name):
             "skillDescription": "龟"
         }
     }
-    return echo
+    return first_echo_id, echo

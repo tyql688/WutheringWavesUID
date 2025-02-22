@@ -4,7 +4,7 @@ from gsuid_core.sv import SL, SV
 from gsuid_core.models import Event
 from gsuid_core.logger import logger
 
-from .cardOCR import async_ocr, get_image, upload_discord_bot_card
+from .cardOCR import async_ocr
 
  # 假设这是处理图片的函数
 
@@ -32,5 +32,5 @@ async def analyze_card(bot: Bot, ev: Event):
         f'[鸣潮] 请发送dc官方bot生成的卡片图\n(分辨率尽可能为1920*1080，过低可能导致识别置信率降低)',
     )
     if resp is not None:
-        await bot.send(f'[鸣潮]正在处理，该过程将会占用1-2分钟，请稍等...')
+        await bot.send(f'[鸣潮]正在处理，该过程将会占用30秒到1分钟，请稍等...')
         await async_ocr(bot, resp)

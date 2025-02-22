@@ -1,27 +1,42 @@
-import json
-from typing import Any, Dict, Union, Generator
-
-import aiofiles
+import copy
+from typing import Dict
 from itertools import zip_longest
 
+from gsuid_core.bot import Bot
+from gsuid_core.models import Event
 from gsuid_core.logger import logger
 
 from ..wutheringwaves_charinfo.draw_char_card import generate_online_role_detail
-from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from ..utils.api.model import RoleDetailData
+from ..utils.refresh_char_detail import save_card_info
+from ..utils.name_convert import (
+    alias_to_char_name,
+    char_name_to_char_id,
+    weapon_name_to_weapon_id
+)
+from ..wutheringwaves_config import PREFIX
 from .char_fetterDetail import get_fetterDetail_from_sonata
-from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 
 
-async def save_card_dict_to_json(result_dict):
+async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
+
+    at_sender = True if ev.group_id else False
+
+    uid = result_dict["用户信息"]["UID"]
     
     char = result_dict["角色信息"]["角色名"]
     char_name = alias_to_char_name(char)
     char_id = char_name_to_char_id(char_name)
 
+    if char_id is None:
+        await bot.send(f"[鸣潮]识别结果为角色'{char_name}'不存在")
+        logger.debug(f" [鸣潮][dc卡片识别] 用户{uid}的{char_name}识别错误！")
+
+
+    weapon_id = weapon_name_to_weapon_id(result_dict["武器信息"]["武器名"])
+
     # char_id = "1506" # 菲比..utils\map\detail_json\char\1506.json
     result = await generate_online_role_detail(char_id)
-    
+    waves_data = []
     data = {}
 
     # 处理 `chainList` 的数据
@@ -36,7 +51,7 @@ async def save_card_dict_to_json(result_dict):
         })
         
     # 处理 `level` 的数据
-    data["level"] : result_dict["角色信息"]["等级"]
+    data["level"] = result_dict["角色信息"]["等级"]
         
     # 处理 `phantomData` 的数据
     if result.phantomData is not None:
@@ -45,10 +60,15 @@ async def save_card_dict_to_json(result_dict):
             "cost": 12,
             "equipPhantomList": []
         }
-        ECHO = await get_fetterDetail_from_sonata(char_name)
+        first_echo_id, ECHO = await get_fetterDetail_from_sonata(char_name)
+        get_first_echo = True 
         for echo_value in result_dict["装备数据"]:
             # 创建 ECHO 的独立副本
             echo = copy.deepcopy(ECHO)
+            # 替换第一声骸位为对应套装4C
+            if get_first_echo:
+                echo["phantomProp"]["phantomId"] = first_echo_id
+                get_first_echo = False
 
             # 更新 echo 的 mainProps 和 subProps, 防止空表
             echo["mainProps"] = echo_value.get("mainProps", [])
@@ -64,7 +84,7 @@ async def save_card_dict_to_json(result_dict):
             "acronym": role.acronym,
             "attributeId": role.attributeId,
             "attributeName": role.attributeName,
-            "breach": role.breach,
+            "breach": get_breach(result_dict["角色信息"]["等级"]),
             "isMainRole": False,  # 假设需要一个主角色标识（用户没有提供，可以设置默认值或动态获取）
             "level": result_dict["角色信息"]["等级"],
             "roleIconUrl": role.roleIconUrl,
@@ -108,31 +128,37 @@ async def save_card_dict_to_json(result_dict):
                 "weaponType": weapon_data.weapon.weaponType
             }
         }
+        if weapon_id is not None:
+            data["weaponData"]["level"] = result_dict["武器信息"]["等级"]
+            data["weaponData"]["breach"] = get_breach(result_dict["武器信息"]["等级"])
+            data["weaponData"]["weapon"]["weaponName"] = result_dict["武器信息"]["武器名"]
+            data["weaponData"]["weapon"]["weaponId"] = weapon_id
 
-    # 将字典转换为 JSON 字符串
-    print(json.dumps(data, indent=2, ensure_ascii=False))
+            # weapon_detail: WavesWeaponResult = get_weapon_detail(
+            #     weapon_id, result_dict["武器信息"]["等级"]
+            # )
+            # print(weapon_detail)
 
+    waves_data.append(data)
+    await save_card_info(uid, waves_data)
+    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n请使用'{PREFIX}绑定{uid}'绑定您的角色\n可使用'{PREFIX}{char_name}面板'查看您的角色面板", at_sender)
+    logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name}面板数据已保存到本地！")
 
-
-async def get_all_role_detail_info_list(
-    uid: str,
-) -> Union[Generator[RoleDetailData, Any, None], None]:
-    path = PLAYER_PATH / uid / "rawData.json"
-    if not path.exists():
-        return None
-    try:
-        async with aiofiles.open(path, mode="r", encoding="utf-8") as f:
-            player_data = json.loads(await f.read())
-    except Exception as e:
-        logger.exception(f"get role detail info failed {path}:", e)
-        path.unlink(missing_ok=True)
-        return None
-
-    return iter(RoleDetailData(**r) for r in player_data)
-
-
-async def get_all_role_detail_info(uid: str) -> Union[Dict[str, RoleDetailData], None]:
-    _all = await get_all_role_detail_info_list(uid)
-    if not _all:
-        return None
-    return {r.role.roleName: r for r in _all}
+def get_breach(level: int):
+    if level <= 20:
+        breach = 0
+    elif level <= 40:
+        breach = 1
+    elif level <= 50:
+        breach = 2
+    elif level <= 60:
+        breach = 3
+    elif level <= 70:
+        breach = 4
+    elif level <= 80:
+        breach = 5
+    elif level <= 90:
+        breach = 6
+    else:
+        breach = 0
+    return breach
