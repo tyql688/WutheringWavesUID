@@ -1,25 +1,16 @@
-
 from gsuid_core.bot import Bot
-from gsuid_core.sv import SL, SV
+from gsuid_core.sv import SV
 from gsuid_core.models import Event
 from gsuid_core.logger import logger
 
 from .cardOCR import async_ocr
 
- # 假设这是处理图片的函数
 
-sv_discord_bot_card_analyze = SV(f"discord_bot卡片分析")
+sv_discord_bot_card_analyze = SV(f"waves分析discord_bot卡片")
 
 
 @sv_discord_bot_card_analyze.on_fullmatch(
-    (
-        f"分析卡片",
-        f"卡片分析",
-        f"dc卡片",
-        f"识别卡片",
-        f"分析",
-    ),
-    block=True
+    ("分析卡片", "卡片分析", "dc卡片", "识别卡片", "分析")
 )
 async def analyze_card(bot: Bot, ev: Event):
     """
