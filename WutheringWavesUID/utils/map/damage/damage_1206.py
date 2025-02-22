@@ -17,7 +17,10 @@ from .damage import echo_damage, phase_damage, weapon_damage
 
 
 def calc_damage_1(
-    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+    attr: DamageAttribute,
+    role: RoleDetailData,
+    isGroup: bool = False,
+    is_single: bool = False,
 ) -> tuple[str, str]:
     # 设置角色伤害类型
     attr.set_char_damage(attack_damage)
@@ -35,6 +38,8 @@ def calc_damage_1(
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
     )
+    if is_single:
+        skill_multi = skill_multi.split("+")[-1]
     title = "火焰归亡曲"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
@@ -55,11 +60,17 @@ def calc_damage_1(
 
     # 设置角色技能施放是不是也有加成 eg：守岸人
     if attr.energy_regen > 1.5:
-        title = f"{role_name}-戏中人生"
-        atk_flat = int((attr.energy_regen - 1.5) * 1200)
-        msg = f"每超1%为12点攻击提升，上限为1560，当前提升{atk_flat}"
-        if atk_flat > 1560:
-            atk_flat = 1560
+        # title = f"{role_name}-戏中人生"
+        # atk_flat = int((attr.energy_regen - 1.5) * 1200)
+        # msg = f"每超1%为12点攻击提升，上限为1560，当前提升{atk_flat}"
+        # if atk_flat > 1560:
+        #     atk_flat = 1560
+        # attr.add_atk_flat(atk_flat, title, msg)
+        title = f"{role_name}-「我」的人生"
+        atk_flat = int((attr.energy_regen - 1.5) * 2000)
+        msg = f"每超1%为20点攻击提升，上限为2600，当前提升{atk_flat}"
+        if atk_flat > 2600:
+            atk_flat = 2600
         attr.add_atk_flat(atk_flat, title, msg)
 
     # 设置声骸属性
@@ -184,6 +195,10 @@ def calc_damage_10(
 
 
 damage_detail = [
+    {
+        "title": "火焰归亡曲尾刀",
+        "func": lambda attr, role: calc_damage_1(attr, role, is_single=True),
+    },
     {
         "title": "火焰归亡曲伤害",
         "func": lambda attr, role: calc_damage_1(attr, role),
