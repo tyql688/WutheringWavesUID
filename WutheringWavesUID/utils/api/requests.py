@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import json as j
 import random
@@ -594,42 +595,49 @@ class WavesApi:
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[FormData, Dict[str, Any]]] = None,
+        max_retries: int = 3,
+        retry_delay: float = 1.0,
     ) -> Union[Dict, int]:
         if header is None:
             header = await get_headers()
 
-        try:
-            async with ClientSession(
-                connector=TCPConnector(verify_ssl=self.ssl_verify)
-            ) as client:
-                async with client.request(
-                    method,
-                    url=url,
-                    headers=header,
-                    params=params,
-                    json=json,
-                    data=data,
-                ) as resp:
-                    try:
-                        raw_data = await resp.json()
-                    except ContentTypeError:
-                        _raw_data = await resp.text()
-                        raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                    if (
-                        isinstance(raw_data, dict)
-                        and "data" in raw_data
-                        and isinstance(raw_data["data"], str)
-                    ):
+        for attempt in range(max_retries):
+            try:
+                async with ClientSession(
+                    connector=TCPConnector(verify_ssl=self.ssl_verify)
+                ) as client:
+                    async with client.request(
+                        method,
+                        url=url,
+                        headers=header,
+                        params=params,
+                        json=json,
+                        data=data,
+                        timeout=ClientTimeout(total=10),
+                    ) as resp:
                         try:
-                            des_data = j.loads(raw_data["data"])
-                            raw_data["data"] = des_data
-                        except Exception:
-                            pass
-                    logger.debug(f"url:[{url}] raw_data:{raw_data}")
-                    return raw_data
-        except Exception as e:
-            logger.exception(f"url:[{url}]", e)
-            return {}
+                            raw_data = await resp.json()
+                        except ContentTypeError:
+                            _raw_data = await resp.text()
+                            raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
+                        if (
+                            isinstance(raw_data, dict)
+                            and "data" in raw_data
+                            and isinstance(raw_data["data"], str)
+                        ):
+                            try:
+                                des_data = j.loads(raw_data["data"])
+                                raw_data["data"] = des_data
+                            except Exception:
+                                pass
+                        logger.debug(f"url:[{url}] raw_data:{raw_data}")
+                        return raw_data
+            except Exception as e:
+                logger.exception(f"url:[{url}] attempt {attempt + 1} failed", e)
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(retry_delay)
+
+        return {"code": WAVES_CODE_999, "data": "请求服务器失败"}
 
 
 class KuroLogin:
@@ -648,33 +656,39 @@ class KuroLogin:
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[FormData, Dict[str, Any]]] = None,
+        max_retries: int = 3,
+        retry_delay: float = 1.0,
     ) -> Union[Dict, int]:
         if header is None:
             header = await get_headers()
 
-        try:
-            async with ClientSession(
-                connector=TCPConnector(verify_ssl=self.ssl_verify)
-            ) as client:
-                async with client.request(
-                    method,
-                    url=url,
-                    headers=header,
-                    params=params,
-                    json=json,
-                    data=data,
-                    timeout=ClientTimeout(total=300),
-                ) as resp:
-                    try:
-                        raw_data = await resp.json()
-                    except ContentTypeError:
-                        _raw_data = await resp.text()
-                        raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                    logger.debug(f"url:{url} raw_data:{raw_data}")
-                    return raw_data
-        except Exception as e:
-            logger.exception(f"url:[{url}]", e)
-            return {}
+        for attempt in range(max_retries):
+            try:
+                async with ClientSession(
+                    connector=TCPConnector(verify_ssl=self.ssl_verify)
+                ) as client:
+                    async with client.request(
+                        method,
+                        url=url,
+                        headers=header,
+                        params=params,
+                        json=json,
+                        data=data,
+                        timeout=ClientTimeout(total=10),
+                    ) as resp:
+                        try:
+                            raw_data = await resp.json()
+                        except ContentTypeError:
+                            _raw_data = await resp.text()
+                            raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
+                        logger.debug(f"url:{url} raw_data:{raw_data}")
+                        return raw_data
+            except Exception as e:
+                logger.exception(f"url:[{url}] attempt {attempt + 1} failed", e)
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(retry_delay)
+
+        return {"code": WAVES_CODE_999, "data": "请求服务器失败"}
 
 
 class Wiki:
