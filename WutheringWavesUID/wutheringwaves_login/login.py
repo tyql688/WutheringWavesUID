@@ -36,7 +36,7 @@ game_title = "[鸣潮]"
 msg_error = "[鸣潮] 登录失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据\n"
 
 
-async def get_url() -> (str, bool):
+async def get_url() -> tuple[str, bool]:
     url = WutheringWavesConfig.get_config("WavesLoginUrl").data
     if url:
         if not url.startswith("http"):
@@ -136,7 +136,6 @@ async def page_login_local(bot: Bot, ev: Event, url):
 
 
 async def page_login_other(bot: Bot, ev: Event, url):
-    game_title = "[鸣潮]"
     at_sender = True if ev.group_id else False
     user_token = get_token(ev.user_id)
 
@@ -229,9 +228,7 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
         or result.get("code") != 200
         or result.get("data") is None
     ):
-        return await bot.send(
-            result.get("msg", f"{game_title} 验证码登录失败\n", at_sender=at_sender)
-        )
+        return await bot.send(f"{game_title} 登录失败\n", at_sender=at_sender)
     token = result.get("data", {}).get("token", "")
     waves_user = await add_cookie(ev, token)
     if waves_user:

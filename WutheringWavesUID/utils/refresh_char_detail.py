@@ -1,21 +1,22 @@
 import asyncio
 import json
-from typing import List, Union, Dict
+from typing import Dict, List, Optional, Union
 
 import aiofiles
 
 from gsuid_core.logger import logger
-from . import waves_card_cache
-from .resource.constant import SPECIAL_CHAR_INT
+
 from ..utils.api.model import RoleList
-from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_101
+from ..utils.error_reply import WAVES_CODE_101, WAVES_CODE_102, WAVES_CODE_999
 from ..utils.hint import error_reply
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
+from . import waves_card_cache
+from .resource.constant import SPECIAL_CHAR_INT
 
 
 async def save_card_info(
-    uid: str, waves_data: List, waves_map: Dict = None, user_id=""
+    uid: str, waves_data: List, waves_map: Optional[Dict] = None, user_id: str = ""
 ):
     if len(waves_data) == 0:
         return
@@ -72,27 +73,46 @@ async def save_card_info(
 
 
 async def refresh_char(
-    uid: str, user_id, ck: str = "", waves_map: Dict = None
+    uid: str,
+    user_id: str,
+    ck: Optional[str] = None,  # type: ignore
+    waves_map: Optional[Dict] = None,
 ) -> Union[str, List]:
     waves_datas = []
     if not ck:
-        ck = await waves_api.get_ck(uid, user_id)
+        ck: Optional[str] = await waves_api.get_ck(uid, user_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 共鸣者信息
     succ, role_info = await waves_api.get_role_info(uid, ck)
     if not succ:
-        return role_info
+        if isinstance(role_info, str):
+            return role_info
+        else:
+            return error_reply(WAVES_CODE_999)
+
     try:
-        role_info = RoleList(**role_info)
+        role_info = RoleList.model_validate(role_info)
     except Exception as e:
         logger.exception(f"{uid} 角色信息解析失败", e)
         msg = f"鸣潮特征码[{uid}]获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据"
         return msg
 
     # 改为异步处理
+    # tasks = [
+    #     waves_api.get_role_detail_info(str(r.roleId), uid, ck)
+    #     for r in role_info.roleList
+    # ]
+    # results = await asyncio.gather(*tasks)
+
+    semaphore = asyncio.Semaphore(value=len(role_info.roleList))
+
+    async def limited_get_role_detail_info(role_id, uid, ck):
+        async with semaphore:
+            return await waves_api.get_role_detail_info(role_id, uid, ck)
+
     tasks = [
-        waves_api.get_role_detail_info(r.roleId, uid, ck) for r in role_info.roleList
+        limited_get_role_detail_info(str(r.roleId), uid, ck) for r in role_info.roleList
     ]
     results = await asyncio.gather(*tasks)
 
@@ -100,6 +120,7 @@ async def refresh_char(
     for succ, role_detail_info in results:
         if (
             not succ
+            or not isinstance(role_detail_info, dict)
             or "role" not in role_detail_info
             or role_detail_info["role"] is None
             or "level" not in role_detail_info
