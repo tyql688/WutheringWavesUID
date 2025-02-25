@@ -10,7 +10,7 @@ sv_discord_bot_card_analyze = SV(f"waves分析discord_bot卡片")
 
 
 @sv_discord_bot_card_analyze.on_fullmatch(
-    ("分析卡片", "卡片分析", "dc卡片", "识别卡片", "分析")
+    ("分析卡片", "卡片分析", "dc卡片", "识别卡片", "分析"), block=True
 )
 async def analyze_card(bot: Bot, ev: Event):
     """
