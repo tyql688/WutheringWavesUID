@@ -156,14 +156,6 @@ damage_bar1 = Image.open(TEXT_PATH / "damage_bar1.png")
 damage_bar2 = Image.open(TEXT_PATH / "damage_bar2.png")
 
 
-def is_limit_user(uid):
-    """
-    uid == 1 : [返回值:1] 极限面板
-    uid > 200000000 ：[返回值:2] 国际服用户(可绑定后使用本地rawData数据查询面板，不支持刷新面板)
-    """
-    if waves_api.is_net(uid):
-        return 2
-    return uid == "1"
 
 
 def parse_text_and_number(text):
@@ -623,22 +615,23 @@ async def draw_char_detail_img(
         uid = waves_id
 
     if not is_limit_query:
-        succ, account_info = await waves_api.get_base_info(uid, ck)
-        if not succ:
-            return account_info
-        account_info = AccountBaseInfo.model_validate(account_info)
-        force_resource_id = None
-    elif is_limit_user(uid) == 2:
-        account_info = AccountBaseInfo.model_validate(
-            {
-                "name": "国际服用户",
-                "id": uid,
-                "level": 0,
-                "worldLevel": 0,
-                "creatTime": 1739375719,
-            }
-        )
-        force_resource_id = None
+        if not waves_api.is_net(uid):
+            succ, account_info = await waves_api.get_base_info(uid, ck)
+            if not succ:
+                return account_info
+            account_info = AccountBaseInfo.model_validate(account_info)
+            force_resource_id = None
+        else:
+            account_info = AccountBaseInfo.model_validate(
+                {
+                    "name": "国际服用户",
+                    "id": uid,
+                    "level": 0,
+                    "worldLevel": 0,
+                    "creatTime": 1739375719,
+                }
+            )
+            force_resource_id = None
     else:
         account_info = AccountBaseInfo.model_validate(
             {
