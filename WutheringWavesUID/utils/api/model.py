@@ -569,9 +569,9 @@ class Strategy(BaseModel):
 class RoleCostDetail(BaseModel):
     """角色培养详情"""
 
-    allCost: List[CultivateCost]
-    missingCost: List[CultivateCost]
-    synthetic: List[CultivateCost]
+    allCost: Optional[List[CultivateCost]] = None
+    missingCost: Optional[List[CultivateCost]] = None
+    synthetic: Optional[List[CultivateCost]] = None
     missingRoleCost: Optional[List[CultivateCost]] = None
     missingSkillCost: Optional[List[CultivateCost]] = None
     missingWeaponCost: Optional[List[CultivateCost]] = None
