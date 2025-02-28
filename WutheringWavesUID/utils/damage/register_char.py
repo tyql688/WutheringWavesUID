@@ -220,16 +220,6 @@ class Char_1206(CharAbstract):
             msg = "下一位登场角色共鸣解放伤害加深25%"
             attr.add_dmg_deepen(0.25, title, msg)
 
-        if attr.char_template == temp_atk:
-            title = "布兰特-合鸣效果-轻云出月"
-            msg = "使用延奏技能后，下一个登场的共鸣者攻击提升22.5%"
-            attr.add_atk_percent(0.225, title, msg)
-
-        # 无常凶鹭
-        title = "布兰特-声骸技能-无常凶鹭"
-        msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
-        attr.add_dmg_bonus(0.12, title, msg)
-
 
 class Char_1301(CharAbstract):
     id = 1301
