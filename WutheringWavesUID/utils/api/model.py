@@ -569,12 +569,12 @@ class Strategy(BaseModel):
 class RoleCostDetail(BaseModel):
     """角色培养详情"""
 
-    allCost: List[CultivateCost]
-    missingCost: List[CultivateCost]
-    synthetic: List[CultivateCost]
-    missingRoleCost: List[CultivateCost]
-    missingSkillCost: List[CultivateCost]
-    missingWeaponCost: List[CultivateCost]
+    allCost: Optional[List[CultivateCost]] = None
+    missingCost: Optional[List[CultivateCost]] = None
+    synthetic: Optional[List[CultivateCost]] = None
+    missingRoleCost: Optional[List[CultivateCost]] = None
+    missingSkillCost: Optional[List[CultivateCost]] = None
+    missingWeaponCost: Optional[List[CultivateCost]] = None
     roleId: int
     weaponId: int
     strategyList: Optional[List[Strategy]] = None
@@ -586,7 +586,5 @@ class BatchRoleCostResponse(BaseModel):
 
     roleNum: int  # 角色数量
     weaponNum: int  # 武器数量
-    preview: Dict[
-        str, List[CultivateCost]
-    ]  # 预览数据，包含 allCost/missingCost/synthetic/missingRoleCost/missingSkillCost/missingWeaponCost
+    # preview: Dict[str, Optional[List[CultivateCost]]]
     costList: List[RoleCostDetail]  # 每个角色的详细花费
