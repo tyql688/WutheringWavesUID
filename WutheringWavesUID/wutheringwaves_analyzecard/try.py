@@ -9,39 +9,41 @@ SRC_PATH = Path(__file__).parent / "src"
 CARD_PATH = Path(__file__).parent / "src/card.jpg"
 CARD_NAME = "card.jpg"
 
-async def cut_card_ocr():
-    """
-    裁切卡片：角色，技能树*5，声骸*5，武器
-        （按比例适配任意分辨率，1920*1080识别效果优良）
-    """
-    # 原始参考分辨率
-    REF_WIDTH = 1072
-    REF_HEIGHT = 602
+# 原始dc卡片参考分辨率，from example_card_2.png
+REF_WIDTH = 1072
+REF_HEIGHT = 602
     
-    # 裁切区域比例（左、上、右、下），数字来自src/example_card_2.png
-    # 技能树扫描顺序：普攻、共鸣技能、共鸣解放、变奏技能、共鸣回路(json_skillList顺序)
-    crop_ratios = [
-        (  0/REF_WIDTH,   0/REF_HEIGHT, 420/REF_WIDTH, 350/REF_HEIGHT), # 角色
-        (583/REF_WIDTH,  30/REF_HEIGHT, 653/REF_WIDTH, 130/REF_HEIGHT), # 普攻
-        (456/REF_WIDTH, 115/REF_HEIGHT, 526/REF_WIDTH, 215/REF_HEIGHT), # 共鸣技能
-        (694/REF_WIDTH, 115/REF_HEIGHT, 764/REF_WIDTH, 215/REF_HEIGHT), # 共鸣解放
-        (650/REF_WIDTH, 250/REF_HEIGHT, 720/REF_WIDTH, 350/REF_HEIGHT), # 变奏技能
-        (501/REF_WIDTH, 250/REF_HEIGHT, 571/REF_WIDTH, 350/REF_HEIGHT), # 共鸣回路
-        ( 10/REF_WIDTH, 360/REF_HEIGHT, 214/REF_WIDTH, 590/REF_HEIGHT), # 声骸1
-        (221/REF_WIDTH, 360/REF_HEIGHT, 425/REF_WIDTH, 590/REF_HEIGHT), # 声骸2
-        (430/REF_WIDTH, 360/REF_HEIGHT, 634/REF_WIDTH, 590/REF_HEIGHT), # 声骸3
-        (639/REF_WIDTH, 360/REF_HEIGHT, 843/REF_WIDTH, 590/REF_HEIGHT), # 声骸4
-        (848/REF_WIDTH, 360/REF_HEIGHT, 1052/REF_WIDTH, 590/REF_HEIGHT), # 声骸5
-        (800/REF_WIDTH, 240/REF_HEIGHT, 1020/REF_WIDTH, 350/REF_HEIGHT), # 武器
-    ]
+# 裁切区域比例（左、上、右、下），数字来自src/example_card_2.png
+# 技能树扫描顺序：普攻、共鸣技能、共鸣解放、变奏技能、共鸣回路(json_skillList顺序)
+crop_ratios = [
+    (  0/REF_WIDTH,   0/REF_HEIGHT, 420/REF_WIDTH, 350/REF_HEIGHT), # 角色
+    (583/REF_WIDTH,  30/REF_HEIGHT, 653/REF_WIDTH, 130/REF_HEIGHT), # 普攻
+    (456/REF_WIDTH, 115/REF_HEIGHT, 526/REF_WIDTH, 215/REF_HEIGHT), # 共鸣技能
+    (694/REF_WIDTH, 115/REF_HEIGHT, 764/REF_WIDTH, 215/REF_HEIGHT), # 共鸣解放
+    (650/REF_WIDTH, 250/REF_HEIGHT, 720/REF_WIDTH, 350/REF_HEIGHT), # 变奏技能
+    (501/REF_WIDTH, 250/REF_HEIGHT, 571/REF_WIDTH, 350/REF_HEIGHT), # 共鸣回路
+    ( 10/REF_WIDTH, 360/REF_HEIGHT, 214/REF_WIDTH, 590/REF_HEIGHT), # 声骸1
+    (221/REF_WIDTH, 360/REF_HEIGHT, 425/REF_WIDTH, 590/REF_HEIGHT), # 声骸2
+    (430/REF_WIDTH, 360/REF_HEIGHT, 634/REF_WIDTH, 590/REF_HEIGHT), # 声骸3
+    (639/REF_WIDTH, 360/REF_HEIGHT, 843/REF_WIDTH, 590/REF_HEIGHT), # 声骸4
+    (848/REF_WIDTH, 360/REF_HEIGHT, 1052/REF_WIDTH, 590/REF_HEIGHT), # 声骸5
+    (800/REF_WIDTH, 240/REF_HEIGHT, 1020/REF_WIDTH, 350/REF_HEIGHT), # 武器
+]
 
-    # 打开图片
-    image = Image.open(CARD_PATH).convert('RGB')
-    img_width, img_height = image.size  # 获取实际分辨率
-    
+# 原始声骸裁切区域参考分辨率，from crop_ratios
+ECHO_WIDTH = 204
+ECHO_HEIGHT = 230
+
+echo_crop_ratios = [
+    (110/ECHO_WIDTH,  40/ECHO_HEIGHT, 204/ECHO_WIDTH,  85/ECHO_HEIGHT), # 右上角主词条(忽略声骸cost，暂不处理)
+    ( 26/ECHO_WIDTH, 105/ECHO_HEIGHT, 204/ECHO_WIDTH, 230/ECHO_HEIGHT), # 下部6条副词条
+]
+
+
+def cut_image(image, img_width, img_height, crop_ratios):
     # 裁切图片
     cropped_images = []
-    for i, ratio in enumerate(crop_ratios):
+    for ratio in crop_ratios:
         # 根据相对比例计算实际裁切坐标
         left = ratio[0] * img_width
         top = ratio[1] * img_height
@@ -57,7 +59,50 @@ async def cut_card_ocr():
         # 执行裁切
         cropped_image = image.crop((left, top, right, bottom))
         cropped_images.append(cropped_image)
-        
+
+    return cropped_images
+
+def cut_echo_data_ocr(image_echo):
+    """
+    裁切声骸卡片拼接词条数据: 右上角主词条与余下6条副词条
+    目的: 优化ocrspace 模型2识别
+    """
+    img_width, img_height = image_echo.size
+    
+    # 获取裁切后的子图列表
+    cropped_images = cut_image(image_echo, img_width, img_height, echo_crop_ratios)
+
+    # 计算拼接后图片的总高度和最大宽度
+    total_height = sum(img.height for img in cropped_images)
+    max_width = max(img.width for img in cropped_images) if cropped_images else 0
+
+    # 创建新画布并逐个粘贴子图
+    image_echo_only_data = Image.new('RGB', (max_width, total_height))
+    y_offset = 0
+    for img in cropped_images:
+        image_echo_only_data.paste(img, (0, y_offset))
+        y_offset += img.height  # 累加y轴偏移量
+
+    return image_echo_only_data
+
+async def cut_card_ocr():
+    """
+    裁切卡片：角色，技能树*5，声骸*5，武器
+        （按比例适配任意分辨率，1920*1080识别效果优良）
+    """
+
+    # 打开图片
+    image = Image.open(CARD_PATH).convert('RGB')
+    img_width, img_height = image.size  # 获取实际分辨率
+    
+    cropped_images = cut_image(image, img_width, img_height, crop_ratios)
+
+    # 进一步裁剪拼接声骸图
+    for i in range(6, 11):  # 替换索引6-10，即5张声骸图
+        image_echo = cropped_images[i]
+        cropped_images[i] = cut_echo_data_ocr(image_echo) 
+
+    for i, cropped_image in enumerate(cropped_images):
         # 保存裁切后的图片
         cropped_image.save(f"{SRC_PATH}/_{i}.png")
     
