@@ -1,16 +1,16 @@
 
 # 标准库
-from pathlib import Path
-import asyncio
-import ssl
 import re
 import os
-
-# 第三方库
+import ssl
 import httpx
-import easyocr
+import base64
+import aiohttp
+import asyncio
 import numpy as np
 from PIL import Image
+from io import BytesIO
+from pathlib import Path
 from opencc import OpenCC
 
 # 项目内部模块
@@ -26,7 +26,9 @@ SRC_PATH = Path(__file__).parent / "src"
 CARD_PATH = Path(__file__).parent / "src/card.jpg"
 CARD_NAME = "card.jpg"
 
-# 原始参考分辨率
+API_KEY = 'K84320745188957'  # 请替换为你的API密钥
+
+# 原始dc卡片参考分辨率，from example_card_2.png
 REF_WIDTH = 1072
 REF_HEIGHT = 602
     
@@ -47,6 +49,15 @@ crop_ratios = [
     (800/REF_WIDTH, 240/REF_HEIGHT, 1020/REF_WIDTH, 350/REF_HEIGHT), # 武器
 ]
 
+# 原始声骸裁切区域参考分辨率，from crop_ratios
+ECHO_WIDTH = 204
+ECHO_HEIGHT = 230
+
+echo_crop_ratios = [
+    (110/ECHO_WIDTH,  40/ECHO_HEIGHT, 204/ECHO_WIDTH,  85/ECHO_HEIGHT), # 右上角主词条(忽略声骸cost，暂不处理)
+    ( 26/ECHO_WIDTH, 105/ECHO_HEIGHT, 204/ECHO_WIDTH, 230/ECHO_HEIGHT), # 下部6条副词条
+]
+
 async def async_ocr(bot: Bot, ev: Event):
     """
     异步OCR识别函数
@@ -55,7 +66,8 @@ async def async_ocr(bot: Bot, ev: Event):
         await bot.send(f"[鸣潮]卡片分析已停止。")
         return False
     # 获取dc卡片识别结果
-    bool, final_result = await cut_card_ocr()
+    bool, final_result = await cut_card_to_ocr()
+
     if bool:
         await save_card_dict_to_json(bot, ev, final_result)
     else:
@@ -121,19 +133,10 @@ async def upload_discord_bot_card(bot: Bot, ev: Event):
         await bot.send(f"[鸣潮]上传卡片图失败！\n", at_sender)
         return False
 
-async def cut_card_ocr():
-    """
-    裁切卡片：角色，技能树*5，声骸*5，武器
-        （按比例适配任意分辨率，1920*1080识别效果优良）
-    """
-
-    # 打开图片
-    image = Image.open(CARD_PATH).convert('RGB')
-    img_width, img_height = image.size  # 获取实际分辨率
-    
+def cut_image(image, img_width, img_height, crop_ratios):
     # 裁切图片
     cropped_images = []
-    for i, ratio in enumerate(crop_ratios):
+    for ratio in crop_ratios:
         # 根据相对比例计算实际裁切坐标
         left = ratio[0] * img_width
         top = ratio[1] * img_height
@@ -149,43 +152,154 @@ async def cut_card_ocr():
         # 执行裁切
         cropped_image = image.crop((left, top, right, bottom))
         cropped_images.append(cropped_image)
-        
+
+    return cropped_images
+
+def cut_echo_data(image_echo):
+    """
+    裁切声骸卡片拼接词条数据: 右上角主词条与余下6条副词条
+    目的: 优化ocrspace 模型2识别
+    """
+    img_width, img_height = image_echo.size
+    
+    # 获取裁切后的子图列表
+    cropped_images = cut_image(image_echo, img_width, img_height, echo_crop_ratios)
+
+    # 计算拼接后图片的总高度和最大宽度
+    total_height = sum(img.height for img in cropped_images)
+    max_width = max(img.width for img in cropped_images) if cropped_images else 0
+
+    # 创建新画布并逐个粘贴子图
+    image_echo_only_data = Image.new('RGB', (max_width, total_height))
+    y_offset = 0
+    for img in cropped_images:
+        image_echo_only_data.paste(img, (0, y_offset))
+        y_offset += img.height  # 累加y轴偏移量
+
+    return image_echo_only_data
+
+async def cut_card_to_ocr():
+    """
+    裁切卡片：角色，技能树*5，声骸*5，武器
+        （按比例适配任意分辨率，1920*1080识别效果优良）
+    """
+
+    # 打开图片
+    image = Image.open(CARD_PATH).convert('RGB')
+    img_width, img_height = image.size  # 获取实际分辨率
+    
+    cropped_images = cut_image(image, img_width, img_height, crop_ratios)
+
+    # 进一步裁剪拼接声骸图
+    for i in range(6, 11):  # 替换索引6-10，即5张声骸图
+        image_echo = cropped_images[i]
+        cropped_images[i] = cut_echo_data(image_echo) 
+
+    for i, cropped_image in enumerate(cropped_images):
         # 保存裁切后的图片
         cropped_image.save(f"{SRC_PATH}/_{i}.png")
     
     os.remove(CARD_PATH) # 删除原图片
 
-    async def card_part_ocr():
-        """
-        识别碎块图片
-        """
-        reader = easyocr.Reader(['ch_tra', 'en'])  # 选择语言，繁体中文和英语
-        results = []
-        for cropped_image in cropped_images:
-            image_np = np.array(cropped_image) # 将PIL.Image转为numpy数组
-            result = reader.readtext(image_np) # 结果为：[位置, '文字', 置信度]
-            results.append(result)
-        return results
-
-
-    # 调用 card_part_ocr 函数并获取识别结果
-    ocr_results = await card_part_ocr()
+    # 调用 images_ocrspace 函数并获取识别结果
+    ocr_results = await images_ocrspace(cropped_images)
+    logger.info(f"[鸣潮][OCR.space]dc卡片识别数据:\n{ocr_results}")
 
     return await ocr_results_to_dict(ocr_results)
-   
-async def is_valid_prop(entry):
-    """验证属性是否有效"""
-    name, value = entry
-    # 过滤无效属性名（根据实际需求调整）
-    if not name or len(name) < 2:
-        return False
-    # 过滤纯数值属性名
-    if re.match(r'^\d+%?$', name):
-        return False
-    return True
+
+async def images_ocrspace(cropped_images):
+    """
+    使用 OCR.space 免费API识别碎块图片
+    """
+    API_URL = 'https://api.ocr.space/parse/image'
+    
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for img in cropped_images:
+            # 将PIL.Image转换为base64
+            try:
+                buffered = BytesIO()
+                img.save(buffered, format='PNG')
+                img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+            except Exception as e:
+                print(f"图像转换错误: {e}")
+                continue
+                
+            # 构建请求参数
+            payload = {
+                'apikey': API_KEY,
+                'language': 'cht',          # 仅繁体中文（正确参数值）
+                'isOverlayRequired': 'True', # 需要坐标信息
+                'base64Image': f'data:image/png;base64,{img_base64}',
+                'OCREngine': 2,             # 使用引擎2, 识别效果更好，声骸识别差一些
+                'isTable': 'True',    # 启用表格识别模式
+                'detectOrientation': 'True', # 自动检测方向
+                'scale': 'True'              # 图像缩放增强
+            }
+
+            tasks.append(fetch_ocr_result(session, API_URL, payload))
+
+        # 限制并发数为5防止超过API限制
+        semaphore = asyncio.Semaphore(5)
+        # 修改返回结果处理
+        results = await asyncio.gather(*(process_with_semaphore(task, semaphore) for task in tasks))
+        
+        # 扁平化处理（合并所有子列表）
+        return [item for sublist in results for item in sublist]
+
+async def process_with_semaphore(task, semaphore):
+    async with semaphore:
+        return await task
+
+async def fetch_ocr_result(session, url, payload, retries=3):
+    """发送OCR请求并处理响应, 错误重试次数: retries=3"""
+    for attempt in range(retries):
+        try:
+            async with session.post(url, data=payload) as response:
+                # 检查HTTP状态码
+                if response.status != 200:
+                    # 修改错误返回格式为字典（与其他成功结果结构一致）
+                    return [{'error': f'HTTP Error {response.status}', 'text': None}]
+                
+                data = await response.json()
+                
+                # 检查API错误
+                if data.get('IsErroredOnProcessing', False):
+                    return [{'error': data.get('ErrorMessage', '未知错误'), 'text': None}]
+                
+                # 解析结果
+                if not data.get('ParsedResults'):
+                    return [{'error': 'No Results', 'text': None}]
+                
+                output = []
+                
+                # 提取识别结果
+                for result in data.get('ParsedResults', []):
+                    # 补充完整文本
+                    if parsed_text := result.get('ParsedText'):
+                        output.append({
+                            'text': parsed_text,
+                            'error': None  # 统一数据结构
+                        })
+                
+                return output
+                
+        except aiohttp.ClientError as e:
+            if attempt < retries - 1:
+                await asyncio.sleep(2**attempt)
+                continue
+            return [{'error': f'Network Error:{str(e)}', 'text': None}]
+        except Exception as e:
+            if attempt < retries - 1:
+                await asyncio.sleep(2**attempt)
+                continue
+            return [{'error': f'Processing Error:{str(e)}', 'text': None}]
 
 async def ocr_results_to_dict(ocr_results):
-    # 将识别结果转换为字典
+    """
+    适配OCR.space输出结构的增强版结果解析
+    输入结构: [{'text': '...', 'error': ...}, ...]
+    """
     final_result = {
         "用户信息": {},
         "角色信息": {},
@@ -194,148 +308,92 @@ async def ocr_results_to_dict(ocr_results):
         "武器信息": {}
     }
 
-    # 增强版正则模式, 正则与置信度限制
+    # 增强正则模式（适配多行文本处理）
     patterns = {
-        "name": (re.compile(r'^[\u4e00-\u9fa5A-Za-z]+$'), 0.9),
-        "level": (re.compile(r'(?i)[lv]+[.\s]*(\d+)'), 0.01),  # 支持L.90格式
-        "skill_level": (re.compile(r'L\.?V?[./|]?(\d+).*?10'), 0.3),  # 更宽松的匹配
-        "player_id_en": (re.compile(r'PlayerID'), 0.7), # 未使用
-        "player_id_cn": (re.compile(r'玩家名稱'), 0.7),
-        "uid_en": (re.compile(r'U[|]?D'), 0.7), # 未使用
-        "uid_cn": (re.compile(r'特徵碼'), 0.7),
-        "echo_value": (re.compile(r'(\d+\.?\d*%?)'), 0.01),  # 更宽松的声骸装备处理逻辑
-        "weapon_name": (re.compile(r'^[\u4e00-\u9fa5A-Za-z]+$'), 0.8),
-        "weapon_level": (re.compile(r'LV\.(\d+)'), 0.5)
+        "name": re.compile(r'^([\u4e00-\u9fa5A-Za-z]+)'), # 支持英文名，为后续逻辑判断用
+        "level": re.compile(r'(?i)(LV?\.?)\s*(\d+)'),
+        "skill_level": re.compile(r'(\d+)/10'),
+        "player_info": re.compile(r'玩家名稱[:：]\s*(\S+)'),
+        "uid_info": re.compile(r'特徵碼[:：]\s*(\d+)'),
+        "echo_value": re.compile(r'([\u4e00-\u9fa5]+)\s*\D*([\d.]+%?)'), # 不支持英文词条(空格不好处理), 支持处理"暴擊傷害 器44%", "攻擊 ×18%"
+        "weapon_info": re.compile(r'([\u4e00-\u9fa5]+)\s+LV\.(\d+)')
     }
-    
 
-    # 创建转换器
-    cc = OpenCC('t2s')  # t2s 表示繁体转简体
+    cc = OpenCC('t2s')  # 繁体转简体
 
-    # 正则表达式：提取属性名称
-    # prop_pattern = re.compile(r'(?P<attr>[a-zA-Z\u4e00-\u9fa5]+)')
-    prop_pattern = re.compile(
-        r'^[^a-zA-Z\u4e00-\u9fa5]*'  # 去除前缀符号/空格
-        r'(?P<attr>[a-zA-Z\u4e00-\u9fa5]+)'  # 匹配至少2个中文字符
-    )
-
-    # 增强属性处理逻辑
-    # attribute_aliases = {
-    #     "文攻擊": "攻击",
-    #     "女攻擊": "攻击",
-    #     "弋攻擊": "攻击",
-    #     "C攻擊": "攻击",
-    #     "X攻擊": "攻击",
-    #     "暴擊": "暴击",
-    #     "暴擊傷害": "暴击伤害",
-    #     "共鳴效率": "共鸣效率",
-    #     # ...补充更多映射...
-    # }
-    # 用字符数量判断了，出现三个字符只能是错误识别，不确定，先这样保留
-
-    def validate_value(text):
-        """通用数值格式校验"""
-        return re.match(r'^[\w-]+$', text)  # 允许字母、数字、常见符号
-
-    # 处理角色信息 (image_0)
+    # 处理角色信息（第一个识别结果）
     if ocr_results:
-        data = ocr_results[0]
-        i = 0
-        while i < len(data):
-            text, conf = data[i][1], data[i][2]
-            logger.info(f" [鸣潮][dc卡片识别] ocr基础信息内容:{text}，置信度:{conf}")
-
-            
-            # 角色名提取
-            if patterns["name"][0].fullmatch(text) and conf >= patterns["name"][1]:
-                if '角色名' not in final_result["角色信息"]:
-                    # text为英文，则退出
-                    if not re.match(r'^[\u4e00-\u9fa5]+$', text):
-                        logger.debug(f" [鸣潮][dc卡片识别] 识别出英文角色名:{text}，退出识别！")
-                        return False, final_result
-                    final_result["角色信息"]["角色名"] = cc.convert(text)
-            
-            # 角色等级提取
-            level_match = patterns["level"][0].search(text)
-            if level_match and conf >= patterns["level"][1]:
-                if '等级' not in final_result["角色信息"]:
-                    final_result["角色信息"]["等级"] = int(level_match.group(1))
-            
-            # 处理用户昵称
-            if (patterns["player_id_cn"][0].search(text) and conf >= patterns["player_id_cn"][1]):
-                if i+1 < len(data) and data[i+1][1].isdigit():
-                    next_text, next_conf = data[i+1][1], data[i+1][2]
-                    if validate_value(next_text) and next_conf >= 0.5:  # 置信度阈值
-                        final_result["用户信息"]["玩家名称"] = next_text
-                        i += 1  # 跳过已处理的数字
-            
-            # 处理UID
-            if (patterns["uid_cn"][0].search(text) and conf >= patterns["uid_cn"][1]):
-                if i+1 < len(data) and data[i+1][1].isdigit():
-                    next_text, next_conf = data[i+1][1], data[i+1][2]
-                    if next_text.isdigit() and next_conf >= 0.7:  # UID严格限定为数字
-                        final_result["用户信息"]["UID"] = next_text
-                        i += 1  # 跳过已处理的数字
-            
-            i += 1
-
-        # 处理技能等级的逻辑优化
-        for idx in range(1, 6):
-            if idx >= len(ocr_results):
-                final_result["技能等级"].append(None)
-                continue
+        first_result = ocr_results[0]
+        if first_result['error'] is None:
+            lines = first_result['text'].split('\n')
+            for line in lines:
+                line = line.strip()
                 
-            max_level = 0
-            for data in ocr_results[idx]:
-                text = data[1].replace(" ", "").upper()  # 预处理文本
-                logger.info(f" [鸣潮][dc卡片识别] ocr技能数据:{text}")
-                match = patterns["skill_level"][0].search(text)
-                if match:
-                    try:
-                        level = int(match.group(1))
-                        if 1 <= level <= 10:  # 添加合理范围验证
-                            max_level = max(max_level, level)
-                    except: pass
-            final_result["技能等级"].append(max_level if max_level else None)
+                # 角色名提取
+                if not final_result["角色信息"].get("角色名"):
+                    name_match = patterns["name"].search(line)
+                    if name_match:
+                        if not re.match(r'^[\u4e00-\u9fa5]+$', name_match.group()):
+                            logger.debug(f" [鸣潮][dc卡片识别] 识别出英文角色名:{name_match.group()}，退出识别！")
+                            return False, final_result
+                        final_result["角色信息"]["角色名"] = cc.convert(name_match.group())
+                
+                # 等级提取
+                level_match = patterns["level"].search(line)
+                if level_match and not final_result["角色信息"].get("等级"):
+                    final_result["角色信息"]["等级"] = int(level_match.group(2))
+                
+                # 玩家名称
+                player_match = patterns["player_info"].search(line)
+                if player_match:
+                    final_result["用户信息"]["玩家名称"] = player_match.group(1)
+                
+                # UID提取
+                uid_match = patterns["uid_info"].search(line)
+                if uid_match:
+                    final_result["用户信息"]["UID"] = uid_match.group(1)
+
+    # 处理技能等级（第2-6个结果）
+    for idx in range(1, 6):
+        if idx >= len(ocr_results) or ocr_results[idx]['error'] is not None:
+            final_result["技能等级"].append(1)
+            continue
+            
+        text = ocr_results[idx]['text']
+        matches = patterns["skill_level"].findall(text)
+        if matches:
+            try:
+                level = int(matches[0])
+                final_result["技能等级"].append(min(level, 10))  # 限制最大等级为10
+            except:
+                final_result["技能等级"].append(1)
+        else:
+            final_result["技能等级"].append(1)
+
+    # 处理声骸装备（第7-11个结果）
+    for idx in range(6, 11):
+        if idx >= len(ocr_results) or ocr_results[idx]['error'] is not None:
+            continue
+            
+        equipment = {"mainProps": [], "subProps": []}
+        text = ocr_results[idx]['text']
         
-        # 处理声骸装备数据 (image_6-10)
-        for idx in range(6, 11):
-            if idx >= len(ocr_results):
-                continue
-                
-            equipment = {
-                "mainProps": [],
-                "subProps": []
-            }
-            buffer = []
-            current_attr = None
-            
-            for data in sorted(ocr_results[idx], key=lambda x: x[0][0][1]):  # 按Y坐标排序
-                text, conf = data[1], data[2]
-                logger.info(f" [鸣潮][dc卡片识别] ocr声骸信息内容:{text}，置信度:{conf}")
+        # 文本预处理：去除多余的空白符
+        text_clean = re.sub(r'\s+', ' ', text).strip()  # 使用 \s+ 匹配所有空白符，并替换为单个空格
 
-                # 数值提取和关联
-                value_match = patterns["echo_value"][0].search(text)
-                if value_match and conf > patterns["echo_value"][1]:
-                    value = value_match.group(1)
-                    if current_attr:
-                        buffer.append((current_attr, value))
-                    current_attr = None
-                else:
-                    # 标准化属性名称
-                    # cleaned_text = attribute_aliases.get(text, text)
-                    cleaned_text = text if len(text) != 3 else text[1:]  # 取后两个字符, 避免出现“弋攻擊”
-                    clean_attr = prop_pattern.search(cleaned_text)
-                    pat_attr = None
-                    if clean_attr:
-                        pat_attr = cc.convert(clean_attr.group(1))  # 'attr' 是分组名称
-                    current_attr = pat_attr if len(pat_attr) > 1 else None
-
-            # 智能分配词条
-            valid_entries = [entry for entry in buffer if await is_valid_prop(entry)]
-            logger.info(f" [鸣潮][dc卡片识别] 声骸信息提取内容:{valid_entries}")
-            
-            # 主词条逻辑（取前两个有效词条）
+        # 提取属性对
+        matches = patterns["echo_value"].findall(text_clean)
+        valid_entries = []
+        for attr, value in matches:
+            # 属性清洗
+            clean_attr = cc.convert(attr.strip())
+            # 验证属性名是否符合预期（至少两个中文字符，且不含数字）
+            if len(clean_attr) >= 2 and not re.search(r'[0-9]', clean_attr):
+                valid_entries.append((clean_attr, value))
+        
+        # 分配主副属性
+        if valid_entries:
+             # 主词条逻辑（取前两个有效词条）
             for entry in valid_entries[:2]:
                 equipment["mainProps"].append({
                     "attributeName": entry[0],
@@ -349,27 +407,26 @@ async def ocr_results_to_dict(ocr_results):
                     "attributeName": entry[0],
                     "attributeValue": entry[1]
                 })
-
-            # 有效性验证
-            if len(equipment["mainProps"]) >= 1:
-                final_result["装备数据"].append(equipment)
-
-        # 武器名称提取逻辑优化
-        if len(ocr_results) > 11:
-            for data in ocr_results[11]:
-                text, conf = data[1], data[2]
-                logger.info(f" [鸣潮][dc卡片识别] ocr武器信息内容:{text}，置信度:{conf}")
-
-                # 匹配武器名
-                if patterns["weapon_name"][0].fullmatch(text) and conf >= patterns["weapon_name"][1]:
-                    if '武器名' not in final_result["武器信息"]:
-                        final_result["武器信息"]["武器名"] = cc.convert(text)
             
-                # 匹配武器等级
-                level_match = patterns["weapon_level"][0].search(text)
-                if level_match and conf >= patterns["weapon_level"][1]:
-                    if '等级' not in final_result["武器信息"]:
-                        final_result["武器信息"]["等级"] = int(level_match.group(1))
+            final_result["装备数据"].append(equipment)
 
-    logger.info(f" [鸣潮][dc卡片识别] 提取内容:{final_result}")
+    # 处理武器信息（最后一个结果）
+    if len(ocr_results) > 11 and ocr_results[11]['error'] is None:
+        text = ocr_results[11]['text']
+        lines = [line.strip() for line in text.split('\n') if line.strip()]
+        
+        # 武器名称（取第一行有效文本）
+        for line in lines:
+            if patterns["name"].search(line):
+                final_result["武器信息"]["武器名"] = cc.convert(line)
+                break
+                
+        # 武器等级
+        for line in lines:
+            level_match = patterns["level"].search(line)
+            if level_match:
+                final_result["武器信息"]["等级"] = int(level_match.group(2))
+                break
+
+    logger.info(f" [鸣潮][dc卡片识别] 最终提取内容:\n{final_result}")
     return True, final_result
