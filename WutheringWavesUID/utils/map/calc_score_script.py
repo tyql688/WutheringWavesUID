@@ -7,7 +7,6 @@ from loguru import logger
 from msgspec import json as msgjson
 
 SCRIPT_PATH = Path(__file__).parents[0]
-print(SCRIPT_PATH)
 MAP_PATH = SCRIPT_PATH / "character"
 DETAIL_PATH = SCRIPT_PATH / "detail_json"
 CHAR_DETAIL_PATH = DETAIL_PATH / "char"

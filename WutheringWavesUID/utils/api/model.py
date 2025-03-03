@@ -207,7 +207,7 @@ class RoleDetailData(BaseModel):
     level: int
     chainList: List[Chain]
     weaponData: WeaponData
-    phantomData: Optional[EquipPhantomData]
+    phantomData: Optional[EquipPhantomData] = None
     skillList: List[SkillData]
 
     def get_chain_num(self):
