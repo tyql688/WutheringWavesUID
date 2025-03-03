@@ -325,13 +325,15 @@ async def ocr_results_to_dict(ocr_results):
     if ocr_results:
         first_result = ocr_results[0]
         if first_result['error'] is None:
-            lines = first_result['text'].split('\n')
+            lines = first_result['text'].split('\t') # 支持"◎\t洛可可\tLV.90\t"
             for line in lines:
-                line = line.strip()
+                # 文本预处理：去除多余的空白符
+                line_clean = re.sub(r'\s+', ' ', line).strip()  # 使用 \s+ 匹配所有空白符，并替换为单个空格
+                # line = line.strip()
                 
                 # 角色名提取
                 if not final_result["角色信息"].get("角色名"):
-                    name_match = patterns["name"].search(line)
+                    name_match = patterns["name"].search(line_clean)
                     if name_match:
                         if not re.match(r'^[\u4e00-\u9fa5]+$', name_match.group()):
                             logger.debug(f" [鸣潮][dc卡片识别] 识别出英文角色名:{name_match.group()}，退出识别！")
@@ -339,17 +341,17 @@ async def ocr_results_to_dict(ocr_results):
                         final_result["角色信息"]["角色名"] = cc.convert(name_match.group())
                 
                 # 等级提取
-                level_match = patterns["level"].search(line)
+                level_match = patterns["level"].search(line_clean)
                 if level_match and not final_result["角色信息"].get("等级"):
                     final_result["角色信息"]["等级"] = int(level_match.group(2))
                 
                 # 玩家名称
-                player_match = patterns["player_info"].search(line)
+                player_match = patterns["player_info"].search(line_clean)
                 if player_match:
                     final_result["用户信息"]["玩家名称"] = player_match.group(1)
                 
                 # UID提取
-                uid_match = patterns["uid_info"].search(line)
+                uid_match = patterns["uid_info"].search(line_clean)
                 if uid_match:
                     final_result["用户信息"]["UID"] = uid_match.group(1)
 
@@ -386,7 +388,10 @@ async def ocr_results_to_dict(ocr_results):
         valid_entries = []
         for attr, value in matches:
             # 属性清洗
-            clean_attr = cc.convert(attr.strip())
+            attr = attr.strip()
+            # 自定义替换优先执行（在繁转简之前）
+            attr = attr.replace("暴擎傷害", "暴擊傷害").replace("暴擎", "暴擊")
+            clean_attr = cc.convert(attr) # 标准繁简转换
             # 验证属性名是否符合预期（至少两个中文字符，且不含数字）
             if len(clean_attr) >= 2 and not re.search(r'[0-9]', clean_attr):
                 valid_entries.append((clean_attr, value))
