@@ -335,10 +335,12 @@ async def ocr_results_to_dict(ocr_results):
                 if not final_result["角色信息"].get("角色名"):
                     name_match = patterns["name"].search(line_clean)
                     if name_match:
-                        if not re.match(r'^[\u4e00-\u9fa5]+$', name_match.group()):
-                            logger.debug(f" [鸣潮][dc卡片识别] 识别出英文角色名:{name_match.group()}，退出识别！")
+                        name = name_match.group()
+                        name = name.replace("吟槑", "吟霖")
+                        if not re.match(r'^[\u4e00-\u9fa5]+$', name):
+                            logger.debug(f" [鸣潮][dc卡片识别] 识别出英文角色名:{name}，退出识别！")
                             return False, final_result
-                        final_result["角色信息"]["角色名"] = cc.convert(name_match.group())
+                        final_result["角色信息"]["角色名"] = cc.convert(name)
                 
                 # 等级提取
                 level_match = patterns["level"].search(line_clean)
