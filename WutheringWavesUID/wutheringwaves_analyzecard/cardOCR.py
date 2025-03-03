@@ -19,14 +19,13 @@ from gsuid_core.models import Event
 from gsuid_core.logger import logger
 from gsuid_core.utils.download_resource.download_file import download
 
+from ..wutheringwaves_config import WutheringWavesConfig
 from ..wutheringwaves_analyzecard.userData import save_card_dict_to_json
 
 
 SRC_PATH = Path(__file__).parent / "src"
 CARD_PATH = Path(__file__).parent / "src/card.jpg"
 CARD_NAME = "card.jpg"
-
-API_KEY = 'K84320745188957'  # 请替换为你的API密钥
 
 # 原始dc卡片参考分辨率，from example_card_2.png
 REF_WIDTH = 1072
@@ -62,11 +61,26 @@ async def async_ocr(bot: Bot, ev: Event):
     """
     异步OCR识别函数
     """
+    API_KEY = WutheringWavesConfig.get_config("OCRspaceApiKey").data  # 从控制台获取OCR.space的API密钥
+    if not API_KEY:
+        logger.info(f"[鸣潮]OCRspace API密钥为空！请检查控制台获取API密钥。")
+        await bot.send(f"[鸣潮]OCRspace API密钥为空！请检查控制台获取API密钥。")
+        return False
+
     if not await upload_discord_bot_card(bot, ev):
         await bot.send(f"[鸣潮]卡片分析已停止。")
         return False
-    # 获取dc卡片识别结果
-    bool, final_result = await cut_card_to_ocr()
+
+    # 获取dc卡片识别结果,使用API_KEY
+    ocr_results = await cut_card_to_ocr(API_KEY)
+    logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
+
+    if ocr_results[0]['error']:
+        logger.info(f"[鸣潮]OCRspace识别访问失败！请检查控制台API密钥是否正确，服务器网络是否正常。")
+        await bot.send(f"[鸣潮]OCRspace识别访问失败！请检查控制台API密钥是否正确，服务器网络是否正常。")
+        return False
+
+    bool, final_result = await ocr_results_to_dict(ocr_results)
 
     if bool:
         await save_card_dict_to_json(bot, ev, final_result)
@@ -178,7 +192,7 @@ def cut_echo_data(image_echo):
 
     return image_echo_only_data
 
-async def cut_card_to_ocr():
+async def cut_card_to_ocr(api_key):
     """
     裁切卡片：角色，技能树*5，声骸*5，武器
         （按比例适配任意分辨率，1920*1080识别效果优良）
@@ -202,17 +216,15 @@ async def cut_card_to_ocr():
     os.remove(CARD_PATH) # 删除原图片
 
     # 调用 images_ocrspace 函数并获取识别结果
-    ocr_results = await images_ocrspace(cropped_images)
-    logger.info(f"[鸣潮][OCR.space]dc卡片识别数据:\n{ocr_results}")
+    return await images_ocrspace(api_key, cropped_images)
 
-    return await ocr_results_to_dict(ocr_results)
-
-async def images_ocrspace(cropped_images):
+async def images_ocrspace(api_key, cropped_images):
     """
     使用 OCR.space 免费API识别碎块图片
     """
+    API_KEY = api_key
     API_URL = 'https://api.ocr.space/parse/image'
-    
+
     async with aiohttp.ClientSession() as session:
         tasks = []
         for img in cropped_images:

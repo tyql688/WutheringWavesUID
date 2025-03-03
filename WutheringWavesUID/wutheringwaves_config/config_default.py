@@ -156,4 +156,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     "MaxBindNum": GsIntConfig(
         "绑定特征码限制数量（未登录）", "绑定特征码限制数量（未登录）", 2, 100
     ),
+    "OCRspaceApiKey": GsStrConfig(
+        "OCRspace API Key",
+        "用于设置discord_bot角色卡片ocr识别的OCRspace的配置",
+        "",
+    ),
 }
