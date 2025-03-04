@@ -48,10 +48,17 @@ crop_ratios = [
     (800/REF_WIDTH, 240/REF_HEIGHT, 1020/REF_WIDTH, 350/REF_HEIGHT), # 武器
 ]
 
+# 原始角色裁切区域参考分辨率，from crop_ratios
+CHAR_WIDTH = 420
+CHAR_HEIGHT = 350
+char_crop_ratios = [
+    (37/CHAR_WIDTH,  0/CHAR_HEIGHT, 250/CHAR_WIDTH,  45/CHAR_HEIGHT), # 上面角色名称与等级
+    ( 0/CHAR_WIDTH, 45/CHAR_HEIGHT, 155/CHAR_WIDTH, 80/CHAR_HEIGHT), # 下面用户昵称与id
+]
+
 # 原始声骸裁切区域参考分辨率，from crop_ratios
 ECHO_WIDTH = 204
 ECHO_HEIGHT = 230
-
 echo_crop_ratios = [
     (110/ECHO_WIDTH,  40/ECHO_HEIGHT, 204/ECHO_WIDTH,  85/ECHO_HEIGHT), # 右上角主词条(忽略声骸cost，暂不处理)
     ( 26/ECHO_WIDTH, 105/ECHO_HEIGHT, 204/ECHO_WIDTH, 230/ECHO_HEIGHT), # 下部6条副词条
@@ -169,28 +176,29 @@ def cut_image(image, img_width, img_height, crop_ratios):
 
     return cropped_images
 
-def cut_echo_data(image_echo):
+def cut_image_need_data(image_need, data_crop_ratios):
     """
     裁切声骸卡片拼接词条数据: 右上角主词条与余下6条副词条
+    裁切角色卡片拼接用户数据: 上面角色数据，下面用户信息
     目的: 优化ocrspace 模型2识别
     """
-    img_width, img_height = image_echo.size
+    img_width, img_height = image_need.size
     
     # 获取裁切后的子图列表
-    cropped_images = cut_image(image_echo, img_width, img_height, echo_crop_ratios)
+    cropped_images = cut_image(image_need, img_width, img_height, data_crop_ratios)
 
     # 计算拼接后图片的总高度和最大宽度
     total_height = sum(img.height for img in cropped_images)
     max_width = max(img.width for img in cropped_images) if cropped_images else 0
 
     # 创建新画布并逐个粘贴子图
-    image_echo_only_data = Image.new('RGB', (max_width, total_height))
+    image_only_data = Image.new('RGB', (max_width, total_height))
     y_offset = 0
     for img in cropped_images:
-        image_echo_only_data.paste(img, (0, y_offset))
+        image_only_data.paste(img, (0, y_offset))
         y_offset += img.height  # 累加y轴偏移量
 
-    return image_echo_only_data
+    return image_only_data
 
 async def cut_card_to_ocr(api_key):
     """
@@ -204,10 +212,14 @@ async def cut_card_to_ocr(api_key):
     
     cropped_images = cut_image(image, img_width, img_height, crop_ratios)
 
+    # 进一步裁切角色图
+    image_char = cropped_images[0]
+    cropped_images[0] = cut_image_need_data(image_char, char_crop_ratios)
+
     # 进一步裁剪拼接声骸图
     for i in range(6, 11):  # 替换索引6-10，即5张声骸图
         image_echo = cropped_images[i]
-        cropped_images[i] = cut_echo_data(image_echo) 
+        cropped_images[i] = cut_image_need_data(image_echo, echo_crop_ratios) 
 
     for i, cropped_image in enumerate(cropped_images):
         # 保存裁切后的图片
