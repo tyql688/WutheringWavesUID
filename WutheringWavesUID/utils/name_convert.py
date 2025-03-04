@@ -23,6 +23,11 @@ weapon_alias_data: Dict[str, List[str]] = {}
 sonata_alias_data: Dict[str, List[str]] = {}
 
 
+def add_dictionaries(dict1, dict2):
+    all_keys = set(dict1.keys()) | set(dict2.keys())
+    return {key: list(set(dict1.get(key, []) + dict2.get(key, []))) for key in all_keys}
+
+
 def load_alias_data():
     global char_alias_data, weapon_alias_data, sonata_alias_data
     with open(CHAR_ALIAS, "r", encoding="UTF-8") as f:
@@ -44,8 +49,7 @@ def load_alias_data():
             logger.exception(f"读取自定义角色别名失败 {CUSTOM_CHAR_ALIAS_PATH} - {e}")
             custom_char_alias_data = {}
 
-        char_alias_data.update(custom_char_alias_data)
-        char_alias_data = {k: list(set(v)) for k, v in char_alias_data.items()}
+        char_alias_data = add_dictionaries(char_alias_data, custom_char_alias_data)
 
     if CUSTOM_SONATA_ALIAS_PATH.exists():
         try:
@@ -57,8 +61,9 @@ def load_alias_data():
             logger.exception(f"读取自定义合鸣别名失败 {CUSTOM_SONATA_ALIAS_PATH} - {e}")
             custom_sonata_alias_data = {}
 
-        sonata_alias_data.update(custom_sonata_alias_data)
-        sonata_alias_data = {k: list(set(v)) for k, v in sonata_alias_data.items()}
+        sonata_alias_data = add_dictionaries(
+            sonata_alias_data, custom_sonata_alias_data
+        )
 
     if CUSTOM_WEAPON_ALIAS_PATH.exists():
         try:
@@ -70,8 +75,9 @@ def load_alias_data():
             logger.exception(f"读取自定义武器别名失败 {CUSTOM_WEAPON_ALIAS_PATH} - {e}")
             custom_weapon_alias_data = {}
 
-        weapon_alias_data.update(custom_weapon_alias_data)
-        weapon_alias_data = {k: list(set(v)) for k, v in weapon_alias_data.items()}
+        weapon_alias_data = add_dictionaries(
+            weapon_alias_data, custom_weapon_alias_data
+        )
 
     with open(CUSTOM_CHAR_ALIAS_PATH, "w", encoding="UTF-8") as f:
         f.write(json.dumps(char_alias_data, indent=2, ensure_ascii=False))
