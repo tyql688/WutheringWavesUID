@@ -338,7 +338,7 @@ async def ocr_results_to_dict(ocr_results):
         "level": re.compile(r'(?i)(LV?\.?)\s*(\d+)'),
         "skill_level": re.compile(r'(\d+)/10'),
         "player_info": re.compile(r'玩家名稱[:：]\s*(\S+)'),
-        "uid_info": re.compile(r'特徵碼[:：]\s*(\d+)'),
+        "uid_info": re.compile(r'特.碼[:：]\s*(\d+)'),
         "echo_value": re.compile(r'([\u4e00-\u9fa5]+)\s*\D*([\d.]+%?)'), # 不支持英文词条(空格不好处理), 支持处理"暴擊傷害 器44%", "攻擊 ×18%"
         "weapon_info": re.compile(r'([\u4e00-\u9fa5]+)\s+LV\.(\d+)')
     }
