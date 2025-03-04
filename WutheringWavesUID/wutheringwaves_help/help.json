@@ -45,7 +45,7 @@
     ]
   },
   "库街区登录": {
-    "desc": "在执行查询之前请库街区登录",
+    "desc": "在执行查询之前请库街区登录，暂不支持国际服",
     "data": [
       {
         "name": "推荐->登录页登录",
@@ -89,6 +89,14 @@
         "desc": "鸣潮面板更新",
         "eg": "刷新面板",
         "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "国际服dc卡片分析",
+        "desc": "分析获取dc卡片角色数据",
+        "eg": "分析",
+        "need_ck": false,
         "need_sk": false,
         "need_admin": false
       },
