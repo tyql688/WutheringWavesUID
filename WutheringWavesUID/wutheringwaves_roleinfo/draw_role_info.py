@@ -51,16 +51,20 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
     role_info.roleList.sort(
         key=lambda i: (i.level, i.starLevel, i.roleId), reverse=True
     )
+    
+    if waves_api.is_net(uid):
+        # 填充用户信息,name固定以免误会。没有creatTime 是为了跳过.is_full的逻辑
+        account_info= AccountBaseInfo(name="国际服用户", id=uid)
+    else:
+        # 账户数据
+        succ, account_info = await waves_api.get_base_info(uid, ck)
+        account_info = AccountBaseInfo(**account_info)
 
-    # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    account_info = AccountBaseInfo(**account_info)
-
-    # 数据坞
-    succ, calabash_data = await waves_api.get_calabash_data(uid, ck)
-    if not succ:
-        return calabash_data
-    calabash_data = CalabashData(**calabash_data)
+        # 数据坞
+        succ, calabash_data = await waves_api.get_calabash_data(uid, ck)
+        if not succ:
+            return calabash_data
+        calabash_data = CalabashData(**calabash_data)
 
     # five_num = sum(1 for i in role_info.roleList if i.starLevel == 5)
     up_num = sum(

@@ -375,7 +375,7 @@ async def get_role_need(
     is_online_user=True,
     is_limit_query=False,
 ):
-    if waves_id:
+    if waves_id and not waves_api.is_net(waves_id):
         query_list = [char_id]
         if char_id in SPECIAL_CHAR:
             query_list = SPECIAL_CHAR.copy()
@@ -407,6 +407,8 @@ async def get_role_need(
             )
     else:
         avatar = await draw_pic_with_ring(ev, is_force_avatar, force_resource_id)
+        if waves_api.is_net(waves_id):
+            uid = waves_id
         if is_limit_query:
             uid = "1"
         all_role_detail: Optional[Dict[str, RoleDetailData]] = (

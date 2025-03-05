@@ -48,13 +48,14 @@ TEXT_PATH = Path(__file__).parent / "texture2d"
 
 
 async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, bytes]:
+    ck = await waves_api.get_ck(uid, user_id)
+    if not ck:
+        return error_reply(WAVES_CODE_102)
+        
     if waves_api.is_net(uid):
         # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
         account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
     else:
-        ck = await waves_api.get_ck(uid, user_id)
-        if not ck:
-            return error_reply(WAVES_CODE_102)
         # 账户数据
         succ, account_info = await waves_api.get_base_info(uid, ck)
 
