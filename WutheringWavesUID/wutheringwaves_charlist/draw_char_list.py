@@ -48,14 +48,13 @@ TEXT_PATH = Path(__file__).parent / "texture2d"
 
 
 async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, bytes]:
-    ck = await waves_api.get_ck(uid, user_id)
-    if not ck:
-        return error_reply(WAVES_CODE_102)
-        
     if waves_api.is_net(uid):
         # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
         account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
     else:
+        ck = await waves_api.get_ck(uid, user_id)
+        if not ck:
+            return error_reply(WAVES_CODE_102)
         # 账户数据
         succ, account_info = await waves_api.get_base_info(uid, ck)
 
@@ -66,12 +65,18 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
     # 根据面板数据获取详细信息
     all_role_detail = None
     if "刷新" in ev.command:
+        ck = await waves_api.get_ck(uid, user_id)
+        if not ck:
+            return error_reply(WAVES_CODE_102)
         waves_datas = await refresh_char(uid, user_id, ck=ck)
         if isinstance(waves_datas, str):
             return waves_datas
     else:
         all_role_detail = await get_all_role_detail_info(uid)
         if not all_role_detail:
+            ck = await waves_api.get_ck(uid, user_id)
+            if not ck:
+                return error_reply(WAVES_CODE_102)
             waves_datas = await refresh_char(uid, user_id, ck=ck)
             if isinstance(waves_datas, str):
                 return waves_datas

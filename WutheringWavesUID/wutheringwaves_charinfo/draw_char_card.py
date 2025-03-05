@@ -407,7 +407,7 @@ async def get_role_need(
             )
     else:
         avatar = await draw_pic_with_ring(ev, is_force_avatar, force_resource_id)
-        if waves_api.is_net(waves_id):
+        if waves_id and waves_api.is_net(waves_id):
             uid = waves_id
         if is_limit_query:
             uid = "1"
