@@ -16,11 +16,11 @@ gs_font_30 = waves_font_origin(30)
 black_color = (24, 24, 24)
 
 log_config = {
-    "key": "✨🐛🎨⚡🍱♻️",
+    "key": "🌙✨🐛🎨⚡🍱♻️",
     "num": 18,
 }
 
-log_map = {"✨": "feat", "🐛": "bug", "🍱": "bento", "⚡️": "zap", "🎨": "art"}
+log_map = {"🌙": "UWO","✨": "feat", "🐛": "bug", "🍱": "bento", "⚡️": "zap", "🎨": "art"}
 
 
 async def draw_update_log_img(
