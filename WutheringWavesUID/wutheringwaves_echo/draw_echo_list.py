@@ -52,17 +52,21 @@ class WavesEchoRank(BaseModel):
 
 
 async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
-    ck = await waves_api.get_ck(uid, user_id)
-    if not ck:
-        return hint.error_reply(WAVES_CODE_102)
-        # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    account_info = AccountBaseInfo(**account_info)
+    if waves_api.is_net(uid):
+        # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
+        account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
+    else:
+        ck = await waves_api.get_ck(uid, user_id)
+        if not ck:
+            return hint.error_reply(WAVES_CODE_102)
+            # 账户数据
+        succ, account_info = await waves_api.get_base_info(uid, ck)
+        account_info = AccountBaseInfo(**account_info)
 
     all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
 
     if all_role_detail is None:
-        return f"[鸣潮] 未找到角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!"
+        return f"[鸣潮] 未找到角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n国际服用户请使用[{PREFIX}分析]上传数据"
 
     waves_echo_rank = []
     for char_name, role_detail in all_role_detail.items():

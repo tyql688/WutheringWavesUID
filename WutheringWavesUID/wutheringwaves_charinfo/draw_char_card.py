@@ -624,15 +624,8 @@ async def draw_char_detail_img(
             account_info = AccountBaseInfo.model_validate(account_info)
             force_resource_id = None
         else:
-            account_info = AccountBaseInfo.model_validate(
-                {
-                    "name": "国际服用户",
-                    "id": uid,
-                    "level": 0,
-                    "worldLevel": 0,
-                    "creatTime": 1739375719,
-                }
-            )
+            # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
+            account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
             force_resource_id = None
     else:
         account_info = AccountBaseInfo.model_validate(
@@ -994,10 +987,14 @@ async def draw_char_score_img(
     # 账户数据
     if waves_id:
         uid = waves_id
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info
-    account_info = AccountBaseInfo.model_validate(account_info)
+    if waves_api.is_net(uid):
+        # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
+        account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
+    else:
+        succ, account_info = await waves_api.get_base_info(uid, ck)
+        if not succ:
+            return account_info
+        account_info = AccountBaseInfo.model_validate(account_info)
     # 获取数据
     avatar, role_detail = await get_role_need(ev, char_id, ck, uid, char_name, waves_id)
     if isinstance(role_detail, str):
