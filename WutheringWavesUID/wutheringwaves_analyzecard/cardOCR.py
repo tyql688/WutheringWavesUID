@@ -390,7 +390,7 @@ async def ocr_results_to_dict(ocr_results):
     # 增强正则模式（适配多行文本处理）
     patterns = {
         "name": re.compile(r'^([\u4e00-\u9fa5A-Za-z]+)'), # 支持英文名，为后续逻辑判断用
-        "level": re.compile(r'(?i)(LV?\.?)\s*(\d+)'),
+        "level": re.compile(r'(?i)(.V?\.?)\s*(\d+)'),
         "skill_level": re.compile(r'(\d+)/10'),
         "player_info": re.compile(r'玩家名稱[:：]\s*(\S+)'),
         "uid_info": re.compile(r'特.碼[:：]\s*(\d+)'),
