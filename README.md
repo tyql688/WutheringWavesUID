@@ -20,6 +20,10 @@
 >
 > 如使用命令缺失素材可尝试使用命令`ww下载全部资源`
 >
+> [补充文档地址](https://wiki.wavesuid.top/)
+> 
+> 国际服用户可以基于 `Discord` 图片识别使用 `WutheringWavesUID` -> [传送门](https://github.com/moonshadow1976/WutheringWavesUID)
+>
 > 支持NoneBot2 & HoshinoBot & ZeroBot & YunzaiBot的鸣潮Bot插件
 >
 > 🚧插件目前还在施工中，功能快速迭代中...🚧
