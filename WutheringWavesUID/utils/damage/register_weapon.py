@@ -284,8 +284,10 @@ class Weapon_21020026(WeaponAbstract):
         """造成普攻伤害"""
         if attr.char_damage != attack_damage:
             return
-
-        dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[3][self.weapon_reson_level - 1]}+{self.weapon_detail.param[4][self.weapon_reson_level - 1]}"
+        if attr.role and attr.role.role.roleId == 1603:
+            dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[3][self.weapon_reson_level - 1]}+{self.weapon_detail.param[4][self.weapon_reson_level - 1]}"
+        else:
+            dmg = f"{self.weapon_detail.param[1][self.weapon_reson_level - 1]}*{self.weapon_detail.param[3][self.weapon_reson_level - 1]}"
         title = self.get_title()
         msg = f"普攻伤害加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
