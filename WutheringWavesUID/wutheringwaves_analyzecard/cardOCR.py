@@ -345,49 +345,42 @@ async def process_with_semaphore(task, semaphore):
     async with semaphore:
         return await task
 
-async def fetch_ocr_result(session, url, payload, retries=3):
-    """发送OCR请求并处理响应, 错误重试次数: retries=3"""
-    for attempt in range(retries):
-        try:
-            async with session.post(url, data=payload) as response:
-                # 检查HTTP状态码
-                if response.status != 200:
-                    # 修改错误返回格式为字典（与其他成功结果结构一致）
-                    return [{'error': f'HTTP Error {response.status}', 'text': None}]
+async def fetch_ocr_result(session, url, payload):
+    """发送OCR请求并处理响应"""
+    try:
+        async with session.post(url, data=payload) as response:
+            # 检查HTTP状态码
+            if response.status != 200:
+                # 修改错误返回格式为字典（与其他成功结果结构一致）
+                return [{'error': f'HTTP Error {response.status}', 'text': None}]
                 
-                data = await response.json()
+            data = await response.json()
                 
-                # 检查API错误
-                if data.get('IsErroredOnProcessing', False):
-                    return [{'error': data.get('ErrorMessage', '未知错误'), 'text': None}]
+            # 检查API错误
+            if data.get('IsErroredOnProcessing', False):
+                return [{'error': data.get('ErrorMessage', '未知错误'), 'text': None}]
                 
-                # 解析结果
-                if not data.get('ParsedResults'):
-                    return [{'error': 'No Results', 'text': None}]
+            # 解析结果
+            if not data.get('ParsedResults'):
+                return [{'error': 'No Results', 'text': None}]
                 
-                output = []
+            output = []
                 
-                # 提取识别结果
-                for result in data.get('ParsedResults', []):
-                    # 补充完整文本
-                    if parsed_text := result.get('ParsedText'):
-                        output.append({
-                            'text': parsed_text,
-                            'error': None  # 统一数据结构
-                        })
+            # 提取识别结果
+            for result in data.get('ParsedResults', []):
+                # 补充完整文本
+                if parsed_text := result.get('ParsedText'):
+                    output.append({
+                        'text': parsed_text,
+                        'error': None  # 统一数据结构
+                    })
                 
-                return output
+            return output
                 
-        except aiohttp.ClientError as e:
-            if attempt < retries - 1:
-                await asyncio.sleep(2**attempt)
-                continue
-            return [{'error': f'Network Error:{str(e)}', 'text': None}]
-        except Exception as e:
-            if attempt < retries - 1:
-                await asyncio.sleep(2**attempt)
-                continue
-            return [{'error': f'Processing Error:{str(e)}', 'text': None}]
+    except aiohttp.ClientError as e:
+        return [{'error': f'Network Error:{str(e)}', 'text': None}]
+    except Exception as e:
+        return [{'error': f'Processing Error:{str(e)}', 'text': None}]
 
 async def ocr_results_to_dict(ocr_results):
     """
