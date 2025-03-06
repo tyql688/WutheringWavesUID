@@ -291,9 +291,9 @@ async def cut_card_to_ocr(api_key):
         image_echo = cropped_images[i]
         cropped_images[i] = cut_image_need_data(image_echo, echo_crop_ratios) 
 
-    for i, cropped_image in enumerate(cropped_images):
-        # 保存裁切后的图片
-        cropped_image.save(f"{SRC_PATH}/_{i}.png")
+    # for i, cropped_image in enumerate(cropped_images):
+    #     # 保存裁切后的图片
+    #     cropped_image.save(f"{SRC_PATH}/_{i}.png")
     
     os.remove(CARD_PATH) # 删除原图片
 
