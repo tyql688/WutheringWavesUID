@@ -24,5 +24,4 @@ async def analyze_card(bot: Bot, ev: Event):
         f'[鸣潮] 请在30秒内发送dc官方bot生成的卡片图\n(分辨率尽可能为1920*1080，过低可能导致识别失败)',
     )
     if resp is not None:
-        await bot.send(f'[鸣潮]正在处理，该过程将会占用30秒左右，请稍等...')
         await async_ocr(bot, resp)
