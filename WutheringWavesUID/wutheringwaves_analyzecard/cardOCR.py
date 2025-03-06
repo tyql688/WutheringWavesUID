@@ -333,8 +333,8 @@ async def images_ocrspace(api_key, cropped_images):
 
             tasks.append(fetch_ocr_result(session, API_URL, payload))
 
-        # 限制并发数为5防止超过API限制
-        semaphore = asyncio.Semaphore(5)
+        # 限制并发数为1防止超过API限制
+        semaphore = asyncio.Semaphore(1)
         # 修改返回结果处理
         results = await asyncio.gather(*(process_with_semaphore(task, semaphore) for task in tasks))
         
@@ -471,7 +471,8 @@ async def ocr_results_to_dict(ocr_results):
             # 属性清洗
             attr = attr.strip()
             # 自定义替换优先执行（在繁转简之前）
-            attr = attr.replace("暴擎傷害", "暴擊傷害").replace("暴擎", "暴擊")
+            if re.search(r'暴.(傷害)?', attr):
+                attr = re.sub(r'暴.(傷害)?', r'暴擊\1', attr)
             clean_attr = cc.convert(attr) # 标准繁简转换
             # 验证属性名是否符合预期（至少两个中文字符，且不含数字）
             if len(clean_attr) >= 2 and not re.search(r'[0-9]', clean_attr):
