@@ -22,6 +22,8 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
     at_sender = True if ev.group_id else False
 
     uid = result_dict["用户信息"]["UID"]
+
+    chain_num = result_dict["角色信息"]["共鸣链"]
     
     char = result_dict["角色信息"]["角色名"]
     char_name = alias_to_char_name(char)
@@ -30,6 +32,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
     if char_id is None:
         await bot.send(f"[鸣潮]识别结果为角色'{char_name}'不存在")
         logger.debug(f" [鸣潮][dc卡片识别] 用户{uid}的{char_name}识别错误！")
+        return
 
 
     weapon_id = weapon_name_to_weapon_id(result_dict["武器信息"]["武器名"])
@@ -42,6 +45,8 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
     # 处理 `chainList` 的数据
     data["chainList"] = []
     for chain in result.chainList:
+        if chain.order <= chain_num:
+            chain.unlocked = True
         data["chainList"].append({
             "name": chain.name,
             "order": chain.order,

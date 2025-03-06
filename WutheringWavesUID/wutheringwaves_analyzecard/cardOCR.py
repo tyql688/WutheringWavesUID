@@ -47,6 +47,15 @@ crop_ratios = [
     (848/REF_WIDTH, 360/REF_HEIGHT, 1052/REF_WIDTH, 590/REF_HEIGHT), # 声骸5
     (800/REF_WIDTH, 240/REF_HEIGHT, 1020/REF_WIDTH, 350/REF_HEIGHT), # 武器
 ]
+# 共鸣链识别顺序（从右往左，从6到1）
+chain_crop_ratios = [
+    (321/REF_WIDTH, 316/REF_HEIGHT, 332/REF_WIDTH, 327/REF_HEIGHT), # 6
+    (276/REF_WIDTH, 316/REF_HEIGHT, 287/REF_WIDTH, 327/REF_HEIGHT), # 5
+    (231/REF_WIDTH, 316/REF_HEIGHT, 242/REF_WIDTH, 327/REF_HEIGHT), # 4
+    (186/REF_WIDTH, 316/REF_HEIGHT, 197/REF_WIDTH, 327/REF_HEIGHT), # 3
+    (141/REF_WIDTH, 316/REF_HEIGHT, 152/REF_WIDTH, 327/REF_HEIGHT), # 2
+    (100/REF_WIDTH, 316/REF_HEIGHT, 111/REF_WIDTH, 327/REF_HEIGHT), # 1
+]
 
 # 原始角色裁切区域参考分辨率，from crop_ratios
 CHAR_WIDTH = 420
@@ -63,6 +72,15 @@ echo_crop_ratios = [
     (110/ECHO_WIDTH,  40/ECHO_HEIGHT, 204/ECHO_WIDTH,  85/ECHO_HEIGHT), # 右上角主词条(忽略声骸cost，暂不处理)
     ( 26/ECHO_WIDTH, 105/ECHO_HEIGHT, 204/ECHO_WIDTH, 230/ECHO_HEIGHT), # 下部6条副词条
 ]
+
+# 识别结果容器
+final_result = {
+    "用户信息": {},
+    "角色信息": {},
+    "技能等级": [],
+    "装备数据": [],
+    "武器信息": {}
+}
 
 async def async_ocr(bot: Bot, ev: Event):
     """
@@ -154,7 +172,9 @@ async def upload_discord_bot_card(bot: Bot, ev: Event):
         await bot.send(f"[鸣潮]上传卡片图失败！\n", at_sender)
         return False
 
-def cut_image(image, img_width, img_height, crop_ratios):
+def cut_image(image, crop_ratios):
+    # 获取实际分辨率
+    img_width, img_height = image.size  
     # 裁切图片
     cropped_images = []
     for ratio in crop_ratios:
@@ -182,10 +202,8 @@ def cut_image_need_data(image_need, data_crop_ratios):
     裁切角色卡片拼接用户数据: 上面角色数据，下面用户信息
     目的: 优化ocrspace 模型2识别
     """
-    img_width, img_height = image_need.size
-    
     # 获取裁切后的子图列表
-    cropped_images = cut_image(image_need, img_width, img_height, data_crop_ratios)
+    cropped_images = cut_image(image_need, data_crop_ratios)
 
     # 计算拼接后图片的总高度和最大宽度
     total_height = sum(img.height for img in cropped_images)
@@ -200,6 +218,53 @@ def cut_image_need_data(image_need, data_crop_ratios):
 
     return image_only_data
 
+def analyze_chain_num(image):
+    cropped_chain_images = cut_image(image, chain_crop_ratios)
+
+    avg_colors = []
+
+    # 遍历切割后的图像区域
+    for i, region in enumerate(cropped_chain_images):
+        # 确保图像为RGB模式
+        region = region.convert('RGB')
+        region_array = np.array(region)
+
+        # 计算平均颜色
+        avg_r = int(np.mean(region_array[:, :, 0]))
+        avg_g = int(np.mean(region_array[:, :, 1]))
+        avg_b = int(np.mean(region_array[:, :, 2]))
+        avg_colors.append((avg_r, avg_g, avg_b))
+
+    def is_chain_color(color):
+        """
+        参考 rgb值 -- 3链
+        (143, 129, 79)
+        (144, 129, 80)
+        (142, 128, 79)
+        (203, 185, 127)
+        (205, 189, 132)
+        (207, 191, 135)
+        360 与 530 的中值为 445
+        """
+        r, g, b = color
+        return (r + g + b) > 445
+
+    chain_num = 0
+    chain_bool = False # 共鸣链判断触发应连续
+    for color in avg_colors:
+        if not chain_bool and is_chain_color(color):
+            chain_bool = True
+            chain_num = 1
+            continue
+        if chain_bool and is_chain_color(color):
+            chain_num += 1
+            continue
+        if chain_bool and not is_chain_color(color):
+            logger.debug(f"[鸣潮]卡片分析 共鸣链识别出现断裂错误")
+            return 0
+        
+    return chain_num
+
 async def cut_card_to_ocr(api_key):
     """
     裁切卡片：角色，技能树*5，声骸*5，武器
@@ -208,9 +273,14 @@ async def cut_card_to_ocr(api_key):
 
     # 打开图片
     image = Image.open(CARD_PATH).convert('RGB')
-    img_width, img_height = image.size  # 获取实际分辨率
     
-    cropped_images = cut_image(image, img_width, img_height, crop_ratios)
+    # 分析角色共鸣链数据
+    chain_num = analyze_chain_num(image)
+    if not final_result["角色信息"].get("共鸣链"):
+        final_result["角色信息"]["共鸣链"] = chain_num
+
+    # 裁切卡片，分割识别范围
+    cropped_images = cut_image(image, crop_ratios)
 
     # 进一步裁切角色图
     image_char = cropped_images[0]
@@ -324,14 +394,6 @@ async def ocr_results_to_dict(ocr_results):
     适配OCR.space输出结构的增强版结果解析
     输入结构: [{'text': '...', 'error': ...}, ...]
     """
-    final_result = {
-        "用户信息": {},
-        "角色信息": {},
-        "技能等级": [],
-        "装备数据": [],
-        "武器信息": {}
-    }
-
     # 增强正则模式（适配多行文本处理）
     patterns = {
         "name": re.compile(r'^([\u4e00-\u9fa5A-Za-z]+)'), # 支持英文名，为后续逻辑判断用
