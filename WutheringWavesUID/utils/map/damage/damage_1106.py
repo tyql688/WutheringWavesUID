@@ -1,21 +1,21 @@
 # 釉瑚
-from typing import Union, List
+from typing import List, Optional, Union
 
-from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
 from ...damage.utils import (
-    skill_damage_calc,
-    SkillType,
     SkillTreeMap,
-    cast_skill,
+    SkillType,
     cast_attack,
-    cast_liberation,
-    hit_damage,
     cast_hit,
+    cast_liberation,
+    cast_skill,
     heal_bonus,
+    skill_damage,
+    skill_damage_calc,
 )
+from .damage import echo_damage, phase_damage, weapon_damage
 
 
 def skill_effect(attr, role_name, skill_type, isChain):
@@ -24,14 +24,14 @@ def skill_effect(attr, role_name, skill_type, isChain):
             title = f"{role_name}-二链-联珠"
         else:
             title = f"{role_name}-联珠"
-        msg = f"拥有三个相同的【吉兆】时。诗中物造成的伤害提升175%"
+        msg = "拥有三个相同的【吉兆】时。诗中物造成的伤害提升175%"
         attr.add_dmg_bonus(1.75, title, msg)
     elif "对偶" in skill_type:
         if isChain:
             title = f"{role_name}-二链-对偶"
         else:
             title = f"{role_name}-对偶"
-        msg = f"拥有一对相同的【吉兆】时。诗中物造成的伤害提升70%"
+        msg = "拥有一对相同的【吉兆】时。诗中物造成的伤害提升70%"
         attr.add_dmg_bonus(0.7, title, msg)
 
 
@@ -40,9 +40,9 @@ def calc_damage_1(
     role: RoleDetailData,
     isGroup: bool = False,
     skill_name: Union[str, List[str]] = "",
-) -> (str, str):
+) -> tuple[str, str]:
     # 设置角色伤害类型
-    attr.set_char_damage(hit_damage)
+    attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
     attr.set_char_template("temp_atk")
 
@@ -57,7 +57,7 @@ def calc_damage_1(
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
     )
-    title = f"诗中物"
+    title = "诗中物"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
@@ -73,7 +73,7 @@ def calc_damage_1(
     if role_breach and role_breach >= 3:
         if isGroup:
             title = f"{role_name}-固有技能"
-            msg = f"施放变奏技能遂心匣时，釉瑚的冷凝伤害加成提升15%"
+            msg = "施放变奏技能遂心匣时，釉瑚的冷凝伤害加成提升15%"
             attr.add_dmg_bonus(0.15, title, msg)
 
     skill_effect(attr, role_name, skill_name, False)
@@ -90,18 +90,18 @@ def calc_damage_1(
 
     if chain_num >= 3:
         title = f"{role_name}-三链"
-        msg = f"釉瑚的攻击提升20%。"
+        msg = "釉瑚的攻击提升20%。"
         attr.add_atk_percent(0.2, title, msg)
 
     if chain_num >= 5:
         if isGroup:
             title = f"{role_name}-五链"
-            msg = f"施放变奏技能遂心匣时，釉瑚的暴击提升15%"
+            msg = "施放变奏技能遂心匣时，釉瑚的暴击提升15%"
             attr.add_crit_rate(0.15, title, msg)
 
     if chain_num >= 6:
         title = f"{role_name}-六链"
-        msg = f"4层霁青效果，暴击伤害提升15%*4"
+        msg = "4层霁青效果，暴击伤害提升15%*4"
         attr.add_crit_dmg(0.15 * 4, title, msg)
 
     # 声骸
@@ -122,7 +122,7 @@ def calc_damage_2(
     role: RoleDetailData,
     isGroup: bool = False,
     skill_name: Union[str, List[str]] = "",
-) -> (str, str):
+) -> tuple[Optional[str], str]:
     damage_func = [cast_attack, cast_skill, cast_hit, cast_liberation]
     attr.set_char_damage(heal_bonus)
     attr.set_char_template("temp_atk")
@@ -140,14 +140,14 @@ def calc_damage_2(
         skill_multi = skill_damage_calc(
             char_result.skillTrees, SkillTreeMap[skill_type], "3", skillLevel
         )
-        title = f"双关额外治疗量"
+        title = "双关额外治疗量"
         msg = f"技能倍率{skill_multi}"
     else:
         # 技能技能倍率
         skill_multi = skill_damage_calc(
             char_result.skillTrees, SkillTreeMap[skill_type], "2", skillLevel
         )
-        title = f"诗中物治疗量"
+        title = "诗中物治疗量"
         msg = f"技能倍率{skill_multi}"
     attr.add_healing_skill_multi(skill_multi, title, msg)
 
@@ -156,7 +156,7 @@ def calc_damage_2(
 
     attr.set_phantom_dmg_bonus(needShuxing=False)
 
-    chain_num = role.get_chain_num()
+    # chain_num = role.get_chain_num()
 
     echo_damage(attr, isGroup)
 
@@ -170,7 +170,7 @@ def calc_damage_2(
 
 def calc_damage_3(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[Optional[str], str]:
     damage_func = [cast_attack, cast_skill, cast_hit, cast_liberation]
     attr.set_char_damage(heal_bonus)
     attr.set_char_template("temp_atk")
@@ -186,7 +186,7 @@ def calc_damage_3(
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], "2", skillLevel
     )
-    title = f"匣中问祯治疗量"
+    title = "匣中问祯治疗量"
     msg = f"技能倍率{skill_multi}"
     attr.add_healing_skill_multi(skill_multi, title, msg)
 
@@ -195,7 +195,7 @@ def calc_damage_3(
 
     attr.set_phantom_dmg_bonus(needShuxing=False)
 
-    chain_num = role.get_chain_num()
+    # chain_num = role.get_chain_num()
 
     echo_damage(attr, isGroup)
 
