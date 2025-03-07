@@ -34,8 +34,10 @@ REF_HEIGHT = 602
     
 # 裁切区域比例（左、上、右、下），数字来自src/example_card_2.png
 # 技能树扫描顺序：普攻、共鸣技能、共鸣解放、变奏技能、共鸣回路(json_skillList顺序)
+# 有可能出现空声骸，故放最后
 crop_ratios = [
     (  0/REF_WIDTH,   0/REF_HEIGHT, 420/REF_WIDTH, 350/REF_HEIGHT), # 角色
+    (890/REF_WIDTH, 240/REF_HEIGHT, 1020/REF_WIDTH,310/REF_HEIGHT), # 武器
     (583/REF_WIDTH,  30/REF_HEIGHT, 653/REF_WIDTH, 130/REF_HEIGHT), # 普攻
     (456/REF_WIDTH, 115/REF_HEIGHT, 526/REF_WIDTH, 215/REF_HEIGHT), # 共鸣技能
     (694/REF_WIDTH, 115/REF_HEIGHT, 764/REF_WIDTH, 215/REF_HEIGHT), # 共鸣解放
@@ -45,8 +47,7 @@ crop_ratios = [
     (221/REF_WIDTH, 360/REF_HEIGHT, 425/REF_WIDTH, 590/REF_HEIGHT), # 声骸2
     (430/REF_WIDTH, 360/REF_HEIGHT, 634/REF_WIDTH, 590/REF_HEIGHT), # 声骸3
     (639/REF_WIDTH, 360/REF_HEIGHT, 843/REF_WIDTH, 590/REF_HEIGHT), # 声骸4
-    (848/REF_WIDTH, 360/REF_HEIGHT, 1052/REF_WIDTH, 590/REF_HEIGHT), # 声骸5
-    (800/REF_WIDTH, 240/REF_HEIGHT, 1020/REF_WIDTH, 350/REF_HEIGHT), # 武器
+    (848/REF_WIDTH, 360/REF_HEIGHT, 1052/REF_WIDTH,590/REF_HEIGHT), # 声骸5
 ]
 # 共鸣链识别顺序（从右往左，从6到1）
 chain_crop_ratios = [
@@ -238,6 +239,13 @@ def cut_image_need_data(image_need, data_crop_ratios):
 
     return image_only_data
 
+def reset_final_result(result_dict):
+    result_dict["用户信息"].clear()
+    result_dict["角色信息"].clear()
+    result_dict["技能等级"].clear()
+    result_dict["装备数据"].clear()
+    result_dict["武器信息"].clear()
+
 def analyze_chain_num(image):
     cropped_chain_images = cut_image(image, chain_crop_ratios)
 
@@ -290,6 +298,8 @@ async def cut_card_to_ocr(api_key):
     裁切卡片：角色，技能树*5，声骸*5，武器
         （按比例适配任意分辨率，1920*1080识别效果优良）
     """
+    # 清空上一个识别结果
+    reset_final_result(final_result)
 
     # 打开图片
     image = Image.open(CARD_PATH).convert('RGB')
@@ -411,7 +421,7 @@ async def ocr_results_to_dict(ocr_results):
     patterns = {
         "name": re.compile(r'^([\u4e00-\u9fa5A-Za-z]+)'), # 支持英文名，为后续逻辑判断用
         "level": re.compile(r'(?i)(.V?\.?)\s*(\d+)'),
-        "skill_level": re.compile(r'(\d+)/10'),
+        "skill_level": re.compile(r'[LV]*\.?\s*(\d+)\s*/\s*10'),  # 兼容 L.10/10、LV.10/10 等格式
         "player_info": re.compile(r'玩家名稱[:：]\s*(\S+)'),
         "uid_info": re.compile(r'特.碼[:：]\s*(\d+)'),
         "echo_value": re.compile(r'([\u4e00-\u9fa5]+)\s*\D*([\d.]+%?)'), # 不支持英文词条(空格不好处理), 支持处理"暴擊傷害 器44%", "攻擊 ×18%"
@@ -420,7 +430,7 @@ async def ocr_results_to_dict(ocr_results):
 
     cc = OpenCC('t2s')  # 繁体转简体
 
-    # 处理角色信息（第一个识别结果）
+    # 处理角色信息（第一个识别结果）0
     if ocr_results:
         first_result = ocr_results[0]
         if first_result['error'] is None:
@@ -456,25 +466,45 @@ async def ocr_results_to_dict(ocr_results):
                 if uid_match:
                     final_result["用户信息"]["UID"] = uid_match.group(1)
 
-    # 处理技能等级（第2-6个结果）
-    for idx in range(1, 6):
+    # 处理武器信息（第二个结果）1
+    if len(ocr_results) > 1 and ocr_results[1]['error'] is None:
+        text = ocr_results[1]['text']
+        lines = [line.strip() for line in text.split('\n') if line.strip()]
+        
+        # 武器名称（取第一行有效文本）
+        for line in lines:
+            if patterns["name"].search(line):
+                final_result["武器信息"]["武器名"] = cc.convert(line)
+                break
+                
+        # 武器等级
+        for line in lines:
+            level_match = patterns["level"].search(line)
+            if level_match:
+                final_result["武器信息"]["等级"] = int(level_match.group(2))
+                break
+
+    # 处理技能等级（第3-7个结果）下标：2 3 4 5 6
+    for idx in range(2, 7):
         if idx >= len(ocr_results) or ocr_results[idx]['error'] is not None:
             final_result["技能等级"].append(1)
             continue
             
         text = ocr_results[idx]['text']
-        matches = patterns["skill_level"].findall(text)
-        if matches:
+        # 强化文本清洗
+        text_clean = re.sub(r'[^0-9/]', '', text)  # 移除非数字字符
+        match = patterns["skill_level"].search(text_clean)
+        if match:
             try:
-                level = int(matches[0])
+                level = int(match.group(1))
                 final_result["技能等级"].append(min(level, 10))  # 限制最大等级为10
             except:
                 final_result["技能等级"].append(1)
         else:
             final_result["技能等级"].append(1)
 
-    # 处理声骸装备（第7-11个结果）
-    for idx in range(6, 11):
+    # 处理声骸装备（第8-12个结果）下标：7 8 9 10 11
+    for idx in range(7, 12):
         if idx >= len(ocr_results) or ocr_results[idx]['error'] is not None:
             continue
             
@@ -493,6 +523,7 @@ async def ocr_results_to_dict(ocr_results):
             # 自定义替换优先执行（在繁转简之前）
             if re.search(r'暴.(傷害)?', attr):
                 attr = re.sub(r'暴.(傷害)?', r'暴擊\1', attr)
+            attr = attr.replace("箓擎傷害", "暴擊傷害").replace("箓擎", "暴擊")
             clean_attr = cc.convert(attr) # 标准繁简转换
             # 验证属性名是否符合预期（至少两个中文字符，且不含数字）
             if len(clean_attr) >= 2 and not re.search(r'[0-9]', clean_attr):
@@ -516,24 +547,6 @@ async def ocr_results_to_dict(ocr_results):
                 })
             
             final_result["装备数据"].append(equipment)
-
-    # 处理武器信息（最后一个结果）
-    if len(ocr_results) > 11 and ocr_results[11]['error'] is None:
-        text = ocr_results[11]['text']
-        lines = [line.strip() for line in text.split('\n') if line.strip()]
-        
-        # 武器名称（取第一行有效文本）
-        for line in lines:
-            if patterns["name"].search(line):
-                final_result["武器信息"]["武器名"] = cc.convert(line)
-                break
-                
-        # 武器等级
-        for line in lines:
-            level_match = patterns["level"].search(line)
-            if level_match:
-                final_result["武器信息"]["等级"] = int(level_match.group(2))
-                break
 
     logger.info(f" [鸣潮][dc卡片识别] 最终提取内容:\n{final_result}")
     return True, final_result
