@@ -12,6 +12,7 @@ from PIL import Image
 from io import BytesIO
 from pathlib import Path
 from opencc import OpenCC
+from aiohttp import ClientSession, ClientTimeout
 
 # 项目内部模块
 from gsuid_core.bot import Bot
@@ -81,6 +82,25 @@ final_result = {
     "装备数据": [],
     "武器信息": {}
 }
+
+# 全局配置
+OCR_TIMEOUT = ClientTimeout(total=10)  # 总超时 10 秒
+OCR_SESSION = None  # 全局会话实例
+
+async def get_global_session():
+    global OCR_SESSION
+    if OCR_SESSION is None or OCR_SESSION.closed:
+        # 设置连接池参数：最多 10 个连接，空闲 60 秒自动关闭
+        connector = aiohttp.TCPConnector(
+            limit=10,
+            keepalive_timeout=60  # 空闲连接保留 60 秒
+        )
+        OCR_SESSION = aiohttp.ClientSession(
+            connector=connector,
+            timeout=ClientTimeout(total=10)
+        )
+        logger.info("[鸣潮]已创建新的全局 OCR 会话")
+    return OCR_SESSION
 
 async def async_ocr(bot: Bot, ev: Event):
     """
@@ -307,39 +327,39 @@ async def images_ocrspace(api_key, cropped_images):
     API_KEY = api_key
     API_URL = 'https://api.ocr.space/parse/image'
 
-    async with aiohttp.ClientSession() as session:
-        tasks = []
-        for img in cropped_images:
-            # 将PIL.Image转换为base64
-            try:
-                buffered = BytesIO()
-                img.save(buffered, format='PNG')
-                img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-            except Exception as e:
-                print(f"图像转换错误: {e}")
-                continue
+    session = await get_global_session()  # 复用全局会话
+    tasks = []
+    for img in cropped_images:
+        # 将PIL.Image转换为base64
+        try:
+            buffered = BytesIO()
+            img.save(buffered, format='PNG')
+            img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        except Exception as e:
+            print(f"图像转换错误: {e}")
+            continue
                 
-            # 构建请求参数
-            payload = {
-                'apikey': API_KEY,
-                'language': 'cht',          # 仅繁体中文（正确参数值）
-                'isOverlayRequired': 'True', # 需要坐标信息
-                'base64Image': f'data:image/png;base64,{img_base64}',
-                'OCREngine': 2,             # 使用引擎2, 识别效果更好，声骸识别差一些
-                'isTable': 'True',    # 启用表格识别模式
-                'detectOrientation': 'True', # 自动检测方向
-                'scale': 'True'              # 图像缩放增强
-            }
+        # 构建请求参数
+        payload = {
+            'apikey': API_KEY,
+            'language': 'cht',          # 仅繁体中文（正确参数值）
+            'isOverlayRequired': 'True', # 需要坐标信息
+            'base64Image': f'data:image/png;base64,{img_base64}',
+            'OCREngine': 2,             # 使用引擎2, 识别效果更好，声骸识别差一些
+            'isTable': 'True',    # 启用表格识别模式
+            'detectOrientation': 'True', # 自动检测方向
+            'scale': 'True'              # 图像缩放增强
+        }
 
-            tasks.append(fetch_ocr_result(session, API_URL, payload))
+        tasks.append(fetch_ocr_result(session, API_URL, payload))
 
-        # 限制并发数为1防止超过API限制
-        semaphore = asyncio.Semaphore(1)
-        # 修改返回结果处理
-        results = await asyncio.gather(*(process_with_semaphore(task, semaphore) for task in tasks))
+    # 限制并发数为1防止超过API限制
+    semaphore = asyncio.Semaphore(1)
+    # 修改返回结果处理
+    results = await asyncio.gather(*(process_with_semaphore(task, semaphore) for task in tasks))
         
-        # 扁平化处理（合并所有子列表）
-        return [item for sublist in results for item in sublist]
+    # 扁平化处理（合并所有子列表）
+    return [item for sublist in results for item in sublist]
 
 async def process_with_semaphore(task, semaphore):
     async with semaphore:
@@ -348,7 +368,7 @@ async def process_with_semaphore(task, semaphore):
 async def fetch_ocr_result(session, url, payload):
     """发送OCR请求并处理响应"""
     try:
-        async with session.post(url, data=payload) as response:
+        async with session.post(url, data=payload, timeout=10) as response: # ✅ 添加单次请求超时
             # 检查HTTP状态码
             if response.status != 200:
                 # 修改错误返回格式为字典（与其他成功结果结构一致）
