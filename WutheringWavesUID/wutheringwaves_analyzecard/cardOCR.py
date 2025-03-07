@@ -317,7 +317,7 @@ async def cut_card_to_ocr(api_key):
     cropped_images[0] = cut_image_need_data(image_char, char_crop_ratios)
 
     # 进一步裁剪拼接声骸图
-    for i in range(6, 11):  # 替换索引6-10，即5张声骸图
+    for i in range(7, 12):  # 替换索引7-11，即5张声骸图
         image_echo = cropped_images[i]
         cropped_images[i] = cut_image_need_data(image_echo, echo_crop_ratios) 
 
