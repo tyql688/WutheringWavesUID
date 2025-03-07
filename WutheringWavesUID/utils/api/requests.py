@@ -454,7 +454,7 @@ class WavesApi:
     )
     async def get_online_list_role(self, token: str) -> tuple[bool, Union[Dict, str]]:
         """所有的角色列表"""
-        header = copy.deepcopy(await get_headers())
+        header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
         data = {}
         raw_data = await self._waves_request(
@@ -468,7 +468,7 @@ class WavesApi:
     )
     async def get_online_list_weapon(self, token: str) -> tuple[bool, Union[Dict, str]]:
         """所有的武器列表"""
-        header = copy.deepcopy(await get_headers())
+        header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
         data = {}
         raw_data = await self._waves_request(
@@ -484,7 +484,7 @@ class WavesApi:
         self, token: str
     ) -> tuple[bool, Union[Dict, str]]:
         """所有的声骸列表"""
-        header = copy.deepcopy(await get_headers())
+        header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
         data = {}
         raw_data = await self._waves_request(
