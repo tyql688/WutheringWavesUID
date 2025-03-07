@@ -448,7 +448,10 @@ class WavesApi:
         )
         return await _check_response(raw_data, roleId)
 
-    @timed_async_cache(86400)
+    @timed_async_cache(
+        86400,
+        lambda x: x[0] and isinstance(x[1], (dict, list)),
+    )
     async def get_online_list_role(self, token: str) -> tuple[bool, Union[Dict, str]]:
         """所有的角色列表"""
         header = copy.deepcopy(await get_headers())
@@ -459,7 +462,10 @@ class WavesApi:
         )
         return await _check_response(raw_data)
 
-    @timed_async_cache(86400)
+    @timed_async_cache(
+        86400,
+        lambda x: x[0] and isinstance(x[1], (dict, list)),
+    )
     async def get_online_list_weapon(self, token: str) -> tuple[bool, Union[Dict, str]]:
         """所有的武器列表"""
         header = copy.deepcopy(await get_headers())
@@ -470,7 +476,10 @@ class WavesApi:
         )
         return await _check_response(raw_data)
 
-    @timed_async_cache(86400)
+    @timed_async_cache(
+        86400,
+        lambda x: x[0] and isinstance(x[1], (dict, list)),
+    )
     async def get_online_list_phantom(
         self, token: str
     ) -> tuple[bool, Union[Dict, str]]:

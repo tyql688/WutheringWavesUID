@@ -6,7 +6,7 @@ from functools import wraps
 import httpx
 
 
-def timed_async_cache(expiration):
+def timed_async_cache(expiration, condition=lambda x: True):
     def decorator(func):
         cache = {}
 
@@ -25,7 +25,8 @@ def timed_async_cache(expiration):
                     return value
 
             value = await func(*args)
-            cache[cache_key] = (value, current_time)
+            if condition(value):
+                cache[cache_key] = (value, current_time)
             return value
 
         return wrapper
