@@ -18,15 +18,10 @@ from aiohttp import ClientSession, ClientTimeout
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.logger import logger
-from gsuid_core.utils.download_resource.download_file import download
 
 from ..wutheringwaves_config import WutheringWavesConfig
 from ..wutheringwaves_analyzecard.userData import save_card_dict_to_json
 
-
-SRC_PATH = Path(__file__).parent / "src"
-CARD_PATH = Path(__file__).parent / "src/card.jpg"
-CARD_NAME = "card.jpg"
 
 # 原始dc卡片参考分辨率，from example_card_2.png
 REF_WIDTH = 1072
@@ -75,15 +70,6 @@ echo_crop_ratios = [
     ( 26/ECHO_WIDTH, 105/ECHO_HEIGHT, 204/ECHO_WIDTH, 230/ECHO_HEIGHT), # 下部6条副词条
 ]
 
-# 识别结果容器
-final_result = {
-    "用户信息": {},
-    "角色信息": {},
-    "技能等级": [],
-    "装备数据": [],
-    "武器信息": {}
-}
-
 # 全局配置
 OCR_TIMEOUT = ClientTimeout(total=10)  # 总超时 10 秒
 OCR_SESSION = None  # 全局会话实例
@@ -109,16 +95,18 @@ async def async_ocr(bot: Bot, ev: Event):
     """
     API_KEY = WutheringWavesConfig.get_config("OCRspaceApiKey").data  # 从控制台获取OCR.space的API密钥
     if not API_KEY:
-        logger.info(f"[鸣潮]OCRspace API密钥为空！请检查控制台获取API密钥。")
-        await bot.send(f"[鸣潮]OCRspace API密钥为空！请检查控制台获取API密钥。")
+        logger.info(f"[鸣潮]OCRspace API密钥为空！请检查控制台是否填入API密钥。")
+        await bot.send(f"[鸣潮]OCRspace API密钥为空！请检查控制台是否填入API密钥。")
         return False
 
-    if not await upload_discord_bot_card(bot, ev):
-        await bot.send(f"[鸣潮]卡片分析已停止。")
+    bool_i, image = await upload_discord_bot_card(bot, ev)
+    if not bool_i:
+        await bot.send(f"[鸣潮]获取dc卡片图失败！卡片分析已停止。")
         return False
 
     # 获取dc卡片识别结果,使用API_KEY
-    ocr_results = await cut_card_to_ocr(API_KEY)
+    chain_num, cropped_images = await cut_card_to_ocr(image)
+    ocr_results = await images_ocrspace(API_KEY, cropped_images)
     logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
 
     if ocr_results[0]['error']:
@@ -126,9 +114,9 @@ async def async_ocr(bot: Bot, ev: Event):
         await bot.send(f"[鸣潮]OCRspace识别访问失败！请检查控制台API密钥是否正确，服务器网络是否正常。")
         return False
 
-    bool, final_result = await ocr_results_to_dict(ocr_results)
+    bool_d, final_result = await ocr_results_to_dict(chain_num, ocr_results)
 
-    if bool:
+    if bool_d:
         await save_card_dict_to_json(bot, ev, final_result)
     else:
         await bot.send(f"[鸣潮]Please use chinese card！")
@@ -145,6 +133,8 @@ async def get_image(ev: Event):
             res.append(content.data)
         elif content.type == "image" and content.data and isinstance(content.data, str) and content.data.startswith("http"):
             res.append(content.data)
+        elif content.type == "text" and content.data and isinstance(content.data, str) and content.data.startswith("http"):
+            res.append(content.data)
 
     if not res and ev.image:
         res.append(ev.image)
@@ -160,38 +150,46 @@ async def upload_discord_bot_card(bot: Bot, ev: Event):
 
     upload_images = await get_image(ev)
     if not upload_images:
-        await bot.send(f"[鸣潮]获取卡片图失败！\n", at_sender)
-        return False
+        return False, None
 
     logger.info(f"[鸣潮]卡片分析上传链接{upload_images}")
-    success = True
-    for upload_image in upload_images:
-        # name = f"card_{int(time.time() * 1000)}.jpg"
-        name = CARD_NAME
-        if not CARD_PATH.exists():
-            try:
-                if httpx.__version__ >= "0.28.0":
-                    ssl_context = ssl.create_default_context()
-                    # ssl_context.set_ciphers("AES128-GCM-SHA256")
-                    ssl_context.set_ciphers("DEFAULT")
-                    sess = httpx.AsyncClient(verify=ssl_context)
-                else:
-                    sess = httpx.AsyncClient()
-            except Exception as e:
-                logger.exception(f"{httpx.__version__} - {e}")
-                sess = None
-            code = await download(upload_image, SRC_PATH, name, tag="[鸣潮]", sess=sess)
-            if not isinstance(code, int) or code != 200:
-                # 成功
-                success = False
-                break
+    success = False
+    url = upload_images[0] # 处理一张图片
+    if url:
+        if httpx.__version__ >= "0.28.0":
+            ssl_context = ssl.create_default_context()
+            # ssl_context.set_ciphers("AES128-GCM-SHA256")
+            ssl_context.set_ciphers("DEFAULT")
+            sess = httpx.AsyncClient(verify=ssl_context)
+        else:
+            sess = httpx.AsyncClient()
+
+        try:
+            if isinstance(sess, httpx.AsyncClient):
+                res = await sess.get(url)
+                image_data = res.read()
+                retcode = res.status_code
+            else:
+                async with sess.get(url) as resp:
+                    image_data = await resp.read()
+                    retcode = resp.status
+
+            if retcode == 200:
+                success = True
+                logger.success(f'[鸣潮]图片获取完成！')
+            else:
+                logger.warning(f"[鸣潮]图片获取失败！错误码{retcode}")
+
+        except Exception as e:
+            logger.error(e)
+            logger.warning(f"[鸣潮]图片获取失败！")
 
     if success:
         await bot.send(f"[鸣潮]上传卡片图成功！进行数据提取中...\n", at_sender)
-        return True
+        image = Image.open(BytesIO(image_data))
+        return True, image
     else:
-        await bot.send(f"[鸣潮]上传卡片图失败！\n", at_sender)
-        return False
+        return False, None
 
 def cut_image(image, crop_ratios):
     # 获取实际分辨率
@@ -238,13 +236,6 @@ def cut_image_need_data(image_need, data_crop_ratios):
         y_offset += img.height  # 累加y轴偏移量
 
     return image_only_data
-
-def reset_final_result(result_dict):
-    result_dict["用户信息"].clear()
-    result_dict["角色信息"].clear()
-    result_dict["技能等级"].clear()
-    result_dict["装备数据"].clear()
-    result_dict["武器信息"].clear()
 
 def analyze_chain_num(image):
     cropped_chain_images = cut_image(image, chain_crop_ratios)
@@ -293,21 +284,14 @@ def analyze_chain_num(image):
         
     return chain_num
 
-async def cut_card_to_ocr(api_key):
+async def cut_card_to_ocr(image):
     """
     裁切卡片：角色，技能树*5，声骸*5，武器
         （按比例适配任意分辨率，1920*1080识别效果优良）
     """
-    # 清空上一个识别结果
-    reset_final_result(final_result)
-
-    # 打开图片
-    image = Image.open(CARD_PATH).convert('RGB')
     
     # 分析角色共鸣链数据
     chain_num = analyze_chain_num(image)
-    if not final_result["角色信息"].get("共鸣链"):
-        final_result["角色信息"]["共鸣链"] = chain_num
 
     # 裁切卡片，分割识别范围
     cropped_images = cut_image(image, crop_ratios)
@@ -321,14 +305,8 @@ async def cut_card_to_ocr(api_key):
         image_echo = cropped_images[i]
         cropped_images[i] = cut_image_need_data(image_echo, echo_crop_ratios) 
 
-    # for i, cropped_image in enumerate(cropped_images):
-    #     # 保存裁切后的图片
-    #     cropped_image.save(f"{SRC_PATH}/_{i}.png")
-    
-    os.remove(CARD_PATH) # 删除原图片
-
     # 调用 images_ocrspace 函数并获取识别结果
-    return await images_ocrspace(api_key, cropped_images)
+    return chain_num, cropped_images
 
 async def images_ocrspace(api_key, cropped_images):
     """
@@ -412,11 +390,24 @@ async def fetch_ocr_result(session, url, payload):
     except Exception as e:
         return [{'error': f'Processing Error:{str(e)}', 'text': None}]
 
-async def ocr_results_to_dict(ocr_results):
+async def ocr_results_to_dict(chain_num, ocr_results):
     """
     适配OCR.space输出结构的增强版结果解析
     输入结构: [{'text': '...', 'error': ...}, ...]
     """
+    # 识别结果容器
+    final_result = {
+        "用户信息": {},
+        "角色信息": {},
+        "技能等级": [],
+        "装备数据": [],
+        "武器信息": {}
+    }
+    
+    # 保存角色共鸣链
+    if not final_result["角色信息"].get("共鸣链"):
+        final_result["角色信息"]["共鸣链"] = chain_num
+
     # 增强正则模式（适配多行文本处理）
     patterns = {
         "name": re.compile(r'^([\u4e00-\u9fa5A-Za-z]+)'), # 支持英文名，为后续逻辑判断用
