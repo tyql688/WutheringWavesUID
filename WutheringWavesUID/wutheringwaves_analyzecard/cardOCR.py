@@ -440,6 +440,12 @@ async def ocr_results_to_dict(ocr_results):
                 line_clean = re.sub(r'\s+', ' ', line).strip()  # 使用 \s+ 匹配所有空白符，并替换为单个空格
                 # line = line.strip()
                 
+                # 玩家名称
+                player_match = patterns["player_info"].search(line_clean)
+                if player_match:
+                    final_result["用户信息"]["玩家名称"] = player_match.group(1)
+                    continue # 避免玩家名称在前被识别为角色名
+
                 # 角色名提取
                 if not final_result["角色信息"].get("角色名"):
                     name_match = patterns["name"].search(line_clean)
@@ -455,11 +461,6 @@ async def ocr_results_to_dict(ocr_results):
                 level_match = patterns["level"].search(line_clean)
                 if level_match and not final_result["角色信息"].get("等级"):
                     final_result["角色信息"]["等级"] = int(level_match.group(2))
-                
-                # 玩家名称
-                player_match = patterns["player_info"].search(line_clean)
-                if player_match:
-                    final_result["用户信息"]["玩家名称"] = player_match.group(1)
                 
                 # UID提取
                 uid_match = patterns["uid_info"].search(line_clean)
