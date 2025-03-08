@@ -14,7 +14,7 @@ from ..utils.name_convert import (
     weapon_name_to_weapon_id
 )
 from ..wutheringwaves_config import PREFIX
-from .char_fetterDetail import get_fetterDetail_from_sonata
+from .char_fetterDetail import get_fetterDetail_from_sonata, echo_data_to_cost
 
 
 async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
@@ -65,22 +65,33 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
             "cost": 12,
             "equipPhantomList": []
         }
-        first_echo_id, ECHO = await get_fetterDetail_from_sonata(char_name)
-        get_first_echo = True 
+
+        cost_sum = 0 # 默认cost总数
+        cost4_counter = 0 # 4cost 的计数器
+        ECHO = await get_fetterDetail_from_sonata(char_name)
+
         for echo_value in result_dict["装备数据"]:
             # 创建 ECHO 的独立副本
             echo = copy.deepcopy(ECHO)
-            # 替换第一声骸位为对应套装4C
-            if get_first_echo:
-                echo["phantomProp"]["phantomId"] = first_echo_id
-                get_first_echo = False
 
             # 更新 echo 的 mainProps 和 subProps, 防止空表
             echo["mainProps"] = echo_value.get("mainProps", [])
             echo["subProps"] = echo_value.get("subProps", [])
 
+            # 根据主词条判断声骸cost并适配id
+            echo_id, cost = await echo_data_to_cost(char_name, echo["mainProps"][0], cost4_counter)
+            cost_sum += cost
+            if cost == 4:
+                cost4_counter += 1  # 只有实际生成cost4时递增
+
+            echo["phantomProp"]["phantomId"] = echo_id
+            echo["phantomProp"]["cost"] = cost
+            echo["cost"] = cost
+
             # 将更新后的 echo 添加到 equipPhantomList
             data["phantomData"]["equipPhantomList"].append(echo)
+        
+        data["phantomData"]["cost"] = cost_sum # 更新总cost
     
     # 处理 `role` 的数据
     if result.role is not None:
