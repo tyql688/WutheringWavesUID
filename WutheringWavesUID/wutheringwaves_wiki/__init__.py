@@ -10,15 +10,16 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
+
+from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
+from ..utils.resource.RESOURCE_PATH import GUIDE_CONFIG_MAP
+from ..wutheringwaves_config import WutheringWavesConfig
 from .bilibili import GuideBilibili
 from .draw_char import draw_char_wiki
 from .draw_echo import draw_wiki_detail
 from .draw_weapon import draw_wiki_weapon
 from .main import Guide
 from .tap import GuideTap
-from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from ..utils.resource.RESOURCE_PATH import GUIDE_CONFIG_MAP
-from ..wutheringwaves_config import WutheringWavesConfig
 
 sv_waves_guide = SV("鸣潮攻略")
 sv_waves_wiki = SV("鸣潮wiki")
@@ -196,5 +197,4 @@ def force_delete_dir(_dir: Path):
         if _dir.exists() and _dir.is_dir():
             shutil.rmtree(_dir)
     except Exception as e:
-        print(f"Error deleting directory {_dir}: {e}")
-        print(f"Error deleting directory {_dir}: {e}")
+        logger.exception(f"Error deleting directory {_dir}: {e}")

@@ -274,7 +274,9 @@ async def get_waves_token_condition(ev, is_bot):
     return flag, wavesTokenUsersMap
 
 
-async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str, is_bot: bool):
+async def draw_rank_img(
+    bot: Bot, ev: Event, char: str, rank_type: str, is_bot: bool
+) -> Union[str, bytes]:
     char_id = char_name_to_char_id(char)
     if not char_id:
         return (

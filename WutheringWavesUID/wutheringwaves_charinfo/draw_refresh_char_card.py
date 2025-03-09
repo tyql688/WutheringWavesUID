@@ -116,7 +116,9 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     )
 
     waves_map = {"refresh_update": {}, "refresh_unchanged": {}}
-    waves_datas = await refresh_char(uid, user_id, ck, waves_map=waves_map)
+    waves_datas = await refresh_char(
+        uid, user_id, ck, waves_map=waves_map, is_self_ck=self_ck
+    )
     if isinstance(waves_datas, str):
         return waves_datas
 

@@ -6,17 +6,63 @@ import aiofiles
 
 from gsuid_core.logger import logger
 
-from ..utils.api.model import RoleList
+from ..utils.api.model import AccountBaseInfo, RoleList
 from ..utils.error_reply import WAVES_CODE_101, WAVES_CODE_102, WAVES_CODE_999
+from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
 from ..utils.hint import error_reply
+from ..utils.queues.const import QUEUE_SCORE_RANK
+from ..utils.queues.queues import put_item
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
+from ..version import WWUID_Damage_Version
+from ..wutheringwaves_config import WutheringWavesConfig
 from . import waves_card_cache
 from .resource.constant import SPECIAL_CHAR_INT
 
 
+async def send_card(
+    uid: str,
+    user_id: str,
+    save_data: List,
+    is_self_ck: bool = False,
+    token: Optional[str] = "",
+):
+    waves_char_rank: Optional[List[WavesCharRank]] = None
+
+    CardUseOptions = WutheringWavesConfig.get_config("CardUseOptions").data
+    WavesToken = WutheringWavesConfig.get_config("WavesToken").data
+
+    if CardUseOptions == "redis缓存" or WavesToken:
+        waves_char_rank = await get_waves_char_rank(uid, save_data, True)
+
+    await waves_card_cache.save_card(uid, save_data, user_id, waves_char_rank)
+
+    if is_self_ck and token and waves_char_rank and WavesToken:
+        succ, account_info = await waves_api.get_base_info(uid, token=token)
+        if not succ:
+            return account_info
+        account_info = AccountBaseInfo.model_validate(account_info)
+        metadata = {
+            "user_id": user_id,
+            "waves_id": f"{account_info.id}",
+            "kuro_name": account_info.name,
+            "version": WWUID_Damage_Version,
+            "char_info": [
+                r.to_rank_dict()
+                for r in waves_char_rank
+                if r.sonataName and r.expected_damage and r.expected_damage > 0
+            ],
+        }
+        await put_item(QUEUE_SCORE_RANK, metadata)
+
+
 async def save_card_info(
-    uid: str, waves_data: List, waves_map: Optional[Dict] = None, user_id: str = ""
+    uid: str,
+    waves_data: List,
+    waves_map: Optional[Dict] = None,
+    user_id: str = "",
+    is_self_ck: bool = False,
+    token: str = "",
 ):
     if len(waves_data) == 0:
         return
@@ -59,7 +105,7 @@ async def save_card_info(
 
     save_data = list(old_data.values())
 
-    await waves_card_cache.save_card(uid, save_data, user_id)
+    await send_card(uid, user_id, save_data, is_self_ck, token)
 
     try:
         async with aiofiles.open(path, "w", encoding="utf-8") as file:
@@ -77,10 +123,11 @@ async def refresh_char(
     user_id: str,
     ck: Optional[str] = None,  # type: ignore
     waves_map: Optional[Dict] = None,
+    is_self_ck: bool = False,
 ) -> Union[str, List]:
     waves_datas = []
     if not ck:
-        ck: Optional[str] = await waves_api.get_ck(uid, user_id)
+        is_self_ck, ck = await waves_api.get_ck_result(uid, user_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 共鸣者信息
@@ -97,13 +144,6 @@ async def refresh_char(
         logger.exception(f"{uid} 角色信息解析失败", e)
         msg = f"鸣潮特征码[{uid}]获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据"
         return msg
-
-    # 改为异步处理
-    # tasks = [
-    #     waves_api.get_role_detail_info(str(r.roleId), uid, ck)
-    #     for r in role_info.roleList
-    # ]
-    # results = await asyncio.gather(*tasks)
 
     semaphore = asyncio.Semaphore(value=len(role_info.roleList))
 
@@ -136,7 +176,14 @@ async def refresh_char(
             pass
         waves_datas.append(role_detail_info)
 
-    await save_card_info(uid, waves_datas, waves_map, user_id)
+    await save_card_info(
+        uid,
+        waves_datas,
+        waves_map,
+        user_id,
+        is_self_ck=is_self_ck,
+        token=ck,
+    )
 
     if not waves_datas:
         return error_reply(WAVES_CODE_101)

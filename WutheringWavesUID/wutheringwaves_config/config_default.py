@@ -156,4 +156,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     "MaxBindNum": GsIntConfig(
         "绑定特征码限制数量（未登录）", "绑定特征码限制数量（未登录）", 2, 100
     ),
+    "WavesToken": GsStrConfig(
+        "鸣潮全排行token",
+        "鸣潮全排行token",
+        "",
+    ),
 }
