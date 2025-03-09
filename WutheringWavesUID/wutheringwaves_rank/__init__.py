@@ -53,24 +53,38 @@ async def send_rank_card(bot: Bot, ev: Event):
         await bot.send(im)
 
 
-@sv_waves_rank_all_list.on_regex("^[\u4e00-\u9fa5]+(?:总排行|总排名)$", block=True)
+@sv_waves_rank_all_list.on_regex(
+    "^[\u4e00-\u9fa5]+(?:总排行|总排名)(\d+)?$", block=True
+)
 async def send_all_rank_card(bot: Bot, ev: Event):
     # 正则表达式
-    match = re.search(r"(?P<char>[\u4e00-\u9fa5]+)(?:总排行|总排名)", ev.raw_text)
+    match = re.search(
+        r"(?P<char>[\u4e00-\u9fa5]+)(?:总排行|总排名)(?P<pages>(\d+))?",
+        ev.raw_text,
+    )
     if not match:
         return
     ev.regex_dict = match.groupdict()
     char = match.group("char")
+    pages = match.group("pages")
 
     if not char:
         return
+
+    if pages:
+        pages = int(pages)
+    else:
+        pages = 1
+
+    if pages > 5:
+        pages = 1
 
     rank_type = "伤害"
     if "评分" in char:
         rank_type = "评分"
     char = char.replace("伤害", "").replace("评分", "")
 
-    im = await draw_all_rank_card(bot, ev, char, rank_type)
+    im = await draw_all_rank_card(bot, ev, char, rank_type, pages)
 
     if isinstance(im, str):
         at_sender = True if ev.group_id else False
