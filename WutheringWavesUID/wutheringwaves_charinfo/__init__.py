@@ -208,7 +208,7 @@ async def send_char_detail_msg2_weight(bot: Bot, ev: Event):
     if not char:
         return
 
-    im = await draw_char_score_img(ev, uid, char, user_id, waves_id)
+    im = await draw_char_score_img(ev, uid, char, user_id, waves_id)  # type: ignore
     at_sender = False
     if isinstance(im, str) and ev.group_id:
         at_sender = True

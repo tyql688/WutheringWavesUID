@@ -69,11 +69,10 @@ async def clear_rank_cache():
         await pipe.execute()
 
 
-async def save_rank_cache(uid: str, player_data: List, user_id: str):
+async def save_rank_cache(uid: str, waves_char_rank: List, user_id: str):
     if not await check_in_rank(uid, user_id):
         return
 
-    waves_char_rank = await get_waves_char_rank(uid, player_data, True)
     async with wavesRedis.get_client() as client:
         pipe = await client.pipeline()
         for rank in waves_char_rank:

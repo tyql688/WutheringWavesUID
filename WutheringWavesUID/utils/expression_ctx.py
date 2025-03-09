@@ -2,12 +2,12 @@ from typing import Dict, Optional
 
 from pydantic import BaseModel
 
-from .calc import WuWaCalc
 from ..utils.api.model import RoleDetailData
+from .calc import WuWaCalc
+from .calculate import calc_phantom_score, get_calc_map, get_total_score_bg
+from .char_info_utils import get_all_role_detail_info
 from .damage.abstract import DamageRankRegister
 from .damage.utils import comma_separated_number
-from .char_info_utils import get_all_role_detail_info
-from .calculate import get_calc_map, calc_phantom_score, get_total_score_bg
 
 
 class WavesCharRank(BaseModel):
@@ -20,6 +20,27 @@ class WavesCharRank(BaseModel):
     score: float  # 角色评分
     score_bg: str  # 评分背景
     expected_damage: Optional[float]  # 期望伤害
+
+    weaponId: int  # 武器id
+    weaponLevel: int  # 武器等级
+    weaponResonLevel: int  # 武器共鸣等级
+    sonataName: str  # 合鸣效果
+    expected_name: str  # 期望伤害名字
+
+    def to_rank_dict(self):
+        return {
+            "char_id": self.roleId,
+            "level": self.level,
+            "chain": self.chain,
+            "weapon_id": self.weaponId,
+            "weapon_level": self.weaponLevel,
+            "weapon_reson_level": self.weaponResonLevel,
+            "sonata_name": self.sonataName,
+            "phantom_score": self.score,
+            "phantom_score_bg": self.score_bg,
+            "expected_damage": self.expected_damage if self.expected_damage else 0,
+            "expected_name": self.expected_name if self.expected_name else "",
+        }
 
 
 async def get_waves_char_rank(uid, all_role_detail, need_expected_damage=False):
@@ -39,6 +60,8 @@ async def get_waves_char_rank(uid, all_role_detail, need_expected_damage=False):
         # calc_temp = None
         expected_damage = None
 
+        sonataName = ""
+        expected_name = ""
         if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
             equipPhantomList = role_detail.phantomData.equipPhantomList
 
@@ -66,6 +89,11 @@ async def get_waves_char_rank(uid, all_role_detail, need_expected_damage=False):
                         calc.damageAttribute, role_detail
                     )
                     expected_damage = comma_separated_number(expected_damage)
+                    expected_name = rankDetail["title"]
+
+            for ph_detail in calc.phantom_pre.get("ph_detail", []):
+                if ph_detail.get("ph_name") and ph_detail.get("ph_num") == 5:
+                    sonataName = ph_detail["ph_name"]
 
         wcr = WavesCharRank(
             **{
@@ -80,6 +108,11 @@ async def get_waves_char_rank(uid, all_role_detail, need_expected_damage=False):
                     role_detail.role.roleName, phantom_score, calc.calc_temp
                 ),
                 "expected_damage": expected_damage,
+                "weaponId": role_detail.weaponData.weapon.weaponId,
+                "weaponLevel": role_detail.weaponData.level,
+                "weaponResonLevel": role_detail.weaponData.resonLevel,
+                "sonataName": sonataName,
+                "expected_name": expected_name,
             }
         )
         waves_char_rank.append(wcr)

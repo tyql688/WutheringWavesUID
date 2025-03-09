@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import Dict, List, Optional
 
 from gsuid_core.logger import logger
 
@@ -29,15 +29,15 @@ phantom_main_value = [
 phantom_main_value_map = {i["name"]: i["values"] for i in phantom_main_value}
 
 
-async def get_remote_role_detail_info(find_char_id: List[str], waves_id, ck):
-    role_detail_info = await get_card(waves_id)
-    if role_detail_info:
+async def get_remote_role_detail_info(
+    find_char_id: List[str], waves_id, ck
+) -> Optional[RoleDetailData]:
+    role_detail_info = None
+
+    gen_temp = await get_card(waves_id)
+    if gen_temp:
         role_detail_info = next(
-            (
-                role
-                for role in role_detail_info
-                if str(role.role.roleId) in find_char_id
-            ),
+            (role for role in gen_temp if str(role.role.roleId) in find_char_id),
             None,
         )
 
@@ -48,6 +48,7 @@ async def get_remote_role_detail_info(find_char_id: List[str], waves_id, ck):
             )
             if (
                 not succ
+                or not isinstance(role_detail_info, Dict)
                 or "role" not in role_detail_info
                 or role_detail_info["role"] is None
                 or "level" not in role_detail_info
@@ -284,7 +285,7 @@ def parse_phantom_position(
         role_name = match.group(2)
 
         phantom_info = PhantomInfo()
-        phantom_info.uid = uid
+        phantom_info.uid = uid if len(uid) != 9 else None
         phantom_info.charName = role_name
         phantom_info.positions = []
         phantom_info.toPositions = []
@@ -430,6 +431,8 @@ class ChangeParser:
         if phantom_info_list:
             self.rr.phantom.phantomList.extend(phantom_info_list)
             for phantom_info in phantom_info_list:
+                if not phantom_info.positions or not phantom_info.toPositions:
+                    continue
                 matched_list.append(
                     f"{phantom_info.uid if phantom_info.uid else ''}{phantom_info.charName}"
                     f"{' '.join(f'{p}到{t}' for p, t in zip(phantom_info.positions, phantom_info.toPositions))}"
@@ -478,8 +481,6 @@ async def change_role_detail(
                 temp.unlocked = False
 
         for chainNum, temp in enumerate(role_detail.chainList, start=1):
-            print(temp)
-            print(type(temp))
             if chainNum <= chain:
                 temp.unlocked = True
             else:
@@ -604,7 +605,7 @@ async def change_role_phantom(
         f"change_role_phantom {parserWavesUid}{parserCharName}{parserPositions}到{parserToPositions}"
     )
 
-    char_id = char_name_to_char_id(parserCharName)
+    char_id = char_name_to_char_id(parserCharName) if parserCharName else None
     find_char_id = []
     if char_id in SPECIAL_CHAR:
         find_char_id = SPECIAL_CHAR[char_id]
@@ -621,13 +622,14 @@ async def change_role_phantom(
     )
     if not remote_role_detail_info:
         return
+
     if (
         not remote_role_detail_info.phantomData
         or not remote_role_detail_info.phantomData.equipPhantomList
     ):
         return
 
-    if not parserPositions or not parserPositions:
+    if not parserPositions or not parserToPositions:
         role_detail.phantomData = remote_role_detail_info.phantomData
     else:
         if not role_detail.phantomData or not role_detail.phantomData.equipPhantomList:
@@ -646,18 +648,20 @@ async def change_role_phantom(
             if new:
                 newCost = new.cost
 
-            old = role_detail.phantomData.equipPhantomList[int(parserToPosition) - 1]
+            temp = role_detail.phantomData.equipPhantomList
+            if not temp:
+                continue
+
+            old = temp[int(parserToPosition) - 1]
             oldCost = 0
             if old:
                 oldCost = old.cost
 
             totalCost = 0
-            for eq in role_detail.phantomData.equipPhantomList:
+            for eq in temp:
                 if not eq:
                     continue
                 totalCost += eq.cost
 
             if totalCost - oldCost + newCost <= 12:
-                role_detail.phantomData.equipPhantomList[int(parserToPosition) - 1] = (
-                    new
-                )
+                temp[int(parserToPosition) - 1] = new  # type: ignore

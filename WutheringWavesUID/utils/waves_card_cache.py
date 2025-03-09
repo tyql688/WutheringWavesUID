@@ -2,7 +2,7 @@ import asyncio
 import json
 import time
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional
 
 import aiofiles
 
@@ -65,7 +65,7 @@ async def load_all_players(player_path: Path, all_card: Dict):
     await asyncio.gather(*tasks)
 
 
-async def load_all_card() -> int:
+async def load_all_card() -> Optional[int]:
     logger.info(f"[鸣潮][排行面板数据启用规则 {CardUseOptions}]")
     if CardUseOptions == "不使用缓存":
         return -1
@@ -92,16 +92,20 @@ async def load_all_card() -> int:
             return total
 
 
-async def save_card(uid: str, data: Union[List], user_id: str):
+async def save_card(
+    uid: str,
+    data: List,
+    user_id: str,
+    waves_char_rank: Optional[List] = None,
+):
     if CardUseOptions == "不使用缓存":
         return
     elif CardUseOptions == "内存缓存":
         await save_user_card(uid, data)
-    elif CardUseOptions == "redis缓存":
+    elif CardUseOptions == "redis缓存" and waves_char_rank:
         from .wwredis import rank_cache
 
-        # await card_cache.save_user_card(uid, data)
-        await rank_cache.save_rank_cache(uid, data, user_id)
+        await rank_cache.save_rank_cache(uid, waves_char_rank, user_id)
 
 
 async def get_card(uid: str):
@@ -113,20 +117,11 @@ async def get_card(uid: str):
             return None
         return iter(RoleDetailData(**r) for r in player_data)
     elif CardUseOptions == "redis缓存":
-        # from .wwredis import card_cache
-        #
-        # player_data = await card_cache.get_user_card(uid)
-        # if not player_data:
-        #     return None
-        # return iter(RoleDetailData(**r) for r in player_data)
         return await get_all_role_detail_info_list(uid)
 
 
 async def get_user_all_card():
     if CardUseOptions == "redis缓存":
-        # if StartServerRedisLoad:
-        #     return await card_cache.get_all_card()
-        # else:
         all_card = {}
         await load_all_players(PLAYER_PATH, all_card)
         return all_card
