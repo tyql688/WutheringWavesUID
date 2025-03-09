@@ -15,6 +15,7 @@ from ..utils.api.wwapi import GET_RANK_URL
 from ..utils.ascension.char import get_char_model
 from ..utils.ascension.weapon import get_weapon_model
 from ..utils.cache import TimedCache
+from ..utils.database.models import WavesBind
 from ..utils.fonts.waves_fonts import (
     waves_font_14,
     waves_font_16,
@@ -28,6 +29,7 @@ from ..utils.fonts.waves_fonts import (
 )
 from ..utils.image import (
     CHAIN_COLOR,
+    RED,
     SPECIAL_GOLD,
     WEAPON_RESONLEVEL_COLOR,
     add_footer,
@@ -45,6 +47,7 @@ from ..utils.resource.constant import (
     SPECIAL_CHAR,
     SPECIAL_CHAR_NAME,
 )
+from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import WutheringWavesConfig
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -122,9 +125,15 @@ async def get_rank(item: RankItem) -> Optional[RankInfoResponse]:
 
 
 async def draw_all_rank_card(
-    bot: Bot, ev: Event, char: str, rank_type: str
+    bot: Bot, ev: Event, char: str, rank_type: str, pages: int
 ) -> Union[str, bytes]:
-
+    is_self_ck = False
+    self_uid = ""
+    try:
+        self_uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
+        is_self_ck, ck = await waves_api.get_ck_result(self_uid, ev.user_id)
+    except Exception:
+        pass
     char_id = char_name_to_char_id(char)
     if not char_id:
         return (
@@ -146,8 +155,10 @@ async def draw_all_rank_card(
     start_time = time.time()
     logger.info(f"[get_rank_info_for_user] start: {start_time}")
 
-    rank_type_num = 1 if rank_type == "伤害" else 2
-    item = RankItem(char_id=int(char_id), page=1, page_num=20, rank_type=rank_type_num)
+    rank_type_num = 2 if rank_type == "伤害" else 1
+    item = RankItem(
+        char_id=int(char_id), page=pages, page_num=20, rank_type=rank_type_num
+    )
 
     rankInfoList = await get_rank(item)
     if not rankInfoList:
@@ -309,7 +320,7 @@ async def draw_all_rank_card(
             rank_draw.text(draw, f"{rank_id}", "white", waves_font_34, "mm")
             bar_bg.alpha_composite(info_rank, dest)
 
-        rank_id = index + 1
+        rank_id = index + 1 + (pages - 1) * 20
         draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30))
 
         # # bot主人名字
@@ -321,6 +332,8 @@ async def draw_all_rank_card(
 
         # uid
         uid_color = "white"
+        if is_self_ck and self_uid == rank.waves_id:
+            uid_color = RED
         bar_star_draw.text(
             (210, 75), f"{rank.waves_id}", uid_color, waves_font_20, "lm"
         )
