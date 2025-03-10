@@ -1,17 +1,21 @@
 import time
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import httpx
 from PIL import Image, ImageDraw
-from pydantic import BaseModel
 from utils.image.convert import convert_img
 
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 
-from ..utils.api.wwapi import GET_RANK_URL
+from ..utils.api.wwapi import (
+    GET_RANK_URL,
+    RankDetail,
+    RankInfoResponse,
+    RankItem,
+)
 from ..utils.ascension.char import get_char_model
 from ..utils.ascension.weapon import get_weapon_model
 from ..utils.cache import TimedCache
@@ -61,43 +65,6 @@ promote_icon = Image.open(TEXT_PATH / "promote_icon.png")
 char_mask = Image.open(TEXT_PATH / "char_mask.png")
 logo_img = Image.open(TEXT_PATH / "logo_small_2.png")
 rank_res_cache = TimedCache(600, 200)
-
-
-class RankDetail(BaseModel):
-    username: str
-    alias_name: str
-    kuro_name: str
-    waves_id: str
-    char_id: int
-    level: int
-    chain: int
-    weapon_id: int
-    weapon_level: int
-    weapon_reson_level: int
-    sonata_name: str
-    phantom_score: float
-    phantom_score_bg: str
-    expected_damage: float
-    expected_name: str
-
-
-class RankInfoData(BaseModel):
-    details: List[RankDetail]
-    page: int
-    page_num: int
-
-
-class RankInfoResponse(BaseModel):
-    code: int
-    message: str
-    data: RankInfoData
-
-
-class RankItem(BaseModel):
-    char_id: int
-    page: int
-    page_num: int
-    rank_type: int
 
 
 async def get_rank(item: RankItem) -> Optional[RankInfoResponse]:
@@ -157,7 +124,11 @@ async def draw_all_rank_card(
 
     rank_type_num = 2 if rank_type == "伤害" else 1
     item = RankItem(
-        char_id=int(char_id), page=pages, page_num=20, rank_type=rank_type_num
+        char_id=int(char_id),
+        page=pages,
+        page_num=20,
+        rank_type=rank_type_num,
+        waves_id=self_uid,
     )
 
     rankInfoList = await get_rank(item)
@@ -320,7 +291,8 @@ async def draw_all_rank_card(
             rank_draw.text(draw, f"{rank_id}", "white", waves_font_34, "mm")
             bar_bg.alpha_composite(info_rank, dest)
 
-        rank_id = index + 1 + (pages - 1) * 20
+        # rank_id = index + 1 + (pages - 1) * 20
+        rank_id = rank.rank
         draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30))
 
         # # bot主人名字

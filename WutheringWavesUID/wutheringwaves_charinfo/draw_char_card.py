@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from typing import Dict, Optional
 
+import httpx
 from PIL import Image, ImageDraw, ImageEnhance
 
 from gsuid_core.logger import logger
@@ -17,6 +18,7 @@ from ..utils.api.model import (
     RoleDetailData,
     WeaponData,
 )
+from ..utils.api.wwapi import ONE_RANK_URL, OneRankRequest, OneRankResponse
 from ..utils.ascension.char import get_char_model
 from ..utils.ascension.template import get_template_data
 from ..utils.ascension.weapon import (
@@ -87,6 +89,7 @@ from ..utils.resource.download_file import (
 )
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
+from ..wutheringwaves_config.wutheringwaves_config import WutheringWavesConfig
 from .role_info_change import change_role_detail
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -156,6 +159,30 @@ damage_bar1 = Image.open(TEXT_PATH / "damage_bar1.png")
 damage_bar2 = Image.open(TEXT_PATH / "damage_bar2.png")
 
 
+
+
+async def get_one_rank(item: OneRankRequest) -> Optional[OneRankResponse]:
+    WavesToken = WutheringWavesConfig.get_config("WavesToken").data
+
+    if not WavesToken:
+        return
+
+    async with httpx.AsyncClient() as client:
+        try:
+            res = await client.post(
+                ONE_RANK_URL,
+                json=item.dict(),
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {WavesToken}",
+                },
+                timeout=httpx.Timeout(10),
+            )
+            logger.info(f"获取排行: {res.text}")
+            if res.status_code == 200:
+                return OneRankResponse.model_validate(res.json())
+        except Exception as e:
+            logger.exception(f"获取排行失败: {e}")
 
 
 def parse_text_and_number(text):
@@ -655,6 +682,7 @@ async def draw_char_detail_img(
         return role_detail
 
     change_command = ""
+    oneRank: Optional[OneRankResponse] = None
     if change_list_regex:
         temp = copy.deepcopy(role_detail)
         try:
@@ -664,6 +692,11 @@ async def draw_char_detail_img(
         except Exception as e:
             logger.exception("角色数据转换错误", e)
             role_detail = temp
+    else:
+        oneRank = await get_one_rank(OneRankRequest(char_id=int(char_id), waves_id=uid))
+        if oneRank and len(oneRank.data) > 0:
+            dd_len += 60 * 2
+
     # 创建背景
     img = get_waves_bg(
         1200, 1250 + echo_list + ph_sum_value + jineng_len + dd_len, "bg3"
@@ -822,6 +855,53 @@ async def draw_char_detail_img(
                 damage_bar_draw.text(
                     (850, 50), f"{expected_damage}", "white", waves_font_24, "mm"
                 )
+            img.alpha_composite(
+                damage_bar,
+                dest=(0, 2600 + ph_sum_value + jineng_len + (dindex + 1) * 60),
+            )
+
+        if oneRank and len(oneRank.data) > 0:
+            dindex += 1
+            damage_bar = damage_bar2.copy() if dindex % 2 == 0 else damage_bar1.copy()
+            damage_bar_draw = ImageDraw.Draw(damage_bar)
+            damage_bar_draw = ImageDraw.Draw(damage_bar)
+            damage_bar_draw.text(
+                (400, 50),
+                "评分排名",
+                "white",
+                waves_font_24,
+                "rm",
+            )
+            damage_bar_draw.text(
+                (850, 50),
+                f"{oneRank.data[0].rank}",
+                SPECIAL_GOLD,
+                waves_font_24,
+                "mm",
+            )
+            img.alpha_composite(
+                damage_bar,
+                dest=(0, 2600 + ph_sum_value + jineng_len + (dindex + 1) * 60),
+            )
+
+            dindex += 1
+            damage_bar = damage_bar2.copy() if dindex % 2 == 0 else damage_bar1.copy()
+            damage_bar_draw = ImageDraw.Draw(damage_bar)
+            damage_bar_draw = ImageDraw.Draw(damage_bar)
+            damage_bar_draw.text(
+                (400, 50),
+                "伤害排名",
+                "white",
+                waves_font_24,
+                "rm",
+            )
+            damage_bar_draw.text(
+                (850, 50),
+                f"{oneRank.data[1].rank}",
+                SPECIAL_GOLD,
+                waves_font_24,
+                "mm",
+            )
             img.alpha_composite(
                 damage_bar,
                 dest=(0, 2600 + ph_sum_value + jineng_len + (dindex + 1) * 60),
