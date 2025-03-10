@@ -1,8 +1,9 @@
 import asyncio
 import json
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 from gsuid_core.logger import logger
+
 from ...utils.wwredis.wwredis import wavesRedis
 
 redis_key = "ww:hash:playerCache"
@@ -13,7 +14,7 @@ async def delete_all_card():
         await client.delete(redis_key)
 
 
-async def save_all_card(raw_data: Dict, max_concurrent_batches=10):
+async def save_all_card(raw_data: Dict, max_concurrent_batches=50):
     async with wavesRedis.get_client() as client:
         await client.delete(redis_key)
 
@@ -43,6 +44,7 @@ async def save_all_card(raw_data: Dict, max_concurrent_batches=10):
         async with semaphore:
             async with wavesRedis.get_client() as client:
                 await client.hset(redis_key, mapping=batch)
+        await asyncio.sleep(0.1)
 
     # 创建所有批次处理任务
     tasks = [process_batch(batch) for batch in batches]

@@ -285,7 +285,7 @@ def parse_phantom_position(
         role_name = match.group(2)
 
         phantom_info = PhantomInfo()
-        phantom_info.uid = uid if len(uid) != 9 else None
+        phantom_info.uid = uid if len(uid) == 9 else None
         phantom_info.charName = role_name
         phantom_info.positions = []
         phantom_info.toPositions = []
