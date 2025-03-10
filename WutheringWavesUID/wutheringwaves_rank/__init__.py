@@ -77,6 +77,8 @@ async def send_all_rank_card(bot: Bot, ev: Event):
         pages = 1
 
     if pages > 5:
+        pages = 5
+    elif pages < 1:
         pages = 1
 
     rank_type = "伤害"
