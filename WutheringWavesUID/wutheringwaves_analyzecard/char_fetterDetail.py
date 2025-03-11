@@ -135,7 +135,7 @@ DETAIL = {
     },
     "秧秧": {
         "id": "1402",
-        "fetterDetail": "彻空冥雷"
+        "fetterDetail": "啸谷长风"
     },
     "布兰特": {
         "id": "1206",
