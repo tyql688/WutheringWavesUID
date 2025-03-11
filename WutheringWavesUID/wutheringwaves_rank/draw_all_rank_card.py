@@ -274,12 +274,13 @@ async def draw_all_rank_card(
         )
 
         # 排名
+        rank_id = rank.rank
         rank_color = (54, 54, 54)
-        if index == 0:
+        if rank_id == 1:
             rank_color = (255, 0, 0)
-        elif index == 1:
+        elif rank_id == 2:
             rank_color = (255, 180, 0)
-        elif index == 2:
+        elif rank_id == 3:
             rank_color = (185, 106, 217)
 
         def draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30)):
@@ -292,8 +293,12 @@ async def draw_all_rank_card(
             bar_bg.alpha_composite(info_rank, dest)
 
         # rank_id = index + 1 + (pages - 1) * 20
-        rank_id = rank.rank
-        draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30))
+        if rank_id > 999:
+            draw_rank_id("999+", size=(100, 50), draw=(50, 24), dest=(10, 30))
+        elif rank_id > 99:
+            draw_rank_id(rank_id, size=(75, 50), draw=(37, 24), dest=(25, 30))
+        else:
+            draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30))
 
         # # bot主人名字
         # botName = rank.alias_name if rank.alias_name else rank.username
