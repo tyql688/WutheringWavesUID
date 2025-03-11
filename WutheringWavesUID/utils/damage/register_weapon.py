@@ -33,6 +33,16 @@ class Weapon_21010015(WeaponAbstract):
     type = 1
     name = "浩境粼光"
 
+    # 施放共鸣技能时，共鸣解放伤害加成提升7%，可叠加3层，持续12秒
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_damage != liberation_damage:
+            return
+        dmg = f"{self.param(1)}*{self.param(2)}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，共鸣解放伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21010016(WeaponAbstract):
     id = 21010016
