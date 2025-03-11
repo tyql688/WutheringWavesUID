@@ -253,6 +253,22 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "全服伤害排行",
+        "desc": "全服伤害排行",
+        "eg": "长离总排行",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "全服评分排行",
+        "desc": "全服评分排行",
+        "eg": "长离评分总排行",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
