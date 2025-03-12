@@ -47,11 +47,7 @@ async def send_card(
             "waves_id": f"{account_info.id}",
             "kuro_name": account_info.name,
             "version": WWUID_Damage_Version,
-            "char_info": [
-                r.to_rank_dict()
-                for r in waves_char_rank
-                if r.sonataName and r.expected_damage and r.expected_damage > 0
-            ],
+            "char_info": [r.to_rank_dict() for r in waves_char_rank],
         }
         await put_item(QUEUE_SCORE_RANK, metadata)
 
