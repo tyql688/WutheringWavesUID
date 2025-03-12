@@ -91,6 +91,7 @@ async def auto_delete_all_invalid_cookie():
             "",
             "",
         )
+        break
     logger.info(f"[鸣潮]推送主人删除无效token结果: {msg}")
 
 
