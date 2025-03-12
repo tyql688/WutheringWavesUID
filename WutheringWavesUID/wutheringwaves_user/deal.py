@@ -47,7 +47,7 @@ async def add_cookie(ev: Event, ck: str) -> str:
     if res == 0 or res == -2:
         await WavesBind.switch_uid_by_game(ev.user_id, ev.bot_id, data.roleId)
 
-    await refresh_char(data.roleId, ev.user_id, ck)
+    await refresh_char(data.roleId, ev.user_id, ck, is_self_ck=True)
 
     return f"[鸣潮] 特征码[{data.roleId}]绑定Token成功!\n使用【查看】查看已绑定的特征码\n使用【{PREFIX}开启自动签到】开启游戏内每天的自动签到功能\n使用【{PREFIX}刷新面板】更新角色面板\n更新角色面板后可以使用【{PREFIX}暗主排行】查询暗主排行\n"
 
