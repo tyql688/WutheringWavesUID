@@ -1,3 +1,4 @@
+import re
 import copy
 from typing import Dict
 from itertools import zip_longest
@@ -28,10 +29,11 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
     char = result_dict["角色信息"]["角色名"]
     char_name = alias_to_char_name(char)
     char_id = char_name_to_char_id(char_name)
+    char_name_print = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', char_name) # 删除"漂泊者·衍射"的符号
 
     if char_id is None:
-        await bot.send(f"[鸣潮]识别结果为角色'{char_name}'不存在")
-        logger.debug(f" [鸣潮][dc卡片识别] 用户{uid}的{char_name}识别错误！")
+        await bot.send(f"[鸣潮]识别结果为角色'{char_name_print}'不存在")
+        logger.debug(f" [鸣潮][dc卡片识别] 用户{uid}的{char_name_print}识别错误！")
         return
 
 
@@ -157,8 +159,8 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
     waves_data.append(data)
     await save_card_info(uid, waves_data)
-    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n请使用【{PREFIX}绑定{uid}】绑定您的角色\n可使用【{PREFIX}{char_name}面板】查看您的角色面板\n使用【{PREFIX}{char_name}排行】查看角色排行榜\n使用【{PREFIX}替换帮助】查看面板数据更换方法", at_sender)
-    logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name}面板数据已保存到本地！")
+    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n请使用【{PREFIX}绑定{uid}】绑定您的角色\n可使用【{PREFIX}{char_name_print}面板】查看您的角色面板\n使用【{PREFIX}{char_name_print}排行】查看角色排行榜\n使用【{PREFIX}替换帮助】查看面板数据更换方法", at_sender)
+    logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name_print}面板数据已保存到本地！")
 
 def get_breach(level: int):
     if level <= 20:

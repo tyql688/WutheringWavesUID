@@ -427,9 +427,9 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         if first_result['error'] is None:
             lines = first_result['text'].split('\t') # 支持"◎\t洛可可\tLV.90\t"
             for line in lines:
-                # 文本预处理：去除多余的空白符
-                line_clean = re.sub(r'\s+', ' ', line).strip()  # 使用 \s+ 匹配所有空白符，并替换为单个空格
-                # line = line.strip()
+                # 文本预处理：删除非数字中英文的符号及多余空白
+                line_clean = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', line)  # 先删除非数字中英文的符号, 匹配“漂泊者·湮灭”
+                line_clean = re.sub(r'\s+', ' ', line_clean).strip()  # 再合并多余空白
                 
                 # 玩家名称
                 player_match = patterns["player_info"].search(line_clean)
@@ -443,6 +443,8 @@ async def ocr_results_to_dict(chain_num, ocr_results):
                     if name_match:
                         name = name_match.group()
                         name = name.replace("吟槑", "吟霖")
+                        if name == "漂泊者":
+                            name = "漂泊者衍射"
                         if not re.match(r'^[\u4e00-\u9fa5]+$', name):
                             logger.debug(f" [鸣潮][dc卡片识别] 识别出英文角色名:{name}，退出识别！")
                             return False, final_result

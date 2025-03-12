@@ -7,7 +7,7 @@ from ..utils.resource.constant import SONATA_FIRST_ID
 PLUGIN_PATH =  Path(__file__).parent.parent
 FETTERDETAIL_PATH = PLUGIN_PATH / "utils/map/detail_json/sonata"
 
-
+# id2name
 DETAIL = {
     "今汐": {
         "id": "1304",
@@ -105,10 +105,6 @@ DETAIL = {
         "id": "1305",
         "fetterDetail": "彻空冥雷"
     },
-    "布兰特": {
-        "id": "1206",
-        "fetterDetail": "无惧浪涛之勇"
-    },
     "莫特斐": {
         "id": "1204",
         "fetterDetail": "高天共奏之曲"
@@ -140,7 +136,19 @@ DETAIL = {
     "布兰特": {
         "id": "1206",
         "fetterDetail": "无惧浪涛之勇"
-    }
+    },
+    "漂泊者·气动": {
+        "id": "1408",
+        "fetterDetail": "此间永驻之光"
+    },
+    "漂泊者·气动": {
+        "id": "1406",
+        "fetterDetail": "此间永驻之光"
+    },
+    "坎特蕾拉": {
+        "id": "1607",
+        "fetterDetail": "幽夜隐匿之帷"
+    },
 }
 
 async def get_fetterDetail_from_sonata(char_name) -> dict:
