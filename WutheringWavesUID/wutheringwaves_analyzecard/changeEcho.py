@@ -69,7 +69,7 @@ async def get_local_all_role_detail(uid: str) -> tuple[bool, dict]:
                 data = json.loads(await f.read())
                 role_data = {d["role"]["roleId"]: d for d in data}
         except Exception as e:
-            logger.exception(f"save_card_info get failed {path}:", e)
+            logger.exception(f"[鸣潮] 基础数据get failed {path}:", e)
             path.unlink(missing_ok=True)
     else:
         return False, role_data
@@ -138,4 +138,35 @@ async def change_sonata_and_first_echo(bot: Bot, char_id: int, sonata_a: str, ph
     waves_data = list(role_data.values())
     
     return True, waves_data
+
+
+async def get_local_all_role_info(uid: str) -> tuple[bool, dict]:
+    _dir = PLAYER_PATH / uid
+    _dir.mkdir(parents=True, exist_ok=True)
+    path = _dir / "rawData.json"
+
+    # 初始化标准数据结构
+    role_data = {
+        'roleList': [],
+        'showRoleIdList': [],
+        'showToGuest': False
+    }
     
+    if not path.exists():
+        return False, role_data
+        
+    try:
+        async with aiofiles.open(path, mode="r", encoding="utf-8") as f:
+            raw_data = json.loads(await f.read())
+            
+            # 正确解析角色列表
+            if isinstance(raw_data, list):
+                for item in raw_data:
+                    if "role" in item:
+                        role_data["roleList"].append(item["role"])
+            
+        return True, role_data
+    except Exception as e:
+        logger.exception(f"[鸣潮] 数据解析失败 {path}:", e)
+        path.unlink(missing_ok=True)
+        return False, role_data

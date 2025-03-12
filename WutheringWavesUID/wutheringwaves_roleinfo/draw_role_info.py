@@ -44,7 +44,11 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
     # game_info = KuroRoleInfo(**game_info)
 
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(uid, ck)
+    if waves_api.is_net(uid):
+        from ..wutheringwaves_analyzecard.changeEcho import get_local_all_role_info
+        succ, role_info = await get_local_all_role_info(uid)
+    else:
+        succ, role_info = await waves_api.get_role_info(uid, ck)
     if not succ:
         return role_info
     role_info = RoleList(**role_info)

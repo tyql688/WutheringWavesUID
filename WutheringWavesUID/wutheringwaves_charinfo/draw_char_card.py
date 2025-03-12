@@ -628,7 +628,7 @@ async def draw_char_detail_img(
             return f"[鸣潮] 角色【{char_name}】暂不支持伤害计算！\n"
 
     ck = await waves_api.get_ck(uid, user_id)
-    if not ck:
+    if not ck and not waves_api.is_net(uid):
         return hint.error_reply(WAVES_CODE_102)
 
     is_online_user = False
@@ -1061,7 +1061,7 @@ async def draw_char_score_img(
         )
     char_name = alias_to_char_name(char)
     ck = await waves_api.get_ck(uid, user_id)
-    if not ck:
+    if not ck and not waves_api.is_net(uid):
         return hint.error_reply(WAVES_CODE_102)
 
     # 账户数据
