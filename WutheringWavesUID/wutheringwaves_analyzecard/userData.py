@@ -8,6 +8,7 @@ from gsuid_core.models import Event
 from gsuid_core.logger import logger
 
 from ..wutheringwaves_charinfo.draw_char_card import generate_online_role_detail
+from ..utils.ascension.weapon import get_weapon_detail
 from ..utils.refresh_char_detail import save_card_info
 from ..utils.name_convert import (
     alias_to_char_name,
@@ -149,15 +150,13 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
             }
         }
         if weapon_id is not None:
+            # breach 突破、resonLevel 精炼
             data["weaponData"]["level"] = result_dict["武器信息"]["等级"]
             data["weaponData"]["breach"] = get_breach(result_dict["武器信息"]["等级"])
             data["weaponData"]["weapon"]["weaponName"] = result_dict["武器信息"]["武器名"]
             data["weaponData"]["weapon"]["weaponId"] = weapon_id
-
-            # weapon_detail: WavesWeaponResult = get_weapon_detail(
-            #     weapon_id, result_dict["武器信息"]["等级"]
-            # )
-            # print(weapon_detail)
+            weapon_detail = get_weapon_detail(weapon_id, result_dict["武器信息"]["等级"])
+            data["weaponData"]["weapon"]["weaponStarLevel"] = weapon_detail.starLevel
 
     waves_data.append(data)
     await save_card_info(uid, waves_data)
