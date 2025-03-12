@@ -12,6 +12,7 @@ ONE_RANK_URL = f"{MAIN_URL}/top/waves/one"
 
 class RankDetail(BaseModel):
     rank: int
+    user_id: str
     username: str
     alias_name: str
     kuro_name: str
