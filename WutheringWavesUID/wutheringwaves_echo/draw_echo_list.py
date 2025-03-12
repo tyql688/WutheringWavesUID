@@ -66,7 +66,7 @@ async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
     all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
 
     if all_role_detail is None:
-        return f"[鸣潮] 未找到角色信息, 国服用户请使用[{PREFIX}刷新面板]进行刷新!\n国际服用户请使用[{PREFIX}分析]上传数据"
+        return f"[鸣潮] 未找到角色信息, 国服用户请使用[{PREFIX}刷新面板]进行刷新!，国际服用户请使用[{PREFIX}分析]上传数据"
 
     waves_echo_rank = []
     for char_name, role_detail in all_role_detail.items():

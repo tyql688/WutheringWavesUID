@@ -7,157 +7,21 @@ from ..utils.resource.constant import SONATA_FIRST_ID
 PLUGIN_PATH =  Path(__file__).parent.parent
 FETTERDETAIL_PATH = PLUGIN_PATH / "utils/map/detail_json/sonata"
 
-# id2name
-DETAIL = {
-    "今汐": {
-        "id": "1304",
-        "fetterDetail": "浮星祛暗"
-    },
-    "漂泊者·湮灭": {
-        "id": "1604",
-        "fetterDetail": "沉日劫明"
-    },
-    "渊武": {
-        "id": "1303",
-        "fetterDetail": "高天共奏之曲"
-    },
-    "折枝": {
-        "id": "1105",
-        "fetterDetail": "高天共奏之曲"
-    },
-    "守岸人": {
-        "id": "1505",
-        "fetterDetail": "隐世回光"
-    },
-    "漂泊者·湮灭": {
-        "id": "1605",
-        "fetterDetail": "沉日劫明"
-    },
-    "长离": {
-        "id": "1205",
-        "fetterDetail": "熔山裂谷"
-    },
-    "菲比": {
-        "id": "1506",
-        "fetterDetail": "此间永驻之光"
-    },
-    "凌阳": {
-        "id": "1104",
-        "fetterDetail": "凝夜白霜"
-    },
-    "安可": {
-        "id": "1203",
-        "fetterDetail": "熔山裂谷"
-    },
-    "吟霖": {
-        "id": "1302",
-        "fetterDetail": "高天共奏之曲"
-    },
-    "漂泊者·衍射": {
-        "id": "1502",
-        "fetterDetail": "此间永驻之光"
-    },
-    "鉴心": {
-        "id": "1405",
-        "fetterDetail": "啸谷长风"
-    },
-    "白芷": {
-        "id": "1103",
-        "fetterDetail": "隐世回光"
-    },
-    "釉瑚": {
-        "id": "1106",
-        "fetterDetail": "隐世回光"
-    },
-    "炽霞": {
-        "id": "1202",
-        "fetterDetail": "熔山裂谷"
-    },
-    "维里奈": {
-        "id": "1503",
-        "fetterDetail": "隐世回光"
-    },
-    "洛可可": {
-        "id": "1606",
-        "fetterDetail": "幽夜隐匿之帷"
-    },
-    "散华": {
-        "id": "1102",
-        "fetterDetail": "轻云出月"
-    },
-    "卡卡罗": {
-        "id": "1301",
-        "fetterDetail": "彻空冥雷"
-    },
-    "秋水": {
-        "id": "1403",
-        "fetterDetail": "啸谷长风"
-    },
-    "桃祈": {
-        "id": "1601",
-        "fetterDetail": "轻云出月"
-    },
-    "丹瑾": {
-        "id": "1602",
-        "fetterDetail": "沉日劫明"
-    },
-    "相里要": {
-        "id": "1305",
-        "fetterDetail": "彻空冥雷"
-    },
-    "莫特斐": {
-        "id": "1204",
-        "fetterDetail": "高天共奏之曲"
-    },
-    "珂莱塔": {
-        "id": "1107",
-        "fetterDetail": "凌冽决断之心"
-    },
-    "灯灯": {
-        "id": "1504",
-        "fetterDetail": "彻空冥雷"
-    },
-    "椿": {
-        "id": "1603",
-        "fetterDetail": "沉日劫明"
-    },
-    "漂泊者·衍射": {
-        "id": "1501",
-        "fetterDetail": "此间永驻之光"
-    },
-    "忌炎": {
-        "id": "1404",
-        "fetterDetail": "啸谷长风"
-    },
-    "秧秧": {
-        "id": "1402",
-        "fetterDetail": "啸谷长风"
-    },
-    "布兰特": {
-        "id": "1206",
-        "fetterDetail": "无惧浪涛之勇"
-    },
-    "漂泊者·气动": {
-        "id": "1408",
-        "fetterDetail": "此间永驻之光"
-    },
-    "漂泊者·气动": {
-        "id": "1406",
-        "fetterDetail": "此间永驻之光"
-    },
-    "坎特蕾拉": {
-        "id": "1607",
-        "fetterDetail": "幽夜隐匿之帷"
-    },
-}
+from .detail_json import DETAIL
 
-async def get_fetterDetail_from_sonata(char_name) -> dict:
+async def get_fetterDetail_from_char(char_name) -> dict:
     
-    path = FETTERDETAIL_PATH / f"{DETAIL[char_name]['fetterDetail']}.json"
+    sonata = DETAIL[char_name]['fetterDetail']
+    if sonata == "":
+        return {}
+
+    return await get_fetterDetail_from_sonata(sonata)
+
+async def get_fetterDetail_from_sonata(sonata) -> dict:
+    
+    path = FETTERDETAIL_PATH / f"{sonata}.json"
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
-
-    first_echo_id = SONATA_FIRST_ID[data["name"]][0]
 
     echo = {
         "cost": 1,
@@ -183,6 +47,12 @@ async def get_fetterDetail_from_sonata(char_name) -> dict:
     }
     return echo
 
+async def get_first_echo_id_list(sonata):
+    path = FETTERDETAIL_PATH / f"{sonata}.json"
+    with open(path, "r", encoding="utf-8") as f:
+        char_data = json.load(f)
+
+    return SONATA_FIRST_ID[char_data["name"]]
 
 async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tuple[int, int]:
     """
@@ -220,10 +90,7 @@ async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tupl
     
     # ---------- 获取角色配置 ----------
     try:
-        path = FETTERDETAIL_PATH / f"{DETAIL[char_name]['fetterDetail']}.json"
-        with open(path, "r", encoding="utf-8") as f:
-            char_data = json.load(f)
-        echo_id_list = SONATA_FIRST_ID[char_data["name"]]
+        echo_id_list = await get_first_echo_id_list(DETAIL[char_name]['fetterDetail'])
     except KeyError as e:
         logger.error(f"[鸣潮]角色配置数据缺失: {e}")
         return ECHO_ID_COST_ONE, 1  # 降级处理
@@ -268,3 +135,5 @@ async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tupl
     # 未知属性处理
     logger.warning(f"[鸣潮]未知主词条类型: {key}")
     return ECHO_ID_COST_ONE, 1  # 安全降级
+
+

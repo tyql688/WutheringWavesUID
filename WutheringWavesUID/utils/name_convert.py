@@ -147,6 +147,13 @@ def alias_to_sonata_name(sonata_name: str | None) -> str | None:
             return i
     return None
 
+def phantom_id_to_phantom_name(phantom_id: str) -> Optional[str]:
+    for id, name in id2name.items():
+        if int(phantom_id) == int(id):
+            return name
+    else:
+        return None
 
 def get_all_char_id() -> List[str]:
     return list(char_id_data.keys())
+

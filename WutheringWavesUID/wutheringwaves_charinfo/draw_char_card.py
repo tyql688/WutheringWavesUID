@@ -448,7 +448,7 @@ async def get_role_need(
             if is_online_user:
                 return (
                     None,
-                    f"[鸣潮] 未找到【{char_name}】角色信息, 国服用户请使用[{PREFIX}刷新面板]进行刷新!\n国际服用户请使用[{PREFIX}分析]上传数据\n",
+                    f"[鸣潮] 未找到【{char_name}】角色信息, 国服用户请使用[{PREFIX}刷新面板]进行刷新!，国际服用户请使用[{PREFIX}分析]上传数据\n",
                 )
             else:
                 # 未上线的角色，构造一个数据
@@ -456,7 +456,7 @@ async def get_role_need(
                 if not gen_role_detail:
                     return (
                         None,
-                        f"[鸣潮] 未找到【{char_name}】角色信息, 国服用户请使用[{PREFIX}刷新面板]进行刷新!\n国际服用户请使用[{PREFIX}分析]上传数据\n",
+                        f"[鸣潮] 未找到【{char_name}】角色信息, 国服用户请使用[{PREFIX}刷新面板]进行刷新!，国际服用户请使用[{PREFIX}分析]上传数据\n",
                     )
                 role_detail = gen_role_detail
 

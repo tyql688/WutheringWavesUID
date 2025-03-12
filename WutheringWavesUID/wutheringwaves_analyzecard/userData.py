@@ -15,7 +15,7 @@ from ..utils.name_convert import (
     weapon_name_to_weapon_id
 )
 from ..wutheringwaves_config import PREFIX
-from .char_fetterDetail import get_fetterDetail_from_sonata, echo_data_to_cost
+from .char_fetterDetail import get_fetterDetail_from_char, echo_data_to_cost
 
 
 async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
@@ -70,12 +70,14 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
         cost_sum = 0 # 默认cost总数
         cost4_counter = 0 # 4cost 的计数器
-        ECHO = await get_fetterDetail_from_sonata(char_name)
+        echo_num = len(result_dict["装备数据"])
+        ECHO = await get_fetterDetail_from_char(char_name)
 
         for echo_value in result_dict["装备数据"]:
             # 创建 ECHO 的独立副本
             echo = copy.deepcopy(ECHO)
 
+            echo["fetterDetail"]["num"] = echo_num
             # 更新 echo 的 mainProps 和 subProps, 防止空表
             echo["mainProps"] = echo_value.get("mainProps", [])
             echo["subProps"] = echo_value.get("subProps", [])
@@ -159,7 +161,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
     waves_data.append(data)
     await save_card_info(uid, waves_data)
-    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n请使用【{PREFIX}绑定{uid}】绑定您的角色\n可使用【{PREFIX}{char_name_print}面板】查看您的角色面板\n使用【{PREFIX}{char_name_print}排行】查看角色排行榜\n使用【{PREFIX}替换帮助】查看面板数据更换方法", at_sender)
+    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n可使用：\n【{PREFIX}绑定{uid}】绑定您的角色\n【{PREFIX}改{char_name_print}声骸是】\n或【{PREFIX}改{char_name_print}套装衍射套】\n或【{PREFIX}改{char_name_print}套装衍射套声骸是】手动修改声骸套装", at_sender)
     logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name_print}面板数据已保存到本地！")
 
 def get_breach(level: int):
