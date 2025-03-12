@@ -688,9 +688,13 @@ async def draw_char_detail_img(
             logger.exception("角色数据转换错误", e)
             role_detail = temp
     else:
-        oneRank = await get_one_rank(OneRankRequest(char_id=int(char_id), waves_id=uid))
-        if oneRank and len(oneRank.data) > 0:
-            dd_len += 60 * 2
+        if not is_limit_query:
+            # 非极限查询时，获取评分排名
+            oneRank = await get_one_rank(
+                OneRankRequest(char_id=int(char_id), waves_id=uid)
+            )
+            if oneRank and len(oneRank.data) > 0:
+                dd_len += 60 * 2
 
     # 创建背景
     img = get_waves_bg(
