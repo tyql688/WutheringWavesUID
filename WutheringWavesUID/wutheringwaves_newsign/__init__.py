@@ -4,9 +4,9 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.subscribe import gs_subscribe
 from gsuid_core.sv import SV
-from .main import do_sign_task, auto_sign_task
 
 from ..wutheringwaves_config import WutheringWavesConfig
+from .main import auto_sign_task, do_sign_task
 
 sv_waves_sign = SV("鸣潮-签到", priority=1)
 waves_sign_all = SV("鸣潮-全部签到", pm=1)
@@ -16,7 +16,7 @@ task_name_sign_result = "订阅签到结果"
 
 
 @sv_waves_sign.on_fullmatch(
-    (f"签到", f"社区签到", f"每日任务", f"社区任务", f"库街区签到"), block=True
+    ("签到", "社区签到", "每日任务", "社区任务", "库街区签到"), block=True
 )
 async def get_sign_func(bot: Bot, ev: Event):
     msg = await do_sign_task(bot, ev)
@@ -33,7 +33,7 @@ async def waves_auto_new_sign_task():
             await sub.send(msg)
 
 
-@waves_sign_all.on_fullmatch((f"全部签到"))
+@waves_sign_all.on_fullmatch(("全部签到"))
 async def sign_recheck_all(bot: Bot, ev: Event):
     await bot.send("[鸣潮] [全部签到] 已开始执行!")
     msg = await auto_sign_task()
@@ -47,7 +47,7 @@ async def sign_recheck_all(bot: Bot, ev: Event):
     #         await sub.send(msg)
 
 
-@waves_sign_all.on_regex((f"^(订阅|取消订阅)签到结果$"))
+@waves_sign_all.on_regex(("^(订阅|取消订阅)签到结果$"))
 async def sign_sign_result(bot: Bot, ev: Event):
     if "取消" in ev.raw_text:
         option = "关闭"

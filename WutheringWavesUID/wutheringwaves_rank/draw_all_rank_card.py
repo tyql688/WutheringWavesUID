@@ -1,3 +1,4 @@
+import asyncio
 import time
 from pathlib import Path
 from typing import Optional, Union
@@ -40,17 +41,14 @@ from ..utils.image import (
     crop_center_img,
     get_attribute,
     get_attribute_effect,
+    get_qq_avatar,
     get_role_pile_old,
     get_square_avatar,
     get_square_weapon,
     get_waves_bg,
 )
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from ..utils.resource.constant import (
-    ATTRIBUTE_ID_MAP,
-    SPECIAL_CHAR,
-    SPECIAL_CHAR_NAME,
-)
+from ..utils.resource.constant import ATTRIBUTE_ID_MAP, SPECIAL_CHAR_NAME
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import WutheringWavesConfig
 
@@ -64,7 +62,7 @@ weapon_icon_bg_5 = Image.open(TEXT_PATH / "weapon_icon_bg_5.png")
 promote_icon = Image.open(TEXT_PATH / "promote_icon.png")
 char_mask = Image.open(TEXT_PATH / "char_mask.png")
 logo_img = Image.open(TEXT_PATH / "logo_small_2.png")
-rank_res_cache = TimedCache(600, 200)
+pic_cache = TimedCache(600, 200)
 
 
 async def get_rank(item: RankItem) -> Optional[RankInfoResponse]:
@@ -84,9 +82,10 @@ async def get_rank(item: RankItem) -> Optional[RankInfoResponse]:
                 },
                 timeout=httpx.Timeout(10),
             )
-            logger.info(f"获取排行: {res.text}")
             if res.status_code == 200:
                 return RankInfoResponse.model_validate(res.json())
+            else:
+                logger.warning(f"获取排行失败: {res.status_code} - {res.text}")
         except Exception as e:
             logger.exception(f"获取排行失败: {e}")
 
@@ -108,8 +107,8 @@ async def draw_all_rank_card(
         )
     char_name = alias_to_char_name(char)
 
-    if char_id in SPECIAL_CHAR:
-        char_id = SPECIAL_CHAR[char_id][0]
+    # if char_id in SPECIAL_CHAR:
+    #     char_id = SPECIAL_CHAR[char_id][0]
 
     char_model = get_char_model(char_id)
     if not char_model:
@@ -152,16 +151,14 @@ async def draw_all_rank_card(
     pic_temp.paste(pic.resize((160, 160)), (10, 10))
     pic_temp = pic_temp.resize((160, 160))
 
-    avatar_mask_temp = avatar_mask.copy()
-    mask_pic_temp = Image.new("RGBA", avatar_mask_temp.size)
-    mask_pic_temp.paste(avatar_mask_temp, (-20, -45), avatar_mask_temp)
-    mask_pic_temp = mask_pic_temp.resize((160, 160))
+    tasks = [
+        get_avatar(rank.user_id, rank.char_id) for rank in rankInfoList.data.details
+    ]
+    results = await asyncio.gather(*tasks)
 
-    role_avatar = Image.new("RGBA", (180, 180))
-    role_avatar.paste(pic_temp, (0, 0), mask_pic_temp)
-
-    for index, temp in enumerate(rankInfoList.data.details):
-        rank: RankDetail = temp
+    for index, temp in enumerate(zip(rankInfoList.data.details, results)):
+        rank: RankDetail = temp[0]
+        role_avatar: Image.Image = temp[1]
         bar_bg = bar.copy()
         bar_star_draw = ImageDraw.Draw(bar_bg)
         bar_bg.paste(role_avatar, (100, 0), role_avatar)
@@ -396,3 +393,41 @@ def get_breach(breach: Union[int, None], level: int):
             breach = 0
 
     return breach
+
+
+async def get_avatar(
+    qid: Optional[str],
+    char_id: Union[int, str],
+) -> Image.Image:
+    # 检查qid 为纯数字
+    if qid and qid.isdigit():
+        if WutheringWavesConfig.get_config("QQPicCache").data:
+            pic = pic_cache.get(qid)
+            if not pic:
+                pic = await get_qq_avatar(qid, size=100)
+                pic_cache.set(qid, pic)
+        else:
+            pic = await get_qq_avatar(qid, size=100)
+            pic_cache.set(qid, pic)
+        pic_temp = crop_center_img(pic, 120, 120)
+
+        img = Image.new("RGBA", (180, 180))
+        avatar_mask_temp = avatar_mask.copy()
+        mask_pic_temp = avatar_mask_temp.resize((120, 120))
+        img.paste(pic_temp, (0, -5), mask_pic_temp)
+    else:
+        pic = await get_square_avatar(char_id)
+
+        pic_temp = Image.new("RGBA", pic.size)
+        pic_temp.paste(pic.resize((160, 160)), (10, 10))
+        pic_temp = pic_temp.resize((160, 160))
+
+        avatar_mask_temp = avatar_mask.copy()
+        mask_pic_temp = Image.new("RGBA", avatar_mask_temp.size)
+        mask_pic_temp.paste(avatar_mask_temp, (-20, -45), avatar_mask_temp)
+        mask_pic_temp = mask_pic_temp.resize((160, 160))
+
+        img = Image.new("RGBA", (180, 180))
+        img.paste(pic_temp, (0, 0), mask_pic_temp)
+
+    return img
