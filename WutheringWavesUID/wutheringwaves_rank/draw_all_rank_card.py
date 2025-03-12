@@ -48,11 +48,7 @@ from ..utils.image import (
     get_waves_bg,
 )
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from ..utils.resource.constant import (
-    ATTRIBUTE_ID_MAP,
-    SPECIAL_CHAR,
-    SPECIAL_CHAR_NAME,
-)
+from ..utils.resource.constant import ATTRIBUTE_ID_MAP, SPECIAL_CHAR_NAME
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import WutheringWavesConfig
 
@@ -111,8 +107,8 @@ async def draw_all_rank_card(
         )
     char_name = alias_to_char_name(char)
 
-    if char_id in SPECIAL_CHAR:
-        char_id = SPECIAL_CHAR[char_id][0]
+    # if char_id in SPECIAL_CHAR:
+    #     char_id = SPECIAL_CHAR[char_id][0]
 
     char_model = get_char_model(char_id)
     if not char_model:
