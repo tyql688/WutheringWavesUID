@@ -15,8 +15,12 @@ async def get_add_num():
 
 
 async def get_sign_num():
-    datas = await WavesUser.get_all_sign_user_list()
-    return len(datas) if datas else 0
+    datas = await WavesUser.get_waves_all_user()
+    num = 0
+    for data in datas:
+        if data.sign_switch != "off":
+            num += 1
+    return num
 
 
 register_status(
