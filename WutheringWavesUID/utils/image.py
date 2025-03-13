@@ -17,6 +17,7 @@ from ..utils.resource.RESOURCE_PATH import (
     WEAPON_PATH,
 )
 
+ICON = Path(__file__).parent.parent.parent / "ICON.png"
 TEXT_PATH = Path(__file__).parent / "texture2d"
 GREY = (216, 216, 216)
 BLACK_G = (40, 40, 40)
@@ -87,6 +88,10 @@ WEAPON_RESONLEVEL_COLOR = {
     5: AMBER,
     6: WAVES_MOLTEN,
 }
+
+
+def get_ICON():
+    return Image.open(ICON)
 
 
 async def get_random_waves_role_pile(char_id: Optional[str] = None):
