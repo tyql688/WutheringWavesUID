@@ -25,13 +25,13 @@ async def analyze_card(bot: Bot, ev: Event):
         await async_ocr(bot, resp)
 
 @waves_change_sonata_and_first_echo.on_regex(
-    r"^改(?P<char>[\u4e00-\u9fa5]+?)(套(装?)(?P<sonata>[\u4e00-\u9fa5]+?))?(声骸(?P<echo>[\u4e00-\u9fa5]+?))?$",
+    r"^改(?P<char>[\u4e00-\u9fa5]+?)(套(装?)(?P<sonata>[\u4e00-\u9fa5]+?))?(?P<echo>声骸.*)?$",
     block=True,
 )
 async def change_sonata_and_first_echo(bot: Bot, ev: Event):
     """处理国际服本地识别结果的声骸相关"""
     match = re.search(
-        r"^.*改(?P<char>[\u4e00-\u9fa5]+?)(套(装?)(?P<sonata>[\u4e00-\u9fa5]+?))?(声骸(?P<echo>[\u4e00-\u9fa5]+?))?$",
+        r"^.*改(?P<char>[\u4e00-\u9fa5]+?)(套(装?)(?P<sonata>[\u4e00-\u9fa5]+?))?(?P<echo>声骸.*)?$",
         ev.raw_text,
     )
 

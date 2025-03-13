@@ -39,7 +39,7 @@ async def change_echo(bot: Bot, ev: Event):
 
     char = ev.regex_dict.get("char")
     sonata = ev.regex_dict.get("sonata")
-    phantom = ev.regex_dict.get("echo")
+    phantom = bool(ev.regex_dict.get("echo"))  # 改为布尔值判断
 
     char_name = alias_to_char_name(char)
     char_id = int(char_name_to_char_id(char_name)) # Int类型配合获取到的本地数据集
@@ -76,7 +76,7 @@ async def get_local_all_role_detail(uid: str) -> tuple[bool, dict]:
 
     return True, role_data
 
-async def change_sonata_and_first_echo(bot: Bot, char_id: int, sonata_a: str, phantom_a: str, role_data: dict) -> tuple[bool, dict]:
+async def change_sonata_and_first_echo(bot: Bot, char_id: int, sonata_a: str, phantom_a: bool, role_data: dict) -> tuple[bool, dict]:
     # 检查角色是否存在
     if char_id not in role_data:
         return False, None
@@ -117,7 +117,7 @@ async def change_sonata_and_first_echo(bot: Bot, char_id: int, sonata_a: str, ph
         )
 
         resp = await bot.receive_resp(TEXT_GET_RESP)
-        if resp is not None and resp.content[0].type == "text" and resp.content[0].data:
+        if resp is not None and resp.content[0].type == "text" and resp.content[0].data.isdigit():
             choice = int(resp.content[0].data) - 1
             if 0 <= choice < len(phantom_id_list):
                 first_change_bool = True # 只修改第一顺位4cost声骸
