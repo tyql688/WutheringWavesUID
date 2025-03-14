@@ -126,6 +126,14 @@ async def change_sonata_and_first_echo(bot: Bot, char_id: int, sonata_a: str, ph
                     if int(echo["cost"]) == 4 and first_change_bool:
                         echo["phantomProp"]["phantomId"] = selected_phantom
                         first_change_bool = False
+                        continue
+                    if int(echo["cost"]) == 4 and not first_change_bool:
+                        different_phantoms = [p for p in phantom_id_list if p != selected_phantom]
+                        if not different_phantoms:
+                            return False, None
+                        if echo["phantomProp"]["phantomId"] == selected_phantom or echo["phantomProp"]["phantomId"] not in different_phantoms:
+                            echo["phantomProp"]["phantomId"] = different_phantoms[0]  # 取第一个不同的元素
+
 
                 logger.info(f"[鸣潮] 修改4cost声骸id为:{selected_phantom}")
             else:
