@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 from gsuid_core.logger import logger
 
 from ...utils.api.model import Props, RoleDetailData
+from ...utils.api.model_other import EnemyDetailData
 from ...utils.damage.utils import SONATA_TIDEBREAKING
 from ...utils.map.damage.damage import check_if_ph_5
 from ..ascension.char import WavesCharResult, get_char_detail
@@ -16,7 +17,11 @@ from ..resource.constant import card_sort_map as card_sort_map_back
 
 
 class WuWaCalc(object):
-    def __init__(self, role_detail: RoleDetailData):
+    def __init__(
+        self,
+        role_detail: RoleDetailData,
+        enemy_detail: Optional[EnemyDetailData] = None,
+    ):
         """
         # 声骸预处理 -> 声骸套装，声骸数量，声骸首位id
         self.phantom_pre = self.prepare_phantom()
@@ -52,6 +57,11 @@ class WuWaCalc(object):
         self.role_card = {}
         # attr
         self.damageAttribute: Optional[DamageAttribute] = None
+        # 敌人
+        if not enemy_detail:
+            self.enemy_detail = EnemyDetailData()
+        else:
+            self.enemy_detail = enemy_detail
         self.can_calc = False
         if (
             self.role_detail.phantomData
@@ -376,7 +386,10 @@ class WuWaCalc(object):
         return card_sort_map
 
     def card_sort_map_to_attribute(self, card_sort_map: Dict):
-        attr = DamageAttribute()
+        attr = DamageAttribute(
+            enemy_resistance=self.enemy_detail.enemy_resistance / 100,
+            enemy_level=self.enemy_detail.enemy_level,
+        )
         attr.set_char_atk(card_sort_map["char_atk"])
         attr.set_char_life(card_sort_map["char_life"])
         attr.set_char_def(card_sort_map["char_def"])
