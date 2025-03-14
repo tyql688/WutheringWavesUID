@@ -9,15 +9,16 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.segment import MessageSegment
 from gsuid_core.utils.boardcast.models import BoardCastMsg, BoardCastMsgDict
-from .bbs_api import bbs_api
+
 from ..utils.api.api import MAIN_URL
 from ..utils.api.model import DailyData
-from ..utils.database.models import WavesUser, WavesBind
-from ..utils.error_reply import ERROR_CODE, WAVES_CODE_102, WAVES_CODE_101
+from ..utils.database.models import WavesBind, WavesUser
+from ..utils.error_reply import ERROR_CODE, WAVES_CODE_101, WAVES_CODE_102
 from ..utils.fonts.waves_fonts import waves_font_24
 from ..utils.waves_api import waves_api
 from ..utils.waves_send_msg import send_board_cast_msg
 from ..wutheringwaves_config import WutheringWavesConfig
+from .bbs_api import bbs_api
 
 GET_GOLD_URL = f"{MAIN_URL}/encourage/gold/getTotalGold"
 GET_TASK_URL = f"{MAIN_URL}/encourage/level/getTaskProcess"
@@ -296,7 +297,7 @@ async def process_user(
     # 异步调用 refresh_data
     succ, _ = await waves_api.refresh_data(user.uid, user.cookie)
     if not succ:
-        await WavesUser.mark_invalid(user.cookie, "无效")
+        # await WavesUser.mark_invalid(user.cookie, "无效")
         # 如果刷新数据失败，更新 expiregid2uid
         if user.bbs_sign_switch != "off":
             bbs_expiregid2uid.setdefault(user.bbs_sign_switch, []).append(user.user_id)
