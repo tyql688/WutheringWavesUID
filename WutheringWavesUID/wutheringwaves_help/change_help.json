@@ -112,6 +112,27 @@
       }
     ]
   },
+  "替换敌人信息(环境)": {
+    "desc": "替换敌人信息(环境)；如【xx面板 换敌人 100级 20抗性】；",
+    "data": [
+      {
+        "name": "替换敌人等级",
+        "desc": "替换敌人等级",
+        "eg": "炽霞伤害 换敌人 100级",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "替换敌人抗性",
+        "desc": "替换敌人抗性",
+        "eg": "炽霞面板 换环境 20抗性",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
   "进阶1": {
     "desc": "ww长离面板 换角色 90级 满链 技能 10 10 10 10 10",
     "data": []
