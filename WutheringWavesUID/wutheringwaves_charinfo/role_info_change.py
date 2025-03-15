@@ -225,7 +225,7 @@ def parse_sonatas(content: str) -> str | None:
 
 
 def parse_enemy_resistance(content: str) -> tuple[str, str] | None:
-    pattern = r"(?:(抗性|抗)([1-9][0-9]?)|([1-9][0-9]?)(抗性|抗))"
+    pattern = r"(?:(抗性|抗)([-+]?[0-9][0-9]?)|([-+]?[0-9][0-9]?)(抗性|抗))"
     match = re.search(pattern, content)
     if match:
         matched_string = match.group(0)
