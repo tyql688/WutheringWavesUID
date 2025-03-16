@@ -18,6 +18,7 @@ from ..utils.api.model import (
     RoleDetailData,
     WeaponData,
 )
+from ..utils.api.model_other import EnemyDetailData
 from ..utils.api.wwapi import ONE_RANK_URL, OneRankRequest, OneRankResponse
 from ..utils.ascension.char import get_char_model
 from ..utils.ascension.template import get_template_data
@@ -203,6 +204,7 @@ async def ph_card_draw(
     img,
     is_draw=True,
     change_command="",
+    enemy_detail: Optional[EnemyDetailData] = None,
 ):
     char_name = role_detail.role.roleName
 
@@ -213,7 +215,7 @@ async def ph_card_draw(
     ph_0 = Image.open(TEXT_PATH / "ph_0.png")
     ph_1 = Image.open(TEXT_PATH / "ph_1.png")
     #  phantom_sum_value = {}
-    calc = WuWaCalc(role_detail)
+    calc = WuWaCalc(role_detail, enemy_detail)
     if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
         equipPhantomList = role_detail.phantomData.equipPhantomList
         phantom_score = 0
@@ -683,11 +685,12 @@ async def draw_char_detail_img(
 
     change_command = ""
     oneRank: Optional[OneRankResponse] = None
+    enemy_detail: Optional[EnemyDetailData] = EnemyDetailData()
     if change_list_regex:
         temp = copy.deepcopy(role_detail)
         try:
             role_detail, change_command = await change_role_detail(
-                uid, ck, role_detail, change_list_regex
+                uid, ck, role_detail, enemy_detail, change_list_regex
             )
         except Exception as e:
             logger.exception("角色数据转换错误", e)
@@ -809,7 +812,7 @@ async def draw_char_detail_img(
 
     # 声骸
     calc: WuWaCalc = await ph_card_draw(
-        ph_sum_value, jineng_len, role_detail, img, isDraw, change_command
+        ph_sum_value, jineng_len, role_detail, img, isDraw, change_command, enemy_detail
     )
     calc.role_card = calc.enhance_summation_card_value(calc.phantom_card)
 

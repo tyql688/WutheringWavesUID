@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 from gsuid_core.logger import logger
 
 from ..utils.api.model import EquipPhantomData, RoleDetailData
+from ..utils.api.model_other import EnemyDetailData
 from ..utils.ascension.sonata import WavesSonataResult, get_sonata_detail
 from ..utils.ascension.weapon import WavesWeaponResult, get_weapon_detail
 from ..utils.name_convert import (
@@ -34,7 +35,7 @@ async def get_remote_role_detail_info(
 ) -> Optional[RoleDetailData]:
     role_detail_info = None
 
-    gen_temp = await get_card(waves_id)
+    gen_temp = await get_card(waves_id)  # type: ignore
     if gen_temp:
         role_detail_info = next(
             (role for role in gen_temp if str(role.role.roleId) in find_char_id),
@@ -118,12 +119,21 @@ class ReplacePhantom:
         return f"{self.mainc4} {self.mainc3} {self.mainc1} \n {[str(phantom) for phantom in self.phantomList]}"
 
 
+class ReplaceEnemy:
+    PREFIX_RE: list[str] = ["敌人", "环境", "怪", "怪物", "敌人信息", "怪物信息"]
+
+    def __init__(self):
+        self.enemyLevel: str | None = None  # 敌人等级
+        self.enemyResistance: str | None = None  # 敌人抗性
+
+
 class ReplaceResult:
     def __init__(self):
         self.role: ReplaceRole = ReplaceRole()
         self.weapon: ReplaceWeapon = ReplaceWeapon()
         self.sonata: ReplaceSonata = ReplaceSonata()
         self.phantom: ReplacePhantom = ReplacePhantom()
+        self.enemy: ReplaceEnemy = ReplaceEnemy()
 
 
 def parse_chain(content: str) -> tuple[str, str] | None:
@@ -178,6 +188,16 @@ def parse_level(content: str) -> tuple[str, str] | None:
     return None
 
 
+def parse_three_level(content: str) -> tuple[str, str] | None:
+    pattern = r"(?:(等级|级)([1-9][0-9]?[0-9]?)|([1-9][0-9]?[0-9]?)(等级|级))"
+    match = re.search(pattern, content)
+    if match:
+        matched_string = match.group(0)
+        level = match.group(2) or match.group(3)
+        return matched_string, level
+    return None
+
+
 def parse_skills(content: str) -> list[int] | None:
     pattern = r"(技能等级|天赋|技能)\s*((?:\d{1,2}\s*){1,5})"
     match = re.search(pattern, content)
@@ -201,6 +221,16 @@ def parse_sonatas(content: str) -> str | None:
         type1 = match.group(1).strip()
         return type1
 
+    return None
+
+
+def parse_enemy_resistance(content: str) -> tuple[str, str] | None:
+    pattern = r"(?:(抗性|抗)([-+]?[0-9][0-9]?)|([-+]?[0-9][0-9]?)(抗性|抗))"
+    match = re.search(pattern, content)
+    if match:
+        matched_string = match.group(0)
+        level = match.group(2) or match.group(3)
+        return matched_string, level
     return None
 
 
@@ -366,6 +396,11 @@ class ChangeParser:
                 cont = cont[len(prefix) :].strip()
                 matched_list.extend(self.parse_sonata(cont))
                 break
+        for prefix in self.rr.enemy.PREFIX_RE:
+            if cont.startswith(prefix):
+                cont = cont[len(prefix) :].strip()
+                matched_list.extend(self.parse_enemy(cont))
+                break
 
         if matched_list:
             self.matched_segments.append(" ".join(matched_list))
@@ -451,12 +486,33 @@ class ChangeParser:
             matched_list.append(matched_string)
         return matched_list
 
+    def parse_enemy(self, cont: str) -> list[str]:
+        matched_list = [f"换{self.rr.enemy.PREFIX_RE[0]}"]
+        level = parse_three_level(cont)
+        if level:
+            matched_string, level_value = level
+            self.rr.enemy.enemyLevel = level_value
+            cont = cont.replace(matched_string, "")
+            matched_list.append(matched_string)
+        enemy_resistance = parse_enemy_resistance(cont)
+        if enemy_resistance:
+            matched_string, resistance_value = enemy_resistance
+            self.rr.enemy.enemyResistance = resistance_value
+            cont = cont.replace(matched_string, "")
+            matched_list.append(matched_string)
+
+        return matched_list
+
     def get_matched_content(self) -> str:
         return ";".join(self.matched_segments)
 
 
 async def change_role_detail(
-    waves_id: str, ck: str, role_detail: RoleDetailData, change_list_regex: str
+    waves_id: str,
+    ck: str,
+    role_detail: RoleDetailData,
+    enemy_detail: EnemyDetailData,
+    change_list_regex: str,
 ) -> tuple[RoleDetailData, str]:
     parser: ChangeParser = ChangeParser(change_list_regex)
     parserResult: ReplaceResult = parser.rr
@@ -590,6 +646,13 @@ async def change_role_detail(
                     ep.phantomProp.phantomId = SONATA_FIRST_ID.get(
                         sonata_result.name, []
                     )[0]
+
+    # 敌人
+    if parserResult.enemy.enemyResistance:
+        enemy_detail.enemy_resistance = int(parserResult.enemy.enemyResistance)
+    if parserResult.enemy.enemyLevel:
+        enemy_detail.enemy_level = int(parserResult.enemy.enemyLevel)
+
     return role_detail, parser.get_matched_content()
 
 
