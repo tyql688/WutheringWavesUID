@@ -29,6 +29,19 @@ POST_DETAIL_URL = f"{MAIN_URL}/forum/getPostDetail"
 SHARE_URL = f"{MAIN_URL}/encourage/level/shareTask"
 
 
+async def get_sign_interval(is_bbs: bool = False):
+    next_group_sign_time = WutheringWavesConfig.get_config(
+        "SigninConcurrentNumInterval"
+    ).data
+    ratio = random.uniform(1, 2) if is_bbs else 1
+    if not next_group_sign_time:
+        return random.uniform(2, 3) * ratio
+    return (
+        random.uniform(float(next_group_sign_time[0]), float(next_group_sign_time[1]))
+        * ratio
+    )
+
+
 async def do_sign_in(taskData, uid, token, form_result):
     key = "用户签到"
     form_result[uid][key] = -1
@@ -157,6 +170,8 @@ async def do_single_task(uid, token):
             await do_like(i, uid, token, form_result, post_list)
         elif "分享" in i["remark"]:
             await do_share(i, uid, token, form_result)
+
+        await asyncio.sleep(random.uniform(0, 1))
 
     gold_res = await bbs_api.get_gold(token)
     if isinstance(gold_res, dict):
@@ -348,7 +363,7 @@ async def process_all_users(_user_list: List):
     for batch in batches:
         tasks = [process_user_with_semaphore(user) for user in batch]
         await asyncio.gather(*tasks, return_exceptions=True)
-        delay = round(random.uniform(0, 1), 2)
+        delay = round(await get_sign_interval(), 2)
         logger.info(
             f"[鸣潮] [签到任务] 正在处理token验证批次[{flag}]，共{len(tasks)}个用户, 等待{delay:.2f}秒进行下一次token验证"
         )
@@ -384,7 +399,7 @@ async def auto_bbs_task_action(expiregid2uid, user_list):
         batch = tasks[i : i + max_concurrent]
         results = await asyncio.gather(*batch, return_exceptions=True)
 
-        delay = round(random.uniform(0, 1), 2)
+        delay = round(await get_sign_interval(), 2)
         logger.info(f"[鸣潮] [社区签到] 等待{delay:.2f}秒进行下一次签到")
         await asyncio.sleep(delay)
 
@@ -520,7 +535,7 @@ async def daily_sign_action(expiregid2uid, user_list):
         batch = tasks[i : i + max_concurrent]
         results = await asyncio.gather(*batch, return_exceptions=True)
 
-        delay = round(random.uniform(0, 1), 2)
+        delay = round(await get_sign_interval(), 2)
         logger.info(f"[鸣潮] [签到]  等待{delay:.2f}秒进行下一次签到")
         await asyncio.sleep(delay)
 
