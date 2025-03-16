@@ -1,7 +1,6 @@
 from gsuid_core.bot import Bot
 from gsuid_core.sv import SV
 from gsuid_core.models import Event
-from gsuid_core.logger import logger
 
 from .cardOCR import async_ocr
 from .changeEcho import change_echo
@@ -19,7 +18,7 @@ async def analyze_card(bot: Bot, ev: Event):
     """处理 Discord 上的图片分析请求。"""
 
     resp = await bot.receive_resp(
-        f'[鸣潮] 请在30秒内发送dc官方bot生成的卡片图或图片链接\n(分辨率尽可能为1920*1080，过低可能导致识别失败)',
+        '[鸣潮] 请在30秒内发送dc官方bot生成的卡片图或图片链接\n(分辨率尽可能为1920*1080，过低可能导致识别失败)',
     )
     if resp is not None:
         await async_ocr(bot, resp)

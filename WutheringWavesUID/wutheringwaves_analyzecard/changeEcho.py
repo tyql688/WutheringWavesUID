@@ -2,7 +2,8 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.logger import logger
 
-from ..utils.error_reply import WAVES_CODE_103, WAVES_CODE_099
+from ..utils.error_reply import WAVES_CODE_103
+from ..utils.hint import error_reply
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..wutheringwaves_config import PREFIX
 from ..utils.refresh_char_detail import save_card_info
