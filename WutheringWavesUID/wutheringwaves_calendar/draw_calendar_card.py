@@ -55,8 +55,8 @@ def tower_node(now: datetime):
 
 
 def shenhai_node(now: datetime):
-    start_time = datetime(2025, 2, 13, 4, 0)
-    date_range = 86400 * 32  # 32天为一周期（秒）
+    start_time = datetime(2025, 3, 17, 4, 0)
+    date_range = 86400 * 28  # 28天为一周期（秒）
     # 将秒数转为 timedelta 对象
     date_range_td = timedelta(seconds=date_range)
 
