@@ -63,7 +63,10 @@ def calc_chain(attr: DamageAttribute, role: RoleDetailData, isGroup: bool = Fals
 
 
 def calc_damage_0(
-    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+    attr: DamageAttribute,
+    role: RoleDetailData,
+    isGroup: bool = False,
+    is_lianzhao: bool = False,
 ) -> tuple[str, str]:
     """
     焚身以火
@@ -90,7 +93,10 @@ def calc_damage_0(
     # 设置角色等级
     attr.set_character_level(role.role.level)
 
-    damage_func = [cast_skill, cast_attack]
+    if is_lianzhao:
+        damage_func = [cast_skill, cast_attack, cast_liberation]
+    else:
+        damage_func = [cast_skill, cast_attack]
     phase_damage(attr, role, damage_func, isGroup)
 
     role_breach = role.role.breach
@@ -103,6 +109,12 @@ def calc_damage_0(
         attr.add_effect(title, msg)
 
     attr.set_phantom_dmg_bonus()
+
+    if is_lianzhao:
+        # 连招计算
+        title = f"{role_name}-焰羽"
+        msg = "10秒内施放重击焚身以火时攻击提升25%"
+        attr.add_atk_percent(0.25, title, msg)
 
     # 命座计算
     calc_chain(attr, role, isGroup)
@@ -176,16 +188,22 @@ def calc_damage_1(
 
 
 def calc_damage_2(
-    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
 ) -> tuple[str, str]:
     attr1 = copy.deepcopy(attr)
     crit_damage1, expected_damage1 = calc_damage_0(attr1, role, isGroup)
+    attr1.add_effect("焚身以火暴击伤害", f"{crit_damage1}")
+    attr1.add_effect("焚身以火期望伤害", f"{expected_damage1}")
 
     attr2 = copy.deepcopy(attr)
     crit_damage2, expected_damage2 = calc_damage_1(attr2, role, isGroup)
+    attr2.add_effect("离火照丹心暴击伤害", f"{crit_damage2}")
+    attr2.add_effect("离火照丹心期望伤害", f"{expected_damage2}")
 
     attr3 = copy.deepcopy(attr)
-    crit_damage3, expected_damage3 = calc_damage_0(attr3, role, isGroup)
+    crit_damage3, expected_damage3 = calc_damage_0(attr3, role, isGroup, True)
+    attr3.add_effect("焚身以火暴击伤害", f"{crit_damage3}")
+    attr3.add_effect("焚身以火期望伤害", f"{expected_damage3}")
 
     crit_damage = add_comma_separated_numbers(crit_damage1, crit_damage2, crit_damage3)
     expected_damage = add_comma_separated_numbers(
