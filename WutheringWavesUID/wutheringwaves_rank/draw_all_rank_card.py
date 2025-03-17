@@ -1,4 +1,5 @@
 import asyncio
+import copy
 import time
 from pathlib import Path
 from typing import Optional, Union
@@ -33,9 +34,17 @@ from ..utils.fonts.waves_fonts import (
     waves_font_44,
 )
 from ..utils.image import (
+    AMBER,
     CHAIN_COLOR,
+    GREY,
     RED,
     SPECIAL_GOLD,
+    WAVES_FREEZING,
+    WAVES_LINGERING,
+    WAVES_MOLTEN,
+    WAVES_MOONLIT,
+    WAVES_SIERRA,
+    WAVES_VOID,
     WEAPON_RESONLEVEL_COLOR,
     add_footer,
     crop_center_img,
@@ -50,6 +59,7 @@ from ..utils.image import (
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import ATTRIBUTE_ID_MAP, SPECIAL_CHAR_NAME
 from ..utils.waves_api import waves_api
+from ..version import WWUID_Damage_Version
 from ..wutheringwaves_config import WutheringWavesConfig
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -61,8 +71,21 @@ weapon_icon_bg_4 = Image.open(TEXT_PATH / "weapon_icon_bg_4.png")
 weapon_icon_bg_5 = Image.open(TEXT_PATH / "weapon_icon_bg_5.png")
 promote_icon = Image.open(TEXT_PATH / "promote_icon.png")
 char_mask = Image.open(TEXT_PATH / "char_mask.png")
+char_mask2 = Image.open(TEXT_PATH / "char_mask.png")
+char_mask2 = char_mask2.resize((1300, char_mask2.size[1]))
 logo_img = Image.open(TEXT_PATH / "logo_small_2.png")
 pic_cache = TimedCache(600, 200)
+
+
+BOT_COLOR = [
+    WAVES_MOLTEN,
+    AMBER,
+    WAVES_VOID,
+    WAVES_SIERRA,
+    WAVES_FREEZING,
+    WAVES_LINGERING,
+    WAVES_MOONLIT,
+]
 
 
 async def get_rank(item: RankItem) -> Optional[RankInfoResponse]:
@@ -107,9 +130,6 @@ async def draw_all_rank_card(
         )
     char_name = alias_to_char_name(char)
 
-    # if char_id in SPECIAL_CHAR:
-    #     char_id = SPECIAL_CHAR[char_id][0]
-
     char_model = get_char_model(char_id)
     if not char_model:
         return (
@@ -138,10 +158,10 @@ async def draw_all_rank_card(
     title_h = 500
     bar_star_h = 110
     h = title_h + totalNum * bar_star_h + 80
-    card_img = get_waves_bg(1050, h, "bg3")
+    card_img = get_waves_bg(1300, h, "bg3")
     card_img_draw = ImageDraw.Draw(card_img)
 
-    bar = Image.open(TEXT_PATH / "bar.png")
+    bar = Image.open(TEXT_PATH / "bar1.png")
     total_score = 0
     total_damage = 0
 
@@ -156,6 +176,8 @@ async def draw_all_rank_card(
     ]
     results = await asyncio.gather(*tasks)
 
+    bot_color = copy.deepcopy(BOT_COLOR)
+    bot_color_map = {}
     for index, temp in enumerate(zip(rankInfoList.data.details, results)):
         rank: RankDetail = temp[0]
         role_avatar: Image.Image = temp[1]
@@ -189,15 +211,15 @@ async def draw_all_rank_card(
         # 评分
         if rank.phantom_score > 0.0:
             score_bg = Image.open(TEXT_PATH / f"score_{rank.phantom_score_bg}.png")
-            bar_bg.alpha_composite(score_bg, (320, 2))
+            bar_bg.alpha_composite(score_bg, (550, 2))
             bar_star_draw.text(
-                (466, 45),
+                (716, 45),
                 f"{rank.phantom_score.__round__(1)}",
                 "white",
                 waves_font_34,
                 "mm",
             )
-            bar_star_draw.text((466, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
+            bar_star_draw.text((716, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
 
         # 合鸣效果
         if rank.sonata_name:
@@ -205,7 +227,7 @@ async def draw_all_rank_card(
             effect_image = effect_image.resize((50, 50))
             # sonata_color = WAVES_ECHO_MAP.get(rank.sonata_name, (0, 0, 0))
             # effect_image = await change_color(effect_image, sonata_color)
-            bar_bg.alpha_composite(effect_image, (533, 15))
+            bar_bg.alpha_composite(effect_image, (783, 15))
             sonata_name = rank.sonata_name
         else:
             sonata_name = "合鸣效果"
@@ -213,7 +235,7 @@ async def draw_all_rank_card(
         sonata_font = waves_font_16
         if len(sonata_name) > 4:
             sonata_font = waves_font_14
-        bar_star_draw.text((558, 75), f"{sonata_name}", "white", sonata_font, "mm")
+        bar_star_draw.text((808, 75), f"{sonata_name}", "white", sonata_font, "mm")
 
         # 武器
         weapon_bg_temp = Image.new("RGBA", (600, 300))
@@ -260,14 +282,18 @@ async def draw_all_rank_card(
 
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
-        bar_bg.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(580, 25))
+        bar_bg.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(830, 25))
 
         # 伤害
         bar_star_draw.text(
-            (870, 45), f"{rank.expected_damage:,.0f}", SPECIAL_GOLD, waves_font_34, "mm"
+            (1120, 45),
+            f"{rank.expected_damage:,.0f}",
+            SPECIAL_GOLD,
+            waves_font_34,
+            "mm",
         )
         bar_star_draw.text(
-            (870, 75), f"{rank.expected_name}", "white", waves_font_16, "mm"
+            (1120, 75), f"{rank.expected_name}", "white", waves_font_16, "mm"
         )
 
         # 排名
@@ -297,20 +323,39 @@ async def draw_all_rank_card(
         else:
             draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30))
 
-        # # bot主人名字
-        # botName = rank.alias_name if rank.alias_name else rank.username
-        # bar_star_draw.text((70, 10), f"{botName}", SPECIAL_GOLD, waves_font_30, "mm")
-
         # 名字
-        # bar_star_draw.text((210, 40), f"{rank.kuro_name}", "white", waves_font_20, "lm")
+        bar_star_draw.text((210, 75), f"{rank.kuro_name}", "white", waves_font_20, "lm")
 
         # uid
         uid_color = "white"
         if is_self_ck and self_uid == rank.waves_id:
             uid_color = RED
         bar_star_draw.text(
-            (210, 75), f"{rank.waves_id}", uid_color, waves_font_20, "lm"
+            (350, 40), f"特征码: {rank.waves_id}", uid_color, waves_font_20, "lm"
         )
+
+        # bot主人名字
+        botName = rank.alias_name if rank.alias_name else ""
+        # bar_star_draw.text(
+        #     (350, 75), f"来自bot: {botName}", SPECIAL_GOLD, waves_font_20, "lm"
+        # )
+        if botName:
+            color = (54, 54, 54)
+            if rank.username in bot_color_map:
+                color = bot_color_map[rank.username]
+            elif bot_color:
+                color = bot_color.pop(0)
+                bot_color_map[rank.username] = color
+
+            info_block = Image.new("RGBA", (200, 30), color=(255, 255, 255, 0))
+            info_block_draw = ImageDraw.Draw(info_block)
+            info_block_draw.rounded_rectangle(
+                [0, 0, 200, 30], radius=6, fill=color + (int(0.6 * 255),)
+            )
+            info_block_draw.text(
+                (100, 15), f"bot: {botName}", "white", waves_font_18, "mm"
+            )
+            bar_bg.alpha_composite(info_block, (350, 65))
 
         # 贴到背景
         card_img.paste(bar_bg, (0, title_h + index * bar_star_h), bar_bg)
@@ -321,39 +366,58 @@ async def draw_all_rank_card(
     avg_score = f"{total_score / totalNum:.1f}" if totalNum != 0 else "0"
     avg_damage = f"{total_damage / totalNum:,.0f}" if totalNum != 0 else "0"
 
-    title = TITLE_I.copy()
+    title = TITLE_II.copy()
     title_draw = ImageDraw.Draw(title)
     # logo
-    title.alpha_composite(logo_img.copy(), dest=(50, 65))
+    title.alpha_composite(logo_img.copy(), dest=(350, 65))
 
-    # 人物bg
-    pile = await get_role_pile_old(char_id)
-    title.paste(pile, (450, -120), pile)
-    title_draw.text((200, 335), f"{avg_score}", "white", waves_font_44, "mm")
-    title_draw.text((200, 375), "平均声骸分数", SPECIAL_GOLD, waves_font_20, "mm")
+    title_draw.text((600, 335), f"{avg_score}", "white", waves_font_44, "mm")
+    title_draw.text((600, 375), "平均声骸分数", SPECIAL_GOLD, waves_font_20, "mm")
 
-    title_draw.text((390, 335), f"{avg_damage}", "white", waves_font_44, "mm")
-    title_draw.text((390, 375), "平均伤害", SPECIAL_GOLD, waves_font_20, "mm")
+    title_draw.text((790, 335), f"{avg_damage}", "white", waves_font_44, "mm")
+    title_draw.text((790, 375), "平均伤害", SPECIAL_GOLD, waves_font_20, "mm")
 
     if char_id in SPECIAL_CHAR_NAME:
         char_name = SPECIAL_CHAR_NAME[char_id]
 
     title_name = f"{char_name}{rank_type}总排行"
-    title_draw.text((140, 265), f"{title_name}", "black", waves_font_30, "lm")
+    title_draw.text((540, 265), f"{title_name}", "black", waves_font_30, "lm")
+
+    # 时间
+    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    title_draw.text((470, 205), f"{time_str}", GREY, waves_font_20, "lm")
+
+    # 版本
+    info_block = Image.new("RGBA", (70, 30), color=(255, 255, 255, 0))
+    info_block_draw = ImageDraw.Draw(info_block)
+    info_block_draw.rounded_rectangle(
+        [0, 0, 70, 30], radius=6, fill=(0, 79, 152, int(0.9 * 255))
+    )
+    info_block_draw.text(
+        (35, 15), f"v{WWUID_Damage_Version}", "white", waves_font_24, "mm"
+    )
+    _x = 540 + 31 * len(title_name)
+    title.alpha_composite(info_block, (_x, 255))
 
     # 备注
-
     if rank_type == "伤害":
         temp_notes = (
             "排行标准：以期望伤害（计算暴击率的伤害，不代表实际伤害) 为排序的排名"
         )
     else:
         temp_notes = "排行标准：以声骸分数（声骸评分高，不代表实际伤害高) 为排序的排名"
-    card_img_draw.text((450, 500), f"{temp_notes}", SPECIAL_GOLD, waves_font_16, "lm")
+    card_img_draw.text((700, 500), f"{temp_notes}", SPECIAL_GOLD, waves_font_16, "lm")
 
-    img_temp = Image.new("RGBA", char_mask.size)
-    img_temp.paste(title, (0, 0), char_mask.copy())
-    card_img.alpha_composite(img_temp, (0, 0))
+    img_temp = Image.new("RGBA", char_mask2.size)
+    img_temp.alpha_composite(title, (-300, 0))
+    # 人物bg
+    pile = await get_role_pile_old(char_id)
+    img_temp.alpha_composite(pile, (600, -120))
+
+    img_temp2 = Image.new("RGBA", char_mask2.size)
+    img_temp2.paste(img_temp, (0, 0), char_mask2.copy())
+
+    card_img.alpha_composite(img_temp2, (0, 0))
     card_img = add_footer(card_img)
     card_img = await convert_img(card_img)
 
