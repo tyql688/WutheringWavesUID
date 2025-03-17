@@ -7,7 +7,7 @@
       "1": [
         {
           "name": "攻击",
-          "value": 33.0,
+          "value": 40.0,
           "isRatio": false,
           "isPercent": false
         },
@@ -21,7 +21,7 @@
       "2": [
         {
           "name": "攻击",
-          "value": 35.7786,
+          "value": 43.368,
           "isRatio": false,
           "isPercent": false
         },
@@ -35,7 +35,7 @@
       "3": [
         {
           "name": "攻击",
-          "value": 38.5605,
+          "value": 46.74,
           "isRatio": false,
           "isPercent": false
         },
@@ -49,7 +49,7 @@
       "4": [
         {
           "name": "攻击",
-          "value": 41.3424,
+          "value": 50.112,
           "isRatio": false,
           "isPercent": false
         },
@@ -63,7 +63,7 @@
       "5": [
         {
           "name": "攻击",
-          "value": 44.121,
+          "value": 53.48,
           "isRatio": false,
           "isPercent": false
         },
@@ -77,7 +77,7 @@
       "6": [
         {
           "name": "攻击",
-          "value": 46.9029,
+          "value": 56.852,
           "isRatio": false,
           "isPercent": false
         },
@@ -91,7 +91,7 @@
       "7": [
         {
           "name": "攻击",
-          "value": 49.6848,
+          "value": 60.224,
           "isRatio": false,
           "isPercent": false
         },
@@ -105,7 +105,7 @@
       "8": [
         {
           "name": "攻击",
-          "value": 52.4634,
+          "value": 63.592,
           "isRatio": false,
           "isPercent": false
         },
@@ -119,7 +119,7 @@
       "9": [
         {
           "name": "攻击",
-          "value": 55.2453,
+          "value": 66.964,
           "isRatio": false,
           "isPercent": false
         },
@@ -133,7 +133,7 @@
       "10": [
         {
           "name": "攻击",
-          "value": 58.0272,
+          "value": 70.336,
           "isRatio": false,
           "isPercent": false
         },
@@ -147,7 +147,7 @@
       "11": [
         {
           "name": "攻击",
-          "value": 60.8058,
+          "value": 73.704,
           "isRatio": false,
           "isPercent": false
         },
@@ -161,7 +161,7 @@
       "12": [
         {
           "name": "攻击",
-          "value": 63.5877,
+          "value": 77.076,
           "isRatio": false,
           "isPercent": false
         },
@@ -175,7 +175,7 @@
       "13": [
         {
           "name": "攻击",
-          "value": 66.3696,
+          "value": 80.448,
           "isRatio": false,
           "isPercent": false
         },
@@ -189,7 +189,7 @@
       "14": [
         {
           "name": "攻击",
-          "value": 69.1515,
+          "value": 83.82,
           "isRatio": false,
           "isPercent": false
         },
@@ -203,7 +203,7 @@
       "15": [
         {
           "name": "攻击",
-          "value": 71.9301,
+          "value": 87.188,
           "isRatio": false,
           "isPercent": false
         },
@@ -217,7 +217,7 @@
       "16": [
         {
           "name": "攻击",
-          "value": 74.712,
+          "value": 90.56,
           "isRatio": false,
           "isPercent": false
         },
@@ -231,7 +231,7 @@
       "17": [
         {
           "name": "攻击",
-          "value": 77.4939,
+          "value": 93.932,
           "isRatio": false,
           "isPercent": false
         },
@@ -245,7 +245,7 @@
       "18": [
         {
           "name": "攻击",
-          "value": 80.2725,
+          "value": 97.3,
           "isRatio": false,
           "isPercent": false
         },
@@ -259,7 +259,7 @@
       "19": [
         {
           "name": "攻击",
-          "value": 83.0544,
+          "value": 100.672,
           "isRatio": false,
           "isPercent": false
         },
@@ -273,7 +273,7 @@
       "20": [
         {
           "name": "攻击",
-          "value": 85.8363,
+          "value": 104.044,
           "isRatio": false,
           "isPercent": false
         },
@@ -289,7 +289,7 @@
       "20": [
         {
           "name": "攻击",
-          "value": 107.8341,
+          "value": 130.708,
           "isRatio": false,
           "isPercent": false
         },
@@ -303,7 +303,7 @@
       "21": [
         {
           "name": "攻击",
-          "value": 110.616,
+          "value": 134.08,
           "isRatio": false,
           "isPercent": false
         },
@@ -317,7 +317,7 @@
       "22": [
         {
           "name": "攻击",
-          "value": 113.3979,
+          "value": 137.452,
           "isRatio": false,
           "isPercent": false
         },
@@ -331,7 +331,7 @@
       "23": [
         {
           "name": "攻击",
-          "value": 116.1765,
+          "value": 140.82,
           "isRatio": false,
           "isPercent": false
         },
@@ -345,7 +345,7 @@
       "24": [
         {
           "name": "攻击",
-          "value": 118.9584,
+          "value": 144.192,
           "isRatio": false,
           "isPercent": false
         },
@@ -359,7 +359,7 @@
       "25": [
         {
           "name": "攻击",
-          "value": 121.7403,
+          "value": 147.564,
           "isRatio": false,
           "isPercent": false
         },
@@ -373,7 +373,7 @@
       "26": [
         {
           "name": "攻击",
-          "value": 124.5222,
+          "value": 150.936,
           "isRatio": false,
           "isPercent": false
         },
@@ -387,7 +387,7 @@
       "27": [
         {
           "name": "攻击",
-          "value": 127.3008,
+          "value": 154.304,
           "isRatio": false,
           "isPercent": false
         },
@@ -401,7 +401,7 @@
       "28": [
         {
           "name": "攻击",
-          "value": 130.0827,
+          "value": 157.676,
           "isRatio": false,
           "isPercent": false
         },
@@ -415,7 +415,7 @@
       "29": [
         {
           "name": "攻击",
-          "value": 132.8646,
+          "value": 161.048,
           "isRatio": false,
           "isPercent": false
         },
@@ -429,7 +429,7 @@
       "30": [
         {
           "name": "攻击",
-          "value": 135.6432,
+          "value": 164.416,
           "isRatio": false,
           "isPercent": false
         },
@@ -443,7 +443,7 @@
       "31": [
         {
           "name": "攻击",
-          "value": 138.4251,
+          "value": 167.788,
           "isRatio": false,
           "isPercent": false
         },
@@ -457,7 +457,7 @@
       "32": [
         {
           "name": "攻击",
-          "value": 141.207,
+          "value": 171.16,
           "isRatio": false,
           "isPercent": false
         },
@@ -471,7 +471,7 @@
       "33": [
         {
           "name": "攻击",
-          "value": 143.9856,
+          "value": 174.528,
           "isRatio": false,
           "isPercent": false
         },
@@ -485,7 +485,7 @@
       "34": [
         {
           "name": "攻击",
-          "value": 146.7675,
+          "value": 177.9,
           "isRatio": false,
           "isPercent": false
         },
@@ -499,7 +499,7 @@
       "35": [
         {
           "name": "攻击",
-          "value": 149.5494,
+          "value": 181.272,
           "isRatio": false,
           "isPercent": false
         },
@@ -513,7 +513,7 @@
       "36": [
         {
           "name": "攻击",
-          "value": 152.3313,
+          "value": 184.644,
           "isRatio": false,
           "isPercent": false
         },
@@ -527,7 +527,7 @@
       "37": [
         {
           "name": "攻击",
-          "value": 155.1099,
+          "value": 188.012,
           "isRatio": false,
           "isPercent": false
         },
@@ -541,7 +541,7 @@
       "38": [
         {
           "name": "攻击",
-          "value": 157.8918,
+          "value": 191.384,
           "isRatio": false,
           "isPercent": false
         },
@@ -555,7 +555,7 @@
       "39": [
         {
           "name": "攻击",
-          "value": 160.6737,
+          "value": 194.756,
           "isRatio": false,
           "isPercent": false
         },
@@ -569,7 +569,7 @@
       "40": [
         {
           "name": "攻击",
-          "value": 163.4523,
+          "value": 198.124,
           "isRatio": false,
           "isPercent": false
         },
@@ -585,7 +585,7 @@
       "40": [
         {
           "name": "攻击",
-          "value": 185.4534,
+          "value": 224.792,
           "isRatio": false,
           "isPercent": false
         },
@@ -599,7 +599,7 @@
       "41": [
         {
           "name": "攻击",
-          "value": 188.2353,
+          "value": 228.164,
           "isRatio": false,
           "isPercent": false
         },
@@ -613,7 +613,7 @@
       "42": [
         {
           "name": "攻击",
-          "value": 191.0139,
+          "value": 231.532,
           "isRatio": false,
           "isPercent": false
         },
@@ -627,7 +627,7 @@
       "43": [
         {
           "name": "攻击",
-          "value": 193.7958,
+          "value": 234.904,
           "isRatio": false,
           "isPercent": false
         },
@@ -641,7 +641,7 @@
       "44": [
         {
           "name": "攻击",
-          "value": 196.5777,
+          "value": 238.276,
           "isRatio": false,
           "isPercent": false
         },
@@ -655,7 +655,7 @@
       "45": [
         {
           "name": "攻击",
-          "value": 199.3563,
+          "value": 241.644,
           "isRatio": false,
           "isPercent": false
         },
@@ -669,7 +669,7 @@
       "46": [
         {
           "name": "攻击",
-          "value": 202.1382,
+          "value": 245.016,
           "isRatio": false,
           "isPercent": false
         },
@@ -683,7 +683,7 @@
       "47": [
         {
           "name": "攻击",
-          "value": 204.9201,
+          "value": 248.388,
           "isRatio": false,
           "isPercent": false
         },
@@ -697,7 +697,7 @@
       "48": [
         {
           "name": "攻击",
-          "value": 207.702,
+          "value": 251.76,
           "isRatio": false,
           "isPercent": false
         },
@@ -711,7 +711,7 @@
       "49": [
         {
           "name": "攻击",
-          "value": 210.4806,
+          "value": 255.128,
           "isRatio": false,
           "isPercent": false
         },
@@ -725,7 +725,7 @@
       "50": [
         {
           "name": "攻击",
-          "value": 213.2625,
+          "value": 258.5,
           "isRatio": false,
           "isPercent": false
         },
@@ -741,7 +741,7 @@
       "50": [
         {
           "name": "攻击",
-          "value": 235.2636,
+          "value": 285.168,
           "isRatio": false,
           "isPercent": false
         },
@@ -755,7 +755,7 @@
       "51": [
         {
           "name": "攻击",
-          "value": 238.0422,
+          "value": 288.536,
           "isRatio": false,
           "isPercent": false
         },
@@ -769,7 +769,7 @@
       "52": [
         {
           "name": "攻击",
-          "value": 240.8241,
+          "value": 291.908,
           "isRatio": false,
           "isPercent": false
         },
@@ -783,7 +783,7 @@
       "53": [
         {
           "name": "攻击",
-          "value": 243.606,
+          "value": 295.28,
           "isRatio": false,
           "isPercent": false
         },
@@ -797,7 +797,7 @@
       "54": [
         {
           "name": "攻击",
-          "value": 246.3846,
+          "value": 298.648,
           "isRatio": false,
           "isPercent": false
         },
@@ -811,7 +811,7 @@
       "55": [
         {
           "name": "攻击",
-          "value": 249.1665,
+          "value": 302.02,
           "isRatio": false,
           "isPercent": false
         },
@@ -825,7 +825,7 @@
       "56": [
         {
           "name": "攻击",
-          "value": 251.9484,
+          "value": 305.392,
           "isRatio": false,
           "isPercent": false
         },
@@ -839,7 +839,7 @@
       "57": [
         {
           "name": "攻击",
-          "value": 254.7303,
+          "value": 308.764,
           "isRatio": false,
           "isPercent": false
         },
@@ -853,7 +853,7 @@
       "58": [
         {
           "name": "攻击",
-          "value": 257.5089,
+          "value": 312.132,
           "isRatio": false,
           "isPercent": false
         },
@@ -867,7 +867,7 @@
       "59": [
         {
           "name": "攻击",
-          "value": 260.2908,
+          "value": 315.504,
           "isRatio": false,
           "isPercent": false
         },
@@ -881,7 +881,7 @@
       "60": [
         {
           "name": "攻击",
-          "value": 263.0727,
+          "value": 318.876,
           "isRatio": false,
           "isPercent": false
         },
@@ -897,7 +897,7 @@
       "60": [
         {
           "name": "攻击",
-          "value": 285.0705,
+          "value": 345.54,
           "isRatio": false,
           "isPercent": false
         },
@@ -911,7 +911,7 @@
       "61": [
         {
           "name": "攻击",
-          "value": 287.8524,
+          "value": 348.912,
           "isRatio": false,
           "isPercent": false
         },
@@ -925,7 +925,7 @@
       "62": [
         {
           "name": "攻击",
-          "value": 290.6343,
+          "value": 352.284,
           "isRatio": false,
           "isPercent": false
         },
@@ -939,7 +939,7 @@
       "63": [
         {
           "name": "攻击",
-          "value": 293.4129,
+          "value": 355.652,
           "isRatio": false,
           "isPercent": false
         },
@@ -953,7 +953,7 @@
       "64": [
         {
           "name": "攻击",
-          "value": 296.1948,
+          "value": 359.024,
           "isRatio": false,
           "isPercent": false
         },
@@ -967,7 +967,7 @@
       "65": [
         {
           "name": "攻击",
-          "value": 298.9767,
+          "value": 362.396,
           "isRatio": false,
           "isPercent": false
         },
@@ -981,7 +981,7 @@
       "66": [
         {
           "name": "攻击",
-          "value": 301.7553,
+          "value": 365.764,
           "isRatio": false,
           "isPercent": false
         },
@@ -995,7 +995,7 @@
       "67": [
         {
           "name": "攻击",
-          "value": 304.5372,
+          "value": 369.136,
           "isRatio": false,
           "isPercent": false
         },
@@ -1009,7 +1009,7 @@
       "68": [
         {
           "name": "攻击",
-          "value": 307.3191,
+          "value": 372.508,
           "isRatio": false,
           "isPercent": false
         },
@@ -1023,7 +1023,7 @@
       "69": [
         {
           "name": "攻击",
-          "value": 310.101,
+          "value": 375.88,
           "isRatio": false,
           "isPercent": false
         },
@@ -1037,7 +1037,7 @@
       "70": [
         {
           "name": "攻击",
-          "value": 312.8796,
+          "value": 379.248,
           "isRatio": false,
           "isPercent": false
         },
@@ -1053,7 +1053,7 @@
       "70": [
         {
           "name": "攻击",
-          "value": 334.8807,
+          "value": 405.916,
           "isRatio": false,
           "isPercent": false
         },
@@ -1067,7 +1067,7 @@
       "71": [
         {
           "name": "攻击",
-          "value": 337.6626,
+          "value": 409.288,
           "isRatio": false,
           "isPercent": false
         },
@@ -1081,7 +1081,7 @@
       "72": [
         {
           "name": "攻击",
-          "value": 340.4412,
+          "value": 412.656,
           "isRatio": false,
           "isPercent": false
         },
@@ -1095,7 +1095,7 @@
       "73": [
         {
           "name": "攻击",
-          "value": 343.2231,
+          "value": 416.028,
           "isRatio": false,
           "isPercent": false
         },
@@ -1109,7 +1109,7 @@
       "74": [
         {
           "name": "攻击",
-          "value": 346.005,
+          "value": 419.4,
           "isRatio": false,
           "isPercent": false
         },
@@ -1123,7 +1123,7 @@
       "75": [
         {
           "name": "攻击",
-          "value": 348.7836,
+          "value": 422.768,
           "isRatio": false,
           "isPercent": false
         },
@@ -1137,7 +1137,7 @@
       "76": [
         {
           "name": "攻击",
-          "value": 351.5655,
+          "value": 426.14,
           "isRatio": false,
           "isPercent": false
         },
@@ -1151,7 +1151,7 @@
       "77": [
         {
           "name": "攻击",
-          "value": 354.3474,
+          "value": 429.512,
           "isRatio": false,
           "isPercent": false
         },
@@ -1165,7 +1165,7 @@
       "78": [
         {
           "name": "攻击",
-          "value": 357.126,
+          "value": 432.88,
           "isRatio": false,
           "isPercent": false
         },
@@ -1179,7 +1179,7 @@
       "79": [
         {
           "name": "攻击",
-          "value": 359.9079,
+          "value": 436.252,
           "isRatio": false,
           "isPercent": false
         },
@@ -1193,7 +1193,7 @@
       "80": [
         {
           "name": "攻击",
-          "value": 362.6898,
+          "value": 439.624,
           "isRatio": false,
           "isPercent": false
         },
@@ -1209,7 +1209,7 @@
       "80": [
         {
           "name": "攻击",
-          "value": 384.6909,
+          "value": 466.292,
           "isRatio": false,
           "isPercent": false
         },
@@ -1223,7 +1223,7 @@
       "81": [
         {
           "name": "攻击",
-          "value": 387.4695,
+          "value": 469.66,
           "isRatio": false,
           "isPercent": false
         },
@@ -1237,7 +1237,7 @@
       "82": [
         {
           "name": "攻击",
-          "value": 390.2514,
+          "value": 473.032,
           "isRatio": false,
           "isPercent": false
         },
@@ -1251,7 +1251,7 @@
       "83": [
         {
           "name": "攻击",
-          "value": 393.0333,
+          "value": 476.404,
           "isRatio": false,
           "isPercent": false
         },
@@ -1265,7 +1265,7 @@
       "84": [
         {
           "name": "攻击",
-          "value": 395.8119,
+          "value": 479.772,
           "isRatio": false,
           "isPercent": false
         },
@@ -1279,7 +1279,7 @@
       "85": [
         {
           "name": "攻击",
-          "value": 398.5938,
+          "value": 483.144,
           "isRatio": false,
           "isPercent": false
         },
@@ -1293,7 +1293,7 @@
       "86": [
         {
           "name": "攻击",
-          "value": 401.3757,
+          "value": 486.516,
           "isRatio": false,
           "isPercent": false
         },
@@ -1307,7 +1307,7 @@
       "87": [
         {
           "name": "攻击",
-          "value": 404.1543,
+          "value": 489.884,
           "isRatio": false,
           "isPercent": false
         },
@@ -1321,7 +1321,7 @@
       "88": [
         {
           "name": "攻击",
-          "value": 406.9362,
+          "value": 493.256,
           "isRatio": false,
           "isPercent": false
         },
@@ -1335,7 +1335,7 @@
       "89": [
         {
           "name": "攻击",
-          "value": 409.7181,
+          "value": 496.628,
           "isRatio": false,
           "isPercent": false
         },
@@ -1349,7 +1349,7 @@
       "90": [
         {
           "name": "攻击",
-          "value": 412.5,
+          "value": 500.0,
           "isRatio": false,
           "isPercent": false
         },
@@ -1362,7 +1362,7 @@
       ]
     }
   },
-  "effect": "攻击提升{0}。施放变奏技能后{1}秒内，施放声骸技能时，获得{2}层【柔软的梦】，同名声骸只可触发一次，可叠加{3}层，持续{4}秒，若切换至其他角色则该效果提前结束。\n第{5}层：普攻伤害加成提升{6}；\n第{7}层：无视目标{8}湮灭属性抗性；\n第{9}层：【柔软的梦】提前结束时，自身的普攻伤害加成提升{10}，无视目标{11}湮灭属性抗性，持续{12}秒，切换至自身时则该效果提前结束。",
+  "effect": "攻击提升{0}。施放变奏技能或普攻后{1}秒内，施放声骸技能时，获得{2}层【柔软的梦】，同名声骸只可触发一次，最多可叠加{3}层，持续{4}秒，该效果10秒内最多生效1次，若切换至其他角色则该效果提前结束。\n第{5}层：普攻伤害加成提升{6}；\n第{7}层：无视目标{8}湮灭属性抗性。",
   "effectName": "群星迭律",
   "param": [
     [
@@ -1387,11 +1387,11 @@
       "1"
     ],
     [
-      "3",
-      "3",
-      "3",
-      "3",
-      "3"
+      "2",
+      "2",
+      "2",
+      "2",
+      "2"
     ],
     [
       "10",
@@ -1422,39 +1422,11 @@
       "2"
     ],
     [
-      "10%",
-      "12.5%",
+      "12%",
       "15%",
-      "17.5%",
-      "20%"
-    ],
-    [
-      "3",
-      "3",
-      "3",
-      "3",
-      "3"
-    ],
-    [
-      "40%",
-      "50%",
-      "60%",
-      "70%",
-      "80%"
-    ],
-    [
-      "10%",
-      "12.5%",
-      "15%",
-      "17.5%",
-      "20%"
-    ],
-    [
-      "27",
-      "27",
-      "27",
-      "27",
-      "27"
+      "18%",
+      "21%",
+      "24%"
     ]
   ],
   "desc": "在海中，有人看到星星，有人捞到月亮，也有人听到无数细语和呢喃。\n那些呢喃沁入她的毒里，流淌过每一条蜿蜒的河流。\n最后，那些呢喃将她包裹，像水母的伞，像海。",
