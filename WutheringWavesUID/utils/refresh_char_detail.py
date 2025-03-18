@@ -101,7 +101,8 @@ async def save_card_info(
 
     save_data = list(old_data.values())
 
-    await send_card(uid, user_id, save_data, is_self_ck, token)
+    if not waves_api.is_net(uid):
+        await send_card(uid, user_id, save_data, is_self_ck, token)
 
     try:
         async with aiofiles.open(path, "w", encoding="utf-8") as file:
