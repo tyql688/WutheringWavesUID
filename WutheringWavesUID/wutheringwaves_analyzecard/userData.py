@@ -23,22 +23,28 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
     at_sender = True if ev.group_id else False
 
-    uid = result_dict["用户信息"]["UID"]
+    try:
+        uid = result_dict["用户信息"]["UID"]
 
-    chain_num = result_dict["角色信息"]["共鸣链"]
-    
-    char = result_dict["角色信息"]["角色名"]
-    char_name = alias_to_char_name(char)
-    char_id = char_name_to_char_id(char_name)
-    char_name_print = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', char_name) # 删除"漂泊者·衍射"的符号
+        chain_num = result_dict["角色信息"]["共鸣链"]
+        
+        char = result_dict["角色信息"]["角色名"]
+        char_name = alias_to_char_name(char)
+        char_id = char_name_to_char_id(char_name)
+        char_name_print = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', char_name) # 删除"漂泊者·衍射"的符号
 
-    if char_id is None:
-        await bot.send(f"[鸣潮]识别结果为角色'{char_name_print}'不存在")
-        logger.debug(f" [鸣潮][dc卡片识别] 用户{uid}的{char_name_print}识别错误！")
+        if char_id is None:
+            await bot.send(f"[鸣潮]识别结果为角色'{char_name_print}'不存在")
+            logger.debug(f" [鸣潮][dc卡片识别] 用户{uid}的{char_name_print}识别错误！")
+            return
+
+        weapon_id = weapon_name_to_weapon_id(result_dict["武器信息"]["武器名"])
+
+    except Exception as e:
+        logger.error(f" [鸣潮][dc卡片识别] 识别结果结构错误：{e}")
+        await bot.send("[鸣潮]识别结果结构错误", at_sender)
         return
 
-
-    weapon_id = weapon_name_to_weapon_id(result_dict["武器信息"]["武器名"])
 
     # char_id = "1506" # 菲比..utils\map\detail_json\char\1506.json
     result = await generate_online_role_detail(char_id)
@@ -62,60 +68,57 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
     data["level"] = result_dict["角色信息"]["等级"]
         
     # 处理 `phantomData` 的数据
-    if result.phantomData is not None:
-        phantom_data = result.phantomData
-        data["phantomData"] = {
-            "cost": 12,
-            "equipPhantomList": []
-        }
+    data["phantomData"] = {
+        "cost": 12,
+        "equipPhantomList": []
+    }
 
-        cost_sum = 0 # 默认cost总数
-        cost4_counter = 0 # 4cost 的计数器
-        echo_num = len(result_dict["装备数据"])
-        ECHO = await get_fetterDetail_from_char(char_name)
+    cost_sum = 0 # 默认cost总数
+    cost4_counter = 0 # 4cost 的计数器
+    echo_num = len(result_dict["装备数据"])
+    ECHO = await get_fetterDetail_from_char(char_name)
 
-        for echo_value in result_dict["装备数据"]:
-            # 创建 ECHO 的独立副本
-            echo = copy.deepcopy(ECHO)
+    for echo_value in result_dict["装备数据"]:
+        # 创建 ECHO 的独立副本
+        echo = copy.deepcopy(ECHO)
 
-            echo["fetterDetail"]["num"] = echo_num
-            # 更新 echo 的 mainProps 和 subProps, 防止空表
-            echo["mainProps"] = echo_value.get("mainProps", [])
-            echo["subProps"] = echo_value.get("subProps", [])
+        echo["fetterDetail"]["num"] = echo_num
+        # 更新 echo 的 mainProps 和 subProps, 防止空表
+        echo["mainProps"] = echo_value.get("mainProps", [])
+        echo["subProps"] = echo_value.get("subProps", [])
 
-            # 根据主词条判断声骸cost并适配id
-            echo_id, cost = await echo_data_to_cost(char_name, echo["mainProps"][0], cost4_counter)
-            cost_sum += cost
-            if cost == 4:
-                cost4_counter += 1  # 只有实际生成cost4时递增
+        # 根据主词条判断声骸cost并适配id
+        echo_id, cost = await echo_data_to_cost(char_name, echo["mainProps"][0], cost4_counter)
+        cost_sum += cost
+        if cost == 4:
+            cost4_counter += 1  # 只有实际生成cost4时递增
 
-            echo["phantomProp"]["phantomId"] = echo_id
-            echo["phantomProp"]["cost"] = cost
-            echo["cost"] = cost
+        echo["phantomProp"]["phantomId"] = echo_id
+        echo["phantomProp"]["cost"] = cost
+        echo["cost"] = cost
 
-            # 将更新后的 echo 添加到 equipPhantomList
-            data["phantomData"]["equipPhantomList"].append(echo)
+        # 将更新后的 echo 添加到 equipPhantomList
+        data["phantomData"]["equipPhantomList"].append(echo)
         
-        data["phantomData"]["cost"] = cost_sum # 更新总cost
+    data["phantomData"]["cost"] = cost_sum # 更新总cost
     
     # 处理 `role` 的数据
-    if result.role is not None:
-        role = result.role
-        data["role"] = {
-            "acronym": role.acronym,
-            "attributeId": role.attributeId,
-            "attributeName": role.attributeName,
-            "breach": get_breach(result_dict["角色信息"]["等级"]),
-            "isMainRole": False,  # 假设需要一个主角色标识（用户没有提供，可以设置默认值或动态获取）
-            "level": result_dict["角色信息"]["等级"],
-            "roleIconUrl": role.roleIconUrl,
-            "roleId": role.roleId,
-            "roleName": role.roleName,
-            "rolePicUrl": role.rolePicUrl,
-            "starLevel": role.starLevel,
-            "weaponTypeId": role.weaponTypeId,
-            "weaponTypeName": role.weaponTypeName
-        }
+    role = result.role
+    data["role"] = {
+        "acronym": role.acronym,
+        "attributeId": role.attributeId,
+        "attributeName": role.attributeName,
+        "breach": get_breach(result_dict["角色信息"]["等级"]),
+        "isMainRole": False,  # 假设需要一个主角色标识（用户没有提供，可以设置默认值或动态获取）
+        "level": result_dict["角色信息"]["等级"],
+        "roleIconUrl": role.roleIconUrl,
+        "roleId": role.roleId,
+        "roleName": role.roleName,
+        "rolePicUrl": role.rolePicUrl,
+        "starLevel": role.starLevel,
+        "weaponTypeId": role.weaponTypeId,
+        "weaponTypeName": role.weaponTypeName
+    }
         
     # 处理 `skillList` 的数据
     data["skillList"] = []
@@ -134,29 +137,28 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         })
         
     # 处理 `weaponData` 的数据，暂时没办法处理识别到的武器名
-    if result.weaponData is not None:
-        weapon_data = result.weaponData
-        data["weaponData"] = {
-            "breach": weapon_data.breach,
-            "level": weapon_data.level,
-            "resonLevel": weapon_data.resonLevel,
-            "weapon": {
-                "weaponEffectName": weapon_data.weapon.weaponEffectName,
-                "weaponIcon": weapon_data.weapon.weaponIcon,
-                "weaponId": weapon_data.weapon.weaponId,
-                "weaponName": weapon_data.weapon.weaponName,
-                "weaponStarLevel": weapon_data.weapon.weaponStarLevel,
-                "weaponType": weapon_data.weapon.weaponType
-            }
+    weapon_data = result.weaponData
+    data["weaponData"] = {
+        "breach": weapon_data.breach,
+        "level": weapon_data.level,
+        "resonLevel": weapon_data.resonLevel,
+        "weapon": {
+            "weaponEffectName": weapon_data.weapon.weaponEffectName,
+            "weaponIcon": weapon_data.weapon.weaponIcon,
+            "weaponId": weapon_data.weapon.weaponId,
+            "weaponName": weapon_data.weapon.weaponName,
+            "weaponStarLevel": weapon_data.weapon.weaponStarLevel,
+            "weaponType": weapon_data.weapon.weaponType
         }
-        if weapon_id is not None:
-            # breach 突破、resonLevel 精炼
-            data["weaponData"]["level"] = result_dict["武器信息"]["等级"]
-            data["weaponData"]["breach"] = get_breach(result_dict["武器信息"]["等级"])
-            data["weaponData"]["weapon"]["weaponName"] = result_dict["武器信息"]["武器名"]
-            data["weaponData"]["weapon"]["weaponId"] = weapon_id
-            weapon_detail = get_weapon_detail(weapon_id, result_dict["武器信息"]["等级"])
-            data["weaponData"]["weapon"]["weaponStarLevel"] = weapon_detail.starLevel
+    }
+    if weapon_id is not None:
+        # breach 突破、resonLevel 精炼
+        data["weaponData"]["level"] = result_dict["武器信息"]["等级"]
+        data["weaponData"]["breach"] = get_breach(result_dict["武器信息"]["等级"])
+        data["weaponData"]["weapon"]["weaponName"] = result_dict["武器信息"]["武器名"]
+        data["weaponData"]["weapon"]["weaponId"] = weapon_id
+        weapon_detail = get_weapon_detail(weapon_id, result_dict["武器信息"]["等级"])
+        data["weaponData"]["weapon"]["weaponStarLevel"] = weapon_detail.starLevel
 
     waves_data.append(data)
     await save_card_info(uid, waves_data)
