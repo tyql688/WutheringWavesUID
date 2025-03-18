@@ -517,6 +517,8 @@ async def ocr_results_to_dict(chain_num, ocr_results):
             # 自定义替换优先执行（在繁转简之前）
             if re.search(r'暴.(傷害)?', attr):
                 attr = re.sub(r'暴.(傷害)?', r'暴擊\1', attr)
+            if re.search(r'.擊(傷害)?', attr):
+                attr = re.sub(r'.擊(傷害)?', r'暴擊\1', attr)
             attr = attr.replace("箓擎傷害", "暴擊傷害").replace("箓擎", "暴擊")
             clean_attr = cc.convert(attr) # 标准繁简转换
             # 验证属性名是否符合预期（至少两个中文字符，且不含数字）
