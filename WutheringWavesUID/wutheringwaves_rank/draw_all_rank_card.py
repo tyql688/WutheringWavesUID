@@ -341,11 +341,11 @@ async def draw_all_rank_card(
         # )
         if botName:
             color = (54, 54, 54)
-            if rank.username in bot_color_map:
-                color = bot_color_map[rank.username]
+            if botName in bot_color_map:
+                color = bot_color_map[botName]
             elif bot_color:
                 color = bot_color.pop(0)
-                bot_color_map[rank.username] = color
+                bot_color_map[botName] = color
 
             info_block = Image.new("RGBA", (200, 30), color=(255, 255, 255, 0))
             info_block_draw = ImageDraw.Draw(info_block)
