@@ -6,7 +6,7 @@ from gsuid_core.subscribe import gs_subscribe
 from gsuid_core.sv import SV
 
 from ..wutheringwaves_config import WutheringWavesConfig
-from .main import auto_sign_task, do_sign_task
+from .new_sign import auto_sign_task, sign_up_handler
 
 sv_waves_sign = SV("鸣潮-签到", priority=1)
 waves_sign_all = SV("鸣潮-全部签到", pm=1)
@@ -19,7 +19,7 @@ task_name_sign_result = "订阅签到结果"
     ("签到", "社区签到", "每日任务", "社区任务", "库街区签到"), block=True
 )
 async def get_sign_func(bot: Bot, ev: Event):
-    msg = await do_sign_task(bot, ev)
+    msg = await sign_up_handler(bot, ev)
     return await bot.send(msg)
 
 
