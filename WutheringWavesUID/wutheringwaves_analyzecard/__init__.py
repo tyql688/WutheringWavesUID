@@ -51,12 +51,13 @@ async def analyze_card(bot: Bot, ev: Event):
             while True:
                 resp = await bot.receive_resp(timeout=30)
                 if resp is not None:
-                    await async_ocr(bot, resp)
+                    ev = resp
                     break
     except asyncio.TimeoutError:
         await bot.send("[鸣潮] 等待超时，discord卡片分析已关闭", at_sender)
         return
 
+    await async_ocr(bot, ev)
 
 @waves_change_sonata_and_first_echo.on_regex(
     r"^改(?P<char>[\u4e00-\u9fa5]+?)(套(装?)(?P<sonata>[\u4e00-\u9fa5]+?))?(?P<echo>声骸.*)?$",
