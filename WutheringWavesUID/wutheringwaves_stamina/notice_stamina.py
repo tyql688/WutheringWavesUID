@@ -9,6 +9,10 @@ from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 
 async def get_notice_list() -> Dict[str, Dict[str, Dict]]:
+    """获取推送列表"""
+    if not WutheringWavesConfig.get_config("StaminaPush").data:
+        return {}
+
     msg_dict = {"private_msg_dict": {}, "group_msg_dict": {}}
 
     user_list: List[WavesUser] = await WavesUser.get_all_push_user_list()

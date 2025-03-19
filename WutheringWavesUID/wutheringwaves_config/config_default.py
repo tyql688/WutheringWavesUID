@@ -90,6 +90,12 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         ["3", "5"],
     ),
     "CrazyNotice": GsBoolConfig("催命模式", "开启后当达到推送阈值将会一直推送", False),
+    "StaminaPush": GsBoolConfig(
+        "体力推送全局开关", "开启后当体力达到推送阈值将会推送", False
+    ),
+    "StaminaPushInterval": GsIntConfig(
+        "体力推送间隔（分钟）", "体力推送间隔（分钟）", 30, 60
+    ),
     "WavesGuideProvideNew": GsStrConfig(
         "角色攻略图提供方",
         "使用ww角色攻略时选择的提供方",
