@@ -22,15 +22,10 @@ async def analyze_card(bot: Bot, ev: Event):
     if ev.text.strip():
         raw_data = ev.content[0].data
         raw_data = re.sub(r'\s+', '', raw_data).strip()  # 合并多余空白
-        protocol_matches = list(re.finditer(r'https?://', raw_data))
-        urls = []
 
-        for i in range(len(protocol_matches)):
-            start = protocol_matches[i].start()
-            # 如果是最后一个协议头，则取到字符串末尾
-            end = protocol_matches[i+1].start() if i < len(protocol_matches)-1 else len(raw_data)
-            url = raw_data[start:end]
-            urls.append(url)
+        # 直接匹配完整URL（直到遇到空格或右括号为止）
+        url_pattern = r'https?://[^\s)>]+'  # 排除空格、右括号和大于号等常见终止符
+        urls = re.findall(url_pattern, raw_data)
 
         first_url = urls[0] if urls else ""
 
