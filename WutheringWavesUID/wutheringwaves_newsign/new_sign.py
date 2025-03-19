@@ -46,10 +46,10 @@ async def sign_up_handler(bot: Bot, ev: Event):
             if token == "":
                 expire_uid.append(uid)
             continue
-        succ, _ = await waves_api.refresh_data(uid, token)
-        if not succ:
-            expire_uid.append(uid)
-            continue
+        # succ, _ = await waves_api.refresh_data(uid, token)
+        # if not succ:
+        #     expire_uid.append(uid)
+        #     continue
 
         # 签到状态
         signed = False
@@ -61,18 +61,19 @@ async def sign_up_handler(bot: Bot, ev: Event):
             res = await sign_in(uid, token)
             if "成功" in res:
                 signed = True
-            await asyncio.sleep(random.randint(1, 2))
+
         msg_temp["signed"] = signed
 
         bbs_signed = await bbs_api.check_bbs_completed(token)
         if not bbs_signed:
             res = await do_single_task(uid, token)
-            await asyncio.sleep(random.randint(1, 2))
+            bbs_signed = await bbs_api.check_bbs_completed(token)
 
-        bbs_signed = await bbs_api.check_bbs_completed(token)
         msg_temp["bbs_signed"] = bbs_signed
 
         to_msg[uid] = msg_temp
+
+        await asyncio.sleep(random.randint(1, 2))
 
     if not to_msg:
         return ERROR_CODE[WAVES_CODE_102]
@@ -185,7 +186,7 @@ async def auto_sign_task():
 
                 await asyncio.sleep(random.randint(2, 4))
 
-    max_concurrent: int = WutheringWavesConfig.get_config("SigninConcurrentNum").data
+    max_concurrent: int = WutheringWavesConfig.get_config("SigninConcurrentNum2").data
     semaphore = asyncio.Semaphore(max_concurrent)
     tasks = [process_user(semaphore, user) for user in need_user_list]
     for i in range(0, len(tasks), max_concurrent):

@@ -81,11 +81,13 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "开启后自动帮登录的人签到",
         False,
     ),
-    "SigninConcurrentNum": GsIntConfig("自动签到并发数量", "自动签到并发数量", 5, 50),
-    "SigninConcurrentNumInterval": GsListStrConfig(
-        "自动签到并发数量间隔，默认2-3秒",
-        "自动签到并发数量间隔，默认2-3秒",
-        ["2", "3"],
+    "SigninConcurrentNum2": GsIntConfig(
+        "自动签到并发数量", "自动签到并发数量", 2, max_value=5
+    ),
+    "SigninConcurrentNumInterval2": GsListStrConfig(
+        "自动签到并发数量间隔，默认3-5秒",
+        "自动签到并发数量间隔，默认3-5秒",
+        ["3", "5"],
     ),
     "CrazyNotice": GsBoolConfig("催命模式", "开启后当达到推送阈值将会一直推送", False),
     "WavesGuideProvideNew": GsStrConfig(

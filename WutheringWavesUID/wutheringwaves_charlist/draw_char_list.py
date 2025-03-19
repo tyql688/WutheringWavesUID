@@ -6,38 +6,39 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
+
 from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
 from ..utils.ascension.weapon import get_breach
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
-from ..utils.expression_ctx import get_waves_char_rank, WavesCharRank
+from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
 from ..utils.fonts.waves_fonts import (
-    waves_font_30,
-    waves_font_25,
-    waves_font_26,
-    waves_font_42,
     waves_font_15,
-    waves_font_22,
-    waves_font_40,
-    waves_font_24,
+    waves_font_16,
     waves_font_18,
     waves_font_20,
-    waves_font_16,
+    waves_font_22,
+    waves_font_24,
+    waves_font_25,
+    waves_font_26,
+    waves_font_30,
     waves_font_34,
+    waves_font_40,
+    waves_font_42,
 )
 from ..utils.hint import error_reply
 from ..utils.image import (
-    get_waves_bg,
-    get_event_avatar,
-    add_footer,
+    CHAIN_COLOR,
     GOLD,
     GREY,
+    SPECIAL_GOLD,
+    WEAPON_RESONLEVEL_COLOR,
+    add_footer,
     get_attribute,
+    get_event_avatar,
     get_square_avatar,
     get_square_weapon,
-    SPECIAL_GOLD,
-    CHAIN_COLOR,
-    WEAPON_RESONLEVEL_COLOR,
+    get_waves_bg,
 )
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NORMAL_LIST
@@ -52,15 +53,14 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
         # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
         account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
     else:
-        ck = await waves_api.get_ck(uid, user_id)
+        _, ck = await waves_api.get_ck_result(uid, user_id)
         if not ck:
             return error_reply(WAVES_CODE_102)
         # 账户数据
         succ, account_info = await waves_api.get_base_info(uid, ck)
-
         if not succ:
             return account_info
-        account_info = AccountBaseInfo(**account_info)
+        account_info = AccountBaseInfo.model_validate(account_info)
 
     # 根据面板数据获取详细信息
     all_role_detail = None
@@ -178,9 +178,7 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
             bar_star_draw.text(
                 (348, 45), f"{_rank.score.__round__(1)}", "white", waves_font_34, "mm"
             )
-            bar_star_draw.text(
-                (348, 75), f"声骸分数", SPECIAL_GOLD, waves_font_16, "mm"
-            )
+            bar_star_draw.text((348, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
 
         # 技能
         skill_img_temp = Image.new("RGBA", (1500, 300))
@@ -277,22 +275,22 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
     info_bg = Image.open(TEXT_PATH / "info_bg.png")
     info_bg_draw = ImageDraw.Draw(info_bg)
     info_bg_draw.text((240, 120), f"{up_num}/{all_num}", "white", waves_font_40, "mm")
-    info_bg_draw.text((240, 160), f"up角色", "white", waves_font_20, "mm")
+    info_bg_draw.text((240, 160), "up角色", "white", waves_font_20, "mm")
 
     info_bg_draw.text(
         (410, 120), f"{level_num}/{all_num}", "white", waves_font_40, "mm"
     )
-    info_bg_draw.text((410, 160), f"高练角色", "white", waves_font_20, "mm")
+    info_bg_draw.text((410, 160), "高练角色", "white", waves_font_20, "mm")
 
     info_bg_draw.text(
         (580, 120), f"{chain_num}/{all_num - all_num_5}", "white", waves_font_40, "mm"
     )
-    info_bg_draw.text((580, 160), f"高链4星", "white", waves_font_20, "mm")
+    info_bg_draw.text((580, 160), "高链4星", "white", waves_font_20, "mm")
 
     info_bg_draw.text(
         (750, 120), f"{chain_num_5}/{all_num_5}", "white", waves_font_40, "mm"
     )
-    info_bg_draw.text((750, 160), f"高链5星", "white", waves_font_20, "mm")
+    info_bg_draw.text((750, 160), "高链5星", "white", waves_font_20, "mm")
 
     card_img.paste(info_bg, (0, avatar_h), info_bg)
 

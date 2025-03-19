@@ -70,9 +70,9 @@ async def load_all_card() -> Optional[int]:
     if CardUseOptions == "不使用缓存":
         return -1
     all_card = {}
-    # 并行加载所有玩家数据
-    await load_all_players(PLAYER_PATH, all_card)
     if CardUseOptions == "内存缓存":
+        # 并行加载所有玩家数据
+        await load_all_players(PLAYER_PATH, all_card)
         return await save_all_card(all_card)
     elif CardUseOptions == "redis缓存":
         from .wwredis import card_cache
@@ -82,9 +82,9 @@ async def load_all_card() -> Optional[int]:
         if StartServerRedisLoad:
             from .wwredis import rank_cache
 
-            # total = await card_cache.save_all_card(all_card)
             a = time.time()
             logger.info("[鸣潮][开始处理排行......]")
+            await load_all_players(PLAYER_PATH, all_card)
             total = await rank_cache.save_rank_caches(all_card)
             logger.info(
                 f"[鸣潮][结束处理排行......] 耗时:{time.time() - a:.2f}s 共加载{total}个用户"
@@ -97,6 +97,8 @@ async def save_card(
     data: List,
     user_id: str,
     waves_char_rank: Optional[List] = None,
+    is_self_ck: bool = False,
+    token: Optional[str] = "",
 ):
     if CardUseOptions == "不使用缓存":
         return
@@ -105,7 +107,9 @@ async def save_card(
     elif CardUseOptions == "redis缓存" and waves_char_rank:
         from .wwredis import rank_cache
 
-        await rank_cache.save_rank_cache(uid, waves_char_rank, user_id)
+        await rank_cache.save_rank_cache(
+            uid, waves_char_rank, user_id, is_self_ck, token
+        )
 
 
 async def get_card(uid: str):

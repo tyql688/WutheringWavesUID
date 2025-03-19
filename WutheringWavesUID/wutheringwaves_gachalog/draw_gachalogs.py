@@ -11,30 +11,31 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
+
 from ..utils import hint
 from ..utils.api.model import AccountBaseInfo
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import (
     waves_font_18,
-    waves_font_32,
     waves_font_20,
-    waves_font_40,
     waves_font_23,
     waves_font_24,
     waves_font_25,
     waves_font_30,
+    waves_font_32,
+    waves_font_40,
 )
 from ..utils.image import (
-    get_waves_bg,
+    GOLD,
     add_footer,
     cropped_square_avatar,
+    get_event_avatar,
     get_square_avatar,
     get_square_weapon,
-    get_event_avatar,
-    GOLD,
+    get_waves_bg,
 )
-from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.resource.constant import NORMAL_LIST
+from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 
@@ -82,7 +83,7 @@ async def draw_card_help():
         "",
         f"使用命令【{PREFIX}导入抽卡链接 + 你复制的内容】即可开始进行抽卡分析",
         "",
-        f"抽卡链接具有有效期，请在有效期内尽快导入",
+        "抽卡链接具有有效期，请在有效期内尽快导入",
     ]
     msg = [android, ios, pc, "\n".join(text)]
     return msg
@@ -298,9 +299,9 @@ async def draw_card(uid: int, ev: Event):
         title_draw.text(
             (110, 80), gacha_type_meta_rename[gacha_name], "white", waves_font_40, "lm"
         )
-        title_draw.text((380, 87), f"已", "white", waves_font_23, "rm")
+        title_draw.text((380, 87), "已", "white", waves_font_23, "rm")
         title_draw.text((410, 84), remain_s, "red", waves_font_40, "mm")
-        title_draw.text((530, 87), f"抽未出金", "white", waves_font_23, "rm")
+        title_draw.text((530, 87), "抽未出金", "white", waves_font_23, "rm")
 
         title.paste(level_icon, (710, 51), level_icon)
         title_draw.text((783, 225), tag, "white", waves_font_24, "mm")
@@ -423,13 +424,13 @@ async def draw_uid_avatar(uid, ev, card_img):
         card_img.paste(title, (0, 0), title)
 
     else:
-        ck = await waves_api.get_ck(uid, ev.user_id)
+        _, ck = await waves_api.get_ck_result(uid, ev.user_id)
         if not ck:
             return hint.error_reply(WAVES_CODE_102)
         succ, account_info = await waves_api.get_base_info(uid, ck)
         if not succ:
             return account_info
-        account_info = AccountBaseInfo(**account_info)
+        account_info = AccountBaseInfo.model_validate(account_info)
 
         base_info_bg = Image.open(TEXT_PATH / "base_info_bg.png")
         base_info_draw = ImageDraw.Draw(base_info_bg)

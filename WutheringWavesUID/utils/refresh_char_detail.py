@@ -35,7 +35,9 @@ async def send_card(
     if CardUseOptions == "redis缓存" or WavesToken:
         waves_char_rank = await get_waves_char_rank(uid, save_data, True)
 
-    await waves_card_cache.save_card(uid, save_data, user_id, waves_char_rank)
+    await waves_card_cache.save_card(
+        uid, save_data, user_id, waves_char_rank, is_self_ck, token
+    )
 
     if is_self_ck and token and waves_char_rank and WavesToken:
         succ, account_info = await waves_api.get_base_info(uid, token=token)
@@ -142,15 +144,27 @@ async def refresh_char(
         msg = f"鸣潮特征码[{uid}]获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据"
         return msg
 
-    semaphore = asyncio.Semaphore(value=len(role_info.roleList))
-
     async def limited_get_role_detail_info(role_id, uid, ck):
         async with semaphore:
             return await waves_api.get_role_detail_info(role_id, uid, ck)
 
-    tasks = [
-        limited_get_role_detail_info(str(r.roleId), uid, ck) for r in role_info.roleList
-    ]
+    semaphore = asyncio.Semaphore(value=len(role_info.roleList))
+    if is_self_ck:
+        tasks = [
+            limited_get_role_detail_info(str(r.roleId), uid, ck)
+            for r in role_info.roleList
+        ]
+    else:
+        if role_info.showRoleIdList:
+            tasks = [
+                limited_get_role_detail_info(str(r), uid, ck)
+                for r in role_info.showRoleIdList
+            ]
+        else:
+            tasks = [
+                limited_get_role_detail_info(str(r.roleId), uid, ck)
+                for r in role_info.roleList
+            ]
     results = await asyncio.gather(*tasks)
 
     # 处理返回的数据

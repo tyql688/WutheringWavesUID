@@ -1,25 +1,25 @@
 # 安可
-from .buff import shouanren_buff, guangzhu_buff
-from .damage import echo_damage, weapon_damage, phase_damage
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute
 from ...damage.utils import (
-    skill_damage_calc,
-    SkillType,
     SkillTreeMap,
-    cast_skill,
-    cast_attack,
-    cast_liberation,
+    SkillType,
     attack_damage,
-    skill_damage,
+    cast_attack,
     cast_hit,
+    cast_liberation,
+    cast_skill,
+    skill_damage,
+    skill_damage_calc,
 )
+from .buff import guangzhu_buff, shouanren_buff
+from .damage import echo_damage, phase_damage, weapon_damage
 
 
 def calc_damage_1(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[str, str]:
     # 设置角色伤害类型
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -36,28 +36,28 @@ def calc_damage_1(
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], "1", skillLevel
     )
-    title = f"黑咩·胡闹第一段伤害"
+    title = "黑咩·胡闹第一段伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], "2", skillLevel
     )
-    title = f"黑咩·胡闹第二段伤害"
+    title = "黑咩·胡闹第二段伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], "3", skillLevel
     )
-    title = f"黑咩·胡闹第三段伤害"
+    title = "黑咩·胡闹第三段伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], "4", skillLevel
     )
-    title = f"黑咩·胡闹第四段伤害"
+    title = "黑咩·胡闹第四段伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
@@ -72,11 +72,11 @@ def calc_damage_1(
     role_breach = role.role.breach
     if role_breach and role_breach >= 3:
         title = f"{role_name}-固有技能-咩咩加油歌"
-        msg = f"施放热力羊咩或黑咩·狂热时，安可的热熔伤害加成提升10%"
+        msg = "施放热力羊咩或黑咩·狂热时，安可的热熔伤害加成提升10%"
         attr.add_dmg_bonus(0.1, title, msg)
 
         title = f"{role_name}-固有技能-生气的黑咩"
-        msg = f"黑咩大暴走期间，安可的生命高于70%时，伤害提升10%。"
+        msg = "黑咩大暴走期间，安可的生命高于70%时，伤害提升10%。"
         attr.add_dmg_bonus(0.1, title, msg)
 
     # 设置角色技能施放是不是也有加成 eg：守岸人
@@ -88,7 +88,7 @@ def calc_damage_1(
     chain_num = role.get_chain_num()
     if chain_num >= 1:
         title = f"{role_name}-一链"
-        msg = f"热熔伤害加成额外提升3%，可叠加4层"
+        msg = "热熔伤害加成额外提升3%，可叠加4层"
         attr.add_dmg_bonus(0.12, title, msg)
 
     if chain_num >= 6:
@@ -111,7 +111,7 @@ def calc_damage_1(
 
 def calc_damage_2(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[str, str]:
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -128,7 +128,7 @@ def calc_damage_2(
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], "6", skillLevel
     )
-    title = f"黑咩·狂热"
+    title = "黑咩·狂热"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
@@ -143,11 +143,11 @@ def calc_damage_2(
     role_breach = role.role.breach
     if role_breach and role_breach >= 3:
         title = f"{role_name}-固有技能-咩咩加油歌"
-        msg = f"施放热力羊咩或黑咩·狂热时，安可的热熔伤害加成提升10%"
+        msg = "施放热力羊咩或黑咩·狂热时，安可的热熔伤害加成提升10%"
         attr.add_dmg_bonus(0.1, title, msg)
 
         title = f"{role_name}-固有技能-生气的黑咩"
-        msg = f"黑咩大暴走期间，安可的生命高于70%时，伤害提升10%。"
+        msg = "黑咩大暴走期间，安可的生命高于70%时，伤害提升10%。"
         attr.add_dmg_bonus(0.1, title, msg)
 
     # 设置角色技能施放是不是也有加成 eg：守岸人
@@ -159,7 +159,7 @@ def calc_damage_2(
     chain_num = role.get_chain_num()
     if chain_num >= 1:
         title = f"{role_name}-一链"
-        msg = f"热熔伤害加成额外提升3%，可叠加4层"
+        msg = "热熔伤害加成额外提升3%，可叠加4层"
         attr.add_dmg_bonus(0.12, title, msg)
 
     if chain_num >= 5:
@@ -187,7 +187,7 @@ def calc_damage_2(
 
 def calc_damage_10(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
-) -> (str, str):
+) -> tuple[str, str]:
     attr.set_char_damage(attack_damage)
     attr.set_char_template("temp_atk")
     # 守岸人buff

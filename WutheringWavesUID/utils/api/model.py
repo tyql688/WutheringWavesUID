@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Union, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, RootModel
 from msgspec import UNSET, Struct, UnsetType, field
+from pydantic import BaseModel, RootModel
 
 
 class GeneralGeetestData(Struct):
@@ -76,6 +76,8 @@ class Role(BaseModel):
 
 class RoleList(BaseModel):
     roleList: List[Role]
+    showRoleIdList: Optional[List[int]] = None
+    showToGuest: bool
 
 
 class Box(BaseModel):
