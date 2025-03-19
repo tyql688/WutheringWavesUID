@@ -447,6 +447,11 @@ async def get_role_need(
         if all_role_detail and char_name in all_role_detail:
             role_detail: RoleDetailData = all_role_detail[char_name]
         else:
+            if is_limit_query:
+                 return (
+                     None,
+                     f"[鸣潮] 暂未支持【{char_name}】极限面板, 请关注后续更新\n",
+                 )
             if is_online_user:
                 return (
                     None,
