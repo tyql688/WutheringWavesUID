@@ -21,7 +21,6 @@ async def analyze_card(bot: Bot, ev: Event):
     # 指令与图片链接同时发送时
     if ev.text.strip():
         raw_data = ev.content[0].data
-        raw_data = re.sub(r'\s+', '', raw_data).strip()  # 合并多余空白
 
         # 直接匹配完整URL（直到遇到空格或右括号为止）
         url_pattern = r'https?://[^\s)>]+'  # 排除空格、右括号和大于号等常见终止符
