@@ -7,10 +7,14 @@ from gsuid_core.sv import SV
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_103
 from ..utils.waves_send_msg import send_board_cast_msg
+from ..wutheringwaves_config import WutheringWavesConfig
 from .draw_waves_stamina import draw_stamina_img
 from .notice_stamina import get_notice_list
 
 waves_daily_info = SV("waves查询体力")
+
+
+stamina_push_interval = WutheringWavesConfig.get_config("StaminaPushInterval").data
 
 
 @waves_daily_info.on_fullmatch(
@@ -31,8 +35,10 @@ async def send_daily_info_pic(bot: Bot, ev: Event):
     return await bot.send(await draw_stamina_img(bot, ev))
 
 
-@scheduler.scheduled_job("cron", minute="*/10")
+@scheduler.scheduled_job("interval", minutes=stamina_push_interval)
 async def waves_daily_info_notice_job():
     result = await get_notice_list()
+    if not result:
+        return
     logger.debug(f"鸣潮推送开始：{result}")
     await send_board_cast_msg(result, "resin")
