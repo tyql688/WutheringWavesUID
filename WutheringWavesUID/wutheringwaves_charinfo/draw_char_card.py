@@ -181,7 +181,7 @@ async def get_one_rank(item: OneRankRequest) -> Optional[OneRankResponse]:
                 },
                 timeout=httpx.Timeout(10),
             )
-            logger.info(f"获取排行: {res.text}")
+            # logger.debug(f"获取排行: {res.text}")
             if res.status_code == 200:
                 return OneRankResponse.model_validate(res.json())
         except Exception as e:

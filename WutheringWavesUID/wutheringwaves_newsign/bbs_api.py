@@ -1,10 +1,18 @@
+import asyncio
 import copy
 import json as j
-from typing import Literal, Optional, Union, Dict, Any
+from typing import Any, Dict, Literal, Optional, Union
 
-from aiohttp import FormData, ClientSession, TCPConnector, ContentTypeError
+from aiohttp import (
+    ClientSession,
+    ClientTimeout,
+    ContentTypeError,
+    FormData,
+    TCPConnector,
+)
 
 from gsuid_core.logger import logger
+
 from ..utils.api.api import MAIN_URL
 from ..utils.database.models import WavesUser
 from ..utils.error_reply import WAVES_CODE_999
@@ -40,11 +48,13 @@ async def get_headers_ios():
     return header
 
 
-async def get_headers(ck: str = None, platform: str = None):
+async def get_headers(ck: Optional[str] = None, platform: Optional[str] = None):
     if ck and not platform:
         try:
-            waves_user = await WavesUser.select_data_by_cookie(cookie=ck)
-            platform = waves_user.platform
+            waves_user: Optional[WavesUser] = await WavesUser.select_data_by_cookie(
+                cookie=ck
+            )
+            platform = waves_user.platform if waves_user else "h5"
         except Exception as _:
             pass
     if platform == "h5" or not platform:
@@ -52,11 +62,13 @@ async def get_headers(ck: str = None, platform: str = None):
     elif platform == "ios":
         return await get_headers_ios()
 
+    return await get_headers_h5()
+
 
 class KuroBBS:
     ssl_verify = True
 
-    async def get_task(self, token: str) -> (bool, Union[Dict, str]):
+    async def get_task(self, token: str) -> Optional[Union[Dict, int, str]]:
         try:
             header = copy.deepcopy(await get_headers(token))
             header.update({"token": token})
@@ -65,7 +77,7 @@ class KuroBBS:
         except Exception as e:
             logger.exception(f"get_task token {token}", e)
 
-    async def get_form_list(self, token: str) -> (bool, Union[Dict, str]):
+    async def get_form_list(self, token: str) -> Optional[Union[Dict, int, str]]:
         try:
             header = copy.deepcopy(await get_headers(token))
             header.update({"token": token, "version": "2.25"})
@@ -81,7 +93,7 @@ class KuroBBS:
         except Exception as e:
             logger.exception(f"get_form_list token {token}", e)
 
-    async def get_gold(self, token: str) -> (bool, Union[Dict, str]):
+    async def get_gold(self, token: str) -> Optional[Union[Dict, int, str]]:
         try:
             header = copy.deepcopy(await get_headers(token))
             header.update({"token": token})
@@ -89,7 +101,9 @@ class KuroBBS:
         except Exception as e:
             logger.exception(f"get_gold token {token}", e)
 
-    async def do_like(self, token: str, postId, toUserId) -> (bool, Union[Dict, str]):
+    async def do_like(
+        self, token: str, postId, toUserId
+    ) -> Optional[Union[Dict, int, str]]:
         """点赞"""
         try:
             header = copy.deepcopy(await get_headers(token))
@@ -105,7 +119,7 @@ class KuroBBS:
         except Exception as e:
             logger.exception(f"do_like token {token}", e)
 
-    async def do_sign_in(self, token: str) -> (bool, Union[Dict, str]):
+    async def do_sign_in(self, token: str) -> Optional[Union[Dict, int, str]]:
         """签到"""
         try:
             header = copy.deepcopy(await get_headers(token))
@@ -115,7 +129,9 @@ class KuroBBS:
         except Exception as e:
             logger.exception(f"do_sign_in token {token}", e)
 
-    async def do_post_detail(self, token: str, postId) -> (bool, Union[Dict, str]):
+    async def do_post_detail(
+        self, token: str, postId
+    ) -> Optional[Union[Dict, int, str]]:
         """浏览"""
         try:
             header = copy.deepcopy(await get_headers(token))
@@ -125,7 +141,7 @@ class KuroBBS:
         except Exception as e:
             logger.exception(f"do_post_detail token {token}", e)
 
-    async def do_share(self, token: str) -> (bool, Union[Dict, str]):
+    async def do_share(self, token: str) -> Optional[Union[Dict, int, str]]:
         """分享"""
         try:
             header = copy.deepcopy(await get_headers(token))
@@ -137,6 +153,7 @@ class KuroBBS:
 
     async def check_bbs_completed(self, token: str) -> bool:
         task_res = await self.get_task(token)
+        logger.info(f"check_bbs_completed  task_res {task_res}")
         if not isinstance(task_res, dict):
             return False
         if task_res.get("code") != 200 or not task_res.get("data"):
@@ -154,39 +171,48 @@ class KuroBBS:
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         data: Optional[Union[FormData, Dict[str, Any]]] = None,
+        max_retries: int = 3,
+        retry_delay: float = 1.0,
     ) -> Union[Dict, int]:
         if header is None:
             header = await get_headers()
 
-        async with ClientSession(
-            connector=TCPConnector(verify_ssl=self.ssl_verify)
-        ) as client:
-            async with client.request(
-                method,
-                url=url,
-                headers=header,
-                params=params,
-                json=json,
-                data=data,
-                timeout=300,
-            ) as resp:
-                try:
-                    raw_data = await resp.json()
-                except ContentTypeError:
-                    _raw_data = await resp.text()
-                    raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                if (
-                    isinstance(raw_data, dict)
-                    and "data" in raw_data
-                    and isinstance(raw_data["data"], str)
-                ):
-                    try:
-                        des_data = j.loads(raw_data["data"])
-                        raw_data["data"] = des_data
-                    except:
-                        pass
-                logger.debug(f"url:[{url}] raw_data:{raw_data}")
-                return raw_data
+        for attempt in range(max_retries):
+            try:
+                async with ClientSession(
+                    connector=TCPConnector(verify_ssl=self.ssl_verify)
+                ) as client:
+                    async with client.request(
+                        method,
+                        url=url,
+                        headers=header,
+                        params=params,
+                        json=json,
+                        data=data,
+                        timeout=ClientTimeout(10),
+                    ) as resp:
+                        try:
+                            raw_data = await resp.json()
+                        except ContentTypeError:
+                            _raw_data = await resp.text()
+                            raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
+                        if (
+                            isinstance(raw_data, dict)
+                            and "data" in raw_data
+                            and isinstance(raw_data["data"], str)
+                        ):
+                            try:
+                                des_data = j.loads(raw_data["data"])
+                                raw_data["data"] = des_data
+                            except Exception:
+                                pass
+                        logger.debug(f"url:[{url}] raw_data:{raw_data}")
+                        return raw_data
+            except Exception as e:
+                logger.exception(f"url:[{url}] attempt {attempt + 1} failed", e)
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(retry_delay)
+        return WAVES_CODE_999
 
 
 bbs_api = KuroBBS()
