@@ -447,6 +447,11 @@ async def get_role_need(
         if all_role_detail and char_name in all_role_detail:
             role_detail: RoleDetailData = all_role_detail[char_name]
         else:
+            if is_limit_query:
+                return (
+                    None,
+                    f"[鸣潮] 暂未支持【{char_name}】极限面板, 请关注后续更新\n",
+                )
             if is_online_user:
                 return (
                     None,
@@ -629,17 +634,20 @@ async def draw_char_detail_img(
         if damageId and not damageDetail:
             return f"[鸣潮] 角色【{char_name}】暂不支持伤害计算！\n"
 
-    _, ck = await waves_api.get_ck_result(uid, user_id)
-    if not ck:
-        return hint.error_reply(WAVES_CODE_102)
-
+    # 函数get_role_need必要参数
+    ck = None
     is_online_user = False
-    succ, online_list = await waves_api.get_online_list_role(ck)
-    if succ and online_list:
-        online_list_role_model = OnlineRoleList.model_validate(online_list)
-        online_role_map = {str(i.roleId): i for i in online_list_role_model}
-        if char_id in online_role_map:
-            is_online_user = True
+    if not is_limit_query:
+        _, ck = await waves_api.get_ck_result(uid, user_id)
+        if not ck:
+            return hint.error_reply(WAVES_CODE_102)
+
+        succ, online_list = await waves_api.get_online_list_role(ck)
+        if succ and online_list:
+            online_list_role_model = OnlineRoleList.model_validate(online_list)
+            online_role_map = {str(i.roleId): i for i in online_list_role_model}
+            if char_id in online_role_map:
+                is_online_user = True
 
     # 账户数据
     if waves_id:
