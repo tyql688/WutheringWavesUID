@@ -1271,6 +1271,429 @@
   {
     "chainList": [
       {
+        "description": "施放第5段普攻时，散华自身暴击提升15%，持续10秒。",
+        "iconUrl": "",
+        "name": "孤身孑然",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "重击爆裂消耗的耐力降低10点，施放共鸣技能朔雪永冻时散华抗打断能力提升，持续5秒。",
+        "iconUrl": "",
+        "name": "净雪明心",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "散华攻击生命低于70%的目标时，造成的伤害提升35%。",
+        "iconUrl": "",
+        "name": "目视异常",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "施放共鸣解放焦瞑冻土时，回复10点共鸣能量。\n并且5秒内的下次重击爆裂伤害提升120%。",
+        "iconUrl": "",
+        "name": "剑修五蕴",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣回路冰绽的暴击伤害提升100%。\n即使没有成功引爆，【冰棘】、【冰棱】、【冰川】也会在消失时直接爆炸。",
+        "iconUrl": "",
+        "name": "颠覆无常",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "引爆【冰棱】或【冰川】后，队伍中的角色攻击提升10%，持续20秒，可叠加2层。",
+        "iconUrl": "",
+        "name": "曙色天光",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "冷凝伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "凝夜白霜",
+            "num": 5,
+            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "辉萤军势",
+            "phantomId": 6000044,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "冷凝伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "凝夜白霜",
+            "num": 5,
+            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "冷凝伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "雪鬃狼",
+            "phantomId": 6000056,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "冷凝伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "凝夜白霜",
+            "num": 5,
+            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "冷凝伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "巡哨机傀",
+            "phantomId": 6000049,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "冷凝伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "凝夜白霜",
+            "num": 5,
+            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "热熔棱镜",
+            "phantomId": 390077012,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "冷凝伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "凝夜白霜",
+            "num": 5,
+            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "冷凝棱镜",
+            "phantomId": 390077013,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 1,
+      "attributeName": "冷凝",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1102,
+      "roleName": "散华",
+      "rolePicUrl": "",
+      "starLevel": 4,
+      "weaponTypeId": 2,
+      "weaponTypeName": "迅刀",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n进行最多5段的连续攻击，造成冷凝伤害。\n\n重击\n消耗耐力发动攻击，造成冷凝伤害。\n\n空中攻击\n消耗耐力进行空中下落攻击，造成冷凝伤害。\n\n闪避反击\n成功闪避后一定时间内短按普攻，将会攻击目标，造成冷凝伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "寒光",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "造成冷凝伤害，剑气会留下1道【冰棱】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "朔雪永冻",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "造成冷凝伤害，并形成1道【冰川】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "焦瞑冻土",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "挥刀坠击，造成冷凝伤害，留下1道【冰棘】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "凛刺",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "重击·爆裂\n按住普攻时，指针将会移动，若指针在【冰痕】区域时松开普攻，散华将施放重击爆裂攻击目标，造成冷凝伤害，此次伤害为重击伤害。\n\n冰绽\n重击爆裂会引爆攻击范围内的【冰棘】、【冰棱】和【冰川】，造成冷凝伤害，冰绽造成的伤害为共鸣技能伤害。\n\n冰痕区域扩大规则\n每拥有1层【透视】都会扩大【冰痕】区域，最多可拥有2层【透视】。\n施放第5段普攻时，获得1层【透视】。\n施放变奏技能凛刺时，获得1层【透视】。\n施放共鸣技能朔雪永冻时，获得1层【透视】。\n施放共鸣解放焦瞑冻土时，获得2层【透视】。\n施放重击爆裂时，移除所有【透视】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "无明心音",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "下一位登场角色普攻伤害加深38%，效果持续14秒，若切换至其他角色则该效果提前结束。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "凛絜",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "攻击提升24%。造成伤害时获得1层【灼羽】，每0.5秒可获得1层。施放共鸣技能时额外获得5层。每层【灼羽】使共鸣技能伤害加成提升8%，可叠加14层。【灼羽】达到14层的12秒后，清空全部层数。",
+        "weaponIcon": "",
+        "weaponId": 21020016,
+        "weaponName": "赫奕流明",
+        "weaponStarLevel": 5,
+        "weaponType": 2
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
         "description": "共鸣技能伤害加成提升30%。",
         "iconUrl": "",
         "name": "弦外知机",
@@ -1688,6 +2111,429 @@
         "weaponName": "赫奕流明",
         "weaponStarLevel": 5,
         "weaponType": 2
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
+        "description": "普攻命中目标时，热熔伤害加成额外提升3%，可叠加4层，持续6秒。",
+        "iconUrl": "",
+        "name": "羊咩的童话书",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "施放普攻咩咩或共鸣技能热情欢迎式时，额外回复10点共鸣能量，每10秒可触发1次。",
+        "iconUrl": "",
+        "name": "数羊安眠曲",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "重击白咩·失控之炎、重击黑咩·暴走之炎的伤害倍率提升40%。",
+        "iconUrl": "",
+        "name": "迷雾？黑海岸！",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "施放重击黑咩·暴走之炎时，队伍中的角色热熔伤害加成提升20%，效果持续30秒。",
+        "iconUrl": "",
+        "name": "冒险？好有趣！",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣技能伤害加成提升35%。",
+        "iconUrl": "",
+        "name": "聚光灯，勇士登场！",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣解放黑咩大暴走期间，每次造成伤害为自身叠加1层【迷失羔羊】，每层使攻击提升5%，效果持续10秒，最多可以叠加5层。",
+        "iconUrl": "",
+        "name": "羊咩，拯救世界！",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "热熔伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "熔山裂谷",
+            "num": 5,
+            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "普攻伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "燎照之骑",
+            "phantomId": 390080007,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "热熔伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "熔山裂谷",
+            "num": 5,
+            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "热熔伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "普攻伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "紫羽鹭",
+            "phantomId": 390077004,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "热熔伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "熔山裂谷",
+            "num": 5,
+            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "热熔伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "普攻伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "暗鬃狼",
+            "phantomId": 390077033,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "热熔伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "熔山裂谷",
+            "num": 5,
+            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "普攻伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "通行灯偶",
+            "phantomId": 6000050,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "热熔伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "熔山裂谷",
+            "num": 5,
+            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "普攻伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "融火虫",
+            "phantomId": 6000054,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 2,
+      "attributeName": "热熔",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1203,
+      "roleName": "安可",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 5,
+      "weaponTypeName": "音感仪",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n进行最多4段的连续攻击，造成热熔伤害。\n\n普攻·咩咩\n在普攻第4段攻击后一定时间内短按普攻，将会攻击目标，造成热熔伤害。\n\n重击\n消耗耐力攻击目标，造成热熔伤害。\n\n空中攻击\n消耗耐力进行空中下落攻击，造成热熔伤害。\n\n闪避反击\n成功闪避后一定时间内短按普攻，将会攻击目标，造成热熔伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "羊咩出击",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "热力羊咩\n召唤白咩与黑咩，以高温射线攻击目标，造成热熔伤害。\n\n热情欢迎式\n在施放热力羊咩后一定时间内，短按共鸣技能，将会施放热情欢迎式攻击目标，造成热熔伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "热力羊咩",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "安可无力压制黑咩，暴走黑咩出现并开始攻击目标。\n\n普攻·黑咩·胡闹\n黑咩大暴走期间，普攻替换为黑咩·胡闹，进行最多4段的连续攻击，造成热熔伤害，此次伤害为普攻伤害。\n\n黑咩·重击\n黑咩大暴走期间，重击替换为黑咩·重击，消耗耐力攻击目标，造成热熔伤害，此次伤害为重击伤害。\n\n共鸣技能·黑咩·狂热\n黑咩大暴走期间，热力羊咩转换为黑咩·狂热，以失控的火焰攻击目标，造成热熔伤害，此次伤害为共鸣技能伤害。\n\n黑咩·闪避反击\n黑咩大暴走期间，成功闪避后一定时间内短按普攻，将会攻击目标，造成热熔伤害，此次伤害为普攻伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "黑咩大暴走",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "与黑咩一起从天而降，攻击目标，造成热熔伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "咩咩帮手",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "重击·白咩·失控之炎\n施放重击时，若安可攒满【失序值】，安可会消耗所有的【失序值】进入失序状态，处于失序状态时安可受到伤害降低70%，切换角色不会中断失序状态。\n失序状态结束后，施放失控之炎，造成热熔伤害，此次伤害为共鸣解放伤害。\n\n重击·黑咩·暴走之炎\n黑咩大暴走期间，施放重击时，若安可攒满【失序值】，安可会消耗所有的【失序值】进入黑咩失序状态，处于黑咩失序状态时安可受到伤害降低70%，切换角色不会中断黑咩失序状态。\n黑咩失序状态结束后，施放暴走之炎，造成热熔伤害，此次伤害为共鸣解放伤害。\n\n失序值获取规则\n【失序值】上限100点。\n常态攻击羊咩出击命中目标时，回复【失序值】。\n共鸣技能热力羊咩命中目标时，回复【失序值】。\n共鸣技能热情欢迎式命中目标时，回复【失序值】。\n变奏技能咩咩帮手命中目标时，回复【失序值】。\n共鸣解放黑咩大暴走持续期间命中目标时，回复【失序值】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "黑白羊咩",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "以技能目标为中心，生成半径3米的地炎。地炎将持续灼烧范围内的目标，每1.5秒后造成安可176.76%攻击的热熔伤害，持续6秒。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "热场",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "全属性伤害加成提升24%。造成共鸣技能伤害时，自身攻击提升24%，可叠加2层，效果持续5秒。自身不在场时，该效果攻击额外提升24%。",
+        "weaponIcon": "",
+        "weaponId": 21050016,
+        "weaponName": "掣傀之手",
+        "weaponStarLevel": 5,
+        "weaponType": 5
       }
     }
   },
