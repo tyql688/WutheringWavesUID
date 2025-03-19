@@ -629,7 +629,7 @@ async def draw_char_detail_img(
         if damageId and not damageDetail:
             return f"[鸣潮] 角色【{char_name}】暂不支持伤害计算！\n"
 
-    ck = await waves_api.get_ck(uid, user_id)
+    _, ck = await waves_api.get_ck_result(uid, user_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
 
@@ -1062,7 +1062,7 @@ async def draw_char_score_img(
             f"[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
         )
     char_name = alias_to_char_name(char)
-    ck = await waves_api.get_ck(uid, user_id)
+    _, ck = await waves_api.get_ck_result(uid, user_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
 

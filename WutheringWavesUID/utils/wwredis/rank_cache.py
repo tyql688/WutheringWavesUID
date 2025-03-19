@@ -1,12 +1,12 @@
+import asyncio
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from ...utils.wwredis.wwredis import wavesRedis
 from ...wutheringwaves_config import WutheringWavesConfig
 from ..expression_ctx import get_waves_char_rank
 from ..name_convert import get_all_char_id
 from ..resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_INT
-from ..waves_api import waves_api
 
 redis_key_score = "ww:zset:score_rank:{}"  # 角色id - 分数排行
 redis_key_expected = "ww:zset:expected_rank:{}"  # 角色id - 期望排行
@@ -14,17 +14,6 @@ redis_key_expected = "ww:zset:expected_rank:{}"  # 角色id - 期望排行
 
 async def get_waves_token_map():
     wavesTokenUsersMap = {}
-    # WavesRankUseTokenGroup = WutheringWavesConfig.get_config('WavesRankNoLimitGroup').data
-    # if WavesRankUseTokenGroup:
-    #     from ..database.models import WavesBind
-    #     for group_id in WavesRankUseTokenGroup:
-    #         if not group_id:
-    #             continue
-    #         users = await WavesBind.get_group_all_uid(group_id)
-    #         for w in users:
-    #             if not w.uid:
-    #                 continue
-    #             wavesTokenUsersMap.update({uid: "true" for uid in w.uid.split('_')})
 
     # 全局 主人定义的
     RankUseToken = WutheringWavesConfig.get_config("RankUseToken").data
@@ -37,25 +26,18 @@ async def get_waves_token_map():
     return wavesTokenUsersMap
 
 
-async def check_in_rank(uid: str, user_id: str):
+async def check_in_rank(
+    uid: str,
+    user_id: str,
+    is_self_ck: bool,
+    token: Optional[str] = "",
+):
     RankUseToken = WutheringWavesConfig.get_config("RankUseToken").data
     if RankUseToken:
-
-        token = await waves_api.get_self_waves_ck(uid, user_id)
-        if token:
+        if token and is_self_ck:
             return True
-
-        # WavesRankUseTokenGroup = WutheringWavesConfig.get_config('WavesRankNoLimitGroup').data
-        # if WavesRankUseTokenGroup:
-        #     wavesBind = await WavesBind.select_data_list(user_id)
-        #     for temp in wavesBind:
-        #         if not temp.group_id:
-        #             continue
-        #         if set(WavesRankUseTokenGroup) & set(temp.group_id.split("_")):
-        #             return True
-        #     else:
-        #         return False
-
+        else:
+            return False
     return True
 
 
@@ -69,8 +51,14 @@ async def clear_rank_cache():
         await pipe.execute()
 
 
-async def save_rank_cache(uid: str, waves_char_rank: List, user_id: str):
-    if not await check_in_rank(uid, user_id):
+async def save_rank_cache(
+    uid: str,
+    waves_char_rank: List,
+    user_id: str,
+    is_self_ck: bool = False,
+    token: Optional[str] = "",
+):
+    if not await check_in_rank(uid, user_id, is_self_ck, token):
         return
 
     async with wavesRedis.get_client() as client:
@@ -137,6 +125,7 @@ async def save_rank_caches(all_card):
             expected = {}
             flag_count = 0
         total += 1
+        await asyncio.sleep(0.5)
 
     await func_save(score, expected)
     return total

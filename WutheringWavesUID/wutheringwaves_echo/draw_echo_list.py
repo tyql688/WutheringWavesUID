@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union, List, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from PIL import Image, ImageDraw
 from pydantic import BaseModel
@@ -7,31 +7,37 @@ from pydantic import BaseModel
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
+
 from ..utils import hint
-from ..utils.api.model import RoleDetailData, AccountBaseInfo, Props, EquipPhantom
+from ..utils.api.model import (
+    AccountBaseInfo,
+    EquipPhantom,
+    Props,
+    RoleDetailData,
+)
 from ..utils.calc import WuWaCalc
-from ..utils.calculate import get_calc_map, calc_phantom_score, get_valid_color
+from ..utils.calculate import calc_phantom_score, get_calc_map, get_valid_color
 from ..utils.char_info_utils import get_all_role_detail_info
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import (
-    waves_font_26,
-    waves_font_42,
-    waves_font_25,
-    waves_font_30,
     waves_font_24,
+    waves_font_25,
+    waves_font_26,
     waves_font_28,
+    waves_font_30,
+    waves_font_42,
 )
 from ..utils.image import (
-    get_waves_bg,
-    get_event_avatar,
-    GREY,
-    get_small_logo,
     GOLD,
-    add_footer,
-    get_attribute_prop,
+    GREY,
     SPECIAL_GOLD,
-    get_square_avatar,
+    add_footer,
     get_attribute_effect,
+    get_attribute_prop,
+    get_event_avatar,
+    get_small_logo,
+    get_square_avatar,
+    get_waves_bg,
 )
 from ..utils.resource.download_file import get_phantom_img
 from ..utils.waves_api import waves_api
@@ -52,16 +58,17 @@ class WavesEchoRank(BaseModel):
 
 
 async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
-    ck = await waves_api.get_ck(uid, user_id)
+    _, ck = await waves_api.get_ck_result(uid, user_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
         # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck)
-    account_info = AccountBaseInfo(**account_info)
+    account_info = AccountBaseInfo.model_validate(account_info)
 
-    all_role_detail: dict[str, RoleDetailData] = await get_all_role_detail_info(uid)
-
-    if all_role_detail is None:
+    all_role_detail: Optional[Dict[str, RoleDetailData]] = (
+        await get_all_role_detail_info(uid)
+    )
+    if not all_role_detail:
         return f"[鸣潮] 未找到角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!"
 
     waves_echo_rank = []
@@ -127,7 +134,7 @@ async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
             waves_echo_rank.append(wcr)
 
     if not waves_echo_rank:
-        return f"[鸣潮] 未找到角色的声骸评分! 请检查角色声骸是否在库街区正确显示"
+        return "[鸣潮] 未找到角色的声骸评分! 请检查角色声骸是否在库街区正确显示"
 
     waves_echo_rank.sort(key=lambda i: (i.score, i.roleId), reverse=True)
 

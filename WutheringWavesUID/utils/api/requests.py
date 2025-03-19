@@ -76,6 +76,8 @@ async def _check_response(
             msg = f"\n鸣潮账号id: 【{roleId}】未绑定库街区!!!\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮账号数据\n"
             return False, error_reply(WAVES_CODE_109, msg)
 
+        logger.warning(f"msg: {res.get('msg')}")
+
         if res.get("msg") and "访问被阻断" in res["msg"]:
             return False, error_reply(WAVES_CODE_998)
 
@@ -139,16 +141,16 @@ class WavesApi:
         ck = await self.get_self_waves_ck(uid, user_id)
         if ck:
             return True, ck
-        ck = await self.get_ck(uid, user_id)
+        ck = await self.get_waves_random_cookie(uid, user_id)
         return False, ck
 
-    async def get_ck(
-        self, uid: str, user_id, mode: Literal["OWNER", "RANDOM"] = "RANDOM"
-    ) -> Optional[str]:
-        if mode == "RANDOM":
-            return await self.get_waves_random_cookie(uid, user_id)
-        else:
-            return await self.get_self_waves_ck(uid, user_id)
+    # async def _get_ck(
+    #     self, uid: str, user_id, mode: Literal["OWNER", "RANDOM"] = "RANDOM"
+    # ) -> Optional[str]:
+    #     if mode == "RANDOM":
+    #         return await self.get_waves_random_cookie(uid, user_id)
+    #     else:
+    #         return await self.get_self_waves_ck(uid, user_id)
 
     async def get_self_waves_ck(self, uid: str, user_id) -> Optional[str]:
         cookie = await WavesUser.select_cookie(user_id, uid)
@@ -173,11 +175,6 @@ class WavesApi:
         return ""
 
     async def get_waves_random_cookie(self, uid: str, user_id: str) -> Optional[str]:
-        # 有绑定自己CK 并且该CK有效的前提下，优先使用自己CK
-        ck = await self.get_self_waves_ck(uid, user_id)
-        if ck:
-            return ck
-
         if WutheringWavesConfig.get_config("WavesOnlySelfCk").data:
             return None
 
@@ -188,10 +185,16 @@ class WavesApi:
         for user in user_list:
             if not await WavesUser.cookie_validate(user.uid):
                 continue
-            succ, _ = await self.refresh_data(user.uid, user.cookie)
+            succ, data = await self.refresh_data(user.uid, user.cookie)
             if not succ:
-                await WavesUser.mark_invalid(user.cookie, "无效")
+                if "重新登录" in data or "登录已过期" in data:
+                    await WavesUser.mark_invalid(user.cookie, "无效")
+
+                if "封禁" in data:
+                    break
+
                 continue
+
             ck_list.append(user.cookie)
             break
 
