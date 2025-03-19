@@ -17,7 +17,7 @@ from .bbs_api import bbs_api
 
 async def get_sign_interval(is_bbs: bool = False):
     next_group_sign_time = WutheringWavesConfig.get_config(
-        "SigninConcurrentNumInterval"
+        "SigninConcurrentNumInterval2"
     ).data
     ratio = random.uniform(1, 2) if is_bbs else 1
     if not next_group_sign_time:

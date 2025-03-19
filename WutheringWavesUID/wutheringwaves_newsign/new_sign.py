@@ -186,7 +186,7 @@ async def auto_sign_task():
 
                 await asyncio.sleep(random.randint(2, 4))
 
-    max_concurrent: int = WutheringWavesConfig.get_config("SigninConcurrentNum").data
+    max_concurrent: int = WutheringWavesConfig.get_config("SigninConcurrentNum2").data
     semaphore = asyncio.Semaphore(max_concurrent)
     tasks = [process_user(semaphore, user) for user in need_user_list]
     for i in range(0, len(tasks), max_concurrent):
