@@ -65,9 +65,6 @@ async def send_bot_rank_card(bot: Bot, ev: Event):
     ev.regex_dict = match.groupdict()
     char = match.group("char")
 
-    if not ev.group_id:
-        return await bot.send("请在群聊中使用")
-
     if not char:
         return
 
@@ -76,7 +73,7 @@ async def send_bot_rank_card(bot: Bot, ev: Event):
         rank_type = "评分"
     char = char.replace("伤害", "").replace("评分", "")
 
-    im = await draw_bot_rank_img(bot, ev, char, rank_type, True)
+    im = await draw_bot_rank_img(bot, ev, char, rank_type)
 
     if isinstance(im, str):
         at_sender = True if ev.group_id else False
