@@ -1,6 +1,6 @@
 import asyncio
 import random
-from typing import Dict
+from typing import Dict, Union
 
 from PIL import Image, ImageDraw
 
@@ -28,29 +28,23 @@ async def get_sign_interval(is_bbs: bool = False):
     )
 
 
-async def do_sign_in(taskData, uid, token, form_result):
-    key = "用户签到"
-    form_result[uid][key] = -1
+async def do_sign_in(taskData, uid, token):
     if taskData["completeTimes"] == taskData["needActionTimes"]:
-        form_result[uid][key] = taskData["needActionTimes"] - taskData["completeTimes"]
-        return
+        return True
 
     # 用户签到
     sign_in_res = await bbs_api.do_sign_in(token)
     if isinstance(sign_in_res, dict):
         if sign_in_res.get("code") == 200 and sign_in_res.get("data"):
             # 签到成功
-            form_result[uid][key] = taskData["needActionTimes"]
-            return
+            return True
     logger.warning(f"[鸣潮][社区签到]签到失败 uid: {uid} sign_in_res: {sign_in_res}")
+    return False
 
 
-async def do_detail(taskData, uid, token, form_result, post_list):
-    key = "浏览帖子"
-    form_result[uid][key] = -1
+async def do_detail(taskData, uid, token, post_list):
     if taskData["completeTimes"] == taskData["needActionTimes"]:
-        form_result[uid][key] = taskData["needActionTimes"] - taskData["completeTimes"]
-        return
+        return True
     # 浏览帖子
     detail_succ = 0
     for i, post in enumerate(post_list):
@@ -59,19 +53,16 @@ async def do_detail(taskData, uid, token, form_result, post_list):
             if post_detail_res.get("code") == 200:
                 detail_succ += 1
                 # 浏览成功
-                form_result[uid][key] = detail_succ
         if detail_succ >= taskData["needActionTimes"] - taskData["completeTimes"]:
-            return
+            return True
 
     logger.warning(f"[鸣潮][社区签到]浏览失败 uid: {uid}")
+    return False
 
 
-async def do_like(taskData, uid, token, form_result, post_list):
-    key = "点赞帖子"
-    form_result[uid][key] = -1
+async def do_like(taskData, uid, token, post_list):
     if taskData["completeTimes"] == taskData["needActionTimes"]:
-        form_result[uid][key] = taskData["needActionTimes"] - taskData["completeTimes"]
-        return
+        return True
 
     # 用户点赞5次
     like_succ = 0
@@ -81,40 +72,43 @@ async def do_like(taskData, uid, token, form_result, post_list):
             if like_res.get("code") == 200:
                 like_succ += 1
                 # 点赞成功
-                form_result[uid][key] = like_succ
         if like_succ >= taskData["needActionTimes"] - taskData["completeTimes"]:
-            return
+            return True
 
     logger.warning(f"[鸣潮][社区签到]点赞失败 uid: {uid}")
+    return False
 
 
-async def do_share(taskData, uid, token, form_result):
-    key = "分享帖子"
-    form_result[uid][key] = -1
+async def do_share(taskData, uid, token):
     if taskData["completeTimes"] == taskData["needActionTimes"]:
-        form_result[uid][key] = taskData["needActionTimes"] - taskData["completeTimes"]
-        return
+        return True
 
     # 分享
     share_res = await bbs_api.do_share(token)
     if isinstance(share_res, dict):
         if share_res.get("code") == 200:
             # 分享成功
-            form_result[uid][key] = taskData["needActionTimes"]
-            return
+            return True
 
     logger.exception(f"[鸣潮][社区签到]分享失败 uid: {uid}")
+    return False
 
 
-async def do_single_task(uid, token):
+async def do_single_task(uid, token) -> Union[bool, Dict[str, bool]]:
     # 任务列表
     task_res = await bbs_api.get_task(token)
     if not isinstance(task_res, dict):
-        return
+        return False
     if task_res.get("code") != 200 or not task_res.get("data"):
-        return
+        return False
 
-        # check 1
+    for i in task_res["data"]["dailyTask"]:
+        if i["completeTimes"] != i["needActionTimes"]:
+            break
+    else:
+        return True
+
+    # check 1
     need_post_list_flag = False
     for i in task_res["data"]["dailyTask"]:
         if i["completeTimes"] == i["needActionTimes"]:
@@ -135,34 +129,29 @@ async def do_single_task(uid, token):
                 f"[鸣潮][社区签到]获取帖子列表失败 uid: {uid} res: {form_list_res}"
             )
             # 未获取帖子列表
-            return
+            return False
 
     form_result = {
         uid: {
-            "用户签到": "",
-            "浏览帖子": "",
-            "点赞帖子": "",
-            "分享帖子": "",
-            "库洛币": "",
+            "用户签到": False,
+            "浏览帖子": False,
+            "点赞帖子": False,
+            "分享帖子": False,
         }
     }
+
     # 获取到任务列表
     for i in task_res["data"]["dailyTask"]:
         if "签到" in i["remark"]:
-            await do_sign_in(i, uid, token, form_result)
+            form_result[uid]["用户签到"] = await do_sign_in(i, uid, token)
         elif "浏览" in i["remark"]:
-            await do_detail(i, uid, token, form_result, post_list)
+            form_result[uid]["浏览帖子"] = await do_detail(i, uid, token, post_list)
         elif "点赞" in i["remark"]:
-            await do_like(i, uid, token, form_result, post_list)
+            form_result[uid]["点赞帖子"] = await do_like(i, uid, token, post_list)
         elif "分享" in i["remark"]:
-            await do_share(i, uid, token, form_result)
+            form_result[uid]["分享帖子"] = await do_share(i, uid, token)
 
         await asyncio.sleep(random.uniform(0, 1))
-
-    gold_res = await bbs_api.get_gold(token)
-    if isinstance(gold_res, dict):
-        if gold_res.get("code") == 200:
-            form_result[uid]["库洛币"] = gold_res["data"]["goldNum"]
 
     return form_result
 
@@ -178,30 +167,26 @@ async def single_task(
     all_msgs: Dict,
 ):
     im = await do_single_task(uid, ck)
-    if not im:
-        return
-    msg = []
-    msg.append(f"特征码: {uid}")
-    for i, r in im[str(uid)].items():
-        if r == 0:
-            r = "今日已完成！"
-        elif r == -1:
-            r = "失败"
+    if isinstance(im, dict):
+        msg = []
+        msg.append(f"特征码: {uid}")
+        for i, r in im[str(uid)].items():
+            if r:
+                msg.append(f"{i}: 成功")
+            else:
+                msg.append(f"{i}: 失败")
+
+        im = "\n".join(msg)
+    elif isinstance(im, bool):
+        if im:
+            im = "社区签到成功"
         else:
-            if i == "用户签到":
-                r = "签到成功"
-            elif i == "浏览帖子":
-                r = f"浏览帖子成功 {r} 次"
-            elif i == "点赞帖子":
-                r = f"点赞帖子成功 {r} 次"
-            elif i == "分享帖子":
-                r = "分享帖子成功"
-            elif i == "库洛币":
-                r = f" 当前为{r}"
+            im = "社区签到失败"
+    else:
+        return
 
-        msg.append(f"{i}: {r}")
+    logger.debug(f"[鸣潮][社区签到]签到结果 uid: {uid} res: {im}")
 
-    im = "\n".join(msg)
     if gid == "on":
         if qid not in private_msgs:
             private_msgs[qid] = []
