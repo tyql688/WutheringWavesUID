@@ -436,10 +436,6 @@ async def get_role_need(
             )
     else:
         avatar = await draw_pic_with_ring(ev, is_force_avatar, force_resource_id)
-        if waves_id and waves_api.is_net(waves_id):
-            uid = waves_id
-        if is_limit_query:
-            uid = "1"
         all_role_detail: Optional[Dict[str, RoleDetailData]] = (
             await get_all_role_detail_info(uid)
         )
@@ -448,11 +444,11 @@ async def get_role_need(
             role_detail: RoleDetailData = all_role_detail[char_name]
         else:
             if is_limit_query:
-                 return (
-                     None,
-                     f"[鸣潮] 暂未支持【{char_name}】极限面板, 请关注后续更新\n",
-                 )
-            if is_online_user:
+                return (
+                    None,
+                    f"[鸣潮] 未找到【{char_name}】角色极限面板信息，请等待适配!\n",
+                )
+            elif is_online_user:
                 return (
                     None,
                     f"[鸣潮] 未找到【{char_name}】角色信息, 国服用户请使用[{PREFIX}刷新面板]进行刷新!，国际服用户请使用[{PREFIX}分析]上传数据\n",
@@ -634,17 +630,19 @@ async def draw_char_detail_img(
         if damageId and not damageDetail:
             return f"[鸣潮] 角色【{char_name}】暂不支持伤害计算！\n"
 
-    _, ck = await waves_api.get_ck_result(uid, user_id)
-    if not ck and not waves_api.is_net(uid):
-        return hint.error_reply(WAVES_CODE_102)
-
     is_online_user = False
-    succ, online_list = await waves_api.get_online_list_role(ck)
-    if succ and online_list:
-        online_list_role_model = OnlineRoleList.model_validate(online_list)
-        online_role_map = {str(i.roleId): i for i in online_list_role_model}
-        if char_id in online_role_map:
-            is_online_user = True
+    ck = ""
+    if not is_limit_query:
+        _, ck = await waves_api.get_ck_result(uid, user_id)
+        if not ck:
+            return hint.error_reply(WAVES_CODE_102)
+
+        succ, online_list = await waves_api.get_online_list_role(ck)
+        if succ and online_list:
+            online_list_role_model = OnlineRoleList.model_validate(online_list)
+            online_role_map = {str(i.roleId): i for i in online_list_role_model}
+            if char_id in online_role_map:
+                is_online_user = True
 
     # 账户数据
     if waves_id:
@@ -665,7 +663,7 @@ async def draw_char_detail_img(
         account_info = AccountBaseInfo.model_validate(
             {
                 "name": "库洛交个朋友",
-                "id": 1,
+                "id": uid,
                 "level": 100,
                 "worldLevel": 10,
                 "creatTime": 1739375719,

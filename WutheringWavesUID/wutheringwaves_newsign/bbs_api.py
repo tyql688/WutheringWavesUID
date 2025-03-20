@@ -153,7 +153,6 @@ class KuroBBS:
 
     async def check_bbs_completed(self, token: str) -> bool:
         task_res = await self.get_task(token)
-        logger.info(f"check_bbs_completed  task_res {task_res}")
         if not isinstance(task_res, dict):
             return False
         if task_res.get("code") != 200 or not task_res.get("data"):

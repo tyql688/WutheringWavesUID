@@ -13,7 +13,6 @@ from ..utils.error_reply import ERROR_CODE, WAVES_CODE_102
 from ..utils.waves_api import waves_api
 from ..utils.waves_send_msg import send_board_cast_msg
 from ..wutheringwaves_config import WutheringWavesConfig
-from .bbs_api import bbs_api
 from .main import (
     create_sign_info_image,
     do_single_task,
@@ -64,12 +63,13 @@ async def sign_up_handler(bot: Bot, ev: Event):
 
         msg_temp["signed"] = signed
 
-        bbs_signed = await bbs_api.check_bbs_completed(token)
-        if not bbs_signed:
-            res = await do_single_task(uid, token)
-            bbs_signed = await bbs_api.check_bbs_completed(token)
-
-        msg_temp["bbs_signed"] = bbs_signed
+        bbs_signed = await do_single_task(uid, token)
+        if isinstance(bbs_signed, dict) and all(bbs_signed.values()):
+            msg_temp["bbs_signed"] = True
+        elif isinstance(bbs_signed, bool):
+            msg_temp["bbs_signed"] = bbs_signed
+        else:
+            msg_temp["bbs_signed"] = False
 
         to_msg[uid] = msg_temp
 
