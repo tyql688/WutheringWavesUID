@@ -109,11 +109,8 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
     logger.debug(f"[鸣潮] [角色面板] CHAR: {char} {ev.regex_dict}")
 
     if is_limit_query:
-        uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
-        if not uid:
-            return await bot.send(error_reply(WAVES_CODE_103))
         im = await draw_char_detail_img(
-            ev, uid, char, ev.user_id, is_limit_query=is_limit_query
+            ev, "1", char, ev.user_id, is_limit_query=is_limit_query
         )
         if isinstance(im, str) or isinstance(im, bytes):
             return await bot.send(im)
