@@ -142,10 +142,11 @@ async def draw_all_rank_card(
     logger.info(f"[get_rank_info_for_user] start: {start_time}")
 
     rank_type_num = 2 if rank_type == "伤害" else 1
+    page_num = 20
     item = RankItem(
         char_id=int(char_id),
         page=pages,
-        page_num=20,
+        page_num=page_num,
         rank_type=rank_type_num,
         waves_id=self_uid,
     )
@@ -178,6 +179,7 @@ async def draw_all_rank_card(
 
     bot_color = copy.deepcopy(BOT_COLOR)
     bot_color_map = {}
+    avg_num = 0
     for index, temp in enumerate(zip(rankInfoList.data.details, results)):
         rank: RankDetail = temp[0]
         role_avatar: Image.Image = temp[1]
@@ -360,11 +362,13 @@ async def draw_all_rank_card(
         # 贴到背景
         card_img.paste(bar_bg, (0, title_h + index * bar_star_h), bar_bg)
 
-        total_score += rank.phantom_score
-        total_damage += rank.expected_damage
+        if index + 1 + (pages - 1) * page_num == rank_id:
+            total_score += rank.phantom_score
+            total_damage += rank.expected_damage
+            avg_num += 1
 
-    avg_score = f"{total_score / totalNum:.1f}" if totalNum != 0 else "0"
-    avg_damage = f"{total_damage / totalNum:,.0f}" if totalNum != 0 else "0"
+    avg_score = f"{total_score / avg_num:.1f}" if avg_num != 0 else "0"
+    avg_damage = f"{total_damage / avg_num:,.0f}" if avg_num != 0 else "0"
 
     title = TITLE_II.copy()
     title_draw = ImageDraw.Draw(title)
