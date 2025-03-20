@@ -78,12 +78,7 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
-      }
-    ]
-  },
-  "信息查询": {
-    "desc": "在执行查询之前请绑定账号",
-    "data": [
+      },
       {
         "name": "鸣潮面板更新",
         "desc": "鸣潮面板更新",
@@ -92,6 +87,35 @@
         "need_sk": false,
         "need_admin": false
       },
+      {
+        "name": "体力",
+        "desc": "获取自己的每日状态",
+        "eg": "mr",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "查询探索度",
+        "desc": "查询探索度",
+        "eg": "探索度",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "角色养成",
+        "desc": "角色养成",
+        "eg": "菲比养成",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "信息查询": {
+    "desc": "在执行查询之前请绑定账号",
+    "data": [
       {
         "name": "国际服dc卡片分析",
         "desc": "分析获取dc卡片角色数据",
@@ -164,22 +188,7 @@
         "need_sk": false,
         "need_admin": false
       },
-      {
-        "name": "体力",
-        "desc": "获取自己的每日状态",
-        "eg": "mr",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "查询探索度",
-        "desc": "查询探索度",
-        "eg": "探索度",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
+      
       {
         "name": "日历",
         "desc": "日历",
@@ -203,19 +212,11 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
-      },
-      {
-        "name": "角色养成",
-        "desc": "角色养成",
-        "eg": "菲比养成",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
       }
     ]
   },
   "深渊查询": {
-    "desc": "深渊数据查询",
+    "desc": "深渊数据查询，暂不支持国际服",
     "data": [
       {
         "name": "深渊",
@@ -274,6 +275,22 @@
         "name": "全服评分排行",
         "desc": "全服评分排行",
         "eg": "长离评分总排行",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "bot伤害排行",
+        "desc": "bot伤害排行",
+        "eg": "长离bot排行",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "bot评分排行",
+        "desc": "bot评分排行",
+        "eg": "长离评分bot排行",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -416,7 +433,7 @@
     ]
   },
   "个人服务": {
-    "desc": "该配置项仅针对个人使用",
+    "desc": "该配置项仅针对个人使用，暂不支持国际服",
     "data": [
       {
         "name": "开启全局推送",
