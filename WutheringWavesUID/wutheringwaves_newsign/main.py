@@ -132,24 +132,22 @@ async def do_single_task(uid, token) -> Union[bool, Dict[str, bool]]:
             return False
 
     form_result = {
-        uid: {
-            "用户签到": False,
-            "浏览帖子": False,
-            "点赞帖子": False,
-            "分享帖子": False,
-        }
+        "用户签到": False,
+        "浏览帖子": False,
+        "点赞帖子": False,
+        "分享帖子": False,
     }
 
     # 获取到任务列表
     for i in task_res["data"]["dailyTask"]:
         if "签到" in i["remark"]:
-            form_result[uid]["用户签到"] = await do_sign_in(i, uid, token)
+            form_result["用户签到"] = await do_sign_in(i, uid, token)
         elif "浏览" in i["remark"]:
-            form_result[uid]["浏览帖子"] = await do_detail(i, uid, token, post_list)
+            form_result["浏览帖子"] = await do_detail(i, uid, token, post_list)
         elif "点赞" in i["remark"]:
-            form_result[uid]["点赞帖子"] = await do_like(i, uid, token, post_list)
+            form_result["点赞帖子"] = await do_like(i, uid, token, post_list)
         elif "分享" in i["remark"]:
-            form_result[uid]["分享帖子"] = await do_share(i, uid, token)
+            form_result["分享帖子"] = await do_share(i, uid, token)
 
         await asyncio.sleep(random.uniform(0, 1))
 
@@ -170,7 +168,7 @@ async def single_task(
     if isinstance(im, dict):
         msg = []
         msg.append(f"特征码: {uid}")
-        for i, r in im[str(uid)].items():
+        for i, r in im.items():
             if r:
                 msg.append(f"{i}: 成功")
             else:
