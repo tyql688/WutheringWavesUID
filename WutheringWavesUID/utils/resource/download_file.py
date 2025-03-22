@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Union, Optional
 
 from PIL import Image
 
@@ -6,10 +6,10 @@ from gsuid_core.utils.download_resource.download_file import download
 
 from .RESOURCE_PATH import (
     FETTER_PATH,
-    MATERIAL_PATH,
     PHANTOM_PATH,
-    ROLE_DETAIL_CHAINS_PATH,
+    MATERIAL_PATH,
     ROLE_DETAIL_SKILL_PATH,
+    ROLE_DETAIL_CHAINS_PATH,
 )
 
 
@@ -46,7 +46,10 @@ async def get_phantom_img(phantom_id: int, pic_url: str) -> Image.Image:
     name = f"phantom_{phantom_id}.png"
     _path = PHANTOM_PATH / name
     if not _path.exists():
-        await download(pic_url, PHANTOM_PATH, name, tag="[鸣潮]")
+        if pic_url:
+            await download(pic_url, PHANTOM_PATH, name, tag="[鸣潮]")
+        else:
+            _path = PHANTOM_PATH / "phantom_390070051.png"
 
     return Image.open(_path).convert("RGBA")
 

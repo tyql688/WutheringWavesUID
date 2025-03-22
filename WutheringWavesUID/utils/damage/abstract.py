@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Union, Optional
 
 from ...utils.damage.damage import DamageAttribute
 
@@ -129,6 +129,10 @@ class WeaponAbstract(object):
 
     def env_spectro(self, attr: DamageAttribute, isGroup: bool = False):
         """光噪效应"""
+        pass
+
+    def cast_healing(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放治疗"""
         pass
 
 
