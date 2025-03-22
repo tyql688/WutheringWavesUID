@@ -11,6 +11,7 @@ from ..utils.name_convert import (
     alias_to_sonata_name,
     alias_to_weapon_name,
     char_name_to_char_id,
+    easy_id_to_name,
     weapon_name_to_weapon_id,
 )
 from ..utils.resource.constant import SONATA_FIRST_ID, SPECIAL_CHAR
@@ -646,6 +647,9 @@ async def change_role_detail(
                     ep.phantomProp.phantomId = SONATA_FIRST_ID.get(
                         sonata_result.name, []
                     )[0]
+                    ep.phantomProp.name = easy_id_to_name(
+                        str(ep.phantomProp.phantomId), ep.phantomProp.name
+                    )
 
     # 敌人
     if parserResult.enemy.enemyResistance:

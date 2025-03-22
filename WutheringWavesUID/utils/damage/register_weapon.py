@@ -1,6 +1,7 @@
 from ..damage.abstract import WavesWeaponRegister, WeaponAbstract
 from .damage import DamageAttribute, calc_percent_expression
 from .utils import (
+    CHAR_ATTR_SIERRA,
     Spectro_Frazzle_Role_Ids,
     attack_damage,
     hit_damage,
@@ -352,6 +353,25 @@ class Weapon_21020046(WeaponAbstract):
     id = 21020046
     type = 2
     name = "血誓盟约"
+
+    def cast_healing(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放治疗"""
+        if attr.char_damage != skill_damage:
+            return
+        dmg = f"{self.param(0)}"
+        title = self.get_title()
+        msg = f"造成治疗时，自身共鸣技能伤害提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_attr != CHAR_ATTR_SIERRA:
+            return
+        if attr.role and attr.role.role.roleId in [1406, 1408]:
+            dmg = f"{self.param(2)}"
+            title = self.get_title()
+            msg = f"风主施放共鸣技能时，附近队伍中登场角色气动伤害加深{dmg}"
+            attr.add_dmg_deepen(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21020053(WeaponAbstract):

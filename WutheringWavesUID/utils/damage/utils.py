@@ -53,6 +53,8 @@ cast_dodge_counter = "cast_dodge_counter"
 cast_variation = "cast_variation"
 # 共鸣技能造成治疗
 skill_create_healing = "skill_create_healing"
+# 造成治疗
+cast_healing = "cast_healing"
 
 # 定义一个类型别名
 SkillType = Literal["常态攻击", "共鸣技能", "共鸣解放", "变奏技能", "共鸣回路"]

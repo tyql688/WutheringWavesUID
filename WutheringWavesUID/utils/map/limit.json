@@ -272,6 +272,32 @@
                     "cost": 1
                 }
             ]
+        },
+        {
+            "libId": 11,
+            "fetterDetailName": "流云逝尽之空",
+            "equipPhantomList": [
+                {
+                    "phantomId": 340000121,
+                    "cost": 4
+                },
+                {
+                    "phantomId": 6000096,
+                    "cost": 3
+                },
+                {
+                    "phantomId": 6000097,
+                    "cost": 3
+                },
+                {
+                    "phantomId": 310000550,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 310000560,
+                    "cost": 1
+                }
+            ]
         }
     ],
     "charList":[
