@@ -13,6 +13,7 @@ from gsuid_core.utils.image.utils import sget
 from ..utils.resource.RESOURCE_PATH import (
     AVATAR_PATH,
     CUSTOM_CARD_PATH,
+    CUSTOM_MR_CARD_PATH,
     ROLE_PILE_PATH,
     WEAPON_PATH,
 )
@@ -120,7 +121,17 @@ async def get_role_pile(
     return False, Image.open(path).convert("RGBA")
 
 
-async def get_role_pile_old(resource_id: Union[int, str]) -> Image.Image:
+async def get_role_pile_old(
+    resource_id: Union[int, str], custom: bool = False
+) -> Image.Image:
+    if custom:
+        custom_dir = f"{CUSTOM_MR_CARD_PATH}/{resource_id}"
+        if os.path.isdir(custom_dir) and len(os.listdir(custom_dir)) > 0:
+            # logger.info(f'使用自定义角色头像: {resource_id}')
+            path = random.choice(os.listdir(custom_dir))
+            if path:
+                return Image.open(f"{custom_dir}/{path}").convert("RGBA")
+
     name = f"role_pile_{resource_id}.png"
     path = ROLE_PILE_PATH / name
     return Image.open(path).convert("RGBA")
