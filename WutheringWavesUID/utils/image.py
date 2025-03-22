@@ -97,9 +97,7 @@ def get_ICON():
 
 async def get_random_waves_role_pile(char_id: Optional[str] = None):
     if char_id:
-        png_name = f"role_pile_{char_id}.png"
-        if os.path.exists(f"{ROLE_PILE_PATH}/{png_name}"):
-            return Image.open(f"{ROLE_PILE_PATH}/{png_name}").convert("RGBA")
+        return await get_role_pile_old(char_id, custom=True)
 
     path = random.choice(os.listdir(f"{ROLE_PILE_PATH}"))
     return Image.open(f"{ROLE_PILE_PATH}/{path}").convert("RGBA")
