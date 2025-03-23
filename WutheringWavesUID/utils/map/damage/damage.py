@@ -172,6 +172,10 @@ def phase_damage(
                 attr.add_dmg_bonus(0.8, title, msg)
 
                 # 协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%
+                if attr.char_template == "temp_atk":
+                    title = f"{phase_name}-{ph_detail.ph_name}"
+                    msg = "协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%"
+                    attr.add_atk_percent(0.2, title, msg)
 
         # 幽夜隐匿之帷
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_MIDNIGHT):

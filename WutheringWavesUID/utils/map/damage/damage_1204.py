@@ -18,7 +18,7 @@ from ...damage.utils import (
 
 def calc_damage_1(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[str, str]:
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -72,7 +72,7 @@ def calc_damage_1(
 
 def calc_damage_2(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[str, str]:
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -130,7 +130,7 @@ def calc_damage_2(
 
 def calc_damage_3(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[str, str]:
     # 设置角色伤害类型
     attr.set_char_damage(liberation_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -188,11 +188,13 @@ def calc_damage_3(
 
 def calc_damage_4(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[str, str]:
     # 设置角色伤害类型
     attr.set_char_damage(liberation_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
     attr.set_char_template("temp_atk")
+    # 设置协同攻击
+    attr.set_sync_strike()
 
     role_name = role.role.roleName
     # 获取角色详情
