@@ -695,3 +695,10 @@ class DamageAttribute:
         return effect_value * (percent * 0.01) * (1 + self.dmg_bonus) + flat * (
             1 + self.dmg_bonus
         )
+
+
+def check_char_id(attr: DamageAttribute, char_id: Union[int, List[int]]):
+    if isinstance(char_id, int):
+        return attr.role and attr.role.role.roleId == char_id
+    else:
+        return attr.role and attr.role.role.roleId in char_id

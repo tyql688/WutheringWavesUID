@@ -3,7 +3,7 @@ from typing import List, Union
 from ...api.model import RoleDetailData, WeaponData
 from ...ascension.sonata import get_sonata_detail
 from ...damage.abstract import WavesEchoRegister, WavesWeaponRegister
-from ...damage.damage import DamageAttribute
+from ...damage.damage import DamageAttribute, check_char_id
 from ...damage.utils import (
     CHAR_ATTR_CELESTIAL,
     CHAR_ATTR_FREEZING,
@@ -161,8 +161,13 @@ def phase_damage(
                 attr.add_dmg_bonus(0.225, title, msg)
             if cast_liberation in damage_func and attr.char_damage == skill_damage:
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = "施放共鸣解放时，自身共鸣技能伤害提升18%*2"
-                attr.add_dmg_bonus(0.18 * 2, title, msg)
+                if check_char_id(attr, [1107]):
+                    msg = "施放共鸣解放时，自身共鸣技能伤害提升18%*2"
+                    attr.add_dmg_bonus(0.18 * 2, title, msg)
+                else:
+                    title = f"{phase_name}-{ph_detail.ph_name}"
+                    msg = "施放共鸣解放时，自身共鸣技能伤害提升18%"
+                    attr.add_dmg_bonus(0.18, title, msg)
 
         # 高天共奏之曲 -协同
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_EMPYREAN):
@@ -172,6 +177,10 @@ def phase_damage(
                 attr.add_dmg_bonus(0.8, title, msg)
 
                 # 协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%
+                if attr.char_template == "temp_atk":
+                    title = f"{phase_name}-{ph_detail.ph_name}"
+                    msg = "协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%"
+                    attr.add_atk_percent(0.2, title, msg)
 
         # 幽夜隐匿之帷
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_MIDNIGHT):
@@ -180,7 +189,7 @@ def phase_damage(
 
         # 此间永驻之光
         elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_ETERNAL):
-            if role.role.roleId not in Spectro_Frazzle_Role_Ids:
+            if not check_char_id(attr, Spectro_Frazzle_Role_Ids):
                 return
             # 角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒。
             title = f"{phase_name}-{ph_detail.ph_name}"
