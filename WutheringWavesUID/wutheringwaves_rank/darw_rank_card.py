@@ -566,7 +566,7 @@ async def draw_rank_img(
     title.alpha_composite(logo_img.copy(), dest=(50, 65))
 
     # 人物bg
-    pile = await get_role_pile_old(char_id)
+    pile = await get_role_pile_old(char_id, custom=True)
     title.paste(pile, (450, -120), pile)
     title_draw.text((200, 335), f"{avg_score}", "white", waves_font_44, "mm")
     title_draw.text((200, 375), "平均声骸分数", SPECIAL_GOLD, waves_font_20, "mm")

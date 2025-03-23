@@ -1,4 +1,4 @@
-from ....utils.damage.abstract import DamageDetailRegister, DamageRankRegister
+from ....utils.damage.abstract import DamageRankRegister, DamageDetailRegister
 
 
 def register_damage():
@@ -22,6 +22,7 @@ def register_damage():
     from .damage_1403 import damage_detail as damage_1403
     from .damage_1404 import damage_detail as damage_1404
     from .damage_1405 import damage_detail as damage_1405
+    from .damage_1406 import damage_detail as damage_1406
     from .damage_1502 import damage_detail as damage_1502
     from .damage_1503 import damage_detail as damage_1503
     from .damage_1504 import damage_detail as damage_1504
@@ -32,6 +33,7 @@ def register_damage():
     from .damage_1603 import damage_detail as damage_1603
     from .damage_1604 import damage_detail as damage_1604
     from .damage_1606 import damage_detail as damage_1606
+    from .damage_1607 import damage_detail as damage_1607
 
     # 散华
     DamageDetailRegister.register_class("1102", damage_1102)
@@ -76,6 +78,10 @@ def register_damage():
     DamageDetailRegister.register_class("1404", damage_1404)
     # 鉴心
     DamageDetailRegister.register_class("1405", damage_1405)
+    # 风主男
+    DamageDetailRegister.register_class("1406", damage_1406)
+    # 风主女
+    DamageDetailRegister.register_class("1408", damage_1406)
 
     # 光主男
     DamageDetailRegister.register_class("1501", damage_1502)
@@ -102,6 +108,8 @@ def register_damage():
     DamageDetailRegister.register_class("1605", damage_1604)
     # 洛可可
     DamageDetailRegister.register_class("1606", damage_1606)
+    # 坎特蕾拉
+    DamageDetailRegister.register_class("1607", damage_1607)
 
 
 def register_rank():
@@ -125,6 +133,7 @@ def register_rank():
     from .damage_1403 import rank as rank_1403
     from .damage_1404 import rank as rank_1404
     from .damage_1405 import rank as rank_1405
+    from .damage_1406 import rank as rank_1406
     from .damage_1502 import rank as rank_1502
     from .damage_1503 import rank as rank_1503
     from .damage_1504 import rank as rank_1504
@@ -135,6 +144,7 @@ def register_rank():
     from .damage_1603 import rank as rank_1603
     from .damage_1604 import rank as rank_1604
     from .damage_1606 import rank as rank_1606
+    from .damage_1607 import rank as rank_1607
 
     # 散华
     DamageRankRegister.register_class("1102", rank_1102)
@@ -179,6 +189,10 @@ def register_rank():
     DamageRankRegister.register_class("1404", rank_1404)
     # 鉴心
     DamageRankRegister.register_class("1405", rank_1405)
+    # 风主男
+    DamageRankRegister.register_class("1406", rank_1406)
+    # 风主女
+    DamageRankRegister.register_class("1408", rank_1406)
 
     # 光主男
     DamageRankRegister.register_class("1501", rank_1502)
@@ -205,3 +219,5 @@ def register_rank():
     DamageRankRegister.register_class("1605", rank_1604)
     # 洛可可
     DamageRankRegister.register_class("1606", rank_1606)
+    # 坎特蕾拉
+    DamageRankRegister.register_class("1607", rank_1607)

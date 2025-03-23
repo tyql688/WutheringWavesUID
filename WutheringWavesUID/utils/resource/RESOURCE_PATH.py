@@ -46,6 +46,7 @@ GUIDE_CONFIG_MAP = {
 
 # 自定义背景图
 CUSTOM_CARD_PATH = MAIN_PATH / "custom_role_pile"
+CUSTOM_MR_CARD_PATH = MAIN_PATH / "custom_mr_role_pile"
 
 # 其他的素材
 OTHER_PATH = MAIN_PATH / "other"
@@ -82,6 +83,7 @@ def init_dir():
         OTHER_PATH,
         CALENDAR_PATH,
         ALIAS_PATH,
+        CUSTOM_MR_CARD_PATH,
     ]:
         i.mkdir(parents=True, exist_ok=True)
 
