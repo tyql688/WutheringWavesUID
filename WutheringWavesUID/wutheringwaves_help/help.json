@@ -560,14 +560,6 @@
         "need_admin": true
       },
       {
-        "name": "补充Hakush资源",
-        "desc": "补充Hakush资源",
-        "eg": "补充资源",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": true
-      },
-      {
         "name": "删除无效token",
         "desc": "删除无效token",
         "eg": "删除无效token",
@@ -579,14 +571,6 @@
         "name": "删除自动签到",
         "desc": "删除自动签到",
         "eg": "删除自动签到123456",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": true
-      },
-      {
-        "name": "刷新排行榜",
-        "desc": "刷新排行榜",
-        "eg": "刷新全部排行",
         "need_ck": false,
         "need_sk": false,
         "need_admin": true

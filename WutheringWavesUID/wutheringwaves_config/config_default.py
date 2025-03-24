@@ -11,21 +11,6 @@ from gsuid_core.utils.plugins_config.models import (
 )
 
 CONFIG_DEFAULT: Dict[str, GSC] = {
-    "RedisFromUrl": GsStrConfig(
-        "Redis连接配置",
-        "Redis连接配置",
-        "redis://127.0.0.1:6379/0",
-    ),
-    "IsRedisCluster": GsBoolConfig(
-        "Redis集群开关",
-        "Redis集群开关",
-        False,
-    ),
-    "StartServerRedisLoad": GsBoolConfig(
-        "开启后，在启动GsCore时，redis加载排行数据",
-        "开启后，在启动GsCore时，redis加载排行数据",
-        False,
-    ),
     "WavesAnnGroups": GsDictConfig(
         "推送公告群组",
         "鸣潮公告推送群组",
@@ -54,12 +39,12 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     "SchedSignin": GsBoolConfig(
         "定时签到",
         "开启后每晚00:10将开始自动签到任务",
-        True,
+        False,
     ),
     "BBSSchedSignin": GsBoolConfig(
         "定时库街区每日任务",
-        "开启后每晚00:20将开始自动库街区每日任务",
-        True,
+        "开启后每晚00:10将开始自动库街区每日任务",
+        False,
     ),
     "PrivateSignReport": GsBoolConfig(
         "签到私聊报告",
@@ -79,6 +64,16 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     "SigninMaster": GsBoolConfig(
         "全部开启签到",
         "开启后自动帮登录的人签到",
+        False,
+    ),
+    "UserSchedSignin": GsBoolConfig(
+        "用户签到开关",
+        "用户签到开关",
+        False,
+    ),
+    "UserBBSSchedSignin": GsBoolConfig(
+        "用户库街区每日任务",
+        "用户库街区每日任务",
         False,
     ),
     "SigninConcurrentNum2": GsIntConfig(
@@ -127,16 +122,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "所有查询使用自己的ck",
         False,
     ),
-    "BotRank": GsBoolConfig(
-        "bot排行",
-        "bot排行",
-        False,
-    ),
-    "CardUseOptions": GsStrConfig(
+    "CardUseOptions2": GsStrConfig(
         "排行面板数据启用规则（重启生效）",
         "排行面板数据启用规则",
         "不使用缓存",
-        options=["不使用缓存", "redis缓存", "内存缓存"],
+        options=["不使用缓存", "内存缓存"],
     ),
     "QQPicCache": GsBoolConfig(
         "排行榜qq头像缓存开关",

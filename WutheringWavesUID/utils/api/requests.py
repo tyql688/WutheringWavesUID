@@ -76,7 +76,7 @@ async def _check_response(
             msg = f"\n鸣潮账号id: 【{roleId}】未绑定库街区!!!\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮账号数据\n"
             return False, error_reply(WAVES_CODE_109, msg)
 
-        logger.warning(f"msg: {res.get('msg')}")
+        logger.warning(f"msg: {res.get('msg')} - data: {res.get('data')}")
 
         if res.get("msg") and "访问被阻断" in res["msg"]:
             return False, error_reply(WAVES_CODE_998)
@@ -182,6 +182,7 @@ class WavesApi:
         user_list = await WavesUser.get_waves_all_user()
         random.shuffle(user_list)
         ck_list = []
+        times = 1
         for user in user_list:
             if not await WavesUser.cookie_validate(user.uid):
                 continue
@@ -193,6 +194,10 @@ class WavesApi:
                 if "封禁" in data:
                     break
 
+                if times <= 0:
+                    break
+
+                times -= 1
                 continue
 
             ck_list.append(user.cookie)

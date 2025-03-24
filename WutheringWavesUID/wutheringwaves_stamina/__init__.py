@@ -37,6 +37,8 @@ async def send_daily_info_pic(bot: Bot, ev: Event):
 
 @scheduler.scheduled_job("interval", minutes=stamina_push_interval)
 async def waves_daily_info_notice_job():
+    if stamina_push_interval == 0:
+        return
     result = await get_notice_list()
     if not result:
         return

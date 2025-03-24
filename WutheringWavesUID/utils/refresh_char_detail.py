@@ -5,7 +5,8 @@ from typing import Dict, List, Optional, Union
 import aiofiles
 
 from gsuid_core.logger import logger
-
+from . import waves_card_cache
+from .resource.constant import SPECIAL_CHAR_INT
 from ..utils.api.model import AccountBaseInfo, RoleList
 from ..utils.error_reply import WAVES_CODE_101, WAVES_CODE_102, WAVES_CODE_999
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
@@ -16,8 +17,6 @@ from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
 from ..version import WWUID_Damage_Version
 from ..wutheringwaves_config import WutheringWavesConfig
-from . import waves_card_cache
-from .resource.constant import SPECIAL_CHAR_INT
 
 
 async def send_card(
@@ -29,10 +28,9 @@ async def send_card(
 ):
     waves_char_rank: Optional[List[WavesCharRank]] = None
 
-    CardUseOptions = WutheringWavesConfig.get_config("CardUseOptions").data
     WavesToken = WutheringWavesConfig.get_config("WavesToken").data
 
-    if CardUseOptions == "redis缓存" or WavesToken:
+    if WavesToken:
         waves_char_rank = await get_waves_char_rank(uid, save_data, True)
 
     await waves_card_cache.save_card(
