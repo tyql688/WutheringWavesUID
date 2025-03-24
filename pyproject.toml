@@ -35,7 +35,6 @@ license = { text = "GPL-3.0-or-later" }
 requires-python = ">=3.10, <4.0"
 dependencies = [
   "opencc>=1.1.9",
-  "redis>=5.2.1",
 ]
 name = "WutheringWavesUID"
 version = "1.0.0"
