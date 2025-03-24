@@ -632,7 +632,7 @@ async def draw_char_detail_img(
 
     is_online_user = False
     ck = ""
-    if not is_limit_query:
+    if not is_limit_query and not waves_api.is_net(uid):
         _, ck = await waves_api.get_ck_result(uid, user_id)
         if not ck:
             return hint.error_reply(WAVES_CODE_102)
