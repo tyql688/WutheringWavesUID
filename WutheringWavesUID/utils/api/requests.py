@@ -182,6 +182,7 @@ class WavesApi:
         user_list = await WavesUser.get_waves_all_user()
         random.shuffle(user_list)
         ck_list = []
+        times = 1
         for user in user_list:
             if not await WavesUser.cookie_validate(user.uid):
                 continue
@@ -193,6 +194,10 @@ class WavesApi:
                 if "封禁" in data:
                     break
 
+                if times <= 0:
+                    break
+
+                times -= 1
                 continue
 
             ck_list.append(user.cookie)
