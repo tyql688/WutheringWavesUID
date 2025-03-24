@@ -52,7 +52,7 @@ from ..utils.image import (
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.util import hide_uid
-from ..utils.waves_card_cache import get_card, get_rank, get_self_rank
+from ..utils.waves_card_cache import get_card
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 rank_length = 20  # 排行长度
@@ -282,10 +282,6 @@ async def draw_bot_rank_img(
     logger.info(f"[get_bot_rank_info_for_user] start: {start_time}")
     # 获取bot里的所有拥有该角色人的数据
     users = await WavesBind.get_all_data()
-    uids = await get_rank(char_id, rank_type)
-    if uids:
-        uids = set(uids)
-        users = [u for u in users if u.uid and set(u.uid.split("_")) & uids]
 
     tokenLimitFlag, wavesTokenUsersMap = await get_waves_token_condition(ev)
     if not users:
@@ -347,14 +343,6 @@ async def draw_bot_rank_img(
             ),
             (None, None),
         )
-
-    if not rankId and self_uid and role_detail:
-        rankId = await get_self_rank(char_id, rank_type, self_uid)
-        if rankId:
-            rankId = int(rankId) + 1
-            rankInfo = await get_one_rank_info(
-                ev.user_id, self_uid, role_detail, rankDetail
-            )
 
     rankInfoList = rankInfoList[:rank_length]
     if rankId and rankInfo and rankId > rank_length:
