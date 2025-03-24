@@ -11,7 +11,6 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
-
 from ..utils.api.model import RoleDetailData, WeaponData
 from ..utils.ascension.char import get_breach
 from ..utils.cache import TimedCache
@@ -52,7 +51,7 @@ from ..utils.image import (
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.util import hide_uid
-from ..utils.waves_card_cache import get_card, get_rank, get_self_rank
+from ..utils.waves_card_cache import get_card
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 rank_length = 20  # 排行长度
@@ -83,17 +82,8 @@ class RankInfo(BaseModel):
     sonata_name: str  # 合鸣效果
 
 
-CardUseOptions = WutheringWavesConfig.get_config("CardUseOptions").data
-
-
 async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
     equipPhantomList = role_detail.phantomData.equipPhantomList
-    weaponData = role_detail.weaponData
-    # phantom_sum_value = prepare_phantom(equipPhantomList)
-    # phantom_sum_value = enhance_summation_phantom_value(
-    #     role_detail.role.roleId, role_detail.role.level, role_detail.role.breach,
-    #     weaponData.weapon.weaponId, weaponData.level, weaponData.breach, weaponData.resonLevel,
-    #     phantom_sum_value)
 
     calc: WuWaCalc = WuWaCalc(role_detail)
     calc.phantom_pre = calc.prepare_phantom()
@@ -247,7 +237,7 @@ async def get_all_rank_info(
     return rankInfoList
 
 
-async def get_waves_token_condition(ev, is_bot):
+async def get_waves_token_condition(ev):
     wavesTokenUsersMap = {}
     flag = False
 
@@ -255,7 +245,7 @@ async def get_waves_token_condition(ev, is_bot):
     WavesRankUseTokenGroup = WutheringWavesConfig.get_config(
         "WavesRankNoLimitGroup"
     ).data
-    if not is_bot and WavesRankUseTokenGroup and ev.group_id in WavesRankUseTokenGroup:
+    if WavesRankUseTokenGroup and ev.group_id in WavesRankUseTokenGroup:
         return flag, wavesTokenUsersMap
 
     # 群组 自定义的
@@ -275,7 +265,7 @@ async def get_waves_token_condition(ev, is_bot):
 
 
 async def draw_rank_img(
-    bot: Bot, ev: Event, char: str, rank_type: str, is_bot: bool
+    bot: Bot, ev: Event, char: str, rank_type: str
 ) -> Union[str, bytes]:
     char_id = char_name_to_char_id(char)
     if not char_id:
@@ -296,23 +286,12 @@ async def draw_rank_img(
     start_time = time.time()
     logger.info(f"[get_rank_info_for_user] start: {start_time}")
     # 获取群里的所有拥有该角色人的数据
-    if is_bot:
-        # users = (await user_bind_cache.get_all()).values()
-        users = await WavesBind.get_all_data()
-        uids = await get_rank(char_id, rank_type)
-        if uids:
-            uids = set(uids)
-            users = [u for u in users if u.uid and set(u.uid.split("_")) & uids]
-    else:
-        users = await WavesBind.get_group_all_uid(ev.group_id)
+    users = await WavesBind.get_group_all_uid(ev.group_id)
 
-    tokenLimitFlag, wavesTokenUsersMap = await get_waves_token_condition(ev, is_bot)
+    tokenLimitFlag, wavesTokenUsersMap = await get_waves_token_condition(ev)
     if not users:
         msg = []
-        if is_bot:
-            msg.append(f"[鸣潮] bot内暂无【{char}】面板")
-        else:
-            msg.append(f"[鸣潮] 群【{ev.group_id}】暂无【{char}】面板")
+        msg.append(f"[鸣潮] 群【{ev.group_id}】暂无【{char}】面板")
         msg.append(f"请使用【{PREFIX}刷新面板】后再使用此功能！")
         if tokenLimitFlag:
             msg.append(
@@ -337,10 +316,7 @@ async def draw_rank_img(
     )
     if len(rankInfoList) == 0:
         msg = []
-        if is_bot:
-            msg.append(f"[鸣潮] bot内暂无【{char}】面板")
-        else:
-            msg.append(f"[鸣潮] 群【{ev.group_id}】暂无【{char}】面板")
+        msg.append(f"[鸣潮] 群【{ev.group_id}】暂无【{char}】面板")
         msg.append(f"请使用【{PREFIX}刷新面板】后再使用此功能！")
         if tokenLimitFlag:
             msg.append(
@@ -372,14 +348,6 @@ async def draw_rank_img(
             ),
             (None, None),
         )
-
-    if not rankId and is_bot and self_uid and role_detail:
-        rankId = await get_self_rank(char_id, rank_type, self_uid)
-        if rankId:
-            rankId = int(rankId) + 1
-            rankInfo = await get_one_rank_info(
-                ev.user_id, self_uid, role_detail, rankDetail
-            )
 
     rankInfoList = rankInfoList[:rank_length]
     if rankId and rankInfo and rankId > rank_length:
@@ -578,18 +546,12 @@ async def draw_rank_img(
     if char_id in SPECIAL_CHAR_NAME:
         char_name = SPECIAL_CHAR_NAME[char_id]
 
-    if is_bot:
-        title_name = f"{char_name}{rank_type}bot排行"
-    else:
-        title_name = f"{char_name}{rank_type}群排行"
+    title_name = f"{char_name}{rank_type}群排行"
     title_draw.text((140, 265), f"{title_name}", "black", waves_font_30, "lm")
 
     # 备注
     rank_row_title = "入榜条件"
-    if is_bot:
-        rank_row = f"1.使用命令【{PREFIX}刷新面板】刷新过面板"
-    else:
-        rank_row = f"1.本群内使用命令【{PREFIX}刷新面板】刷新过面板"
+    rank_row = f"1.本群内使用命令【{PREFIX}刷新面板】刷新过面板"
     title_draw.text((20, 420), f"{rank_row_title}", SPECIAL_GOLD, waves_font_16, "lm")
     title_draw.text((90, 420), f"{rank_row}", GREY, waves_font_16, "lm")
     if tokenLimitFlag:

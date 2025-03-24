@@ -11,21 +11,6 @@ from gsuid_core.utils.plugins_config.models import (
 )
 
 CONFIG_DEFAULT: Dict[str, GSC] = {
-    "RedisFromUrl": GsStrConfig(
-        "Redis连接配置",
-        "Redis连接配置",
-        "redis://127.0.0.1:6379/0",
-    ),
-    "IsRedisCluster": GsBoolConfig(
-        "Redis集群开关",
-        "Redis集群开关",
-        False,
-    ),
-    "StartServerRedisLoad": GsBoolConfig(
-        "开启后，在启动GsCore时，redis加载排行数据",
-        "开启后，在启动GsCore时，redis加载排行数据",
-        False,
-    ),
     "WavesAnnGroups": GsDictConfig(
         "推送公告群组",
         "鸣潮公告推送群组",
@@ -127,16 +112,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "所有查询使用自己的ck",
         False,
     ),
-    "BotRank": GsBoolConfig(
-        "bot排行",
-        "bot排行",
-        False,
-    ),
     "CardUseOptions": GsStrConfig(
         "排行面板数据启用规则（重启生效）",
         "排行面板数据启用规则",
         "不使用缓存",
-        options=["不使用缓存", "redis缓存", "内存缓存"],
+        options=["不使用缓存", "内存缓存"],
     ),
     "QQPicCache": GsBoolConfig(
         "排行榜qq头像缓存开关",
