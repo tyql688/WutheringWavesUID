@@ -28,7 +28,22 @@ SIGN_STATUS = {
 }
 
 
+async def get_signin_config():
+    from ..wutheringwaves_config import WutheringWavesConfig
+
+    return WutheringWavesConfig.get_config("UserSchedSignin").data
+
+
+async def get_bbs_signin_config():
+    from ..wutheringwaves_config import WutheringWavesConfig
+
+    return WutheringWavesConfig.get_config("UserBBSSchedSignin").data
+
+
 async def sign_up_handler(bot: Bot, ev: Event):
+    if not await get_signin_config() and not await get_bbs_signin_config():
+        return "签到功能未开启"
+
     uid_list = await WavesBind.get_uid_list_by_game(ev.user_id, ev.bot_id)
     if uid_list is None:
         return ERROR_CODE[WAVES_CODE_102]
@@ -45,31 +60,32 @@ async def sign_up_handler(bot: Bot, ev: Event):
             if token == "":
                 expire_uid.append(uid)
             continue
-        # succ, _ = await waves_api.refresh_data(uid, token)
-        # if not succ:
-        #     expire_uid.append(uid)
-        #     continue
 
         # 签到状态
         signed = False
-        sign_res = await waves_api.sign_in_task_list(uid, token)
-        if isinstance(sign_res, dict):
-            signed = sign_res.get("data", {}).get("isSigIn", False)
+        if await get_signin_config():
+            sign_res = await waves_api.sign_in_task_list(uid, token)
+            if isinstance(sign_res, dict):
+                signed = sign_res.get("data", {}).get("isSigIn", False)
 
-        if not signed:
-            res = await sign_in(uid, token)
-            if "成功" in res:
-                signed = True
+            if not signed:
+                res = await sign_in(uid, token)
+                if "成功" in res:
+                    signed = True
 
         msg_temp["signed"] = signed
 
-        bbs_signed = await do_single_task(uid, token)
-        if isinstance(bbs_signed, dict) and all(bbs_signed.values()):
-            msg_temp["bbs_signed"] = True
-        elif isinstance(bbs_signed, bool):
-            msg_temp["bbs_signed"] = bbs_signed
-        else:
-            msg_temp["bbs_signed"] = False
+        bbs_signed = False
+        if await get_bbs_signin_config():
+            bbs_signed = await do_single_task(uid, token)
+            if isinstance(bbs_signed, dict) and all(bbs_signed.values()):
+                bbs_signed = True
+            elif isinstance(bbs_signed, bool):
+                pass
+            else:
+                bbs_signed = False
+
+        msg_temp["bbs_signed"] = bbs_signed
 
         to_msg[uid] = msg_temp
 
@@ -82,8 +98,15 @@ async def sign_up_handler(bot: Bot, ev: Event):
 
     for uid, msg in to_msg.items():
         msg_list.append(f"特征码: {uid}")
-        msg_list.append(f"签到状态: {SIGN_STATUS[msg['signed']]}")
-        msg_list.append(f"社区签到状态: {SIGN_STATUS[msg['bbs_signed']]}")
+        if await get_signin_config():
+            msg_list.append(f"签到状态: {SIGN_STATUS[msg['signed']]}")
+        else:
+            msg_list.append("签到状态: 功能未开启")
+        if await get_bbs_signin_config():
+            msg_list.append(f"社区签到状态: {SIGN_STATUS[msg['bbs_signed']]}")
+        else:
+            msg_list.append("社区签到状态: 功能未开启")
+
         msg_list.append("-----------------------------")
 
     for uid in expire_uid:

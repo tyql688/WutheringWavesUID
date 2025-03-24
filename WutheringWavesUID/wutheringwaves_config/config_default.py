@@ -39,12 +39,12 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     "SchedSignin": GsBoolConfig(
         "定时签到",
         "开启后每晚00:10将开始自动签到任务",
-        True,
+        False,
     ),
     "BBSSchedSignin": GsBoolConfig(
         "定时库街区每日任务",
-        "开启后每晚00:20将开始自动库街区每日任务",
-        True,
+        "开启后每晚00:10将开始自动库街区每日任务",
+        False,
     ),
     "PrivateSignReport": GsBoolConfig(
         "签到私聊报告",
@@ -64,6 +64,16 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     "SigninMaster": GsBoolConfig(
         "全部开启签到",
         "开启后自动帮登录的人签到",
+        False,
+    ),
+    "UserSchedSignin": GsBoolConfig(
+        "用户签到开关",
+        "用户签到开关",
+        False,
+    ),
+    "UserBBSSchedSignin": GsBoolConfig(
+        "用户库街区每日任务",
+        "用户库街区每日任务",
         False,
     ),
     "SigninConcurrentNum2": GsIntConfig(
