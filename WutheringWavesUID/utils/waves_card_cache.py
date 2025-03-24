@@ -16,7 +16,7 @@ from .waves_card_local_cache import (
 )
 from ..wutheringwaves_config import WutheringWavesConfig
 
-CardUseOptions = WutheringWavesConfig.get_config("CardUseOptions").data
+CardUseOptions = WutheringWavesConfig.get_config("CardUseOptions2").data
 
 
 async def load_player_data(file_path: Path, all_card: Dict):
