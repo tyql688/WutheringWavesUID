@@ -151,6 +151,17 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "刷新面板通知文案",
         True,
     ),
+    "RefreshInterval": GsIntConfig(
+        "刷新面板间隔，重启生效（单位秒）",
+        "刷新面板间隔，重启生效（单位秒）",
+        0,
+        600,
+    ),
+    "RefreshIntervalNotify": GsStrConfig(
+        "刷新面板间隔通知文案",
+        "刷新面板间隔通知文案",
+        "请等待{}s后尝试刷新面板！",
+    ),
     "HideUid": GsBoolConfig(
         "隐藏uid",
         "隐藏uid",

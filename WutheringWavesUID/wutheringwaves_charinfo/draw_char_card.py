@@ -161,10 +161,6 @@ damage_bar1 = Image.open(TEXT_PATH / "damage_bar1.png")
 damage_bar2 = Image.open(TEXT_PATH / "damage_bar2.png")
 
 
-def is_limit_user(uid):
-    return uid == "1"
-
-
 async def get_one_rank(item: OneRankRequest) -> Optional[OneRankResponse]:
     WavesToken = WutheringWavesConfig.get_config("WavesToken").data
 

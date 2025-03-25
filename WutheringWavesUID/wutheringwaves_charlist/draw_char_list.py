@@ -60,16 +60,11 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
 
     # 根据面板数据获取详细信息
     all_role_detail = None
-    if "刷新" in ev.command:
+    all_role_detail = await get_all_role_detail_info(uid)
+    if not all_role_detail:
         waves_datas = await refresh_char(uid, user_id, ck=ck)
         if isinstance(waves_datas, str):
             return waves_datas
-    else:
-        all_role_detail = await get_all_role_detail_info(uid)
-        if not all_role_detail:
-            waves_datas = await refresh_char(uid, user_id, ck=ck)
-            if isinstance(waves_datas, str):
-                return waves_datas
 
     if not all_role_detail:
         all_role_detail = await get_all_role_detail_info(uid)
