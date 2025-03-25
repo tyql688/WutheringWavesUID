@@ -82,6 +82,7 @@ from ..utils.resource.constant import (
     DEAFAULT_WEAPON_ID,
     SPECIAL_CHAR,
     WEAPON_TYPE_ID_MAP,
+    get_short_name,
 )
 from ..utils.resource.download_file import (
     get_chain_img,
@@ -256,8 +257,9 @@ async def ph_card_draw(
                     .replace("（", " ")
                     .replace("）", "")
                 )
+                short_name = get_short_name(_phantom.phantomProp.phantomId, phantomName)
                 sh_temp_draw.text(
-                    (130, 40), f"{phantomName}", SPECIAL_GOLD, waves_font_28, "lm"
+                    (130, 40), f"{short_name}", SPECIAL_GOLD, waves_font_28, "lm"
                 )
 
                 # 声骸等级背景
@@ -1137,8 +1139,9 @@ async def draw_char_score_img(
                     .replace("（", " ")
                     .replace("）", "")
                 )
+                short_name = get_short_name(_phantom.phantomProp.phantomId, phantomName)
                 sh_temp_draw.text(
-                    (130, 40), f"{phantomName}", SPECIAL_GOLD, waves_font_28, "lm"
+                    (130, 40), f"{short_name}", SPECIAL_GOLD, waves_font_28, "lm"
                 )
 
                 # 声骸等级背景
