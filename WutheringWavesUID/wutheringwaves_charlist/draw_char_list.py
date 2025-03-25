@@ -65,9 +65,9 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
 
     # 根据面板数据获取详细信息
     all_role_detail = await get_all_roleid_detail_info_int(uid)
-    if not all_role_detail and waves_api.is_net(uid):
-        return error_reply(WAVES_CODE_099)
-    else:
+    if not all_role_detail:
+        if waves_api.is_net(uid):
+            return error_reply(WAVES_CODE_099)
         return error_reply(WAVES_CODE_107)
 
     waves_char_rank = await get_waves_char_rank(uid, all_role_detail)
