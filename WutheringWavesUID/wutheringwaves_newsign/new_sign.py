@@ -100,12 +100,8 @@ async def sign_up_handler(bot: Bot, ev: Event):
         msg_list.append(f"特征码: {uid}")
         if await get_signin_config():
             msg_list.append(f"签到状态: {SIGN_STATUS[msg['signed']]}")
-        else:
-            msg_list.append("签到状态: 功能未开启")
         if await get_bbs_signin_config():
             msg_list.append(f"社区签到状态: {SIGN_STATUS[msg['bbs_signed']]}")
-        else:
-            msg_list.append("社区签到状态: 功能未开启")
 
         msg_list.append("-----------------------------")
 
