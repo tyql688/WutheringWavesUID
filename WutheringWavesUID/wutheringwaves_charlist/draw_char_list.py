@@ -10,7 +10,7 @@ from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
 from ..utils.ascension.weapon import get_breach
 from ..utils.char_info_utils import get_all_role_detail_info
-from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
+from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107, WAVES_CODE_099
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
 from ..utils.fonts.waves_fonts import (
     waves_font_15,
@@ -66,7 +66,9 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
     # 根据面板数据获取详细信息
     all_role_detail = None
     all_role_detail = await get_all_role_detail_info(uid)
-    if not all_role_detail:
+    if not all_role_detail and waves_api.is_net(uid):
+        return error_reply(WAVES_CODE_099)
+    else:
         waves_datas = await refresh_char(uid, user_id, ck=ck)
         if isinstance(waves_datas, str):
             return waves_datas
