@@ -8,9 +8,10 @@ from gsuid_core.models import Event
 from gsuid_core.subscribe import gs_subscribe
 from gsuid_core.sv import SV
 from gsuid_core.utils.image.convert import convert_img
+
+from ..wutheringwaves_config import WutheringWavesConfig
 from .ann_card import ann_detail_card, ann_list_card
 from .main import ann
-from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 sv_ann = SV("鸣潮公告")
 sv_ann_sub = SV("订阅鸣潮公告", pm=3)
@@ -19,7 +20,7 @@ task_name_ann = "订阅鸣潮公告"
 ann_minute_check: int = WutheringWavesConfig.get_config("AnnMinuteCheck").data
 
 
-@sv_ann.on_command(f"公告")
+@sv_ann.on_command("公告")
 async def ann_(bot: Bot, ev: Event):
     ann_id = ev.text
     if not ann_id:
@@ -35,7 +36,7 @@ async def ann_(bot: Bot, ev: Event):
     await bot.send(img)
 
 
-@sv_ann_sub.on_fullmatch(f"订阅公告")
+@sv_ann_sub.on_fullmatch("订阅公告")
 async def sub_ann_(bot: Bot, ev: Event):
     if ev.group_id is None:
         return await bot.send("请在群聊中订阅")
@@ -56,7 +57,7 @@ async def sub_ann_(bot: Bot, ev: Event):
     await bot.send("成功订阅鸣潮公告!")
 
 
-@sv_ann_sub.on_fullmatch((f"取消订阅公告", f"{PREFIX}取消公告", f"{PREFIX}退订公告"))
+@sv_ann_sub.on_fullmatch(("取消订阅公告", "取消公告", "退订公告"))
 async def unsub_ann_(bot: Bot, ev: Event):
     if ev.group_id is None:
         return await bot.send("请在群聊中取消订阅")

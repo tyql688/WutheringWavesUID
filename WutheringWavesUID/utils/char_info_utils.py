@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Union, Generator
+from typing import Any, Dict, Generator, Union
 
 import aiofiles
 
@@ -31,3 +31,21 @@ async def get_all_role_detail_info(uid: str) -> Union[Dict[str, RoleDetailData],
     if not _all:
         return None
     return {r.role.roleName: r for r in _all}
+
+
+async def get_all_roleid_detail_info(
+    uid: str,
+) -> Union[Dict[str, RoleDetailData], None]:
+    _all = await get_all_role_detail_info_list(uid)
+    if not _all:
+        return None
+    return {str(r.role.roleId): r for r in _all}
+
+
+async def get_all_roleid_detail_info_int(
+    uid: str,
+) -> Union[Dict[int, RoleDetailData], None]:
+    _all = await get_all_role_detail_info_list(uid)
+    if not _all:
+        return None
+    return {r.role.roleId: r for r in _all}

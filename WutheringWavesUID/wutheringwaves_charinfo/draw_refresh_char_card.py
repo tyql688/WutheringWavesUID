@@ -35,7 +35,7 @@ from ..utils.image import (
     get_waves_bg,
 )
 from ..utils.refresh_char_detail import refresh_char
-from ..utils.resource.constant import NAME_ALIAS
+from ..utils.resource.constant import NAME_ALIAS, SPECIAL_CHAR_NAME
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
@@ -284,7 +284,8 @@ async def draw_pic(char_rank: WavesCharRank, isUpdate=False):
     img_draw = ImageDraw.Draw(img)
     img.alpha_composite(resize_pic, (50, 50))
     # 名字
-    roleName = NAME_ALIAS.get(char_rank.roleName, char_rank.roleName)
+    roleName = SPECIAL_CHAR_NAME.get(str(char_rank.roleId), char_rank.roleName)
+
     img_draw.text((150, 290), f"{roleName}", "white", waves_font_40, "mm")
     # 命座
     info_block = Image.new("RGBA", (80, 40), color=(255, 255, 255, 0))

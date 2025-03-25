@@ -6,33 +6,34 @@ from PIL import Image, ImageDraw
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
+
 from ..utils.api.model import (
-    AccountBaseInfo,
     AbyssChallenge,
-    RoleList,
-    RoleDetailData,
     AbyssFloor,
+    AccountBaseInfo,
+    RoleDetailData,
+    RoleList,
 )
-from ..utils.char_info_utils import get_all_role_detail_info
+from ..utils.char_info_utils import get_all_roleid_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
 from ..utils.fonts.waves_fonts import (
-    waves_font_30,
+    waves_font_18,
     waves_font_25,
     waves_font_26,
-    waves_font_42,
+    waves_font_30,
     waves_font_32,
-    waves_font_18,
-    waves_font_40,
     waves_font_36,
+    waves_font_40,
+    waves_font_42,
 )
 from ..utils.hint import error_reply
 from ..utils.image import (
-    get_waves_bg,
-    add_footer,
     GOLD,
     GREY,
-    get_square_avatar,
+    add_footer,
     get_event_avatar,
+    get_square_avatar,
+    get_waves_bg,
 )
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
@@ -95,13 +96,13 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     succ, account_info = await waves_api.get_base_info(uid, ck)
     if not succ:
         return account_info
-    account_info = AccountBaseInfo(**account_info)
+    account_info = AccountBaseInfo.model_validate(account_info)
 
     # 共鸣者信息
     succ, role_info = await waves_api.get_role_info(uid, ck)
     if not succ:
         return role_info
-    role_info = RoleList(**role_info)
+    role_info = RoleList.model_validate(role_info)
 
     # 深渊
     abyss_data = await get_abyss_data(uid, ck, is_self_ck)
@@ -161,7 +162,7 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
         card_img.paste(title_bar, (-20, 70), title_bar)
 
     # 根据面板数据获取详细信息
-    role_detail_info_map = await get_all_role_detail_info(uid)
+    role_detail_info_map = await get_all_roleid_detail_info(uid)
 
     # frame
     frame = Image.open(TEXT_PATH / "frame.png")
@@ -206,7 +207,7 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                 ).convert("RGBA")
                 abyss_bg = abyss_bg.resize((abyss_bg.size[0] + 100, abyss_bg.size[1]))
                 abyss_bg_temp = Image.new("RGBA", abyss_bg.size)
-                name_bg = Image.open(TEXT_PATH / f"name_bg.png")
+                name_bg = Image.open(TEXT_PATH / "name_bg.png")
                 name_bg_draw = ImageDraw.Draw(name_bg)
                 if floor.floor == 1:
                     _floor = "一"
@@ -224,9 +225,9 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                 # 星数
                 for i in range(3):
                     if i + 1 <= floor.star:
-                        star_bg = Image.open(TEXT_PATH / f"star_full.png")
+                        star_bg = Image.open(TEXT_PATH / "star_full.png")
                     else:
-                        star_bg = Image.open(TEXT_PATH / f"star_empty.png")
+                        star_bg = Image.open(TEXT_PATH / "star_empty.png")
                     abyss_bg_temp.paste(star_bg, (10 + i * 70, 50), star_bg)
 
                 if floor.roleList:
@@ -239,6 +240,8 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                             ),
                             None,
                         )
+                        if not role:
+                            continue
 
                         avatar = await draw_pic(role.roleId)
                         char_bg = Image.open(TEXT_PATH / f"char_bg{role.starLevel}.png")
@@ -249,9 +252,11 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                         char_bg.paste(avatar, (0, 0), avatar)
                         if (
                             role_detail_info_map
-                            and role.roleName in role_detail_info_map
+                            and str(role.roleId) in role_detail_info_map
                         ):
-                            temp: RoleDetailData = role_detail_info_map[role.roleName]
+                            temp: RoleDetailData = role_detail_info_map[
+                                str(role.roleId)
+                            ]
                             info_block = Image.new(
                                 "RGBA", (40, 20), color=(255, 255, 255, 0)
                             )
