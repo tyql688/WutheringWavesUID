@@ -1,7 +1,6 @@
 
 # 标准库
 import re
-import os
 import ssl
 import httpx
 import base64
@@ -10,9 +9,8 @@ import asyncio
 import numpy as np
 from PIL import Image
 from io import BytesIO
-from pathlib import Path
 from opencc import OpenCC
-from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientTimeout
 
 # 项目内部模块
 from gsuid_core.bot import Bot
@@ -89,19 +87,43 @@ async def get_global_session():
         logger.info("[鸣潮]已创建新的全局 OCR 会话")
     return OCR_SESSION
 
+async def check_ocr_link_accessible() -> bool:
+    """
+    检查OCR.space示例链接是否能正常访问，返回布尔值。
+    """
+    url = "https://api.ocr.space/parse/imageurl"
+    payload = {
+        'url': 'https://dl.a9t9.com/ocr/solarcell.jpg',
+        'apikey': 'helloworld',
+    }
+    try:
+        session = await get_global_session()  # 复用全局会话
+        async with session.get(url, data=payload, timeout=10) as response:
+            data = await response.json()
+            logger.info(f"[鸣潮]OCR.space示例链接访问成功，状态码为 {response.status}\n内容：{data}")
+            return response.status == 200
+    except (aiohttp.ClientError, asyncio.TimeoutError):
+        logger.info("[鸣潮]OCR.space 访问示例链接失败，请检查网络或服务状态。")
+        return False
+
 async def async_ocr(bot: Bot, ev: Event):
     """
     异步OCR识别函数
     """
     API_KEY = WutheringWavesConfig.get_config("OCRspaceApiKey").data  # 从控制台获取OCR.space的API密钥
     if not API_KEY:
-        logger.info(f"[鸣潮]OCRspace API密钥为空！请检查控制台是否填入API密钥。")
-        await bot.send(f"[鸣潮]OCRspace API密钥为空！请检查控制台是否填入API密钥。")
+        logger.info("[鸣潮] OCRspace API密钥为空！请检查控制台。")
+        await bot.send("[鸣潮] OCRspace API密钥未配置，请检查控制台。")
+        return False
+
+    # 检查示例链接是否可达
+    if not await check_ocr_link_accessible():
+        await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
         return False
 
     bool_i, image = await upload_discord_bot_card(bot, ev)
     if not bool_i:
-        await bot.send(f"[鸣潮]获取dc卡片图失败！卡片分析已停止。")
+        await bot.send("[鸣潮]获取dc卡片图失败！卡片分析已停止。")
         return False
 
     # 获取dc卡片识别结果,使用API_KEY
@@ -110,8 +132,8 @@ async def async_ocr(bot: Bot, ev: Event):
     logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
 
     if ocr_results[0]['error']:
-        logger.info(f"[鸣潮]OCRspace识别访问失败！请检查控制台API密钥是否正确，服务器网络是否正常。")
-        await bot.send(f"[鸣潮]OCRspace识别访问失败！请检查控制台API密钥是否正确，服务器网络是否正常。")
+        logger.info("[鸣潮]OCRspace识别失败！请检查控制台API密钥是否正确，或服务器网络是否正常。")
+        await bot.send("[鸣潮]OCRspace识别失败！请检查控制台API密钥是否正确，或服务器网络是否正常。")
         return False
 
     bool_d, final_result = await ocr_results_to_dict(chain_num, ocr_results)
@@ -119,7 +141,7 @@ async def async_ocr(bot: Bot, ev: Event):
     if bool_d:
         await save_card_dict_to_json(bot, ev, final_result)
     else:
-        await bot.send(f"[鸣潮]Please use chinese card！")
+        await bot.send("[鸣潮]Please use chinese card！")
     
 
 async def get_image(ev: Event):
@@ -176,16 +198,16 @@ async def upload_discord_bot_card(bot: Bot, ev: Event):
 
             if retcode == 200:
                 success = True
-                logger.success(f'[鸣潮]图片获取完成！')
+                logger.success('[鸣潮]图片获取完成！')
             else:
                 logger.warning(f"[鸣潮]图片获取失败！错误码{retcode}")
 
         except Exception as e:
             logger.error(e)
-            logger.warning(f"[鸣潮]图片获取失败！")
+            logger.warning("[鸣潮]图片获取失败！")
 
     if success:
-        await bot.send(f"[鸣潮]上传卡片图成功！进行数据提取中...\n", at_sender)
+        await bot.send("[鸣潮]上传卡片图成功！进行数据提取中...\n", at_sender)
         image = Image.open(BytesIO(image_data))
         return True, image
     else:
@@ -279,7 +301,7 @@ def analyze_chain_num(image):
             chain_num += 1
             continue
         if chain_bool and not is_chain_color(color):
-            logger.debug(f"[鸣潮]卡片分析 共鸣链识别出现断裂错误")
+            logger.debug("[鸣潮]卡片分析 共鸣链识别出现断裂错误")
             return 0
         
     return chain_num
@@ -488,12 +510,9 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         # 强化文本清洗
         text_clean = re.sub(r'[^0-9/]', '', text)  # 移除非数字字符
         match = patterns["skill_level"].search(text_clean)
-        if match:
-            try:
-                level = int(match.group(1))
-                final_result["技能等级"].append(min(level, 10))  # 限制最大等级为10
-            except:
-                final_result["技能等级"].append(1)
+        level = int(match.group(1))
+        if level:
+            final_result["技能等级"].append(min(level, 10))  # 限制最大等级为10
         else:
             final_result["技能等级"].append(1)
 
