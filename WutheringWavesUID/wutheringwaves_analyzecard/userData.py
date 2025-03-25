@@ -162,7 +162,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
     waves_data.append(data)
     await save_card_info(uid, waves_data)
-    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n可使用：\n【{PREFIX}绑定{uid}】绑定您的角色\n【{PREFIX}改{char_name_print}(套装**)(声骸)】手动修改存储在本地的声骸套装(两个括号的指令不必都出现)，例如：【{PREFIX}改{char_name_print}套装衍射套】或【{PREFIX}改{char_name_print}声骸】", at_sender)
+    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n请务必使用：\n【{PREFIX}{char_name_print}面板】检查角色是否识别成功\n【{PREFIX}改{char_name_print}(套装**)(声骸)】修改识别的声骸套装数据(括号内指令不必都出现)，例如：【{PREFIX}改{char_name_print}套装衍射套】或【{PREFIX}改{char_name_print}声骸】", at_sender)
     logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name_print}面板数据已保存到本地！")
 
 def get_breach(level: int):
