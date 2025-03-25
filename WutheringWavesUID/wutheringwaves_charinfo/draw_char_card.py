@@ -407,7 +407,7 @@ async def get_role_need(
     if waves_id and not waves_api.is_net(waves_id):
         query_list = [char_id]
         if char_id in SPECIAL_CHAR:
-            query_list = SPECIAL_CHAR.copy()
+            query_list = SPECIAL_CHAR.copy()[char_id]
 
         for char_id in query_list:
             succ, role_detail_info = await waves_api.get_role_detail_info(
@@ -441,13 +441,15 @@ async def get_role_need(
         )
 
         if char_id in SPECIAL_CHAR:
-            query_list = SPECIAL_CHAR.copy()
+            query_list = SPECIAL_CHAR.copy()[char_id]
         else:
             query_list = [char_id]
 
-        for char_id in query_list:
-            if all_role_detail and char_id in all_role_detail:
-                role_detail: RoleDetailData = all_role_detail[char_id]
+        logger.info(f"query_list: {query_list}")
+
+        for temp_char_id in query_list:
+            if all_role_detail and temp_char_id in all_role_detail:
+                role_detail: RoleDetailData = all_role_detail[temp_char_id]
                 break
         else:
             if is_limit_query:
@@ -455,26 +457,20 @@ async def get_role_need(
                     None,
                     f"[鸣潮] 未找到【{char_name}】角色极限面板信息，请等待适配!\n",
                 )
+            elif is_online_user:
+                return (
+                    None,
+                    f"[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n",
+                )
             else:
-                if is_limit_query:
-                    return (
-                        None,
-                        f"[鸣潮] 未找到【{char_name}】角色极限面板信息，请等待适配!\n",
-                    )
-                elif is_online_user:
+                # 未上线的角色，构造一个数据
+                gen_role_detail = await generate_online_role_detail(char_id)
+                if not gen_role_detail:
                     return (
                         None,
                         f"[鸣潮] 未找到【{char_name}】角色信息, 国服用户请使用[{PREFIX}刷新面板]进行刷新!，国际服用户请使用[{PREFIX}分析]上传数据\n",
                     )
-                else:
-                    # 未上线的角色，构造一个数据
-                    gen_role_detail = await generate_online_role_detail(char_id)
-                    if not gen_role_detail:
-                        return (
-                            None,
-                            f"[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n",
-                        )
-                    role_detail = gen_role_detail
+                role_detail = gen_role_detail
 
     return avatar, role_detail
 
