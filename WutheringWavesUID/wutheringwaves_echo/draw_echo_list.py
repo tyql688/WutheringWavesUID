@@ -78,26 +78,13 @@ async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
         if not role_detail.phantomData.equipPhantomList:
             continue
         equipPhantomList = role_detail.phantomData.equipPhantomList
-        weaponData = role_detail.weaponData
-        # phantom_sum_value = prepare_phantom(equipPhantomList)
-        # phantom_sum_value = enhance_summation_phantom_value(
-        #     role_detail.role.roleId,
-        #     role_detail.role.level,
-        #     role_detail.role.breach,
-        #     weaponData.weapon.weaponId,
-        #     weaponData.level,
-        #     weaponData.breach,
-        #     weaponData.resonLevel,
-        #     phantom_sum_value,
-        # )
-        # calc_temp = get_calc_map(phantom_sum_value, role_detail.role.roleName)
 
         calc: WuWaCalc = WuWaCalc(role_detail)
         calc.phantom_pre = calc.prepare_phantom()
         calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
         calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
 
-        for i, _phantom in enumerate(equipPhantomList):
+        for i, _phantom in enumerate(equipPhantomList):  # type: ignore
             if not _phantom:
                 continue
             if not _phantom.phantomProp:

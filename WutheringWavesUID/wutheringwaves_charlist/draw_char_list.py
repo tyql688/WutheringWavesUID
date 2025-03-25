@@ -9,7 +9,7 @@ from gsuid_core.utils.image.image_tools import crop_center_img
 
 from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
 from ..utils.ascension.weapon import get_breach
-from ..utils.char_info_utils import get_all_role_detail_info
+from ..utils.char_info_utils import get_all_roleid_detail_info_int
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
 from ..utils.fonts.waves_fonts import (
@@ -55,19 +55,11 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
     # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck)
     if not succ:
-        return account_info
+        return account_info  # type: ignore
     account_info = AccountBaseInfo.model_validate(account_info)
 
     # 根据面板数据获取详细信息
-    all_role_detail = None
-    all_role_detail = await get_all_role_detail_info(uid)
-    if not all_role_detail:
-        waves_datas = await refresh_char(uid, user_id, ck=ck)
-        if isinstance(waves_datas, str):
-            return waves_datas
-
-    if not all_role_detail:
-        all_role_detail = await get_all_role_detail_info(uid)
+    all_role_detail = await get_all_roleid_detail_info_int(uid)
     if not all_role_detail:
         return error_reply(WAVES_CODE_107)
 
@@ -132,7 +124,7 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
 
     for index, _rank in enumerate(waves_char_rank):
         _rank: WavesCharRank
-        role_detail: RoleDetailData = all_role_detail[_rank.roleName]
+        role_detail: RoleDetailData = all_role_detail[_rank.roleId]
         bar_star = Image.open(TEXT_PATH / f"bar_{_rank.starLevel}star.png")
         bar_star_draw = ImageDraw.Draw(bar_star)
         role_avatar = await draw_pic(role_detail.role.roleId)
@@ -140,7 +132,7 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
         bar_star.paste(role_avatar, (60, 0), role_avatar)
 
         role_attribute = await get_attribute(
-            role_detail.role.attributeName, is_simple=True
+            role_detail.role.attributeName, is_simple=True  # type: ignore
         )
         role_attribute = role_attribute.resize((40, 40)).convert("RGBA")
         bar_star.alpha_composite(role_attribute, (170, 20))
@@ -216,7 +208,7 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
         _x = 220 + 43 * len(weaponData.weapon.weaponName)
         _y = 37
 
-        wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)
+        wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)  # type: ignore
         weapon_bg_temp_draw.rounded_rectangle(
             [_x - 15, _y - 15, _x + 50, _y + 15], radius=7, fill=wrc_fill
         )
@@ -225,7 +217,7 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
         )
 
         weapon_breach = get_breach(weaponData.breach, weaponData.level)
-        for i in range(0, weapon_breach):
+        for i in range(0, weapon_breach):  # type: ignore
             promote_icon = Image.open(TEXT_PATH / "promote_icon.png")
             weapon_bg_temp.alpha_composite(promote_icon, dest=(200 + 40 * i, 100))
 

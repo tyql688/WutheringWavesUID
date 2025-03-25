@@ -78,6 +78,9 @@ async def _check_response(
 
         logger.warning(f"msg: {res.get('msg')} - data: {res.get('data')}")
 
+        if res.get("msg") and ("重新登录" in res["msg"] or "登录已过期" in res["msg"]):
+            return False, res.get("msg", "登录已过期")
+
         if res.get("msg") and "访问被阻断" in res["msg"]:
             return False, error_reply(WAVES_CODE_998)
 
