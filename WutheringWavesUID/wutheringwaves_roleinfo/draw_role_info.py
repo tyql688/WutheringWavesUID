@@ -1,5 +1,4 @@
 from pathlib import Path
-from tkinter import N
 from typing import Optional
 
 from PIL import Image, ImageDraw
