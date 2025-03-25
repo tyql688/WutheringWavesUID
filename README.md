@@ -20,7 +20,7 @@
 >
 > 如使用命令缺失素材可尝试使用命令`ww下载全部资源`
 >
-> [补充文档地址](https://wiki.wavesuid.top/)
+> bot部署[补充文档地址](https://wiki.wavesuid.top/)，国际服用户使用`ww分析`命令前请先于控制台`修改插件设定`处填充`OCRspace API Key`
 > 
 > 国际服用户可以基于 `Discord` 图片识别使用 `WutheringWavesUID` -> [传送门](https://github.com/moonshadow1976/WutheringWavesUID)
 >
@@ -34,17 +34,23 @@
 
 ## 丨反馈渠道
 
-- QQ群号：[76436110](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=hmB3ejtTx6cIDHegsLM91jd1Rn97eGAe&authKey=HqcnRdI0S98dUBcpHxwjWv72LYpUYE%2BSXVOEjiuBrAZbepCHPzP86szZFhxeiQkG&noverify=0&group_code=76436110)
+- QQ群：[76436110](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=hmB3ejtTx6cIDHegsLM91jd1Rn97eGAe&authKey=HqcnRdI0S98dUBcpHxwjWv72LYpUYE%2BSXVOEjiuBrAZbepCHPzP86szZFhxeiQkG&noverify=0&group_code=76436110)
+  
+#### 丨选择直接使用
+
+- QQ群：[1037977938](https://qm.qq.com/cgi-bin/qm/qr?authKey=slEX2BdUTZLlDcIxQ6X%2FfK20955frbHuysDHtZpRzaiOyKg6i4BlimWCyNFMYOpC&k=LoFWlKzrv-nrd1dfBPfjo2GZ256octsB&noverify=0&group_code=1037977938)
+- Lark Group: [wuwa](https://applink.larksuite.com/client/chat/chatter/add_by_link?link_token=00bld93f-427b-45c8-b104-c6be61ougc7m) `对wwuid的支持并不完整，可以的话请加QQ群使用`
+- Discord Group: [None] `由于网络限制，并没有部署bot`
 
 ## 丨功能
 
 <details><summary>帮助 - 命令: ww帮助</summary><p>
-<a><img src="https://s2.loli.net/2024/12/22/DR9oWlcwpdkmt87.jpg"></a>
+<a><img src="https://s21.ax1x.com/2025/03/25/pEDZSds.jpg"></a>
 </p></details>
 <details><summary>面板图 - 命令: ww椿面板</summary><p>
 <a><img src="https://s2.loli.net/2024/12/22/DreE28uzNCByTtW.jpg"></a>
 </p></details>
-<details><summary>ck获取方法</summary><p>
+<details><summary>库街区ck获取方法</summary><p>
 https://github.com/tyql688/WutheringWavesUID/wiki
 </details>
 
@@ -61,6 +67,7 @@ https://github.com/tyql688/WutheringWavesUID/wiki
 - [waves-plugin](https://github.com/erzaozi/waves-plugin) Yunzai 鸣潮游戏数据查询插件
 - [Yunzai-Kuro-Plugin](https://github.com/TomyJan/Yunzai-Kuro-Plugin) Yunzai 库洛插件
 - [Kuro-API-Collection](https://github.com/TomyJan/Kuro-API-Collection) 库街区 API 文档
+- [ocr.space_code_example](https://github.com/Zaargh/ocr.space_code_example) OCR.space 示例
 - 特别鸣谢以下攻略作者
   - [Moealkyne](https://www.taptap.cn/user/533395803)
   - [小沐XMu](https://www.kurobbs.com/person-center?id=10450567)
