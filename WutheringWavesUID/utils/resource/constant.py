@@ -93,5 +93,14 @@ SONATA_FIRST_ID = {
     "幽夜隐匿之帷": [6000082, 6000087],
     "此间永驻之光": [6000092],
     "无惧浪涛之勇": [6000084],
-    "流云逝尽之空": [340000121],
+    "流云逝尽之空": [6000106],
 }
+
+
+SHORT_NAME = {
+    6000106: "芙露德莉斯",
+}
+
+
+def get_short_name(sonata_id: int, sonata_name: str) -> str:
+    return SHORT_NAME.get(sonata_id, sonata_name)

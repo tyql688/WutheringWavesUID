@@ -1,4 +1,5 @@
 import random
+import time
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -9,6 +10,7 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
 from ..utils.api.model import AccountBaseInfo, RoleDetailData
+from ..utils.cache import TimedCache
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
@@ -59,6 +61,39 @@ refresh_role_list = [
     refresh_roleShare_12,
 ]
 
+refresh_interval: int = WutheringWavesConfig.get_config("RefreshInterval").data
+
+if refresh_interval > 0:
+    timed_cache = TimedCache(timeout=refresh_interval, maxsize=10000)
+else:
+    timed_cache = None
+
+
+def can_refresh_card(user_id: str, uid: str) -> int:
+    """检查是否可以刷新角色面板"""
+    key = f"{user_id}_{uid}"
+    if timed_cache:
+        now = int(time.time())
+        time_stamp = timed_cache.get(key)
+        if time_stamp and time_stamp > now:
+            return time_stamp - now
+    return 0
+
+
+def set_cache_refresh_card(user_id: str, uid: str):
+    """设置缓存"""
+    if timed_cache:
+        key = f"{user_id}_{uid}"
+        timed_cache.set(key, int(time.time()) + refresh_interval)
+
+
+def get_refresh_interval_notify(time_stamp: int):
+    try:
+        value: str = WutheringWavesConfig.get_config("RefreshIntervalNotify").data
+        return value.format(time_stamp)
+    except Exception:
+        return "请等待{0}s后尝试刷新面板！".format(time_stamp)
+
 
 def get_refresh_role_img():
     return random.choice(refresh_role_list)
@@ -102,6 +137,9 @@ async def send_notify(bot: Bot, ev: Event, user_id: str, uid: str, self_ck: bool
 
 
 async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: str):
+    time_stamp = can_refresh_card(user_id, uid)
+    if time_stamp > 0:
+        return get_refresh_interval_notify(time_stamp)
     self_ck, ck = await waves_api.get_ck_result(uid, user_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
@@ -223,6 +261,7 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
 
     img = add_footer(img)
     img = await convert_img(img)
+    set_cache_refresh_card(user_id, uid)
     return img
 
 

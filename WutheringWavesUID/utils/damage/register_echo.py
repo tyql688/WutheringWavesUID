@@ -688,6 +688,51 @@ class Echo_6000097(EchoAbstract):
     name = "飓力熊"
 
 
+class Echo_6000098(EchoAbstract):
+    id = 6000098
+    name = "卫冕节使"
+
+
+class Echo_6000099(EchoAbstract):
+    id = 6000099
+    name = "赦罪节使"
+
+
+class Echo_6000100(EchoAbstract):
+    id = 6000100
+    name = "慈悲节使"
+
+
+class Echo_6000101(EchoAbstract):
+    id = 6000101
+    name = "小翼龙·气动"
+
+
+class Echo_6000102(EchoAbstract):
+    id = 6000102
+    name = "小翼龙·导电"
+
+
+class Echo_6000103(EchoAbstract):
+    id = 6000103
+    name = "小翼龙·冷凝"
+
+
+class Echo_6000104(EchoAbstract):
+    id = 6000104
+    name = "荣光节使"
+
+
+class Echo_6000105(EchoAbstract):
+    id = 6000105
+    name = "梦魇·辉萤军势"
+
+
+class Echo_6000106(EchoAbstract):
+    id = 6000106
+    name = "共鸣回响·芙露德莉斯"
+
+
 class Echo_6000145(Echo_6000045):
     id = 6000145
     name = "异相·哀声鸷"
@@ -800,5 +845,14 @@ def register_echo():
     WavesEchoRegister.register_class(Echo_6000095.id, Echo_6000095)
     WavesEchoRegister.register_class(Echo_6000096.id, Echo_6000096)
     WavesEchoRegister.register_class(Echo_6000097.id, Echo_6000097)
+    WavesEchoRegister.register_class(Echo_6000098.id, Echo_6000098)
+    WavesEchoRegister.register_class(Echo_6000099.id, Echo_6000099)
+    WavesEchoRegister.register_class(Echo_6000100.id, Echo_6000100)
+    WavesEchoRegister.register_class(Echo_6000101.id, Echo_6000101)
+    WavesEchoRegister.register_class(Echo_6000102.id, Echo_6000102)
+    WavesEchoRegister.register_class(Echo_6000103.id, Echo_6000103)
+    WavesEchoRegister.register_class(Echo_6000104.id, Echo_6000104)
+    WavesEchoRegister.register_class(Echo_6000105.id, Echo_6000105)
+    WavesEchoRegister.register_class(Echo_6000106.id, Echo_6000106)
     WavesEchoRegister.register_class(Echo_6000145.id, Echo_6000145)
     WavesEchoRegister.register_class(Echo_6010052.id, Echo_6010052)

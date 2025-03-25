@@ -7,17 +7,17 @@ from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
 
-sv_waves_char_list = SV(f"ww角色练度统计")
+sv_waves_char_list = SV("ww角色练度统计")
 
 
 @sv_waves_char_list.on_fullmatch(
     (
-        f"练度",
-        f"练度统计",
-        f"角色列表",
-        f"刷新练度",
-        f"刷新练度统计",
-        f"刷新角色列表",
+        "练度",
+        "练度统计",
+        "角色列表",
+        "刷新练度",
+        "刷新练度统计",
+        "刷新角色列表",
     )
 )
 async def send_char_list_msg(bot: Bot, ev: Event):
