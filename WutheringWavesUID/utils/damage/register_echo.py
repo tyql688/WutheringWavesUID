@@ -1,17 +1,17 @@
-from .damage import DamageAttribute
 from ...utils.damage.abstract import EchoAbstract, WavesEchoRegister
+from .damage import DamageAttribute
 from .utils import (
-    CHAR_ATTR_VOID,
+    CHAR_ATTR_CELESTIAL,
+    CHAR_ATTR_FREEZING,
     CHAR_ATTR_MOLTEN,
     CHAR_ATTR_SIERRA,
     CHAR_ATTR_SINKING,
-    CHAR_ATTR_FREEZING,
-    CHAR_ATTR_CELESTIAL,
-    temp_atk,
-    hit_damage,
-    skill_damage,
+    CHAR_ATTR_VOID,
     attack_damage,
+    hit_damage,
     liberation_damage,
+    skill_damage,
+    temp_atk,
 )
 
 
@@ -541,7 +541,7 @@ class Echo_6000080(EchoAbstract):
     name = "琉璃刀伶"
 
     # 在首位装备该声骸技能时，自身导电伤害加成提升12.00%。
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"导电伤害加成": "12%"}
 
@@ -556,7 +556,7 @@ class Echo_6000082(EchoAbstract):
     name = "罗蕾莱"
 
     # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，普攻伤害加成提升12.00%。
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"湮灭伤害加成": "12%", "普攻伤害加成": "12%"}
 
@@ -566,7 +566,7 @@ class Echo_6000083(EchoAbstract):
     name = "异构武装"
 
     # 在首位装配该声骸技能时，自身获得12.00%冷凝伤害加成提升，12.00%共鸣技能伤害加成提升
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"共鸣技能伤害加成": "12%", "冷凝伤害加成": "12%"}
 
@@ -576,7 +576,7 @@ class Echo_6000084(EchoAbstract):
     name = "叹息古龙"
 
     # 在首位装配该声骸技能时，自身获得12.00%热熔伤害加成提升，12.00%普攻伤害加成提升
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"热熔伤害加成": "12%", "普攻伤害加成": "12%"}
 
@@ -598,7 +598,7 @@ class Echo_6000086(EchoAbstract):
     name = "梦魇·飞廉之猩"
 
     # 在首位装配该声骸技能时，自身气动伤害加成提升12.00%，重击伤害加成提升12.00%。
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"气动伤害加成": "12%", "重击伤害加成": "12%"}
 
@@ -608,7 +608,7 @@ class Echo_6000087(EchoAbstract):
     name = "梦魇·无常凶鹭"
 
     # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，重击伤害加成提升12.00%。
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"湮灭伤害加成": "12%", "重击伤害加成": "12%"}
 
@@ -618,7 +618,7 @@ class Echo_6000088(EchoAbstract):
     name = "梦魇·云闪之鳞"
 
     # 在首位装配该声骸技能时，自身导电伤害加成提升12.00%，共鸣解放伤害加成提升12.00%。
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"导电伤害加成": "12%", "共鸣解放伤害加成": "12%"}
 
@@ -628,7 +628,7 @@ class Echo_6000089(EchoAbstract):
     name = "梦魇·朔雷之鳞"
 
     # 在首位装配该声骸技能时，自身导电伤害加成提升12.00%，共鸣技能伤害加成提升12.00%。
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"导电伤害加成": "12%", "共鸣技能伤害加成": "12%"}
 
@@ -638,7 +638,7 @@ class Echo_6000090(EchoAbstract):
     name = "梦魇·无冠者"
 
     # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，普攻伤害加成提升12.00%。
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"湮灭伤害加成": "12%", "普攻伤害加成": "12%"}
 
@@ -648,7 +648,7 @@ class Echo_6000091(EchoAbstract):
     name = "梦魇·燎照之骑"
 
     # 在首位装配该声骸技能时，自身热熔伤害加成提升12.00%，共鸣技能伤害加成提升12.00%。
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"热熔伤害加成": "12%", "共鸣技能伤害加成": "12%"}
 
@@ -658,7 +658,7 @@ class Echo_6000092(EchoAbstract):
     name = "梦魇·哀声鸷"
 
     # 在首位装配该声骸技能时，自身衍射伤害加成提升12.00%。
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"衍射伤害加成": "12%"}
 
@@ -722,6 +722,11 @@ class Echo_6000104(EchoAbstract):
     id = 6000104
     name = "荣光节使"
 
+    # 在首位装配该声骸技能时，自身衍射伤害加成提升12.00%，重击伤害加成提升12.00%。
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"衍射伤害加成": "12%", "重击伤害加成": "12%"}
+
 
 class Echo_6000105(EchoAbstract):
     id = 6000105
@@ -731,6 +736,14 @@ class Echo_6000105(EchoAbstract):
 class Echo_6000106(EchoAbstract):
     id = 6000106
     name = "共鸣回响·芙露德莉斯"
+
+    # 在首位装配该声骸技能时，自身气动伤害加成提升10.00%，当装配角色为漂泊者·气动或？？？时，自身气动伤害加成额外提升10.00%。
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        res = {"气动伤害加成": "10%"}
+        if role_id in [1406, 1408]:
+            res["气动伤害加成"] = "20%"
+        return res
 
 
 class Echo_6000145(Echo_6000045):
