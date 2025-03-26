@@ -6,7 +6,6 @@ from typing import Union
 
 import httpx
 from async_timeout import timeout
-from PIL import ImageDraw
 from pydantic import BaseModel
 from starlette.responses import HTMLResponse
 
@@ -16,13 +15,10 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.segment import MessageSegment
 from gsuid_core.utils.cookie_manager.qrlogin import get_qrcode_base64
-from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.web_app import app
 
 from ..utils.cache import TimedCache
 from ..utils.database.models import WavesBind, WavesUser
-from ..utils.fonts.waves_fonts import waves_font_25, waves_font_40
-from ..utils.image import add_footer, get_waves_bg
 from ..utils.kuro_api import kuro_api
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.RESOURCE_PATH import waves_templates
@@ -185,7 +181,7 @@ async def page_login_other(bot: Bot, ev: Event, url):
                 cache.delete(user_token)
                 if waves_user:
                     msg = login_succ.format(waves_user.uid)
-                    return await bot.send("\n".join(msg), at_sender=at_sender)
+                    return await bot.send(msg, at_sender=at_sender)
                 else:
                     return await bot.send(msg_error, at_sender=at_sender)
 
@@ -225,7 +221,7 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
     if waves_user:
         if isPage:
             msg = login_succ.format(waves_user.uid)
-            return await bot.send("\n".join(msg), at_sender=at_sender)
+            return await bot.send(msg, at_sender=at_sender)
         return await bot.send(
             f"{game_title} 鸣潮特征码:[{waves_user.uid}]登录成功!\n",
             at_sender=at_sender,
