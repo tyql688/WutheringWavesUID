@@ -785,6 +785,8 @@ class Weapon_21050026(WeaponAbstract):
                 count_e = effect_value.count("e")
 
                 buff_layer = min(buff_layer, count_e)
+            else:
+                buff_layer = 1
 
             dmg = f"{self.param(1)}*{buff_layer}"
             title = self.get_title()
