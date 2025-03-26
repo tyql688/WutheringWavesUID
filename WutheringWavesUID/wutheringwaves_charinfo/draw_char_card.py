@@ -221,7 +221,11 @@ async def ph_card_draw(
 
         calc.phantom_pre = calc.prepare_phantom()
         calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
-        calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
+        calc.calc_temp = get_calc_map(
+            calc.phantom_card,
+            role_detail.role.roleName,
+            role_detail.role.roleId,
+        )
 
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new("RGBA", (350, 550))
@@ -1113,7 +1117,11 @@ async def draw_char_score_img(
 
         calc.phantom_pre = calc.prepare_phantom()
         calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
-        calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
+        calc.calc_temp = get_calc_map(
+            calc.phantom_card,
+            role_detail.role.roleName,
+            role_detail.role.roleId,
+        )
 
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new("RGBA", (600, 1100))

@@ -11,6 +11,7 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
+
 from ..utils.api.model import RoleDetailData, WeaponData
 from ..utils.ascension.char import get_breach
 from ..utils.cache import TimedCache
@@ -88,7 +89,11 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
     calc: WuWaCalc = WuWaCalc(role_detail)
     calc.phantom_pre = calc.prepare_phantom()
     calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
-    calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
+    calc.calc_temp = get_calc_map(
+        calc.phantom_card,
+        role_detail.role.roleName,
+        role_detail.role.roleId,
+    )
 
     # 评分
     phantom_score = 0
