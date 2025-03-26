@@ -26,6 +26,8 @@ def calc_damage_1(
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
     attr.set_char_template("temp_atk")
 
+    attr.add_effect("默认手法", "e1")
+
     role_name = role.role.roleName
     # 获取角色详情
     char_result: WavesCharResult = get_char_detail2(role)
@@ -92,6 +94,8 @@ def calc_damage_2(
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
     attr.set_char_template("temp_atk")
+
+    attr.add_effect("默认手法", "e1 rz e2")
 
     role_name = role.role.roleName
     # 获取角色详情
@@ -160,6 +164,8 @@ def calc_damage_3(
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
     attr.set_char_template("temp_atk")
 
+    attr.add_effect("默认手法", "e1 rz e2aaae3")
+
     role_name = role.role.roleName
     # 获取角色详情
     char_result: WavesCharResult = get_char_detail2(role)
@@ -227,6 +233,8 @@ def calc_damage_4(
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
     attr.set_char_template("temp_atk")
 
+    attr.add_effect("默认手法", "e1 rz e2aaa")
+
     role_name = role.role.roleName
     # 获取角色详情
     char_result: WavesCharResult = get_char_detail2(role)
@@ -291,6 +299,8 @@ def calc_damage_5(
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
     attr.set_char_template("temp_atk")
+
+    attr.add_effect("默认手法", "e1 rz e2aaae3")
 
     role_name = role.role.roleName
     # 获取角色详情
@@ -358,6 +368,8 @@ def calc_damage_6(
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
     attr.set_char_template("temp_atk")
+
+    attr.add_effect("默认手法", "e1 rz e2aaae3")
 
     role_name = role.role.roleName
     # 获取角色详情

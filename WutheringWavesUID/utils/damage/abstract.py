@@ -147,7 +147,7 @@ class EchoAbstract(object):
         """造成伤害"""
         pass
 
-    def do_equipment_first(self):
+    def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {}
 

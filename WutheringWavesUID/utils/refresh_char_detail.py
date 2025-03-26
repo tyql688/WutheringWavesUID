@@ -6,7 +6,7 @@ import aiofiles
 
 from gsuid_core.logger import logger
 from . import waves_card_cache
-from .resource.constant import SPECIAL_CHAR_INT
+from .resource.constant import SPECIAL_CHAR_INT, SPECIAL_CHAR_INT_ALL
 from ..utils.api.model import AccountBaseInfo, RoleList
 from ..utils.error_reply import WAVES_CODE_101, WAVES_CODE_102, WAVES_CODE_999
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
@@ -82,9 +82,9 @@ async def save_card_info(
     for item in waves_data:
         role_id = item["role"]["roleId"]
 
-        if role_id in SPECIAL_CHAR_INT:
+        if role_id in SPECIAL_CHAR_INT_ALL:
             # 漂泊者预处理
-            for piaobo_id in SPECIAL_CHAR_INT[role_id]:
+            for piaobo_id in SPECIAL_CHAR_INT_ALL:
                 old = old_data.get(piaobo_id)
                 if not old:
                     continue

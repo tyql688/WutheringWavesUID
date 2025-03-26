@@ -67,7 +67,11 @@ async def get_waves_char_rank(uid, all_role_detail, need_expected_damage=False):
 
             calc.phantom_pre = calc.prepare_phantom()
             calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
-            calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
+            calc.calc_temp = get_calc_map(
+                calc.phantom_card,
+                role_detail.role.roleName,
+                role_detail.role.roleId,
+            )
             for i, _phantom in enumerate(equipPhantomList):
                 if _phantom and _phantom.phantomProp:
                     props = _phantom.get_props()

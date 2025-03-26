@@ -4,11 +4,11 @@ from typing import Dict, List, Union
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
-
-from ..utils.api.model import Props
 from .expression_evaluator import find_first_matching_expression
-from .map.calc_score_script import phantom_sub_value_map as ph_sub_map
 from .image import WAVES_VOID, SPECIAL_GOLD, WAVES_MOLTEN, WAVES_SIERRA
+from .map.calc_score_script import phantom_sub_value_map as ph_sub_map
+from .resource.constant import ID_FULL_CHAR_NAME
+from ..utils.api.model import Props
 
 MAP_PATH = Path(__file__).parent / "map/character"
 
@@ -16,7 +16,9 @@ score_interval = ["c", "b", "a", "s", "ss", "sss"]
 fix_max_score = 50
 
 
-def get_calc_map(ctx: Dict, char_name: str):
+def get_calc_map(ctx: Dict, char_name: str, char_id: Union[int, str]):
+    if str(char_id) in ID_FULL_CHAR_NAME:
+        char_name = ID_FULL_CHAR_NAME[str(char_id)]
     char_path = MAP_PATH / char_name
     if not char_path.is_dir():
         char_path = MAP_PATH / "default"

@@ -6,7 +6,6 @@ from typing import Union
 
 import httpx
 from async_timeout import timeout
-from PIL import ImageDraw
 from pydantic import BaseModel
 from starlette.responses import HTMLResponse
 
@@ -16,13 +15,10 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.segment import MessageSegment
 from gsuid_core.utils.cookie_manager.qrlogin import get_qrcode_base64
-from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.web_app import app
 
 from ..utils.cache import TimedCache
 from ..utils.database.models import WavesBind, WavesUser
-from ..utils.fonts.waves_fonts import waves_font_25, waves_font_40
-from ..utils.image import add_footer, get_waves_bg
 from ..utils.kuro_api import kuro_api
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.RESOURCE_PATH import waves_templates
@@ -34,6 +30,7 @@ cache = TimedCache(timeout=600, maxsize=10)
 
 game_title = "[鸣潮]"
 msg_error = "[鸣潮] 登录失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据\n"
+login_succ = "[鸣潮] 特征码[{}]登录成功! "
 
 
 async def get_url() -> tuple[str, bool]:
@@ -183,18 +180,8 @@ async def page_login_other(bot: Bot, ev: Event, url):
                 waves_user = await add_cookie(ev, data["ck"])
                 cache.delete(user_token)
                 if waves_user:
-                    msg = [
-                        f"[鸣潮] 特征码[{waves_user.uid}]登录成功! ",
-                        "当前账号已进入托管状态，请勿登录相似程序，导致token失效",
-                        "",
-                        f">使用【{PREFIX}mr】查看体力数据",
-                        f">使用【{PREFIX}签到】获取游戏签到及其社区签到奖励",
-                        f">使用【{PREFIX}刷新面板】更新角色面板",
-                        f">更新角色面板后可以使用【{PREFIX}暗主排行】查询暗主排行",
-                        "",
-                    ]
-
-                    return await bot.send("\n".join(msg), at_sender=at_sender)
+                    msg = login_succ.format(waves_user.uid)
+                    return await bot.send(msg, at_sender=at_sender)
                 else:
                     return await bot.send(msg_error, at_sender=at_sender)
 
@@ -233,55 +220,14 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
     waves_user = await add_cookie(ev, token)
     if waves_user:
         if isPage:
-            msg = [
-                f"[鸣潮] 特征码[{waves_user.uid}]登录成功! ",
-                "当前账号已进入托管状态，请勿登录相似程序，导致token失效",
-                "",
-                f">使用【{PREFIX}mr】查看体力数据",
-                f">使用【{PREFIX}查看】查看已绑定的特征码",
-                f">使用【{PREFIX}签到】获取游戏签到及其社区签到奖励",
-                f">使用【{PREFIX}刷新面板】更新角色面板",
-                f">更新角色面板后可以使用【{PREFIX}暗主排行】查询暗主排行",
-                "",
-            ]
-            return await bot.send("\n".join(msg), at_sender=at_sender)
+            msg = login_succ.format(waves_user.uid)
+            return await bot.send(msg, at_sender=at_sender)
         return await bot.send(
             f"{game_title} 鸣潮特征码:[{waves_user.uid}]登录成功!\n",
             at_sender=at_sender,
         )
     else:
         return await bot.send(msg_error, at_sender=at_sender)
-
-
-async def login_help():
-    card_img = get_waves_bg(900, 1020)
-    card_draw = ImageDraw.Draw(card_img)
-
-    card_draw.text((20, 50), "登录帮助", "white", waves_font_40, "lm")
-    text = [
-        "1. 直接暴露服务器公网ip给用户（云服务器）",
-        "   1.1 gscore控制台将HOST设置为 0.0.0.0",
-        "   1.2 服务器开放gscore的端口，默认为8765（注意及时修改账号或者密码",
-        "   1.3 在ww配置`鸣潮登录url`中填写`http://<云服务器公网ip>:8765`",
-        "   1.4 在ww配置`强制【鸣潮登录url】为自己的域名`开关开启",
-        "2. 使用自己的域名",
-        "   2.1 在ww配置`鸣潮登录url`中填写自己的域名",
-        "   2.2 在ww配置`强制【鸣潮登录url】为自己的域名`开关开启",
-        "   2.3 注意：域名需要解析到bot服务器，请选用你了解的方式进行配置",
-        "       http://域名",
-        "       http://域名:port",
-        "       https://域名",
-        "       https://域名:port",
-        "3. 家里云",
-        "   3.1 樱花FRP 或者 Cloudflare Tunnel",
-        "   3.2 在ww配置`鸣潮登录url`中填写提供的域名 or FRP地址",
-        "   3.3 在ww配置`强制【鸣潮登录url】为自己的域名`开关开启",
-        "wiki地址: wiki.wavesuid.top",
-    ]
-    for i, t in enumerate(text):
-        card_draw.text((20, 100 + i * 50), t, "white", waves_font_25, "lm")
-    card_img = add_footer(card_img, 600, 20)
-    return await convert_img(card_img)
 
 
 async def add_cookie(ev, token) -> Union[WavesUser, None]:

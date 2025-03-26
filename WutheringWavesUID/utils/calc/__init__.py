@@ -204,7 +204,7 @@ class WuWaCalc(object):
             echo_clz = WavesEchoRegister.find_class(result["echo_id"])
             if echo_clz:
                 e = echo_clz()
-                temp = e.do_equipment_first()
+                temp = e.do_equipment_first(role_id)
                 logger.debug(f"首位声骸数据 {e.name}-{e.id}-{temp}")
                 for key, value in temp.items():
                     if key not in result:

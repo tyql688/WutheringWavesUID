@@ -221,7 +221,11 @@ async def ph_card_draw(
 
         calc.phantom_pre = calc.prepare_phantom()
         calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
-        calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
+        calc.calc_temp = get_calc_map(
+            calc.phantom_card,
+            role_detail.role.roleName,
+            role_detail.role.roleId,
+        )
 
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new("RGBA", (350, 550))
@@ -444,8 +448,6 @@ async def get_role_need(
             query_list = SPECIAL_CHAR.copy()[char_id]
         else:
             query_list = [char_id]
-
-        logger.info(f"query_list: {query_list}")
 
         for temp_char_id in query_list:
             if all_role_detail and temp_char_id in all_role_detail:
@@ -1123,7 +1125,11 @@ async def draw_char_score_img(
 
         calc.phantom_pre = calc.prepare_phantom()
         calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
-        calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
+        calc.calc_temp = get_calc_map(
+            calc.phantom_card,
+            role_detail.role.roleName,
+            role_detail.role.roleId,
+        )
 
         for i, _phantom in enumerate(equipPhantomList):
             sh_temp = Image.new("RGBA", (600, 1100))
