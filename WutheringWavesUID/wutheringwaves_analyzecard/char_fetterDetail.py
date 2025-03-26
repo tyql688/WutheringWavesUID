@@ -1,13 +1,15 @@
-import re
 import json
+import re
 from pathlib import Path
+
 from gsuid_core.logger import logger
-from ..utils.resource.constant import SONATA_FIRST_ID
+
+from .detail_json import DETAIL, SONATA_COST_4_ID
 
 PLUGIN_PATH =  Path(__file__).parent.parent
 FETTERDETAIL_PATH = PLUGIN_PATH / "utils/map/detail_json/sonata"
 
-from .detail_json import DETAIL
+
 
 async def get_fetterDetail_from_char(char_name) -> dict:
     
@@ -52,7 +54,7 @@ async def get_first_echo_id_list(sonata):
     with open(path, "r", encoding="utf-8") as f:
         char_data = json.load(f)
 
-    return SONATA_FIRST_ID[char_data["name"]]
+    return SONATA_COST_4_ID[char_data["name"]]
 
 async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tuple[int, int]:
     """
@@ -86,7 +88,6 @@ async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tupl
     # ---------- 初始化 ----------
     key = mainProps_first["attributeName"]
     value = float(mainProps_first["attributeValue"].strip('%'))
-    echo_id = ECHO_ID_COST_ONE  # 默认ID
     
     # ---------- 获取角色配置 ----------
     try:
@@ -95,7 +96,7 @@ async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tupl
         logger.error(f"[鸣潮]角色配置数据缺失: {e}")
         return ECHO_ID_COST_ONE, 1  # 降级处理
     except FileNotFoundError:
-        logger.error(f"[鸣潮]角色配置文件不存在: {path}")
+        logger.error(f"[鸣潮]角色{char_name}配置文件不存在")
         return ECHO_ID_COST_ONE, 1
 
     # ---------- 4cost分配id逻辑 ----------
