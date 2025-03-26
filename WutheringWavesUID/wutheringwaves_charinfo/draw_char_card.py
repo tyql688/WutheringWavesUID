@@ -449,8 +449,6 @@ async def get_role_need(
         else:
             query_list = [char_id]
 
-        logger.info(f"query_list: {query_list}")
-
         for temp_char_id in query_list:
             if all_role_detail and temp_char_id in all_role_detail:
                 role_detail: RoleDetailData = all_role_detail[temp_char_id]
