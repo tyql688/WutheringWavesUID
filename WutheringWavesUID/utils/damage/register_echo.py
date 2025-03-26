@@ -732,6 +732,17 @@ class Echo_6000105(EchoAbstract):
     id = 6000105
     name = "梦魇·辉萤军势"
 
+    # 在首位装配该声骸技能时，自身冷凝伤害加成提升12.00%，协同攻击造成的伤害提升30.00%。
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"冷凝伤害加成": "12%"}
+
+    def damage(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.sync_strike:
+            title = self.name
+            msg = "自身协同攻击造成的伤害提升30.00%"
+            attr.add_dmg_bonus(0.3, title, msg)
+
 
 class Echo_6000106(EchoAbstract):
     id = 6000106
