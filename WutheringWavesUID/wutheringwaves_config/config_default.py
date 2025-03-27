@@ -21,6 +21,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "鸣潮公告推送ID列表",
         [],
     ),
+    "WavesAnnOpen": GsBoolConfig(
+        "公告推送总开关",
+        "公告推送总开关",
+        True,
+    ),
     "WavesRankUseTokenGroup": GsListStrConfig(
         "有token才能进排行，群管理可设置",
         "有token才能进排行，群管理可设置",
