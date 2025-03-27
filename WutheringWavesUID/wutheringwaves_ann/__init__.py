@@ -109,6 +109,9 @@ async def check_waves_ann_state():
         logger.info("[鸣潮公告] 没有最新公告")
         return
 
+    logger.info("[鸣潮公告] 更新数据库")
+    WutheringWavesConfig.set_config("WavesAnnNewIds", new_ids)
+
     for ann_id in new_ann:
         try:
             img = await ann_detail_card(ann_id)
@@ -120,5 +123,4 @@ async def check_waves_ann_state():
         except Exception as e:
             logger.exception(e)
 
-    logger.info("[鸣潮公告] 推送完毕, 更新数据库")
-    WutheringWavesConfig.set_config("WavesAnnNewIds", new_ids)
+    logger.info("[鸣潮公告] 推送完毕")
