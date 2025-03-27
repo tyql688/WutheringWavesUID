@@ -1,8 +1,9 @@
+import asyncio
 import copy
 
 import httpx
 
-from ..utils.api.api import GAME_ID, ANN_CONTENT_URL, ANN_LIST_URL
+from ..utils.api.api import ANN_CONTENT_URL, ANN_LIST_URL, GAME_ID
 
 
 class _Dict(dict):
@@ -58,6 +59,8 @@ class ann:
             if res.code == 200:
                 value = [{**x, "id": int(x["id"])} for x in res.data.list]
                 self.ann_list_data.extend(value)
+
+            await asyncio.sleep(1)
 
         return self.ann_list_data
 
