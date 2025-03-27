@@ -40,6 +40,9 @@ async def ann_(bot: Bot, ev: Event):
 async def sub_ann_(bot: Bot, ev: Event):
     if ev.group_id is None:
         return await bot.send("请在群聊中订阅")
+    if not WutheringWavesConfig.get_config("WavesAnnOpen").data:
+        return await bot.send("鸣潮公告推送功能已关闭")
+
     data = await gs_subscribe.get_subscribe(task_name_ann)
     if data:
         for subscribe in data:
@@ -68,12 +71,17 @@ async def unsub_ann_(bot: Bot, ev: Event):
             if subscribe.group_id == ev.group_id:
                 await gs_subscribe.delete_subscribe("session", task_name_ann, ev)
                 return await bot.send("成功取消订阅鸣潮公告!")
+    else:
+        if not WutheringWavesConfig.get_config("WavesAnnOpen").data:
+            return await bot.send("鸣潮公告推送功能已关闭")
 
     return await bot.send("未曾订阅鸣潮公告！")
 
 
 @scheduler.scheduled_job("interval", minutes=ann_minute_check)
 async def check_waves_ann():
+    if not WutheringWavesConfig.get_config("WavesAnnOpen").data:
+        return
     await check_waves_ann_state()
 
 
@@ -82,8 +90,8 @@ async def check_waves_ann_state():
     datas = await gs_subscribe.get_subscribe(task_name_ann)
     if not datas:
         logger.info("[鸣潮公告] 暂无群订阅")
-        new_ids = await ann().get_ann_ids()
-        WutheringWavesConfig.set_config("WavesAnnNewIds", new_ids)
+        # new_ids = await ann().get_ann_ids()
+        # WutheringWavesConfig.set_config("WavesAnnNewIds", new_ids)
         return
 
     ids = WutheringWavesConfig.get_config("WavesAnnNewIds").data
