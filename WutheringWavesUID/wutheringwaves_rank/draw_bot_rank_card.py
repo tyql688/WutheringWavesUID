@@ -90,7 +90,11 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
     calc: WuWaCalc = WuWaCalc(role_detail)
     calc.phantom_pre = calc.prepare_phantom()
     calc.phantom_card = calc.enhance_summation_phantom_value(calc.phantom_pre)
-    calc.calc_temp = get_calc_map(calc.phantom_card, role_detail.role.roleName)
+    calc.calc_temp = get_calc_map(
+        calc.phantom_card,
+        role_detail.role.roleName,
+        role_detail.role.roleId,
+    )
 
     # 评分
     phantom_score = 0
