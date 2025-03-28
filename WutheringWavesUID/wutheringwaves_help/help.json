@@ -212,6 +212,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "卡池倒计时",
+        "desc": "卡池倒计时",
+        "eg": "未复刻角色",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },

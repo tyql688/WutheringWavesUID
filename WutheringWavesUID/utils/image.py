@@ -15,6 +15,7 @@ from ..utils.resource.RESOURCE_PATH import (
     CUSTOM_CARD_PATH,
     CUSTOM_MR_CARD_PATH,
     ROLE_PILE_PATH,
+    SHARE_BG_PATH,
     WEAPON_PATH,
 )
 
@@ -93,6 +94,11 @@ WEAPON_RESONLEVEL_COLOR = {
 
 def get_ICON():
     return Image.open(ICON)
+
+
+async def get_random_share_bg():
+    path = random.choice(os.listdir(f"{SHARE_BG_PATH}"))
+    return Image.open(f"{SHARE_BG_PATH}/{path}").convert("RGBA")
 
 
 async def get_random_waves_role_pile(char_id: Optional[str] = None):
