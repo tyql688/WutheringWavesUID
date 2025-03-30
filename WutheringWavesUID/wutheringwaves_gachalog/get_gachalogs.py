@@ -1,15 +1,17 @@
 import asyncio
+import base64
 import copy
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import aiofiles
 import msgspec
 
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
+
 from ..utils.api.model import GachaLog
 from ..utils.database.models import WavesUser
 from ..utils.error_reply import WAVES_CODE_104, WAVES_CODE_108
@@ -18,6 +20,8 @@ from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
 from ..version import WutheringWavesUID_version
 from ..wutheringwaves_config import PREFIX
+from .model import WWUIDGacha
+from .model_for_waves_plugin import WavesPluginGacha
 
 gacha_type_meta_data = {
     "角色精准调谐": ["1"],
@@ -27,6 +31,16 @@ gacha_type_meta_data = {
     "新手调谐": ["5"],
     "新手自选唤取": ["6"],
     "新手自选唤取（感恩定向唤取）": ["7"],
+}
+
+gachalogs_history_meta = {
+    "角色精准调谐": [],
+    "武器精准调谐": [],
+    "角色调谐（常驻池）": [],
+    "武器调谐（常驻池）": [],
+    "新手调谐": [],
+    "新手自选唤取": [],
+    "新手自选唤取（感恩定向唤取）": [],
 }
 
 
@@ -44,7 +58,7 @@ def find_length(A, B) -> int:
 
 async def get_new_gachalog(
     uid: str, record_id: str, full_data: Dict[str, List[GachaLog]], is_force: bool
-) -> (Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]):
+) -> tuple[Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]]:
     new = {}
     new_count = {}
     for gacha_name in gacha_type_meta_data:
@@ -56,10 +70,10 @@ async def get_new_gachalog(
                 or res.get("data", None) is None
             ):
                 # 抽卡记录获取失败
-                if res.get("code") == -1:
-                    return WAVES_CODE_108, None, None
+                if res.get("code") == -1:  # type: ignore
+                    return WAVES_CODE_108, None, None  # type: ignore
                 else:
-                    return WAVES_CODE_104, None, None
+                    return WAVES_CODE_104, None, None  # type: ignore
             gacha_log = [GachaLog(**log) for log in res["data"]]
             old_length = find_length(full_data[gacha_name], gacha_log)
             _add = gacha_log if old_length == 0 else gacha_log[:-old_length]
@@ -69,8 +83,32 @@ async def get_new_gachalog(
     return None, new, new_count
 
 
+async def get_new_gachalog_for_file(
+    full_data: Dict[str, List[GachaLog]],
+    import_data: Dict[str, List[GachaLog]],
+) -> tuple[Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]]:
+    new = {}
+    new_count = {}
+
+    for cardPoolType, item in import_data.items():
+        item: List[GachaLog]
+        if cardPoolType not in gacha_type_meta_data:
+            continue
+        gacha_name = cardPoolType
+        gacha_log = [GachaLog(**log.dict()) for log in item]
+        old_length = find_length(full_data[gacha_name], gacha_log)
+        _add = gacha_log if old_length == 0 else gacha_log[:-old_length]
+        new[gacha_name] = _add + copy.deepcopy(full_data[gacha_name])
+        new_count[gacha_name] = len(_add)
+    return None, new, new_count
+
+
 async def save_gachalogs(
-    ev: Event, uid: str, record_id: str, is_force: bool = False
+    ev: Event,
+    uid: str,
+    record_id: str,
+    is_force: bool = False,
+    import_data: Optional[Dict[str, List[GachaLog]]] = None,
 ) -> str:
     path = PLAYER_PATH / str(uid)
     if not path.exists():
@@ -84,28 +122,27 @@ async def save_gachalogs(
             gachalogs_history: Dict = json.load(f)
         gachalogs_history = gachalogs_history["data"]
     else:
-        gachalogs_history = {
-            "角色精准调谐": [],
-            "武器精准调谐": [],
-            "角色调谐（常驻池）": [],
-            "武器调谐（常驻池）": [],
-            "新手调谐": [],
-            "新手自选唤取": [],
-            "新手自选唤取（感恩定向唤取）": [],
-        }
+        gachalogs_history = copy.deepcopy(gachalogs_history_meta)
 
     for gacha_name in gacha_type_meta_data.keys():
         gachalogs_history[gacha_name] = [
             GachaLog(**log) for log in gachalogs_history[gacha_name]
         ]
 
-    code, gachalogs_new, gachalogs_count_add = await get_new_gachalog(
-        uid, record_id, gachalogs_history, is_force
-    )
+    if record_id:
+        code, gachalogs_new, gachalogs_count_add = await get_new_gachalog(
+            uid, record_id, gachalogs_history, is_force
+        )
+    else:
+        code, gachalogs_new, gachalogs_count_add = await get_new_gachalog_for_file(
+            gachalogs_history, import_data  # type: ignore
+        )
+
     if isinstance(code, int) or not gachalogs_new:
         return error_reply(code)
 
-    await save_record_id(ev.user_id, ev.bot_id, uid, record_id)
+    if record_id:
+        await save_record_id(ev.user_id, ev.bot_id, uid, record_id)
 
     # 获取当前时间
     current_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
@@ -115,10 +152,10 @@ async def save_gachalogs(
 
     # 保存数量
     for gacha_name in gacha_type_meta_data.keys():
-        result[gacha_name] = len(gachalogs_new[gacha_name])
+        result[gacha_name] = len(gachalogs_new.get(gacha_name, []))  # type: ignore
 
-    result["data"] = {
-        gacha_name: [log.dict() for log in gachalogs_new[gacha_name]]
+    result["data"] = {  # type: ignore
+        gacha_name: [log.dict() for log in gachalogs_new.get(gacha_name, [])]
         for gacha_name in gacha_type_meta_data.keys()
     }
 
@@ -153,6 +190,55 @@ async def save_record_id(user_id, bot_id, uid, record_id):
         )
     else:
         await WavesUser.insert_data(user_id, bot_id, record_id=record_id, uid=uid)
+
+
+async def import_gachalogs(ev: Event, history_url: str, type: str, uid: str) -> str:
+    history_data: Dict = {}
+    if type == "json":
+        history_data = json.loads(history_url)
+    else:
+        data_bytes = base64.b64decode(history_url)
+        try:
+            history_data = json.loads(data_bytes.decode())
+        except UnicodeDecodeError:
+            history_data = json.loads(data_bytes.decode("gbk"))
+        except json.decoder.JSONDecodeError:
+            return "请传入正确的JSON格式文件!"
+
+    def turn_wwuid_gacha(data: Dict) -> Optional[WWUIDGacha]:
+        if "info" in data and "export_app" in data["info"]:
+            if "Waves-Plugin" == data["info"]["export_app"]:
+                return WavesPluginGacha.model_validate(data).turn_wwuid_gacha()
+            elif "WutheringWavesUID" == data["info"]["export_app"]:
+                return WWUIDGacha.model_validate(data)
+        return None
+
+    wwuid_gacha = turn_wwuid_gacha(history_data)
+    if not wwuid_gacha:
+        err_res = [
+            "你当前导入的抽卡记录文件不支持, 目前支持的文件类型有:",
+            "1.WutheringWavesUID",
+            "2.Waves-Plugin",
+        ]
+        return "\n".join(err_res)
+
+    if wwuid_gacha.info.uid != uid:
+        return "你当前导入的抽卡记录文件的UID与当前UID不匹配!"
+
+    import_data = copy.deepcopy(gachalogs_history_meta)
+    for item in wwuid_gacha.list:
+        gacha_name = item.cardPoolType
+        if gacha_name not in gacha_type_meta_data:
+            if gacha_name == "6":
+                gacha_name = "新手自选唤取"
+            elif gacha_name == "7":
+                gacha_name = "新手自选唤取（感恩定向唤取）"
+            else:
+                continue
+        import_data[gacha_name].append(GachaLog(**item.dict()))
+
+    res = await save_gachalogs(ev, uid, "", import_data=import_data)
+    return res
 
 
 async def export_gachalogs(uid: str) -> dict:

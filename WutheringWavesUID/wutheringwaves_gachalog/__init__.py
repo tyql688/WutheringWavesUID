@@ -8,27 +8,28 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.segment import MessageSegment
 from gsuid_core.sv import SV
-from .draw_gachalogs import draw_card, draw_card_help
-from .get_gachalogs import save_gachalogs, export_gachalogs
+
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import (
-    WAVES_CODE_103,
     ERROR_CODE,
-    WAVES_CODE_105,
+    WAVES_CODE_103,
     WAVES_CODE_104,
+    WAVES_CODE_105,
 )
 from ..utils.hint import error_reply
 from ..wutheringwaves_config import PREFIX
+from .draw_gachalogs import draw_card, draw_card_help
+from .get_gachalogs import export_gachalogs, import_gachalogs, save_gachalogs
 
 sv_gacha_log = SV("waves抽卡记录")
 sv_gacha_help_log = SV("waves抽卡记录帮助")
 sv_get_gachalog_by_link = SV("waves导入抽卡链接", area="DIRECT")
+sv_import_gacha_log = SV("waves导入抽卡记录", area="DIRECT")
 sv_export_json_gacha_log = SV("waves导出抽卡记录")
 
 
-@sv_get_gachalog_by_link.on_command((f"导入抽卡链接", f"导入抽卡记录"))
+@sv_get_gachalog_by_link.on_command(("导入抽卡链接", "导入抽卡记录"))
 async def get_gacha_log_by_link(bot: Bot, ev: Event):
-    await bot.logger.info(f"开始执行[导入抽卡链接]")
 
     # 没有uid 就别导了吧
     uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
@@ -89,7 +90,7 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
 
 
 @sv_gacha_log.on_fullmatch(
-    (f"刷新抽卡记录", f"更新抽卡记录"),
+    ("刷新抽卡记录", "更新抽卡记录"),
 )
 async def send_refresh_gachalog_msg(bot: Bot, ev: Event):
     uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
@@ -105,9 +106,9 @@ async def send_refresh_gachalog_msg(bot: Bot, ev: Event):
     return await bot.send(im)
 
 
-@sv_gacha_log.on_fullmatch(f"抽卡记录")
+@sv_gacha_log.on_fullmatch("抽卡记录")
 async def send_gacha_log_card_info(bot: Bot, ev: Event):
-    await bot.logger.info(f"[鸣潮]开始执行 抽卡记录")
+    await bot.logger.info("[鸣潮]开始执行 抽卡记录")
     uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
     if not uid:
         return await bot.send(ERROR_CODE[WAVES_CODE_103])
@@ -116,24 +117,38 @@ async def send_gacha_log_card_info(bot: Bot, ev: Event):
     await bot.send(im)
 
 
-@sv_gacha_help_log.on_fullmatch(f"抽卡帮助")
+@sv_gacha_help_log.on_fullmatch("抽卡帮助")
 async def send_gacha_log_help(bot: Bot, ev: Event):
     im = await draw_card_help()
     await bot.send(im)
 
 
-@sv_export_json_gacha_log.on_fullmatch((f"导出抽卡记录"))
+@sv_import_gacha_log.on_file("json")
+async def get_gacha_log_by_file(bot: Bot, ev: Event):
+    # 没有uid 就别导了吧
+    uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
+    if not uid:
+        return await bot.send(ERROR_CODE[WAVES_CODE_103])
+
+    if ev.file and ev.file_type:
+        await bot.send("正在尝试导入抽卡记录中，请耐心等待……")
+        return await bot.send(await import_gachalogs(ev, ev.file, ev.file_type, uid))
+    else:
+        return await bot.send("导入抽卡记录异常...")
+
+
+@sv_export_json_gacha_log.on_fullmatch(("导出抽卡记录"))
 async def send_export_gacha_info(bot: Bot, ev: Event):
     uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
     if not uid:
         return await bot.send(ERROR_CODE[WAVES_CODE_103])
 
-    await bot.send(f"🔜即将为你导出WutheringWavesUID抽卡记录文件，请耐心等待...")
+    await bot.send("🔜即将为你导出WutheringWavesUID抽卡记录文件，请耐心等待...")
     export = await export_gachalogs(uid)
     if export["retcode"] == "ok":
         file_name = export["name"]
         file_path = export["url"]
         await bot.send(MessageSegment.file(file_path, file_name))
-        await bot.send(f"✅导出抽卡记录成功！")
+        await bot.send("✅导出抽卡记录成功！")
     else:
         await bot.send("导出抽卡记录失败...")
