@@ -126,15 +126,16 @@ async def send_gacha_log_help(bot: Bot, ev: Event):
 @sv_import_gacha_log.on_file("json")
 async def get_gacha_log_by_file(bot: Bot, ev: Event):
     # 没有uid 就别导了吧
-    uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
-    if not uid:
-        return await bot.send(ERROR_CODE[WAVES_CODE_103])
+    # uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
+    # if not uid:
+    #     return await bot.send(ERROR_CODE[WAVES_CODE_103])
 
-    if ev.file and ev.file_type:
-        await bot.send("正在尝试导入抽卡记录中，请耐心等待……")
-        return await bot.send(await import_gachalogs(ev, ev.file, ev.file_type, uid))
-    else:
-        return await bot.send("导入抽卡记录异常...")
+    # if ev.file and ev.file_type:
+    #     await bot.send("正在尝试导入抽卡记录中，请耐心等待……")
+    #     return await bot.send(await import_gachalogs(ev, ev.file, ev.file_type, uid))
+    # else:
+    #     return await bot.send("导入抽卡记录异常...")
+    pass
 
 
 @sv_export_json_gacha_log.on_fullmatch(("导出抽卡记录"))
