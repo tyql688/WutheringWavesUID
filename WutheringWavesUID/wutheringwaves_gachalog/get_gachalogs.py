@@ -4,7 +4,7 @@ import copy
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import aiofiles
 import msgspec
@@ -45,7 +45,7 @@ gachalogs_history_meta = {
 
 
 def find_length(A, B) -> int:
-    """数组最长公共子序列长度"""
+    """数组最长公共子串长度"""
     n, m = len(A), len(B)
     dp = [[0] * (m + 1) for _ in range(n + 1)]
     ans = 0
@@ -54,6 +54,53 @@ def find_length(A, B) -> int:
             dp[i][j] = dp[i + 1][j + 1] + 1 if A[i] == B[j] else 0
             ans = max(ans, dp[i][j])
     return ans
+
+
+# 找到两个数组中最长公共子串的下标
+def find_longest_common_subarray_indices(
+    a: List[GachaLog], b: List[GachaLog]
+) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
+    n, m = len(a), len(b)
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    length = 0
+    a_end = b_end = 0
+
+    for i in range(n - 1, -1, -1):
+        for j in range(m - 1, -1, -1):
+            if a[i] == b[j]:
+                dp[i][j] = dp[i + 1][j + 1] + 1
+                if dp[i][j] > length:
+                    length = dp[i][j]
+                    a_end = i + length - 1
+                    b_end = j + length - 1
+            else:
+                dp[i][j] = 0
+
+    if length == 0:
+        return None
+
+    return (a_end - length + 1, a_end), (b_end - length + 1, b_end)
+
+
+# 根据最长公共子串递归合并两个GachaLog列表，不去重，按time排序
+def merge_gacha_logs_by_common_subarray(
+    a: List[GachaLog], b: List[GachaLog]
+) -> List[GachaLog]:
+    common_indices = find_longest_common_subarray_indices(a, b)
+    if not common_indices:
+        return sorted(
+            a + b,
+            key=lambda log: datetime.strptime(log.time, "%Y-%m-%d %H:%M:%S"),
+            reverse=True,
+        )
+
+    (a_start, a_end), (b_start, b_end) = common_indices
+
+    prefix = merge_gacha_logs_by_common_subarray(a[:a_start], b[:b_start])
+    common_subarray = a[a_start : a_end + 1]
+    suffix = merge_gacha_logs_by_common_subarray(a[a_end + 1 :], b[b_end + 1 :])
+
+    return prefix + common_subarray + suffix
 
 
 async def get_new_gachalog(
@@ -96,11 +143,24 @@ async def get_new_gachalog_for_file(
             continue
         gacha_name = cardPoolType
         gacha_log = [GachaLog(**log.dict()) for log in item]
-        old_length = find_length(full_data[gacha_name], gacha_log)
-        _add = gacha_log if old_length == 0 else gacha_log[:-old_length]
-        new[gacha_name] = _add + copy.deepcopy(full_data[gacha_name])
-        new_count[gacha_name] = len(_add)
+        new_gacha_log = merge_gacha_logs_by_common_subarray(
+            full_data[gacha_name], gacha_log
+        )
+        new[gacha_name] = new_gacha_log
+        new_count[gacha_name] = len(new_gacha_log)
     return None, new, new_count
+
+
+async def backup_gachalogs(uid: str, record_id: str, gachalogs_history: Dict):
+    if record_id:
+        return
+    path = PLAYER_PATH / str(uid)
+    if not path.exists():
+        path.mkdir(parents=True, exist_ok=True)
+    # 备份
+    backup_path = path / f"gacha_logs_{datetime.now().strftime('%Y-%m-%d.%H%M%S')}.json"
+    async with aiofiles.open(backup_path, "w", encoding="UTF-8") as file:
+        await file.write(json.dumps(gachalogs_history, ensure_ascii=False))
 
 
 async def save_gachalogs(
@@ -120,6 +180,9 @@ async def save_gachalogs(
     if gachalogs_path.exists():
         with Path.open(gachalogs_path, encoding="UTF-8") as f:
             gachalogs_history: Dict = json.load(f)
+
+        # 备份
+        await backup_gachalogs(uid, record_id, gachalogs_history)
         gachalogs_history = gachalogs_history["data"]
     else:
         gachalogs_history = copy.deepcopy(gachalogs_history_meta)
