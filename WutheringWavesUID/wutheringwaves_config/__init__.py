@@ -7,7 +7,7 @@ from gsuid_core.sv import SV, get_plugin_available_prefix
 
 from ..utils.database.models import WavesBind
 from ..utils.name_convert import alias_to_char_name
-from .set_config import set_config_func, set_push_value, set_waves_user_value
+from .set_config import set_config_func, set_waves_user_value
 from .wutheringwaves_config import WutheringWavesConfig
 
 sv_self_config = SV("鸣潮配置")
@@ -49,15 +49,7 @@ async def send_config_ev(bot: Bot, ev: Event):
             f"您还未绑定鸣潮特征码, 请使用【{PREFIX}绑定uid】 完成绑定！\n", at_sender
         )
 
-    if "阈值" in ev.text:
-        func = "".join(re.findall("[\u4e00-\u9fa5]", ev.text.replace("阈值", "")))
-        value = re.findall(r"\d+", ev.text)
-        value = value[0] if value else None
-
-        if value is None:
-            return await bot.send("请输入正确的阈值数字...\n", at_sender)
-        im = await set_push_value(ev.bot_id, func, uid, int(value))
-    elif "体力背景" in ev.text:
+    if "体力背景" in ev.text:
         from ..utils.waves_api import waves_api
 
         ck = await waves_api.get_self_waves_ck(uid, ev.user_id)

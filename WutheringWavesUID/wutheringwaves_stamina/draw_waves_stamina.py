@@ -36,7 +36,6 @@ from ..utils.image import (
 from ..utils.name_convert import char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR
 from ..utils.waves_api import waves_api
-from ..wutheringwaves_newsign.bbs_api import bbs_api
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 YES = Image.open(TEXT_PATH / "yes.png")
@@ -55,7 +54,7 @@ async def seconds2hours(seconds: int) -> str:
     return "%02d小时%02d分" % (h, m)
 
 
-async def process_uid(uid, ev, waves_api, bbs_api):
+async def process_uid(uid, ev, waves_api):
     ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
     if not ck:
         return None
@@ -65,11 +64,10 @@ async def process_uid(uid, ev, waves_api, bbs_api):
         waves_api.refresh_data(uid, ck),
         waves_api.get_daily_info(ck),
         waves_api.get_base_info(uid, ck),
-        bbs_api.check_bbs_completed(ck),
         return_exceptions=True,
     )
 
-    (refresh_res, daily_info_res, account_info_res, bbs_state) = results
+    (refresh_res, daily_info_res, account_info_res) = results
 
     if not refresh_res[0] or not daily_info_res[0] or not account_info_res[0]:
         return None
@@ -85,7 +83,6 @@ async def process_uid(uid, ev, waves_api, bbs_api):
     return {
         "daily_info": daily_info,
         "account_info": account_info,
-        "bbs_state": bbs_state,
     }
 
 
@@ -96,7 +93,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
         if uid_list is None:
             return ERROR_CODE[WAVES_CODE_103]
         # 进行校验UID是否绑定CK
-        tasks = [process_uid(uid, ev, waves_api, bbs_api) for uid in uid_list]
+        tasks = [process_uid(uid, ev, waves_api) for uid in uid_list]
         results = await asyncio.gather(*tasks)
 
         # 过滤掉 None 值
@@ -131,7 +128,6 @@ async def _draw_all_stamina_img(ev: Event, img: Image.Image, valid: Dict, index:
 async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
     daily_info: DailyData = valid["daily_info"]
     account_info: AccountBaseInfo = valid["account_info"]
-    bbs_state = valid["bbs_state"]
     if daily_info.hasSignIn:
         sign_in_icon = YES
         sing_in_text = "签到已完成！"
@@ -148,13 +144,6 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
     else:
         active_icon = NO
         active_text = "活跃度未满！"
-
-    if bbs_state:
-        bbs_icon = YES
-        bbs_text = "社区签到已完成！"
-    else:
-        bbs_icon = NO
-        bbs_text = "社区签到未完成！！"
 
     img = Image.open(TEXT_PATH / "bg.jpg").convert("RGBA")
     info = Image.open(TEXT_PATH / "main_bar.png").convert("RGBA")
@@ -307,7 +296,7 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
     status_img_draw.rounded_rectangle([0, 0, 230, 40], fill=(0, 0, 0, int(0.3 * 255)))
     status_img.alpha_composite(sign_in_icon, (0, 0))
     status_img_draw.text((50, 20), f"{sing_in_text}", "white", waves_font_30, "lm")
-    img.alpha_composite(status_img, (70, 140))
+    img.alpha_composite(status_img, (70, 80))
 
     # 活跃状态
     status_img2 = Image.new("RGBA", (230, 40), (255, 255, 255, 0))
@@ -315,15 +304,15 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
     status_img2_draw.rounded_rectangle([0, 0, 230, 40], fill=(0, 0, 0, int(0.3 * 255)))
     status_img2.alpha_composite(active_icon, (0, 0))
     status_img2_draw.text((50, 20), f"{active_text}", "white", waves_font_30, "lm")
-    img.alpha_composite(status_img2, (320, 140))
+    img.alpha_composite(status_img2, (70, 140))
 
     # bbs状态
-    status_img3 = Image.new("RGBA", (300, 40), (255, 255, 255, 0))
-    status_img3_draw = ImageDraw.Draw(status_img3)
-    status_img3_draw.rounded_rectangle([0, 0, 300, 40], fill=(0, 0, 0, int(0.3 * 255)))
-    status_img3.alpha_composite(bbs_icon, (0, 0))
-    status_img3_draw.text((50, 20), f"{bbs_text}", "white", waves_font_30, "lm")
-    img.alpha_composite(status_img3, (70, 80))
+    # status_img3 = Image.new("RGBA", (300, 40), (255, 255, 255, 0))
+    # status_img3_draw = ImageDraw.Draw(status_img3)
+    # status_img3_draw.rounded_rectangle([0, 0, 300, 40], fill=(0, 0, 0, int(0.3 * 255)))
+    # status_img3.alpha_composite(bbs_icon, (0, 0))
+    # status_img3_draw.text((50, 20), f"{bbs_text}", "white", waves_font_30, "lm")
+    # img.alpha_composite(status_img3, (70, 80))
 
     # pile 放在背景上
     img.paste(pile, (550, -150), pile)
