@@ -14,21 +14,11 @@ async def get_add_num():
     return len(datas)
 
 
-async def get_sign_num():
-    datas = await WavesUser.get_waves_all_user()
-    num = 0
-    for data in datas:
-        if data.sign_switch != "off":
-            num += 1
-    return num
-
-
 register_status(
     get_ICON(),
     "WutheringWavesUID",
     {
         "绑定UID": get_add_num,
         "登录账户": get_user_num,
-        "开启签到": get_sign_num,
     },
 )
