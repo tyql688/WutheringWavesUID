@@ -661,6 +661,9 @@ async def draw_char_detail_img(
 
     if not is_limit_query:
         if not waves_api.is_net(uid):
+            _, ck = await waves_api.get_ck_result(uid, user_id)
+            if not ck:
+                return hint.error_reply(WAVES_CODE_102)
             succ, account_info = await waves_api.get_base_info(uid, ck)
             if not succ:
                 return account_info

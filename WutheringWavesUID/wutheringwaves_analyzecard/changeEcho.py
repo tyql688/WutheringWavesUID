@@ -36,7 +36,7 @@ async def change_echo(bot: Bot, ev: Event):
     )
 
     if not waves_api.is_net(uid):
-        return await bot.send(f"[鸣潮] 国服用户不支持修改角色数据", at_sender)
+        return await bot.send("[鸣潮] 国服用户不支持修改角色数据", at_sender)
 
     char = ev.regex_dict.get("char")
     sonata = ev.regex_dict.get("sonata")
