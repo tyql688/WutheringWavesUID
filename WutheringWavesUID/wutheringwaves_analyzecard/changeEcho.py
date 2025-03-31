@@ -87,6 +87,7 @@ async def change_sonata_and_first_echo(bot: Bot, char_id: int, sonata_a: str, ph
     waves_data = []
 
     if sonata_a:
+        phantom_a = True # 启用首位声骸替换
         sonata = alias_to_sonata_name(sonata_a)
         logger.info(f"[鸣潮] 修改套装为:{sonata}")
         if not sonata:
@@ -105,38 +106,55 @@ async def change_sonata_and_first_echo(bot: Bot, char_id: int, sonata_a: str, ph
         for echo in char_data["phantomData"]["equipPhantomList"]:
             if not sonata:
                 sonata = echo["fetterDetail"]["name"]
-        phantom_id_list = await get_first_echo_id_list(sonata)
+        phantom_id_list_groups = await get_first_echo_id_list(sonata)
+        
+        # 构建可选项（标注 cost 层级）
+        options = []
+        flat_choices = []  # 用于存储扁平化的选项信息（cost + id）
+        for group in phantom_id_list_groups:
+            cost = group["cost"]
+            for phantom_id in group["list"]:
+                options.append(
+                    f"{len(options)+1}: [{cost}cost] {phantom_id_to_phantom_name(phantom_id)}"
+                )
+                flat_choices.append({"cost": cost, "id": phantom_id})
 
-        options = [
-            f"{index+1}: {phantom_id_to_phantom_name(phantom)}"
-            for index, phantom in enumerate(phantom_id_list)
-        ]
         TEXT_GET_RESP = (
-            "[鸣潮] 请选择替换为哪个4cost声骸：\n"
+            "[鸣潮] 请选择首位声骸替换为(仅提供有buff加成的)：\n"
             + "\n".join(options)
-            + "\n请输入序号（1-{}）选择".format(len(phantom_id_list))
+            + "\n请输入序号（1-{}）选择".format(len(options))
         )
 
         resp = await bot.receive_resp(TEXT_GET_RESP)
         if resp is not None and resp.content[0].type == "text" and resp.content[0].data.isdigit():
             choice = int(resp.content[0].data) - 1
-            if 0 <= choice < len(phantom_id_list):
-                first_change_bool = True # 只修改第一顺位4cost声骸
-                selected_phantom = phantom_id_list[choice]
+            if 0 <= choice < len(flat_choices):
+                selected = flat_choices[choice]
+                target_cost = selected["cost"]
+                selected_id = selected["id"]
+                
+                # 获取该 cost 层级的全部可选 ID
+                same_cost_ids = [echo_id for g in phantom_id_list_groups if g["cost"] == target_cost for echo_id in g["list"]]
+                
+                logger.info(f"[鸣潮]4444声骸id列表：{same_cost_ids}")
+                other_phantoms = [p for p in same_cost_ids if p != selected_id]
+
+                first_change_bool = True # 只修改第一顺位声骸
                 for echo in char_data["phantomData"]["equipPhantomList"]:
-                    if int(echo["cost"]) == 4 and first_change_bool:
-                        echo["phantomProp"]["phantomId"] = selected_phantom
-                        first_change_bool = False
-                        continue
-                    if int(echo["cost"]) == 4 and not first_change_bool:
-                        different_phantoms = [p for p in phantom_id_list if p != selected_phantom]
-                        if not different_phantoms:
-                            return False, None
-                        if echo["phantomProp"]["phantomId"] == selected_phantom or echo["phantomProp"]["phantomId"] not in different_phantoms:
-                            echo["phantomProp"]["phantomId"] = different_phantoms[0]  # 取第一个不同的元素
+                    if int(echo["cost"]) == target_cost:
+                        if first_change_bool:
+                            echo["phantomProp"]["phantomId"] = selected_id
+                            echo["phantomProp"]["name"] = phantom_id_to_phantom_name(selected_id)
+                            first_change_bool = False
+                        else:
+                            if other_phantoms:
+                                echo["phantomProp"]["phantomId"] = other_phantoms[0]  # 取第一个不同的元素
+                                echo["phantomProp"]["name"] = phantom_id_to_phantom_name(other_phantoms[0])
+                            else:
+                                pass
 
 
-                logger.info(f"[鸣潮] 修改4cost声骸id为:{selected_phantom}")
+                logger.info(f"[鸣潮] 修改cost声骸id为:{selected_id}")
             else:
                 return False, None
         else:

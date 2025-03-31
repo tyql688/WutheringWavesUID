@@ -4,7 +4,7 @@ from pathlib import Path
 
 from gsuid_core.logger import logger
 
-from .detail_json import DETAIL, SONATA_COST_4_ID
+from .detail_json import DETAIL, SONATA_COST_4_ID, SONATA_COST_3_ID, SONATA_COST_1_ID
 
 PLUGIN_PATH =  Path(__file__).parent.parent
 FETTERDETAIL_PATH = PLUGIN_PATH / "utils/map/detail_json/sonata"
@@ -49,12 +49,14 @@ async def get_fetterDetail_from_sonata(sonata) -> dict:
     }
     return echo
 
-async def get_first_echo_id_list(sonata):
-    path = FETTERDETAIL_PATH / f"{sonata}.json"
-    with open(path, "r", encoding="utf-8") as f:
-        char_data = json.load(f)
-
-    return SONATA_COST_4_ID[char_data["name"]]
+async def get_first_echo_id_list(sonata_name):
+    phantom_id_list = [
+        {"cost": 4, "list": SONATA_COST_4_ID.get(sonata_name, [])},
+        {"cost": 3, "list": SONATA_COST_3_ID.get(sonata_name, [])},
+        {"cost": 1, "list": SONATA_COST_1_ID.get(sonata_name, [])},
+    ]
+    logger.info(f"[鸣潮]获取到{sonata_name}的声骸id列表：{phantom_id_list}")
+    return phantom_id_list
 
 async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tuple[int, int]:
     """
@@ -91,7 +93,10 @@ async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tupl
     
     # ---------- 获取角色配置 ----------
     try:
-        echo_id_list = await get_first_echo_id_list(DETAIL[char_name]['fetterDetail'])
+        # 获取完整的层级结构
+        full_id_list = await get_first_echo_id_list(DETAIL[char_name]['fetterDetail'])
+        # 提取 4cost 的列表
+        echo_id_list = [echo_id for item in full_id_list if item["cost"] == 4 for echo_id in item["list"]]
     except KeyError as e:
         logger.error(f"[鸣潮]角色配置数据缺失: {e}")
         return ECHO_ID_COST_ONE, 1  # 降级处理
