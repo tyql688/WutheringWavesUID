@@ -1,6 +1,6 @@
-from typing import Any, List, Optional, Type, TypeVar
+from typing import Any, Dict, List, Optional, Type, TypeVar
 
-from sqlalchemy import and_, delete, null, or_, update
+from sqlalchemy import and_, delete, null, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Field, col, select
 
@@ -26,6 +26,7 @@ T_WavesUser = TypeVar("T_WavesUser", bound="WavesUser")
 
 
 class WavesBind(Bind, table=True):
+    __table_args__: Dict[str, Any] = {"extend_existing": True}
     uid: Optional[str] = Field(default=None, title="鸣潮UID")
 
     @classmethod
@@ -146,6 +147,7 @@ class WavesBind(Bind, table=True):
 
 
 class WavesUser(User, table=True):
+    __table_args__: Dict[str, Any] = {"extend_existing": True}
     cookie: str = Field(default="", title="Cookie")
     uid: str = Field(default=None, title="鸣潮UID")
     record_id: Optional[str] = Field(default=None, title="鸣潮记录ID")
@@ -269,7 +271,7 @@ class WavesUser(User, table=True):
 
 
 class WavesPush(Push, table=True):
-    __table_args__ = {"extend_existing": True}
+    __table_args__: Dict[str, Any] = {"extend_existing": True}
     bot_id: str = Field(title="平台")
     uid: str = Field(default=None, title="鸣潮UID")
     resin_push: Optional[str] = Field(
