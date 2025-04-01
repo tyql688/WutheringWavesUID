@@ -89,7 +89,7 @@ async def draw_card_help():
     return msg
 
 
-async def draw_card(uid: int, ev: Event):
+async def draw_card(uid: str, ev: Event):
     # 获取数据
     gacha_log_path = PLAYER_PATH / str(uid) / "gacha_logs.json"
     if not gacha_log_path.exists():
@@ -223,7 +223,7 @@ async def draw_card(uid: int, ev: Event):
     up_icon = Image.open(TEXT_PATH / "up_tag.png")
     up_icon = up_icon.resize((68, 52))
 
-    async def draw_pic(item) -> Image:
+    async def draw_pic(item) -> Image.Image:
         item_bg = Image.new("RGBA", (167, 170))
         item_fg_cp = item_fg.copy()
         item_bg.paste(item_fg_cp, (0, 0), item_fg_cp)

@@ -444,58 +444,10 @@
     "desc": "该配置项仅针对个人使用，暂不支持国际服",
     "data": [
       {
-        "name": "开启全局推送",
-        "desc": "是否开启全局推送",
-        "eg": "开启推送",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "开启体力推送",
-        "desc": "是否开启体力推送",
-        "eg": "开启体力推送",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "设置体力阈值",
-        "desc": "超过阈值才会推送体力信息",
-        "eg": "设置体力阈值160",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
         "name": "设置体力背景",
         "desc": "设置体力背景",
         "eg": "设置体力背景长离",
         "need_ck": false,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "签到",
-        "desc": "鸣潮签到",
-        "eg": "签到",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "开启自动签到",
-        "desc": "开启每天的自动签到功能",
-        "eg": "开启自动签到",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "开启库街区自动任务",
-        "desc": "开启每天的库街区自动任务",
-        "eg": "开启自动社区签到",
-        "need_ck": true,
         "need_sk": false,
         "need_admin": false
       }
@@ -552,14 +504,6 @@
         "need_admin": true
       },
       {
-        "name": "全部重新签到",
-        "desc": "全部重新签到所有人",
-        "eg": "全部签到",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": true
-      },
-      {
         "name": "下载全部资源",
         "desc": "下载全部资源",
         "eg": "下载全部资源",
@@ -571,22 +515,6 @@
         "name": "删除无效token",
         "desc": "删除无效token",
         "eg": "删除无效token",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": true
-      },
-      {
-        "name": "删除自动签到",
-        "desc": "删除自动签到",
-        "eg": "删除自动签到123456",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": true
-      },
-      {
-        "name": "订阅自动签到结果",
-        "desc": "订阅自动签到结果",
-        "eg": "订阅签到结果",
         "need_ck": false,
         "need_sk": false,
         "need_admin": true

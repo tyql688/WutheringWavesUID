@@ -36,66 +36,6 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "无限制进排行，群管理可设置",
         [],
     ),
-    "SignTime": GsListStrConfig(
-        "每晚签到时间设置",
-        "每晚库街区签到时间设置（时，分）",
-        ["0", "10"],
-    ),
-    "SchedSignin": GsBoolConfig(
-        "定时签到",
-        "开启后每晚00:10将开始自动签到任务",
-        False,
-    ),
-    "BBSSchedSignin": GsBoolConfig(
-        "定时库街区每日任务",
-        "开启后每晚00:10将开始自动库街区每日任务",
-        False,
-    ),
-    "PrivateSignReport": GsBoolConfig(
-        "签到私聊报告",
-        "关闭后将不再给任何人推送当天签到任务完成情况",
-        False,
-    ),
-    "GroupSignReport": GsBoolConfig(
-        "签到群组报告",
-        "关闭后将不再给任何群推送当天签到任务完成情况",
-        True,
-    ),
-    "GroupSignReportPic": GsBoolConfig(
-        "签到群组图片报告",
-        "签到以图片形式报告",
-        False,
-    ),
-    "SigninMaster": GsBoolConfig(
-        "全部开启签到",
-        "开启后自动帮登录的人签到",
-        False,
-    ),
-    "UserSchedSignin": GsBoolConfig(
-        "用户签到开关",
-        "用户签到开关",
-        False,
-    ),
-    "UserBBSSchedSignin": GsBoolConfig(
-        "用户库街区每日任务",
-        "用户库街区每日任务",
-        False,
-    ),
-    "SigninConcurrentNum2": GsIntConfig(
-        "自动签到并发数量", "自动签到并发数量", 2, max_value=5
-    ),
-    "SigninConcurrentNumInterval2": GsListStrConfig(
-        "自动签到并发数量间隔，默认3-5秒",
-        "自动签到并发数量间隔，默认3-5秒",
-        ["3", "5"],
-    ),
-    "CrazyNotice": GsBoolConfig("催命模式", "开启后当达到推送阈值将会一直推送", False),
-    "StaminaPush": GsBoolConfig(
-        "体力推送全局开关", "开启后当体力达到推送阈值将会推送", False
-    ),
-    "StaminaPushInterval": GsIntConfig(
-        "体力推送间隔（分钟）", "体力推送间隔（分钟）", 30, 60
-    ),
     "WavesGuideProvideNew": GsStrConfig(
         "角色攻略图提供方",
         "使用ww角色攻略时选择的提供方",

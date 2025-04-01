@@ -1,6 +1,6 @@
-from typing import Any, List, Optional, Type, TypeVar
+from typing import Any, Dict, List, Optional, Type, TypeVar
 
-from sqlalchemy import and_, delete, null, or_, update
+from sqlalchemy import and_, delete, null, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Field, col, select
 
@@ -26,6 +26,7 @@ T_WavesUser = TypeVar("T_WavesUser", bound="WavesUser")
 
 
 class WavesBind(Bind, table=True):
+    __table_args__: Dict[str, Any] = {"extend_existing": True}
     uid: Optional[str] = Field(default=None, title="鸣潮UID")
 
     @classmethod
@@ -146,6 +147,7 @@ class WavesBind(Bind, table=True):
 
 
 class WavesUser(User, table=True):
+    __table_args__: Dict[str, Any] = {"extend_existing": True}
     cookie: str = Field(default="", title="Cookie")
     uid: str = Field(default=None, title="鸣潮UID")
     record_id: Optional[str] = Field(default=None, title="鸣潮记录ID")
@@ -267,28 +269,9 @@ class WavesUser(User, table=True):
         await session.execute(sql)
         return len(query)
 
-    @classmethod
-    @with_session
-    async def delete_group_sign_switch(cls, session: AsyncSession, param_id: str):
-        """删除自动签到"""
-        # 先查数量
-        sql = select(cls).where(and_(cls.sign_switch == param_id))
-        result = await session.execute(sql)
-        query = result.scalars().all()
-        if len(query) == 0:
-            return 0
-
-        sql = (
-            update(cls)
-            .where(and_(cls.sign_switch == param_id))
-            .values({"sign_switch": "off"})
-        )
-        await session.execute(sql)
-        return len(query)
-
 
 class WavesPush(Push, table=True):
-    __table_args__ = {"extend_existing": True}
+    __table_args__: Dict[str, Any] = {"extend_existing": True}
     bot_id: str = Field(title="平台")
     uid: str = Field(default=None, title="鸣潮UID")
     resin_push: Optional[str] = Field(
