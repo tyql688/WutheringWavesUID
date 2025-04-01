@@ -38,6 +38,10 @@ async def ann_(bot: Bot, ev: Event):
 
 @sv_ann_sub.on_fullmatch("订阅公告")
 async def sub_ann_(bot: Bot, ev: Event):
+    if ev.bot_id != "onebot":
+        logger.debug(f"非onebot禁止订阅鸣潮公告 【{ev.bot_id}】")
+        return
+
     if ev.group_id is None:
         return await bot.send("请在群聊中订阅")
     if not WutheringWavesConfig.get_config("WavesAnnOpen").data:
@@ -62,6 +66,10 @@ async def sub_ann_(bot: Bot, ev: Event):
 
 @sv_ann_sub.on_fullmatch(("取消订阅公告", "取消公告", "退订公告"))
 async def unsub_ann_(bot: Bot, ev: Event):
+    if ev.bot_id != "onebot":
+        logger.debug(f"非onebot禁止订阅鸣潮公告 【{ev.bot_id}】")
+        return
+
     if ev.group_id is None:
         return await bot.send("请在群聊中取消订阅")
 
