@@ -338,7 +338,7 @@ def calc_damage_5(
 
     # 设置共鸣链
     chain_num = role.get_chain_num()
-    if chain_num >= 1:
+    if chain_num >= 2:
         title = f"{role_name}-二链"
         msg = "惊醒的伤害倍率提升245%。"
         attr.add_skill_ratio(2.45, title, msg)
