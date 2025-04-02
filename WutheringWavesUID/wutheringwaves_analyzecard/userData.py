@@ -12,7 +12,8 @@ from ..utils.ascension.weapon import get_weapon_detail
 from ..utils.refresh_char_detail import save_card_info
 from ..utils.name_convert import (
     char_id_to_char_name,
-    weapon_name_to_weapon_id
+    weapon_name_to_weapon_id,
+    phantom_id_to_phantom_name
 )
 from ..wutheringwaves_config import PREFIX
 from .char_fetterDetail import get_fetterDetail_from_char, echo_data_to_cost
@@ -88,8 +89,11 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         # 根据主词条判断声骸cost并适配id
         echo_id, cost = await echo_data_to_cost(char_id, echo["mainProps"][0], cost4_counter)
         cost_sum += cost
+
+        echo["phantomProp"]["name"] = f"识别默认{cost}c"
         if cost == 4:
             cost4_counter += 1  # 只有实际生成cost4时递增
+            echo["phantomProp"]["name"] = phantom_id_to_phantom_name(echo_id)
 
         echo["phantomProp"]["phantomId"] = echo_id
         echo["phantomProp"]["cost"] = cost
