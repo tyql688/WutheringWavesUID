@@ -242,11 +242,25 @@ class WavesApi:
                 return True, role
         return False, WAVES_CODE_100
 
-    async def get_daily_info(self, token: str) -> tuple[bool, Union[Dict, str]]:
+    async def get_daily_info(
+        self, roleId: str, token: str, gameId: Union[str, int] = GAME_ID
+    ) -> tuple[bool, Union[Dict, str]]:
         """每日"""
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
-        raw_data = await self._waves_request(GAME_DATA_URL, "POST", header)
+        data = {
+            "type": "2",
+            "sizeType": "1",
+            "gameId": gameId,
+            "serverId": self.get_server_id(roleId),
+            "roleId": roleId,
+        }
+        raw_data = await self._waves_request(
+            GAME_DATA_URL,
+            "POST",
+            header,
+            data=data,
+        )
         return await _check_response(raw_data)
 
     async def refresh_data(

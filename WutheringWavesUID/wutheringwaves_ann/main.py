@@ -12,7 +12,11 @@ class _Dict(dict):
 
 
 class ann:
-    _headers = {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8"}
+    _headers = {
+        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0",
+        "version": "2.4.3",
+    }
     ann_list_data = []
     ann_content_data = {}
     event_type = {"2": "资讯", "3": "公告", "1": "活动"}

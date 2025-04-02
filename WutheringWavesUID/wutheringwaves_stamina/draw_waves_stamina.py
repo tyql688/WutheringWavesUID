@@ -11,7 +11,6 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
-
 from ..utils.api.model import AccountBaseInfo, DailyData
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_102, WAVES_CODE_103
@@ -54,31 +53,30 @@ async def seconds2hours(seconds: int) -> str:
     return "%02d小时%02d分" % (h, m)
 
 
-async def process_uid(uid, ev, waves_api):
+async def process_uid(uid, ev):
     ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
     if not ck:
         return None
 
     # 并行请求所有相关 API
     results = await asyncio.gather(
-        waves_api.refresh_data(uid, ck),
-        waves_api.get_daily_info(ck),
+        waves_api.get_daily_info(uid, ck),
         waves_api.get_base_info(uid, ck),
         return_exceptions=True,
     )
 
-    (refresh_res, daily_info_res, account_info_res) = results
+    (daily_info_res, account_info_res) = results
 
-    if not refresh_res[0] or not daily_info_res[0] or not account_info_res[0]:
+    if not daily_info_res[0] or not account_info_res[0]:
         return None
 
     daily_info = DailyData(**daily_info_res[1])
     account_info = AccountBaseInfo(**account_info_res[1])
 
     # 处理签到状态
-    res = await waves_api.sign_in_task_list(uid, ck)
-    if isinstance(res, dict):
-        daily_info.hasSignIn = res.get("data", {}).get("isSigIn", False)
+    # res = await waves_api.sign_in_task_list(uid, ck)
+    # if isinstance(res, dict):
+    #     daily_info.hasSignIn = res.get("data", {}).get("isSigIn", False)
 
     return {
         "daily_info": daily_info,
@@ -93,7 +91,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
         if uid_list is None:
             return ERROR_CODE[WAVES_CODE_103]
         # 进行校验UID是否绑定CK
-        tasks = [process_uid(uid, ev, waves_api) for uid in uid_list]
+        tasks = [process_uid(uid, ev) for uid in uid_list]
         results = await asyncio.gather(*tasks)
 
         # 过滤掉 None 值
