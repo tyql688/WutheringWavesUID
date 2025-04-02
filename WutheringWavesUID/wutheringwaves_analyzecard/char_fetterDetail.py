@@ -11,9 +11,9 @@ FETTERDETAIL_PATH = PLUGIN_PATH / "utils/map/detail_json/sonata"
 
 
 
-async def get_fetterDetail_from_char(char_name) -> dict:
+async def get_fetterDetail_from_char(char_id) -> dict:
     
-    sonata = DETAIL[char_name]['fetterDetail']
+    sonata = DETAIL[char_id]['fetterDetail']
     if sonata == "":
         return {}
 
@@ -58,7 +58,7 @@ async def get_first_echo_id_list(sonata_name):
     logger.info(f"[鸣潮]获取到{sonata_name}的声骸id列表：{phantom_id_list}")
     return phantom_id_list
 
-async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tuple[int, int]:
+async def echo_data_to_cost(char_id, mainProps_first, cost4_counter=0) -> tuple[int, int]:
     """
     根据主词条判断声骸cost并返回适配ID
     
@@ -94,14 +94,14 @@ async def echo_data_to_cost(char_name, mainProps_first, cost4_counter=0) -> tupl
     # ---------- 获取角色配置 ----------
     try:
         # 获取完整的层级结构
-        full_id_list = await get_first_echo_id_list(DETAIL[char_name]['fetterDetail'])
+        full_id_list = await get_first_echo_id_list(DETAIL[char_id]['fetterDetail'])
         # 提取 4cost 的列表
         echo_id_list = [echo_id for item in full_id_list if item["cost"] == 4 for echo_id in item["list"]]
     except KeyError as e:
         logger.error(f"[鸣潮]角色配置数据缺失: {e}")
         return ECHO_ID_COST_ONE, 1  # 降级处理
     except FileNotFoundError:
-        logger.error(f"[鸣潮]角色{char_name}配置文件不存在")
+        logger.error(f"[鸣潮]角色{DETAIL[char_id]['name']}配置文件不存在")
         return ECHO_ID_COST_ONE, 1
 
     # ---------- 4cost分配id逻辑 ----------

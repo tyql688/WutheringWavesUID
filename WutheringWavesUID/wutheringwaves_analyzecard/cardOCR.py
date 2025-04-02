@@ -11,12 +11,14 @@ from PIL import Image
 from io import BytesIO
 from opencc import OpenCC
 from aiohttp import ClientTimeout
+from async_timeout import timeout
 
 # 项目内部模块
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.logger import logger
 
+from .detail_json import DETAIL
 from ..wutheringwaves_config import WutheringWavesConfig
 from ..wutheringwaves_analyzecard.userData import save_card_dict_to_json
 
@@ -121,7 +123,7 @@ async def async_ocr(bot: Bot, ev: Event):
         await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
         return False
 
-    bool_i, image = await upload_discord_bot_card(bot, ev)
+    bool_i, image = await upload_discord_bot_card(ev)
     if not bool_i:
         await bot.send("[鸣潮]获取dc卡片图失败！卡片分析已停止。")
         return False
@@ -137,6 +139,14 @@ async def async_ocr(bot: Bot, ev: Event):
         return False
 
     bool_d, final_result = await ocr_results_to_dict(chain_num, ocr_results)
+
+    name, char_id = await which_char(bot, ev, final_result["角色信息"]["角色名"])
+    if char_id is None:
+        await bot.send(f"[鸣潮]识别结果为角色{name}不存在")
+        logger.debug(f"[鸣潮][dc卡片识别] 角色{name}识别错误！")
+        return False
+    final_result["角色信息"]["角色名"] = name
+    final_result["角色信息"]["角色ID"] = char_id
 
     if bool_d:
         await save_card_dict_to_json(bot, ev, final_result)
@@ -163,13 +173,11 @@ async def get_image(ev: Event):
 
     return res
 
-async def upload_discord_bot_card(bot: Bot, ev: Event):
+async def upload_discord_bot_card(ev: Event):
     """
     上传Discord机器人的卡片
     change from .upload_card.upload_custom_card
     """
-    at_sender = True if ev.group_id else False
-
     upload_images = await get_image(ev)
     if not upload_images:
         return False, None
@@ -207,7 +215,6 @@ async def upload_discord_bot_card(bot: Bot, ev: Event):
             logger.warning("[鸣潮]图片获取失败！")
 
     if success:
-        await bot.send("[鸣潮]上传卡片图成功！进行数据提取中...\n", at_sender)
         image = Image.open(BytesIO(image_data))
         return True, image
     else:
@@ -465,8 +472,6 @@ async def ocr_results_to_dict(chain_num, ocr_results):
                     if name_match:
                         name = name_match.group()
                         name = name.replace("吟槑", "吟霖")
-                        if name == "漂泊者":
-                            name = "漂泊者衍射"
                         if not re.match(r'^[\u4e00-\u9fa5]+$', name):
                             logger.debug(f" [鸣潮][dc卡片识别] 识别出英文角色名:{name}，退出识别！")
                             return False, final_result
@@ -563,3 +568,58 @@ async def ocr_results_to_dict(chain_num, ocr_results):
 
     logger.info(f" [鸣潮][dc卡片识别] 最终提取内容:\n{final_result}")
     return True, final_result
+
+async def which_char(bot: Bot, ev: Event, char: str):
+    at_sender = True if ev.group_id else False
+    # 角色信息
+    candidates = []
+    for char_id, info in DETAIL.items():
+        normalized_name = info["name"].replace("·", "").replace(" ", "")
+        if char in normalized_name:
+            candidates.append((char_id, info))
+    logger.debug(f"[鸣潮][dc卡片识别] 角色匹配结果：{candidates}")
+
+    if len(candidates) == 1:  # 唯一匹配
+        char_id, info = candidates[0]
+        return info["name"], char_id
+
+    # 为漂泊者？
+    options = []
+    flat_choices = []  # 存储 (角色名, id)
+    for idx, (char_id, info) in enumerate(candidates, 1):
+        sex = info.get("sex", "未配置")
+        options.append(f"{idx:>2}: [{sex}] {info['name']}")
+        flat_choices.append((info['name'], char_id))
+    
+    # 构建双列布局
+    paired_options = []
+    for i in range(0, len(options), 2):
+        line = []
+        if i < len(options):
+            line.append(options[i])
+        if i+1 < len(options):
+            line.append(options[i+1].ljust(30))  # 控制列宽
+        paired_options.append("    ".join(line))  # 两列间用4空格分隔
+    
+    prompt = (
+        f"[鸣潮] 检测到{char}的多个分支：\n"
+        + "\n".join(paired_options) 
+        + f"\n请于30秒内输入序号选择（1-{len(candidates)}）"
+    )
+    await bot.send(prompt, at_sender=at_sender)
+    
+    # 第四步：处理用户响应
+    try:
+        async with timeout(30):
+            while True:
+                resp = await bot.receive_resp()
+            
+                if resp is not None and resp.content[0].type == "text" and resp.content[0].data.isdigit():
+                    choice_idx = int(resp.content[0].data) - 1
+                    if 0 <= choice_idx < len(flat_choices):
+                        return flat_choices[choice_idx]
+                await bot.send(f"无效序号，请输入范围[1-{len(candidates)}]的数字选择", at_sender=at_sender)
+    except asyncio.TimeoutError:
+        default_name, default_id = flat_choices[0] if flat_choices else (char, None)
+        await bot.send(f"[鸣潮] 选择超时，已自动使用 {default_name}", at_sender=at_sender)
+        return default_name, default_id

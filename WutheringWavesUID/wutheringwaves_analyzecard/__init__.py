@@ -9,8 +9,8 @@ import asyncio
 from async_timeout import timeout
 
 
-waves_discord_bot_card_analyze = SV(f"waves分析discord_bot卡片")
-waves_change_sonata_and_first_echo = SV(f"waves修改首位声骸与套装")
+waves_discord_bot_card_analyze = SV("waves分析discord_bot卡片")
+waves_change_sonata_and_first_echo = SV("waves修改首位声骸与套装")
 
 
 @waves_discord_bot_card_analyze.on_command(

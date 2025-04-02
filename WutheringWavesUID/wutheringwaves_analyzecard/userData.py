@@ -11,8 +11,7 @@ from ..wutheringwaves_charinfo.draw_char_card import generate_online_role_detail
 from ..utils.ascension.weapon import get_weapon_detail
 from ..utils.refresh_char_detail import save_card_info
 from ..utils.name_convert import (
-    alias_to_char_name,
-    char_name_to_char_id,
+    char_id_to_char_name,
     weapon_name_to_weapon_id
 )
 from ..wutheringwaves_config import PREFIX
@@ -28,9 +27,8 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
         chain_num = result_dict["角色信息"]["共鸣链"]
         
-        char = result_dict["角色信息"]["角色名"]
-        char_name = alias_to_char_name(char)
-        char_id = char_name_to_char_id(char_name)
+        char_id = result_dict["角色信息"]["角色ID"]
+        char_name = char_id_to_char_name(char_id)
         char_name_print = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', char_name) # 删除"漂泊者·衍射"的符号
 
         if char_id is None:
@@ -76,7 +74,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
     cost_sum = 0 # 默认cost总数
     cost4_counter = 0 # 4cost 的计数器
     echo_num = len(result_dict["装备数据"])
-    ECHO = await get_fetterDetail_from_char(char_name)
+    ECHO = await get_fetterDetail_from_char(char_id)
 
     for echo_value in result_dict["装备数据"]:
         # 创建 ECHO 的独立副本
@@ -88,7 +86,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         echo["subProps"] = echo_value.get("subProps", [])
 
         # 根据主词条判断声骸cost并适配id
-        echo_id, cost = await echo_data_to_cost(char_name, echo["mainProps"][0], cost4_counter)
+        echo_id, cost = await echo_data_to_cost(char_id, echo["mainProps"][0], cost4_counter)
         cost_sum += cost
         if cost == 4:
             cost4_counter += 1  # 只有实际生成cost4时递增
