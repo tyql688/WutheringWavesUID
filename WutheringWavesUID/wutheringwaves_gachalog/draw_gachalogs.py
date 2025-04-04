@@ -74,6 +74,7 @@ def get_level_from_list(ast: int, lst: List) -> int:
 
 
 async def draw_card_help():
+    warn = "【注意】\n△请确保您的抽卡记录是【简体中文】，暂不支持其他语言△\n△导入链接前请在浏览器打开抽卡记录链接，并检查是否有数据△"
     android = "安卓手机获取链接方式\n\n1.打开游戏抽卡界面\n2.关闭网络或打开飞行模式\n3.点开换取记录\n4.长按左上角区域，全选，复制"
     ios = '苹果手机获取方式\n\n1.使用Stream抓包（详细教程网上搜索）\n2.关键字搜索:[game2]的请求\n3.点击“请求”\n4点击最下方的"查看JSON"，全选，复制\n\n国服域名：[gmserver-api.aki-game2.com]\n国际服域名：[gmserver-api.aki-game2.net]'
     pc = 'PC获取方式\n\n1.打开游戏抽卡界面，点开换取记录\n2.在鸣潮安装的目录下进入目录："Wuthering Waves\Wuthering Waves Game\Client\Saved\Logs"\n3.找到文件"Client.log"并用记事本打开\n4.搜索关键字：国服域名：[aki-gm-resources.aki-game]\n国际服域名：[aki-gm-resources-oversea.aki-game]\n5.复制一整行链接'
@@ -85,7 +86,7 @@ async def draw_card_help():
         "",
         "抽卡链接具有有效期，请在有效期内尽快导入",
     ]
-    msg = [android, ios, pc, "\n".join(text)]
+    msg = [warn, android, ios, pc, "\n".join(text)]
     return msg
 
 
