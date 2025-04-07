@@ -43,12 +43,18 @@ async def change_echo(bot: Bot, ev: Event):
     phantom = bool(ev.regex_dict.get("echo"))  # 改为布尔值判断
 
     char_name = alias_to_char_name(char)
-    char_id = int(char_name_to_char_id(char_name)) # Int类型配合获取到的本地数据集
+    if char == "漂泊者":
+        char_name = char # 匹配本地用，不接受alias的结果
     char_name_print = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', char_name) # 删除"漂泊者·衍射"的符号
 
     bool_get, old_data = await get_local_all_role_detail(uid)
     if not bool_get:
         return await bot.send(f"[鸣潮] 用户{uid}数据不存在，请先使用【{PREFIX}分析】上传{char_name_print}角色数据", at_sender)
+
+    char_id, roleName = await get_char_name_from_local(char_name, old_data)
+    if not char_id:
+        return await bot.send(f"[鸣潮] 角色{char_name_print}不存在，请先使用【{PREFIX}分析】上传角色数据", at_sender)
+    char_name_print = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', roleName) # 删除"漂泊者·衍射"的符号
 
     bool_change, waves_data = await change_sonata_and_first_echo(bot, char_id, sonata, phantom, old_data)
     if not bool_change:
@@ -76,6 +82,15 @@ async def get_local_all_role_detail(uid: str) -> tuple[bool, dict]:
         return False, role_data
 
     return True, role_data
+
+async def get_char_name_from_local(char_name: str, role_data: dict) -> tuple[int, str]:
+    for char_id, role_info in role_data.items():
+        roleName = role_info.get("role").get("roleName")
+        logger.info(f"[鸣潮] 角色{char_name}与{roleName}匹配")
+        if char_name in roleName:
+            return int(char_id), roleName
+    # 未找到匹配角色
+    return None, None
 
 async def change_sonata_and_first_echo(bot: Bot, char_id: int, sonata_a: str, phantom_a: bool, role_data: dict) -> tuple[bool, dict]:
     # 检查角色是否存在
