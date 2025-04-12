@@ -52,6 +52,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "强制【鸣潮登录url】为自己的域名",
         False,
     ),
+    "WavesTencentWord": GsBoolConfig(
+        "腾讯文档",
+        "腾讯文档",
+        False,
+    ),
     "WavesQRLogin": GsBoolConfig(
         "开启后，登录链接变成二维码",
         "开启后，登录链接变成二维码",
