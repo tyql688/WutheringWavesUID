@@ -827,6 +827,8 @@ async def get_group_char_hold_rate_data(group_id: str) -> Dict:
     # 提取所有需要处理的UID
     all_uids = []
     for user in users:
+        if not user.uid:
+            continue
         uids = user.uid.split("_")
         for uid in uids:
             if uid not in uid_fiter:
