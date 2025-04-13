@@ -11,11 +11,18 @@ sv_char_hold_rate = SV("waves角色持有率")
 @sv_char_hold_rate.on_command(
     (
         "角色持有率",
-        "角色持有率",
         "角色持有率列表",
         "持有率",
+        "群角色持有率",
+        "群角色持有率列表",
+        "群持有率",
     )
 )
 async def handle_char_hold_rate(bot: Bot, ev: Event):
-    img = await get_char_hold_rate_img()
+    if "群" in ev.command:
+        if not ev.group_id:
+            return await bot.send("请在群聊中使用")
+        img = await get_char_hold_rate_img(ev.group_id)
+    else:
+        img = await get_char_hold_rate_img()
     await bot.send(img)
