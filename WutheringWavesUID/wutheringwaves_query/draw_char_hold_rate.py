@@ -1,3 +1,4 @@
+import asyncio
 from typing import Dict, Tuple, Union
 
 import httpx
@@ -8,6 +9,7 @@ from gsuid_core.utils.image.convert import convert_img
 
 from ..utils.api.wwapi import GET_HOLD_RATE_URL
 from ..utils.ascension.char import get_char_model
+from ..utils.database.models import WavesBind
 from ..utils.fonts.waves_fonts import (
     waves_font_12,
     waves_font_14,
@@ -25,6 +27,7 @@ from ..utils.image import (
 )
 from ..utils.resource.constant import SPECIAL_CHAR_NAME
 from ..utils.util import timed_async_cache
+from ..utils.waves_card_cache import get_card
 
 # 定义颜色
 BG_COLOR = (30, 33, 45)
@@ -610,7 +613,7 @@ async def draw_character_item(
         )
 
 
-async def draw_char_hold_rate(data) -> bytes:
+async def draw_char_hold_rate(data, group_id: str = "") -> bytes:
     """绘制角色持有率列表图像"""
     # 加载数据
     char_list = data["char_hold_rate"]
@@ -674,7 +677,10 @@ async def draw_char_hold_rate(data) -> bytes:
     img.paste(header_bg, (margin, margin), header_bg)
 
     # 绘制标题 - 添加光晕效果
-    title = "鸣潮角色持有率列表"
+    if group_id:
+        title = f"群组[{group_id}]角色持有率列表"
+    else:
+        title = "鸣潮角色持有率列表"
     title_x = width // 2
     title_y = margin + 50
 
@@ -699,6 +705,61 @@ async def draw_char_hold_rate(data) -> bytes:
         WHITE,
         BLACK,
         (2, 2),
+        "mm",
+    )
+
+    # 绘制样本人数
+    total_count = data.get("total_player_count", 0)
+    count_text = f"样本数量: {total_count} 人"
+    count_x = title_x
+    count_y = title_y + 40
+
+    # 添加样式化样本数显示框
+    count_bg_width = waves_font_20.getlength(count_text) + 40
+    count_bg_height = 30
+    count_bg = Image.new("RGBA", (int(count_bg_width), count_bg_height), (0, 0, 0, 0))
+    count_bg_draw = ImageDraw.Draw(count_bg)
+
+    # 绘制半透明背景
+    count_bg_color = (75, 132, 221, 180)  # 使用高亮蓝色
+    count_bg_draw.rounded_rectangle(
+        (0, 0, count_bg_width, count_bg_height),
+        count_bg_height // 2,
+        fill=count_bg_color,
+    )
+
+    # 添加发光效果
+    glow_color = (100, 150, 230)
+    for i in range(1, 4):
+        glow_alpha = 100 - i * 30
+        glow_width = i * 2
+        count_bg_draw.rounded_rectangle(
+            (
+                -glow_width,
+                -glow_width,
+                count_bg_width + glow_width,
+                count_bg_height + glow_width,
+            ),
+            (count_bg_height + glow_width) // 2,
+            outline=(*glow_color, glow_alpha),
+            width=2,
+        )
+
+    # 将背景粘贴到主图像
+    count_bg_x = int(count_x - count_bg_width // 2)
+    count_bg_y = int(count_y - count_bg_height // 2)
+    img.paste(count_bg, (count_bg_x, count_bg_y), count_bg)
+
+    # 绘制文本
+    draw_text_with_shadow(
+        draw,
+        count_text,
+        count_x,
+        count_y,
+        waves_font_20,
+        WHITE,
+        BLACK,
+        (1, 1),
         "mm",
     )
 
@@ -735,10 +796,118 @@ async def get_char_hold_rate_data() -> Dict:
     return {}
 
 
+async def get_group_char_hold_rate_data(group_id: str) -> Dict:
+    """获取群组角色持有率数据"""
+    res = {}
+
+    users = await WavesBind.get_group_all_uid(group_id)
+    if not users:
+        return res
+
+    uid_fiter = {}
+
+    # 创建用于处理并发请求的Semaphore
+    semaphore = asyncio.Semaphore(20)
+
+    async def process_uid(uid):
+        """处理单个UID的数据"""
+        if uid in uid_fiter:
+            return None
+
+        role_details = await get_card(uid)
+        if role_details is None:
+            return None
+
+        uid_data = {}
+        for role_detail in role_details:
+            uid_data[role_detail.role.roleId] = role_detail.get_chain_num()
+
+        return uid, uid_data
+
+    # 提取所有需要处理的UID
+    all_uids = []
+    for user in users:
+        uids = user.uid.split("_")
+        for uid in uids:
+            if uid not in uid_fiter:
+                all_uids.append(uid)
+
+    # 使用Semaphore限制并发处理UID
+    async def process_with_semaphore(uid):
+        async with semaphore:
+            return await process_uid(uid)
+
+    # 并发执行所有UID的任务
+    tasks = [process_with_semaphore(uid) for uid in all_uids]
+    results = await asyncio.gather(*tasks)
+
+    # 合并结果
+    for result in results:
+        if result:
+            uid, uid_data = result
+            uid_fiter[uid] = uid_data
+
+    # 计算持有率
+    total_player_count = len(uid_fiter)
+
+    if total_player_count == 0:
+        return res
+
+    # 统计角色持有情况
+    char_stats = {}
+
+    for uid, chars in uid_fiter.items():
+        for char_id, chain_num in chars.items():
+            if char_id not in char_stats:
+                char_stats[char_id] = {
+                    "player_count": 0,
+                    "chains": {str(i): 0 for i in range(7)},
+                }
+
+            # 增加持有人数
+            char_stats[char_id]["player_count"] += 1
+
+            # 增加对应共鸣链数量
+            char_stats[char_id]["chains"][str(chain_num)] += 1
+
+    # 构建结果数据
+    char_hold_rate = []
+
+    for char_id, stats in char_stats.items():
+        player_count = stats["player_count"]
+        hold_rate = round(player_count / total_player_count * 100, 1)
+
+        # 计算共鸣链分布百分比
+        chain_hold_rate = {}
+        for chain, count in stats["chains"].items():
+            if count > 0:
+                chain_hold_rate[chain] = round(count / player_count * 100, 2)
+
+        char_data = {
+            "char_id": char_id,
+            "player_count": player_count,
+            "hold_rate": hold_rate,
+            "chain_hold_rate": chain_hold_rate,
+        }
+
+        char_hold_rate.append(char_data)
+
+    # 构建最终结果
+    res = {"total_player_count": total_player_count, "char_hold_rate": char_hold_rate}
+
+    return res
+
+
 # 主入口函数
-async def get_char_hold_rate_img() -> Union[bytes, str]:
+async def get_char_hold_rate_img(group_id: str = "") -> Union[bytes, str]:
     """获取角色持有率图像"""
-    data = await get_char_hold_rate_data()
-    if not data:
-        return "持有率数据获取失败，请稍后再试"
-    return await draw_char_hold_rate(data)
+    if group_id:
+        data = await get_group_char_hold_rate_data(group_id)
+        if not data:
+            return "群组持有率数据获取失败，请稍后再试"
+    else:
+        data = await get_char_hold_rate_data()
+        if not data:
+            return "鸣潮角色持有率数据获取失败，请稍后再试"
+
+    return await draw_char_hold_rate(data, group_id=group_id)
