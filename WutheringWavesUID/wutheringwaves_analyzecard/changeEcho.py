@@ -11,7 +11,6 @@ from ..utils.database.models import WavesBind
 from ..utils.waves_api import waves_api
 from ..utils.name_convert import (
     alias_to_char_name, 
-    char_name_to_char_id,
     alias_to_sonata_name,
     phantom_id_to_phantom_name
 )

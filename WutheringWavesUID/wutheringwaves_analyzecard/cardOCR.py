@@ -456,15 +456,15 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         if first_result['error'] is None:
             lines = first_result['text'].split('\t') # 支持"◎\t洛可可\tLV.90\t"
             for line in lines:
-                # 文本预处理：删除非数字中英文的符号及多余空白
-                line_clean = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', line)  # 先删除非数字中英文的符号, 匹配“漂泊者·湮灭”
-                line_clean = re.sub(r'\s+', ' ', line_clean).strip()  # 再合并多余空白
-                
                 # 玩家名称
-                player_match = patterns["player_info"].search(line_clean)
+                player_match = patterns["player_info"].search(line)
                 if player_match:
                     final_result["用户信息"]["玩家名称"] = player_match.group(1)
                     continue # 避免玩家名称在前被识别为角色名
+
+                # 文本预处理：删除非数字中英文的符号及多余空白
+                line_clean = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', line)  # 先删除非数字中英文的符号, 匹配“漂泊者·湮灭”
+                line_clean = re.sub(r'\s+', ' ', line_clean).strip()  # 再合并多余空白
 
                 # 角色名提取
                 if not final_result["角色信息"].get("角色名"):
