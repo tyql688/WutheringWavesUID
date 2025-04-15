@@ -5,8 +5,7 @@ from typing import Dict, List, Optional, Union
 import aiofiles
 
 from gsuid_core.logger import logger
-from . import waves_card_cache
-from .resource.constant import SPECIAL_CHAR_INT, SPECIAL_CHAR_INT_ALL
+
 from ..utils.api.model import AccountBaseInfo, RoleList
 from ..utils.error_reply import WAVES_CODE_101, WAVES_CODE_102, WAVES_CODE_999
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
@@ -17,6 +16,8 @@ from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.waves_api import waves_api
 from ..version import WWUID_Damage_Version
 from ..wutheringwaves_config import WutheringWavesConfig
+from . import waves_card_cache
+from .resource.constant import SPECIAL_CHAR_INT_ALL
 
 
 async def send_card(
@@ -42,12 +43,18 @@ async def send_card(
         if not succ:
             return account_info
         account_info = AccountBaseInfo.model_validate(account_info)
+        if account_info.roleNum != len(save_data):
+            logger.warning(
+                f"角色数量不一致，roleNum:{account_info.roleNum} != waves_char_rank:{len(save_data)}"
+            )
+            return
         metadata = {
             "user_id": user_id,
             "waves_id": f"{account_info.id}",
             "kuro_name": account_info.name,
             "version": WWUID_Damage_Version,
             "char_info": [r.to_rank_dict() for r in waves_char_rank],
+            "role_num": account_info.roleNum,
         }
         await put_item(QUEUE_SCORE_RANK, metadata)
 

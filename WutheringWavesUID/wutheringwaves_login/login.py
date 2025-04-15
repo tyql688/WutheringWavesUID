@@ -74,8 +74,7 @@ async def send_login(bot: Bot, ev: Event, url):
         path = Path(__file__).parent / f"{ev.user_id}.gif"
 
         im = [
-            f"{game_title}\n",
-            f"您的id为【{ev.user_id}】\n",
+            f"{game_title} 您的id为【{ev.user_id}】\n",
             "请扫描下方二维码获取登录地址，并复制地址到浏览器打开\n",
             MessageSegment.image(await get_qrcode_base64(url, path, ev.bot_id)),
         ]
@@ -87,9 +86,10 @@ async def send_login(bot: Bot, ev: Event, url):
         if path.exists():
             path.unlink()
     else:
+        if WutheringWavesConfig.get_config("WavesTencentWord").data:
+            url = f"https://docs.qq.com/scenario/link.html?url={url}"
         im = [
-            f"{game_title}",
-            f"您的id为【{ev.user_id}】",
+            f"{game_title} 您的id为【{ev.user_id}】",
             "请复制地址到浏览器打开",
             f" {url}",
             "登录地址10分钟内有效",
@@ -102,7 +102,6 @@ async def send_login(bot: Bot, ev: Event, url):
 
 
 async def page_login_local(bot: Bot, ev: Event, url):
-    game_title = "[鸣潮]"
     at_sender = True if ev.group_id else False
     user_token = get_token(ev.user_id)
     await send_login(bot, ev, f"{url}/waves/i/{user_token}")

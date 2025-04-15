@@ -3,6 +3,7 @@ from typing import Union
 
 from PIL import Image, ImageDraw
 
+from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
@@ -14,6 +15,7 @@ from ..utils.api.model import (
     RoleDetailData,
     RoleList,
 )
+from ..utils.api.wwapi import ABYSS_TYPE_MAP, AbyssDetail, AbyssItem
 from ..utils.char_info_utils import get_all_roleid_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
 from ..utils.fonts.waves_fonts import (
@@ -35,6 +37,8 @@ from ..utils.image import (
     get_square_avatar,
     get_waves_bg,
 )
+from ..utils.queues.const import QUEUE_ABYSS_RECORD
+from ..utils.queues.queues import put_item
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 
@@ -58,13 +62,16 @@ async def get_abyss_data(uid: str, ck: str, is_self_ck: bool):
     else:
         abyss_data = await waves_api.get_abyss_index(uid, ck)
 
+    if not isinstance(abyss_data, dict):
+        return ABYSS_ERROR_MESSAGE_NO_DATA
+
     if abyss_data.get("code") == 200:
         if not abyss_data.get("data") or not abyss_data["data"].get("isUnlock", False):
             if not is_self_ck:
                 return ABYSS_ERROR_MESSAGE_LOGIN
             return ABYSS_ERROR_MESSAGE_NO_DATA
         else:
-            return AbyssChallenge(**abyss_data["data"])
+            return AbyssChallenge.model_validate(abyss_data["data"])
     else:
         msg = error_reply(WAVES_CODE_999)
         if abyss_data.get("msg"):
@@ -95,21 +102,24 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck)
     if not succ:
-        return account_info
+        return account_info  # type: ignore
     account_info = AccountBaseInfo.model_validate(account_info)
 
     # 共鸣者信息
     succ, role_info = await waves_api.get_role_info(uid, ck)
     if not succ:
-        return role_info
+        return role_info  # type: ignore
     role_info = RoleList.model_validate(role_info)
 
     # 深渊
     abyss_data = await get_abyss_data(uid, ck, is_self_ck)
-    if isinstance(abyss_data, str):
+    if isinstance(abyss_data, str) or not abyss_data:
         return abyss_data
     if not abyss_data.isUnlock:
         return ABYSS_ERROR_MESSAGE_NO_UNLOCK
+
+    if not abyss_data.difficultyList:
+        return ABYSS_ERROR_MESSAGE_NO_DEEP
 
     abyss_check = next(
         (
@@ -286,6 +296,9 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
             return ABYSS_ERROR_MESSAGE_LOGIN
         return ABYSS_ERROR_MESSAGE_NO_DATA
 
+    # 上传深渊记录
+    await upload_abyss_record(is_self_ck, uid, difficultyName, abyss_data)
+
     card_img.paste(frame, (0, 0), frame)
 
     card_img = add_footer(card_img, 600, 20)
@@ -314,3 +327,57 @@ async def draw_pic(roleId):
     img.paste(resize_pic, (22, 18), mask)
 
     return img
+
+
+async def upload_abyss_record(
+    is_self_ck: bool,
+    waves_id: str,
+    difficultyName: str,
+    abyss_data: AbyssChallenge,
+):
+    from ..wutheringwaves_config import WutheringWavesConfig
+
+    WavesToken = WutheringWavesConfig.get_config("WavesToken").data
+    if not WavesToken:
+        return
+
+    if difficultyName != "深境区":
+        return
+    if not abyss_data:
+        return
+    if not abyss_data.difficultyList:
+        return
+    if not is_self_ck:
+        return
+    abyss_record = []
+    for _abyss in abyss_data.difficultyList:
+        if _abyss.difficultyName != difficultyName:
+            continue
+        for tower_index, tower in enumerate(_abyss.towerAreaList):
+            if not tower.floorList:
+                continue
+            if len(tower.floorList) <= 1:
+                continue
+            floor = tower.floorList[-1]
+            if floor.star == 3 and floor.roleList:
+                abyss_record.append(
+                    AbyssDetail.model_validate(
+                        {
+                            "area_type": f"{ABYSS_TYPE_MAP[tower.areaName]}{floor.floor}",
+                            "area_name": tower.areaName,
+                            "floor": floor.floor,
+                            "char_ids": [role.roleId for role in floor.roleList],
+                        }
+                    )
+                )
+
+    if not abyss_record:
+        return
+    abyss_item = AbyssItem.model_validate(
+        {
+            "waves_id": waves_id,
+            "abyss_record": abyss_record,
+        }
+    )
+    # logger.info(f"上传深渊记录: {abyss_item.model_dump()}")
+    await put_item(QUEUE_ABYSS_RECORD, abyss_item.model_dump())

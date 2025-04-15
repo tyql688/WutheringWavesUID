@@ -260,6 +260,10 @@ def parse_main(content: str) -> list[tuple[str, list[str], str]]:
         "共鸣": "共鸣效率",
         "充能": "共鸣效率",
         "充": "共鸣效率",
+        "治疗": "治疗效果加成",
+        "疗": "治疗效果加成",
+        "治疗效果": "治疗效果加成",
+        "治": "治疗效果加成",
     }
 
     content = re.sub(r"^(?:主词条|主词|主|main)\s*", "", content)
