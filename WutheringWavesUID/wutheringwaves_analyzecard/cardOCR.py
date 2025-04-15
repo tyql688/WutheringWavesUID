@@ -139,6 +139,8 @@ async def async_ocr(bot: Bot, ev: Event):
         return False
 
     bool_d, final_result = await ocr_results_to_dict(chain_num, ocr_results)
+    if not bool_d:
+        return await bot.send("[鸣潮]Please use chinese card！")
 
     name, char_id = await which_char(bot, ev, final_result["角色信息"]["角色名"])
     if char_id is None:
@@ -148,10 +150,10 @@ async def async_ocr(bot: Bot, ev: Event):
     final_result["角色信息"]["角色名"] = name
     final_result["角色信息"]["角色ID"] = char_id
 
-    if bool_d:
-        await save_card_dict_to_json(bot, ev, final_result)
-    else:
-        await bot.send("[鸣潮]Please use chinese card！")
+    
+    await save_card_dict_to_json(bot, ev, final_result)
+
+        
     
 
 async def get_image(ev: Event):
@@ -439,7 +441,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
 
     # 增强正则模式（适配多行文本处理）
     patterns = {
-        "name": re.compile(r'^([\u4e00-\u9fa5A-Za-z]+)'), # 支持英文名，为后续逻辑判断用
+        "name": re.compile(r'^([A-Za-z\u4e00-\u9fa5\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7A3\u00C0-\u00FF]+)'), # 支持英文、中文、日文、韩文，以及西班牙文、德文和法文中的扩展拉丁字符，为后续逻辑判断用
         "level": re.compile(r'(?i)(.V?\.?)\s*(\d+)'),
         "skill_level": re.compile(r'[LV]*\.?\s*(\d+)\s*/\s*10'),  # 兼容 L.10/10、LV.10/10 等格式
         "player_info": re.compile(r'玩家名稱\s*[:：]?\s*(\S+)'),
@@ -463,7 +465,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
                     continue # 避免玩家名称在前被识别为角色名
 
                 # 文本预处理：删除非数字中英文的符号及多余空白
-                line_clean = re.sub(r'[^\u4e00-\u9fa5A-Za-z0-9\s]', '', line)  # 先删除非数字中英文的符号, 匹配“漂泊者·湮灭”
+                line_clean = re.sub(r'[^\u4e00-\u9fa5\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7A3\u00C0-\u00FFA-Za-z0-9\s]', '', line)  # 先删除特殊符号, 匹配“漂泊者·湮灭”
                 line_clean = re.sub(r'\s+', ' ', line_clean).strip()  # 再合并多余空白
 
                 # 角色名提取
@@ -473,7 +475,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
                         name = name_match.group()
                         name = name.replace("吟槑", "吟霖")
                         if not re.match(r'^[\u4e00-\u9fa5]+$', name):
-                            logger.debug(f" [鸣潮][dc卡片识别] 识别出英文角色名:{name}，退出识别！")
+                            logger.debug(f" [鸣潮][dc卡片识别] 识别出非中文角色名:{name}，退出识别！")
                             return False, final_result
                         final_result["角色信息"]["角色名"] = cc.convert(name)
                 
