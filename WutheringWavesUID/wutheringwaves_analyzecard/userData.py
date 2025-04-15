@@ -12,6 +12,7 @@ from ..utils.ascension.weapon import get_weapon_detail
 from ..utils.refresh_char_detail import save_card_info
 from ..utils.name_convert import (
     char_id_to_char_name,
+    alias_to_weapon_name,
     weapon_name_to_weapon_id,
     phantom_id_to_phantom_name
 )
@@ -36,7 +37,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
             await bot.send(f"[鸣潮]识别结果为角色'{char_name_print}'不存在")
             logger.debug(f" [鸣潮][dc卡片识别] 用户{uid}的{char_name_print}识别错误！")
             return
-
+        weapon_name = alias_to_weapon_name(result_dict["武器信息"]["武器名"])
         weapon_id = weapon_name_to_weapon_id(result_dict["武器信息"]["武器名"])
 
     except Exception as e:
@@ -157,7 +158,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         # breach 突破、resonLevel 精炼
         data["weaponData"]["level"] = result_dict["武器信息"]["等级"]
         data["weaponData"]["breach"] = get_breach(result_dict["武器信息"]["等级"])
-        data["weaponData"]["weapon"]["weaponName"] = result_dict["武器信息"]["武器名"]
+        data["weaponData"]["weapon"]["weaponName"] = weapon_name
         data["weaponData"]["weapon"]["weaponId"] = weapon_id
         weapon_detail = get_weapon_detail(weapon_id, result_dict["武器信息"]["等级"])
         data["weaponData"]["weapon"]["weaponStarLevel"] = weapon_detail.starLevel

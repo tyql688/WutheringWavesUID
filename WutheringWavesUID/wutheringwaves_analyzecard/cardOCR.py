@@ -496,8 +496,11 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         
         # 武器名称（取第一行有效文本）
         for line in lines:
-            if patterns["name"].search(line):
-                final_result["武器信息"]["武器名"] = cc.convert(line)
+            # 文本预处理：删除非数字中英文的符号及多余空白
+            line_clean = re.sub(r'[^\u4e00-\u9fa50-9\s]', '', line)  # 先删除非数字中英文的符号, 匹配“源能臂铠·测肆”
+            line_clean = re.sub(r'\s+', ' ', line_clean).strip()  # 再合并多余空白
+            if patterns["name"].search(line_clean):
+                final_result["武器信息"]["武器名"] = cc.convert(line_clean)
                 break
                 
         # 武器等级
