@@ -11,7 +11,7 @@ ONE_RANK_URL = f"{MAIN_URL}/top/waves/one"
 UPLOAD_ABYSS_RECORD_URL = f"{MAIN_URL}/top/waves/abyss/upload"
 GET_ABYSS_RECORD_URL = f"{MAIN_URL}/top/waves/abyss/record"
 GET_HOLD_RATE_URL = f"{MAIN_URL}/api/waves/hold/rates"
-
+GET_POOL_LIST = f"{MAIN_URL}/api/waves/pool/list"
 
 ABYSS_TYPE = Literal["l4", "m2", "r4", "a"]
 

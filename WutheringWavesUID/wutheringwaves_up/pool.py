@@ -1,13 +1,15 @@
-import json
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
 
+import httpx
 from PIL import Image, ImageDraw
 
+from gsuid_core.logger import logger
 from gsuid_core.utils.image.convert import convert_img
 
+from ..utils.api.wwapi import GET_POOL_LIST
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_58
 from ..utils.image import (
     SPECIAL_GOLD,
@@ -20,6 +22,7 @@ from ..utils.image import (
     get_waves_bg,
 )
 from ..utils.name_convert import easy_id_to_name
+from ..utils.util import timed_async_cache
 from .model import WavesPool
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -27,15 +30,24 @@ bar = Image.open(TEXT_PATH / "bar.png")
 avatar_mask = Image.open(TEXT_PATH / "avatar_mask.png")
 
 
-def get_pool_data():
-    with open(TEXT_PATH / "pool.json", "r", encoding="utf-8") as f:
-        return json.load(f)
+@timed_async_cache(expiration=3600, condition=lambda x: isinstance(x, list))
+async def get_pool_data() -> Union[List, None]:
+    async with httpx.AsyncClient() as client:
+        try:
+            res = await client.get(
+                GET_POOL_LIST,
+                headers={
+                    "Content-Type": "application/json",
+                },
+                timeout=httpx.Timeout(10),
+            )
+            if res.status_code == 200:
+                return res.json().get("data", [])
+        except Exception as e:
+            logger.exception(f"获取卡池数据失败: {e}")
 
 
-pools = get_pool_data()
-
-
-def clean_pool_data():
+async def clean_pool_data():
     result_char = {
         "four2num": defaultdict(int),
         "four2endtime": defaultdict(int),
@@ -52,12 +64,22 @@ def clean_pool_data():
     fixed_four_repeat = set()
 
     now = datetime.now()
+    pools = await get_pool_data()
+    if not pools:
+        return None, None
+
+    char_up_end_time = None
+    weapon_up_end_time = None
+
     for temp_pool in pools:
         pool = WavesPool.model_validate(temp_pool)
 
         end_time = datetime.strptime(pool.end_time, "%Y-%m-%d %H:%M:%S")
 
         if pool.pool_type == "角色活动唤取":
+            if char_up_end_time is not None:
+                continue
+
             for five_star in pool.five_star_ids:
                 result_char["five2num"][five_star] += 1
                 result_char["five2endtime"][five_star] = (now - end_time).days
@@ -70,7 +92,14 @@ def clean_pool_data():
                 result_char["four2endtime"][four_star] = (now - end_time).days
 
             fixed_four_repeat.add(f"{pool.end_time}_{pool.pool_type}")
+
+            # is up
+            if (now - end_time).days < 0 and char_up_end_time is None:
+                char_up_end_time = (now - end_time).days
         else:
+            if weapon_up_end_time is not None:
+                continue
+
             for five_star in pool.five_star_ids:
                 result_weapon["five2num"][five_star] += 1
                 result_weapon["five2endtime"][five_star] = (now - end_time).days
@@ -84,12 +113,19 @@ def clean_pool_data():
 
             fixed_four_repeat.add(f"{pool.end_time}_{pool.pool_type}")
 
+            # is up
+            if (now - end_time).days < 0 and weapon_up_end_time is None:
+                weapon_up_end_time = (now - end_time).days
+
     return result_char, result_weapon
 
 
 async def get_pool_data_by_type(query_type: str, star: int):
 
-    result_char, result_weapon = clean_pool_data()
+    result_char, result_weapon = await clean_pool_data()
+
+    if not result_char or not result_weapon:
+        return "未复刻数据获取失败，请稍后再试"
 
     if query_type == "角色":
         result = result_char
@@ -203,7 +239,7 @@ async def draw_pool_char(
         )
 
         # 倒计时
-        if end_time > 0:
+        if end_time >= 0:
             bar_star_draw.text(
                 (800, 50), f"已有 {end_time} 天未UP", color, waves_font_30, "mm"
             )
