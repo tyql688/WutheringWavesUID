@@ -79,7 +79,7 @@ async def clean_pool_data():
         total_seconds = int((now - end_time).total_seconds())
 
         if pool.pool_type == "角色活动唤取":
-            if char_up_end_time is not None:
+            if char_up_end_time is not None and total_seconds != char_up_end_time:
                 continue
 
             for five_star in pool.five_star_ids:
@@ -99,7 +99,7 @@ async def clean_pool_data():
             if total_seconds < 0 and char_up_end_time is None:
                 char_up_end_time = total_seconds
         else:
-            if weapon_up_end_time is not None:
+            if weapon_up_end_time is not None and total_seconds != weapon_up_end_time:
                 continue
 
             for five_star in pool.five_star_ids:
