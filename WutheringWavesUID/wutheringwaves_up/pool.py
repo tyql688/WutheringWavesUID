@@ -1,13 +1,15 @@
-import json
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
 
+import httpx
 from PIL import Image, ImageDraw
 
+from gsuid_core.logger import logger
 from gsuid_core.utils.image.convert import convert_img
 
+from ..utils.api.wwapi import GET_POOL_LIST
 from ..utils.fonts.waves_fonts import waves_font_30, waves_font_58
 from ..utils.image import (
     SPECIAL_GOLD,
@@ -20,6 +22,7 @@ from ..utils.image import (
     get_waves_bg,
 )
 from ..utils.name_convert import easy_id_to_name
+from ..utils.util import timed_async_cache
 from .model import WavesPool
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -27,15 +30,24 @@ bar = Image.open(TEXT_PATH / "bar.png")
 avatar_mask = Image.open(TEXT_PATH / "avatar_mask.png")
 
 
-def get_pool_data():
-    with open(TEXT_PATH / "pool.json", "r", encoding="utf-8") as f:
-        return json.load(f)
+@timed_async_cache(expiration=3600, condition=lambda x: isinstance(x, list))
+async def get_pool_data() -> Union[List, None]:
+    async with httpx.AsyncClient() as client:
+        try:
+            res = await client.get(
+                GET_POOL_LIST,
+                headers={
+                    "Content-Type": "application/json",
+                },
+                timeout=httpx.Timeout(10),
+            )
+            if res.status_code == 200:
+                return res.json().get("data", [])
+        except Exception as e:
+            logger.exception(f"获取卡池数据失败: {e}")
 
 
-pools = get_pool_data()
-
-
-def clean_pool_data():
+async def clean_pool_data():
     result_char = {
         "four2num": defaultdict(int),
         "four2endtime": defaultdict(int),
@@ -52,44 +64,70 @@ def clean_pool_data():
     fixed_four_repeat = set()
 
     now = datetime.now()
+    pools = await get_pool_data()
+    if not pools:
+        return None, None
+
+    char_up_end_time = None
+    weapon_up_end_time = None
+
     for temp_pool in pools:
         pool = WavesPool.model_validate(temp_pool)
 
         end_time = datetime.strptime(pool.end_time, "%Y-%m-%d %H:%M:%S")
 
+        total_seconds = int((now - end_time).total_seconds())
+
         if pool.pool_type == "角色活动唤取":
+            if char_up_end_time is not None and total_seconds != char_up_end_time:
+                continue
+
             for five_star in pool.five_star_ids:
                 result_char["five2num"][five_star] += 1
-                result_char["five2endtime"][five_star] = (now - end_time).days
+                result_char["five2endtime"][five_star] = total_seconds
 
             if f"{pool.end_time}_{pool.pool_type}" in fixed_four_repeat:
                 continue
 
             for four_star in pool.four_star_ids:
                 result_char["four2num"][four_star] += 1
-                result_char["four2endtime"][four_star] = (now - end_time).days
+                result_char["four2endtime"][four_star] = total_seconds
 
             fixed_four_repeat.add(f"{pool.end_time}_{pool.pool_type}")
+
+            # is up
+            if total_seconds < 0 and char_up_end_time is None:
+                char_up_end_time = total_seconds
         else:
+            if weapon_up_end_time is not None and total_seconds != weapon_up_end_time:
+                continue
+
             for five_star in pool.five_star_ids:
                 result_weapon["five2num"][five_star] += 1
-                result_weapon["five2endtime"][five_star] = (now - end_time).days
+                result_weapon["five2endtime"][five_star] = total_seconds
 
             if f"{pool.end_time}_{pool.pool_type}" in fixed_four_repeat:
                 continue
 
             for four_star in pool.four_star_ids:
                 result_weapon["four2num"][four_star] += 1
-                result_weapon["four2endtime"][four_star] = (now - end_time).days
+                result_weapon["four2endtime"][four_star] = total_seconds
 
             fixed_four_repeat.add(f"{pool.end_time}_{pool.pool_type}")
+
+            # is up
+            if total_seconds < 0 and weapon_up_end_time is None:
+                weapon_up_end_time = total_seconds
 
     return result_char, result_weapon
 
 
 async def get_pool_data_by_type(query_type: str, star: int):
 
-    result_char, result_weapon = clean_pool_data()
+    result_char, result_weapon = await clean_pool_data()
+
+    if not result_char or not result_weapon:
+        return "未复刻数据获取失败，请稍后再试"
 
     if query_type == "角色":
         result = result_char
@@ -203,13 +241,40 @@ async def draw_pool_char(
         )
 
         # 倒计时
-        if end_time > 0:
+        if end_time >= 0:
             bar_star_draw.text(
-                (800, 50), f"已有 {end_time} 天未UP", color, waves_font_30, "mm"
+                (800, 50), f"{seconds_to_human(end_time)}", color, waves_font_30, "mm"
             )
         else:
             bar_star_draw.text(
-                (800, 50), f"当前UP({-end_time}天后关闭)", color, waves_font_30, "mm"
+                (800, 50), f"{seconds_to_human(end_time)}", color, waves_font_30, "mm"
             )
 
         card_img.paste(bar_bg, (-20, i * 110 + 530), bar_bg)
+
+
+def seconds_to_human(seconds: int) -> str:
+    if seconds >= 0:
+        if seconds >= 86400:
+            days = seconds // 86400
+            return f"已有 {days} 天未UP"
+        elif seconds >= 3600:
+            hours = seconds // 3600
+            return f"已有 {hours} 小时未UP"
+        elif seconds >= 60:
+            minutes = seconds // 60
+            return f"已有 {minutes} 分钟未UP"
+        else:
+            return f"已有 {seconds} 秒未UP"
+    else:
+        if seconds <= -86400:
+            days = seconds // 86400
+            return f"当前UP({-days}天后关闭)"
+        elif seconds <= -3600:
+            hours = seconds // 3600
+            return f"当前UP({-hours}小时后关闭)"
+        elif seconds <= -60:
+            minutes = seconds // 60
+            return f"当前UP({-minutes}分钟后关闭)"
+        else:
+            return f"当前UP({-seconds}秒后关闭)"
