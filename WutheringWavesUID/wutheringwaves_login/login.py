@@ -78,8 +78,13 @@ async def send_login(bot: Bot, ev: Event, url):
             "请扫描下方二维码获取登录地址，并复制地址到浏览器打开\n",
             MessageSegment.image(await get_qrcode_base64(url, path, ev.bot_id)),
         ]
+
         if WutheringWavesConfig.get_config("WavesLoginForward").data:
-            await bot.send(MessageSegment.node(im), at_sender=at_sender)
+            if not ev.group_id and ev.bot_id == "onebot":
+                # 私聊+onebot 不转发
+                await bot.send(im)
+            else:
+                await bot.send(MessageSegment.node(im))
         else:
             await bot.send(im, at_sender=at_sender)
 
@@ -96,7 +101,11 @@ async def send_login(bot: Bot, ev: Event, url):
         ]
 
         if WutheringWavesConfig.get_config("WavesLoginForward").data:
-            await bot.send(MessageSegment.node(im), at_sender=at_sender)
+            if not ev.group_id and ev.bot_id == "onebot":
+                # 私聊+onebot 不转发
+                await bot.send("\n".join(im))
+            else:
+                await bot.send(MessageSegment.node(im))
         else:
             await bot.send("\n".join(im), at_sender=at_sender)
 
