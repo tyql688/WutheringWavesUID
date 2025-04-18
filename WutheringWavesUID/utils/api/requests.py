@@ -51,6 +51,7 @@ from .api import (
     ROLE_CULTIVATE_STATUS,
     ROLE_DATA_URL,
     ROLE_DETAIL_URL,
+    ROLE_LIST_URL,
     SERVER_ID,
     SERVER_ID_NET,
     SIGNIN_TASK_LIST_URL,
@@ -227,6 +228,22 @@ class WavesApi:
                 await WavesUser.mark_invalid(token, "无效")
                 return False, error_reply(WAVES_CODE_101)
 
+            if raw_data.get("msg"):
+                return False, raw_data["msg"]
+        return False, error_reply(WAVES_CODE_999)
+
+    async def get_kuro_role_list(
+        self, token: str
+    ) -> tuple[bool, Union[List, str, int]]:
+        header = copy.deepcopy(await get_headers(token))
+        header.update({"token": token})
+        data = {"gameId": GAME_ID}
+        raw_data = await self._waves_request(ROLE_LIST_URL, "POST", header, data=data)
+        if isinstance(raw_data, dict):
+            if raw_data.get("code") == 200 and raw_data.get("data"):
+                return True, raw_data["data"]
+
+            logger.warning(f"get_kuro_role_list -> msg: {raw_data}")
             if raw_data.get("msg"):
                 return False, raw_data["msg"]
         return False, error_reply(WAVES_CODE_999)
