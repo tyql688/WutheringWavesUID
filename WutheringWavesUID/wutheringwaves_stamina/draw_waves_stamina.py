@@ -221,6 +221,9 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
         else curr_time
     )
     # remain_time = await seconds2hours(refreshTimeStamp - curr_time)
+    # 设置体力推送时间
+    from ..wutheringwaves_config.set_config import set_push_time
+    await set_push_time(ev.bot_id, daily_info.roleId, refreshTimeStamp)
 
     time_img = Image.new("RGBA", (190, 33), (255, 255, 255, 0))
     time_img_draw = ImageDraw.Draw(time_img)

@@ -26,6 +26,13 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "公告推送总开关",
         True,
     ),
+    "CrazyNotice": GsBoolConfig("催命模式", "开启后当达到推送阈值将会一直推送", False),
+    "StaminaPush": GsBoolConfig(
+        "体力推送全局开关", "开启后当体力达到推送阈值将会推送", False
+    ),
+    "StaminaPushInterval": GsIntConfig(
+        "体力推送间隔（分钟）", "体力推送间隔（分钟）", 30, 60
+    ),
     "WavesRankUseTokenGroup": GsListStrConfig(
         "有token才能进排行，群管理可设置",
         "有token才能进排行，群管理可设置",

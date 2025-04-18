@@ -280,6 +280,7 @@ class WavesPush(Push, table=True):
         schema_extra={"json_schema_extra": {"hint": "ww开启体力推送"}},
     )
     resin_value: Optional[int] = Field(title="体力阈值", default=180)
+    push_time_value: Optional[str] = Field(title="推送时间", default=None)
     resin_is_push: Optional[str] = Field(title="体力是否已推送", default="off")
 
 

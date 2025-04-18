@@ -444,6 +444,22 @@
     "desc": "该配置项仅针对个人使用，暂不支持国际服",
     "data": [
       {
+        "name": "开启体力推送",
+        "desc": "开启体力推送",
+        "eg": "开启体力推送",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "设置体力阈值",
+        "desc": "设置体力阈值",
+        "eg": "设置体力阈值200",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "设置体力背景",
         "desc": "设置体力背景",
         "eg": "设置体力背景长离",

@@ -7,7 +7,10 @@ from gsuid_core.subscribe import gs_subscribe
 from gsuid_core.utils.boardcast.models import BoardCastMsgDict
 from gsuid_core.utils.database.models import Subscribe
 
-board_type = {}
+task_name_resin = "订阅体力推送"
+board_type = {
+    "resin": task_name_resin,
+}
 
 
 async def send_board_cast_msg(msgs: BoardCastMsgDict, board_cast_type: str):
