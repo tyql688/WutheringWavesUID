@@ -16,8 +16,6 @@ async def get_notice_list() -> Dict[str, Dict[str, Dict]]:
     msg_dict = {"private_msg_dict": {}, "group_msg_dict": {}}
 
     user_list: List[WavesUser] = await WavesUser.get_all_push_user_list()
-    from gsuid_core.logger import logger
-    logger.info(f"开始获取推送列表{user_list}")
     for user in user_list:
         if not user.uid or not user.cookie or user.status or not user.bot_id:
             continue
@@ -50,8 +48,6 @@ async def all_check(
         time_now,
         timestamp,
     )
-    from gsuid_core.logger import logger
-    logger.info(f"{_check} >?= ")
 
     if push_data[f"{mode}_is_push"] == "on":
         if not WutheringWavesConfig.get_config("CrazyNotice").data:

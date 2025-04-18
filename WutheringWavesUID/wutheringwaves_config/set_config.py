@@ -60,29 +60,32 @@ async def set_push_time(bot_id: str, uid: str, value: int):
     if func in PUSH_MAP:
         status = PUSH_MAP[func]
     else:
-        return "该配置项不存在!\n"
+        logger.info("该配置项不存在!")
+        return False
     
     data = await WavesPush.select_data_by_uid(uid)
     if data is None:
         return logger.info("[推送时间]设置失败!\n请先绑定UID!\n")
     push_data = data.__dict__
     resin_push = push_data[f"{mode}_value"]
-    push_data[f"{mode}_is_push"] == "off"
 
     # 根据体力阈值计算推送时间
     value = value - (240 -resin_push) * 6 * 60
     time_push = datetime.fromtimestamp(int(value))
 
     logger.info("[设置推送时间]func: {}, value: {}".format(status, time_push))
-    if (
+    try:
         await WavesPush.update_data_by_uid(
             uid=uid, bot_id=bot_id, **{f"{status}_value": time_push}
         )
-        == 0
-    ):
-        return logger.info(f"设置成功!\n当前{func}推送阈值:{time_push}\n")
-    else:
-        return logger.info("[推送时间]设置失败!\n请检查参数是否正确!\n")
+        await WavesPush.update_data_by_uid(
+            uid=uid, bot_id=bot_id, **{f"{mode}_is_push": "off"}
+        )
+        logger.info(f"设置成功!\n当前{func}推送阈值:{time_push}\n")
+        return True
+    except Exception as e:
+        logger.info(f"[推送时间]设置失败:{e}")
+        return False
 
 
 
