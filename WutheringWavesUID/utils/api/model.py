@@ -269,6 +269,17 @@ class KuroRoleInfo(BaseModel):
     achievementCount: int
 
 
+class KuroWavesUserInfo(BaseModel):
+    """库洛用户信息"""
+
+    id: int
+    userId: int
+    gameId: int
+    serverId: str
+    roleId: str
+    roleName: str
+
+
 class GachaLog(BaseModel):
     """抽卡记录"""
 
