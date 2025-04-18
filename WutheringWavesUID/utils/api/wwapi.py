@@ -11,7 +11,8 @@ ONE_RANK_URL = f"{MAIN_URL}/top/waves/one"
 UPLOAD_ABYSS_RECORD_URL = f"{MAIN_URL}/top/waves/abyss/upload"
 GET_ABYSS_RECORD_URL = f"{MAIN_URL}/top/waves/abyss/record"
 GET_HOLD_RATE_URL = f"{MAIN_URL}/api/waves/hold/rates"
-
+GET_POOL_LIST = f"{MAIN_URL}/api/waves/pool/list"
+GET_TOWER_APPEAR_RATE = f"{MAIN_URL}/api/waves/abyss/appear_rate"
 
 ABYSS_TYPE = Literal["l4", "m2", "r4", "a"]
 
@@ -19,6 +20,12 @@ ABYSS_TYPE_MAP = {
     "残响之塔": "l",
     "深境之塔": "m",
     "回音之塔": "r",
+}
+
+ABYSS_TYPE_MAP_REVERSE = {
+    "l4": "残响之塔 - 4层",
+    "m2": "深境之塔 - 2层",
+    "r4": "回音之塔 - 4层",
 }
 
 
