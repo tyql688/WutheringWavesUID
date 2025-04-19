@@ -118,9 +118,11 @@ async def get_new_gachalog(
             ):
                 # 抽卡记录获取失败
                 if res.get("code") == -1:  # type: ignore
-                    return WAVES_CODE_108, None, None  # type: ignore
+                    logger.info(error_reply(WAVES_CODE_108))
+                    continue
                 else:
-                    return WAVES_CODE_104, None, None  # type: ignore
+                    logger.info(error_reply(WAVES_CODE_104))
+                    continue
             gacha_log = [GachaLog(**log) for log in res["data"]]
             old_length = find_length(full_data[gacha_name], gacha_log)
             _add = gacha_log if old_length == 0 else gacha_log[:-old_length]
