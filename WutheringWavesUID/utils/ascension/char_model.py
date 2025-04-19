@@ -2,6 +2,8 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from pydantic import BaseModel, Field
 
+from ...utils.util import format_with_defaults
+
 
 class Stats(BaseModel):
     life: float
@@ -34,7 +36,7 @@ class Skill(BaseModel):
     level: Optional[Dict[int, SkillLevel]] = None
 
     def get_desc_detail(self):
-        return self.desc.format(*self.param)
+        return format_with_defaults(self.desc, self.param)
 
 
 class Chain(BaseModel):
@@ -43,7 +45,7 @@ class Chain(BaseModel):
     param: List[Union[str, float]]
 
     def get_desc_detail(self):
-        return self.desc.format(*self.param)
+        return format_with_defaults(self.desc, self.param)
 
 
 class AscensionMaterial(BaseModel):
