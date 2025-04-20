@@ -1,12 +1,13 @@
 import copy
 from pathlib import Path
-from typing import Union, Optional
+from typing import Optional, Union
 
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
-from .char_model import WeaponModel
+
 from ..ascension.constant import fixed_name
+from .model import WeaponModel
 
 MAP_PATH = Path(__file__).parent.parent / "map/detail_json/weapon"
 weapon_id_data = {}

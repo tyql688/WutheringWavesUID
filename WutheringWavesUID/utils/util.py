@@ -2,6 +2,7 @@ import random
 import string
 import time
 from functools import wraps
+from typing import Any, List
 
 import httpx
 
@@ -75,3 +76,11 @@ def hide_uid(uid: str) -> str:
     if len(uid) < 2:
         return uid
     return uid[:2] + "*" * 4 + uid[-2:]
+
+
+def format_with_defaults(desc: str, params: List[Any], default_value: str = "N/A"):
+    num_placeholders = desc.count("{")  # 简单估计位置参数数量
+    params_list = list(params)
+    while len(params_list) < num_placeholders:
+        params_list.append(default_value)
+    return desc.format(*params_list)

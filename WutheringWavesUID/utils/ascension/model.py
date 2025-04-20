@@ -1,6 +1,8 @@
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from pydantic import BaseModel, Field
+
+from ...utils.util import format_with_defaults
 
 
 class Stats(BaseModel):
@@ -34,7 +36,7 @@ class Skill(BaseModel):
     level: Optional[Dict[int, SkillLevel]] = None
 
     def get_desc_detail(self):
-        return self.desc.format(*self.param)
+        return format_with_defaults(self.desc, self.param)
 
 
 class Chain(BaseModel):
@@ -43,7 +45,7 @@ class Chain(BaseModel):
     param: List[Union[str, float]]
 
     def get_desc_detail(self):
-        return self.desc.format(*self.param)
+        return format_with_defaults(self.desc, self.param)
 
 
 class AscensionMaterial(BaseModel):
@@ -125,3 +127,90 @@ class WeaponModel(BaseModel):
             5: "音感仪",
         }
         return weapon_type.get(self.type, "")
+
+
+"""
+{
+  "id": 6000039,
+  "name": "朔雷之鳞",
+  "intensityCode": 2,
+  "group": {
+    "3": {
+      "name": "彻空冥雷"
+    }
+  },
+  "skill": {
+    "desc": "使用声骸技能，幻形为朔雷之鳞，可连续使用最多2次，甩尾召唤出来的雷击每段造成{0}的导电伤害，爪击造成{1}的导电伤害。\n爪击命中后，自身导电伤害加成提升{2}，重击伤害加成提升{3}，持续{4}秒。\n技能冷却：{5}秒",
+    "simpleDesc": "幻形为朔雷之鳞，连续攻击敌人造成导电伤害，提高自身的导电和重击伤害。",
+    "params": [
+      [
+        "64.05%",
+        "109.80%",
+        "12.00%",
+        "12.00%",
+        "15",
+        "20"
+      ],
+      [
+        "73.66%",
+        "126.27%",
+        "12.00%",
+        "12.00%",
+        "15",
+        "20"
+      ],
+      [
+        "83.27%",
+        "142.74%",
+        "12.00%",
+        "12.00%",
+        "15",
+        "20"
+      ],
+      [
+        "92.87%",
+        "159.21%",
+        "12.00%",
+        "12.00%",
+        "15",
+        "20"
+      ],
+      [
+        "102.48%",
+        "175.68%",
+        "12.00%",
+        "12.00%",
+        "15",
+        "20"
+      ]
+    ]
+  }
+}
+"""
+
+
+class EchoModel(BaseModel):
+    id: int
+    name: str
+    intensityCode: int
+    group: Dict[str, Dict[str, str]]
+    skill: Dict[str, Any]
+
+    class Config:
+        populate_by_name = True
+        str_strip_whitespace = True
+        str_min_length = 1
+
+    def get_skill_detail(self):
+        return format_with_defaults(self.skill["desc"], self.skill["params"][-1])
+
+    def get_intensity(self) -> List[Tuple[str, str]]:
+        temp_cost = {0: "c1", 1: "c3", 2: "c4", 3: "c4"}
+        temp_level = {0: "轻波级", 1: "巨浪级", 2: "怒涛级", 3: "海啸级"}
+        result = []
+        result.append(("声骸等级", temp_level[self.intensityCode]))
+        result.append(("「COST」", temp_cost[self.intensityCode]))
+        return result
+
+    def get_group_name(self) -> List[str]:
+        return [i["name"] for i in self.group.values()]
