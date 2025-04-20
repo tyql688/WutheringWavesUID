@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Union
 
 from PIL import Image
 
@@ -6,10 +6,10 @@ from gsuid_core.utils.download_resource.download_file import download
 
 from .RESOURCE_PATH import (
     FETTER_PATH,
-    PHANTOM_PATH,
     MATERIAL_PATH,
-    ROLE_DETAIL_SKILL_PATH,
+    PHANTOM_PATH,
     ROLE_DETAIL_CHAINS_PATH,
+    ROLE_DETAIL_SKILL_PATH,
 )
 
 

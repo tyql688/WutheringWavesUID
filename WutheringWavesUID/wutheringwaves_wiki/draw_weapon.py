@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
-from ..utils.ascension.char_model import WeaponModel
+from ..utils.ascension.model import WeaponModel
 from ..utils.ascension.weapon import (
     get_weapon_id,
     get_weapon_model,

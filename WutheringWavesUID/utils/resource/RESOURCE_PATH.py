@@ -59,6 +59,7 @@ ALIAS_PATH = MAIN_PATH / "alias"
 CUSTOM_CHAR_ALIAS_PATH = ALIAS_PATH / "char_alias.json"
 CUSTOM_SONATA_ALIAS_PATH = ALIAS_PATH / "sonata_alias.json"
 CUSTOM_WEAPON_ALIAS_PATH = ALIAS_PATH / "weapon_alias.json"
+CUSTOM_ECHO_ALIAS_PATH = ALIAS_PATH / "echo_alias.json"
 
 
 def init_dir():

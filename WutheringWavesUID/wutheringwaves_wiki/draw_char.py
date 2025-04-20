@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 from gsuid_core.utils.image.convert import convert_img
 
 from ..utils.ascension.char import get_char_model
-from ..utils.ascension.char_model import (
+from ..utils.ascension.model import (
     Chain,
     CharacterModel,
     Skill,

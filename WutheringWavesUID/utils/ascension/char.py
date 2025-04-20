@@ -1,13 +1,13 @@
 import copy
 from pathlib import Path
-from typing import Union, Optional
+from typing import Optional, Union
 
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
 
-from .char_model import CharacterModel
 from ..ascension.constant import fixed_name, sum_percentages
+from .model import CharacterModel
 
 MAP_PATH = Path(__file__).parent.parent / "map/detail_json/char"
 char_id_data = {}

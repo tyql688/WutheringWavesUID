@@ -10,7 +10,7 @@ from gsuid_core.utils.image.convert import convert_img
 
 from ..utils.api.wwapi import ABYSS_TYPE_MAP_REVERSE, GET_TOWER_APPEAR_RATE
 from ..utils.ascension.char import get_char_model
-from ..utils.ascension.char_model import CharacterModel
+from ..utils.ascension.model import CharacterModel
 from ..utils.fonts.waves_fonts import (
     waves_font_20,
     waves_font_30,

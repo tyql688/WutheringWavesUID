@@ -16,7 +16,7 @@ from ..utils.resource.RESOURCE_PATH import GUIDE_CONFIG_MAP
 from ..wutheringwaves_config import WutheringWavesConfig
 from .bilibili import GuideBilibili
 from .draw_char import draw_char_wiki
-from .draw_echo import draw_wiki_detail
+from .draw_echo import draw_wiki_echo
 from .draw_weapon import draw_wiki_weapon
 from .main import Guide
 from .tap import GuideTap
@@ -66,7 +66,7 @@ async def send_waves_wiki(bot: Bot, ev: Event):
         if isinstance(img, str) or not img:
             echo_name = wiki_name
             await bot.logger.info(f"[鸣潮] 开始获取{echo_name}wiki")
-            img = await draw_wiki_detail("声骸", echo_name)
+            img = await draw_wiki_echo(echo_name)
 
         if isinstance(img, str) or not img:
             msg = f"[鸣潮] wiki【{wiki_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
