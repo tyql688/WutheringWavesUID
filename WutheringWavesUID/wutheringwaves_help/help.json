@@ -220,6 +220,22 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "角色持有率",
+        "desc": "角色持有率",
+        "eg": "角色持有率",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "深塔出场率",
+        "desc": "深塔出场率",
+        "eg": "深塔出场率",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
