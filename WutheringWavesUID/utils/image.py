@@ -6,6 +6,7 @@ from typing import Literal, Optional, Tuple, Union
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
+from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.image_tools import crop_center_img
 from gsuid_core.utils.image.utils import sget
@@ -354,3 +355,50 @@ def draw_text_with_shadow(
 
     image.text((_x, _y), text, font=font, fill=fill_color, anchor=anchor)
     image.text((_x, _y), text, font=font, fill=fill_color, anchor=anchor)
+
+
+async def compress_to_webp(
+    image_path: Path, quality: int = 80, delete_original: bool = False
+) -> tuple[bool, Path]:
+    try:
+        from PIL import Image
+
+        # 确保文件存在
+        if not image_path.exists():
+            logger.warning(f"图片不存在: {image_path}")
+            return False, image_path
+
+        # 检查文件是否已经是webp格式
+        if image_path.suffix.lower() == ".webp":
+            logger.info(f"图片已经是webp格式: {image_path}")
+            return False, image_path
+
+        # 创建webp文件路径
+        webp_path = image_path.with_suffix(".webp")
+
+        # 打开图片
+        img = Image.open(image_path)
+
+        # 记录原始大小
+        orig_size = image_path.stat().st_size
+
+        # 保存为webp格式
+        img.save(webp_path, "WEBP", quality=quality, method=6)
+
+        # 计算压缩率
+        webp_size = webp_path.stat().st_size
+        compression_ratio = (1 - webp_size / orig_size) * 100 if orig_size > 0 else 0
+        logger.info(
+            f"图片 {image_path.name} 压缩为webp格式, 压缩率: {compression_ratio:.2f}%"
+        )
+
+        # 删除原图片（如果需要）
+        if delete_original:
+            image_path.unlink()
+            logger.info(f"原图片已删除: {image_path}")
+
+        return True, webp_path
+
+    except Exception as e:
+        logger.error(f"压缩图片为webp格式失败: {e}")
+        return False, image_path
