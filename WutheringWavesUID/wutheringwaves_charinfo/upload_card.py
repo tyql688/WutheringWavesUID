@@ -13,6 +13,7 @@ from gsuid_core.models import Event
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 
+from ..utils.image import compress_to_webp
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_ID
 from ..utils.resource.RESOURCE_PATH import CUSTOM_CARD_PATH
@@ -208,3 +209,23 @@ async def delete_all_custom_card(bot: Bot, ev: Event, char: str):
         pass
 
     return await bot.send(f"[鸣潮] 删除角色【{char}】的所有面板图成功！\n", at_sender)
+
+
+async def compress_all_custom_card(bot: Bot, ev: Event):
+    count = 0
+    for char_id_path in CUSTOM_CARD_PATH.iterdir():
+        if not char_id_path.is_dir():
+            continue
+        for img_path in char_id_path.iterdir():
+            if not img_path.is_file():
+                continue
+            if img_path.suffix.lower() in [".jpg", ".png", ".jpeg"]:
+                success, new_path = await compress_to_webp(
+                    img_path, delete_original=True
+                )
+                if success:
+                    count += 1
+    if count > 0:
+        return await bot.send(f"[鸣潮] 压缩【{count}】张面板图成功！\n")
+    else:
+        return await bot.send("[鸣潮] 暂未找到需要压缩的面板图！\n")

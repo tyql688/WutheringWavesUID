@@ -550,6 +550,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": true
+      },
+      {
+        "name": "压缩面板图",
+        "desc": "压缩面板图",
+        "eg": "压缩面板图",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
       }
     ]
   }
