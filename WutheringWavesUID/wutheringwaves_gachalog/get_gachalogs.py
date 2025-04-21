@@ -1,37 +1,37 @@
-import asyncio
-import base64
 import copy
 import json
-from datetime import datetime
+import base64
+import asyncio
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from datetime import datetime
+from typing import Dict, List, Tuple, Union, Optional
 
-import aiofiles
 import msgspec
-
-from gsuid_core.logger import logger
+import aiofiles
 from gsuid_core.models import Event
+from gsuid_core.logger import logger
 
-from ..utils.api.model import GachaLog
-from ..utils.database.models import WavesUser
-from ..utils.error_reply import WAVES_CODE_104, WAVES_CODE_108
-from ..utils.hint import error_reply
-from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
-from ..utils.waves_api import waves_api
-from ..version import WutheringWavesUID_version
-from ..wutheringwaves_config import PREFIX
 from .model import WWUIDGacha
+from ..utils.hint import error_reply
+from ..utils.api.model import GachaLog
+from ..utils.waves_api import waves_api
+from ..wutheringwaves_config import PREFIX
+from ..utils.database.models import WavesUser
+from ..version import WutheringWavesUID_version
 from .model_for_waves_plugin import WavesPluginGacha
+from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 
 gacha_type_meta_data = {
-    "角色精准调谐": ["1"],
-    "武器精准调谐": ["2"],
-    "角色调谐（常驻池）": ["3"],
-    "武器调谐（常驻池）": ["4"],
-    "新手调谐": ["5"],
-    "新手自选唤取": ["6"],
-    "新手自选唤取（感恩定向唤取）": ["7"],
+    "角色精准调谐": "1",
+    "武器精准调谐": "2",
+    "角色调谐（常驻池）": "3",
+    "武器调谐（常驻池）": "4",
+    "新手调谐": "5",
+    "新手自选唤取": "6",
+    "新手自选唤取（感恩定向唤取）": "7",
 }
+
+gacha_type_meta_data_reverse = {v: k for k, v in gacha_type_meta_data.items()}
 
 gachalogs_history_meta = {
     "角色精准调谐": [],
@@ -108,27 +108,25 @@ async def get_new_gachalog(
 ) -> tuple[Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]]:
     new = {}
     new_count = {}
-    for gacha_name in gacha_type_meta_data:
-        for card_pool_type in gacha_type_meta_data[gacha_name]:
-            res = await waves_api.get_gacha_log(card_pool_type, record_id, uid)
-            if (
-                not isinstance(res, dict)
-                or res.get("code") != 0
-                or res.get("data", None) is None
-            ):
-                # 抽卡记录获取失败
-                if res.get("code") == -1:  # type: ignore
-                    logger.info(error_reply(WAVES_CODE_108))
-                    continue
-                else:
-                    logger.info(error_reply(WAVES_CODE_104))
-                    continue
-            gacha_log = [GachaLog(**log) for log in res["data"]]
-            old_length = find_length(full_data[gacha_name], gacha_log)
-            _add = gacha_log if old_length == 0 else gacha_log[:-old_length]
-            new[gacha_name] = _add + copy.deepcopy(full_data[gacha_name])
-            new_count[gacha_name] = len(_add)
-            await asyncio.sleep(1)
+    for gacha_name, card_pool_type in gacha_type_meta_data.items():
+        res = await waves_api.get_gacha_log(card_pool_type, record_id, uid)
+        if (
+            not isinstance(res, dict)
+            or res.get("code") != 0
+            or res.get("data", None) is None
+        ):
+            continue
+
+        gacha_log = [GachaLog(**log) for log in res["data"]]
+        for log in gacha_log:
+            if log.cardPoolType != card_pool_type:
+                log.cardPoolType = card_pool_type
+        old_length = find_length(full_data[gacha_name], gacha_log)
+        _add = gacha_log if old_length == 0 else gacha_log[:-old_length]
+        new[gacha_name] = _add + copy.deepcopy(full_data[gacha_name])
+        new_count[gacha_name] = len(_add)
+        await asyncio.sleep(1)
+
     return None, new, new_count
 
 
@@ -153,14 +151,14 @@ async def get_new_gachalog_for_file(
     return None, new, new_count
 
 
-async def backup_gachalogs(uid: str, record_id: str, gachalogs_history: Dict):
-    if record_id:
-        return
+async def backup_gachalogs(uid: str, gachalogs_history: Dict, type: str):
     path = PLAYER_PATH / str(uid)
     if not path.exists():
         path.mkdir(parents=True, exist_ok=True)
     # 备份
-    backup_path = path / f"gacha_logs_{datetime.now().strftime('%Y-%m-%d.%H%M%S')}.json"
+    backup_path = (
+        path / f"{type}_gacha_logs_{datetime.now().strftime('%Y-%m-%d.%H%M%S')}.json"
+    )
     async with aiofiles.open(backup_path, "w", encoding="UTF-8") as file:
         await file.write(json.dumps(gachalogs_history, ensure_ascii=False))
 
@@ -179,15 +177,41 @@ async def save_gachalogs(
     # 抽卡记录json路径
     gachalogs_path = path / "gacha_logs.json"
 
+    temp_gachalogs_history = {}
     if gachalogs_path.exists():
         with Path.open(gachalogs_path, encoding="UTF-8") as f:
             gachalogs_history: Dict = json.load(f)
 
-        # 备份
-        await backup_gachalogs(uid, record_id, gachalogs_history)
+        # import 时备份
+        if not record_id:
+            await backup_gachalogs(uid, gachalogs_history, type="import")
+
+        # update 时备份
+        temp_gachalogs_history = copy.deepcopy(gachalogs_history)
+
         gachalogs_history = gachalogs_history["data"]
     else:
         gachalogs_history = copy.deepcopy(gachalogs_history_meta)
+
+    is_need_backup = False
+    for gacha_name, card_pool_type in gacha_type_meta_data.items():
+        for log in range(len(gachalogs_history[gacha_name]) - 1, -1, -1):
+            pool_type = gachalogs_history[gacha_name][log]["cardPoolType"]
+            if pool_type == card_pool_type:
+                continue
+            if card_pool_type == "武器精准调谐" and pool_type == "角色精准调谐-2":
+                del gachalogs_history[gacha_name][log]
+            elif card_pool_type == "角色调谐（常驻池）" and pool_type == "武器精准调谐":
+                del gachalogs_history[gacha_name][log]
+            elif card_pool_type == "武器调谐（常驻池）" and pool_type == "全频调谐":
+                del gachalogs_history[gacha_name][log]
+            else:
+                gachalogs_history[gacha_name][log]["cardPoolType"] = card_pool_type
+
+            is_need_backup = True
+
+    if is_need_backup:
+        await backup_gachalogs(uid, temp_gachalogs_history, type="update")
 
     for gacha_name in gacha_type_meta_data.keys():
         gachalogs_history[gacha_name] = [
@@ -293,12 +317,13 @@ async def import_gachalogs(ev: Event, history_url: str, type: str, uid: str) -> 
     import_data = copy.deepcopy(gachalogs_history_meta)
     for item in wwuid_gacha.list:
         gacha_name = item.cardPoolType
-        if gacha_name not in gacha_type_meta_data:
-            if gacha_name == "6":
-                gacha_name = "新手自选唤取"
-            elif gacha_name == "7":
-                gacha_name = "新手自选唤取（感恩定向唤取）"
-            else:
+        if gacha_name in gacha_type_meta_data:
+            # 此时cardPoolType是名字 -> 如角色精准调谐
+            item.cardPoolType = gacha_type_meta_data[gacha_name]
+        else:
+            # 此时cardPoolType是类型 -> 如 "1"
+            gacha_name = gacha_type_meta_data_reverse.get(item.cardPoolType)
+            if not gacha_name:
                 continue
         import_data[gacha_name].append(GachaLog(**item.dict()))
 
@@ -327,7 +352,7 @@ async def export_gachalogs(uid: str) -> dict:
                 "export_app": "WutheringWavesUID",
                 "export_app_version": WutheringWavesUID_version,
                 "export_timestamp": round(now.timestamp()),
-                "version": "v1.0",
+                "version": "v2.0",
                 "uid": uid,
             },
             "list": [],

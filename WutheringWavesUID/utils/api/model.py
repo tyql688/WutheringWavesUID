@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Union, Literal, Optional
 
-from msgspec import UNSET, Struct, UnsetType, field
 from pydantic import BaseModel, RootModel
+from msgspec import UNSET, Struct, UnsetType, field
 
 
 class GeneralGeetestData(Struct):
