@@ -10,12 +10,15 @@ from gsuid_core.logger import logger
 from ..wutheringwaves_charinfo.draw_char_card import generate_online_role_detail
 from ..utils.ascension.weapon import get_weapon_detail
 from ..utils.refresh_char_detail import save_card_info
+from ..utils.api.model import RoleDetailData
+from ..utils.calc import WuWaCalc
 from ..utils.name_convert import (
     char_id_to_char_name,
     alias_to_weapon_name,
     weapon_name_to_weapon_id,
     phantom_id_to_phantom_name
 )
+
 from ..wutheringwaves_config import PREFIX
 from .char_fetterDetail import get_fetterDetail_from_char, echo_data_to_cost
 
@@ -35,7 +38,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
         if char_id is None:
             await bot.send(f"[鸣潮]识别结果为角色'{char_name_print}'不存在")
-            logger.debug(f" [鸣潮][dc卡片识别] 用户{uid}的{char_name_print}识别错误！")
+            logger.error(f" [鸣潮][dc卡片识别] 用户{uid}的{char_name_print}识别错误！")
             return
         weapon_name = alias_to_weapon_name(result_dict["武器信息"]["武器名"])
         weapon_id = weapon_name_to_weapon_id(result_dict["武器信息"]["武器名"])
@@ -163,10 +166,21 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         weapon_detail = get_weapon_detail(weapon_id, result_dict["武器信息"]["等级"])
         data["weaponData"]["weapon"]["weaponStarLevel"] = weapon_detail.starLevel
 
+    # 检查声骸数据是否异常
+    try:
+        role_detail = RoleDetailData.model_validate(data)
+        calc: WuWaCalc = WuWaCalc(role_detail)
+        calc.phantom_pre = calc.prepare_phantom()
+    except Exception as e:
+        logger.error(f" [鸣潮][dc卡片识别] 角色声骸数据异常：{e}")
+        await bot.send("[鸣潮]dc卡片识别数据异常！\n或请使用更高分辨率卡片重新识别！", at_sender)
+        return
+
     waves_data.append(data)
     await save_card_info(uid, waves_data)
     await bot.send(f"[鸣潮]dc卡片数据提取成功！\n请务必使用：\n【{PREFIX}{char_name_print}面板】检查角色是否识别成功\n【{PREFIX}改{char_name_print}(套装**)(声骸)】修改识别的套装或声骸(影响伤害不影响评分)，例如：【{PREFIX}改{char_name_print}套装高天】或【{PREFIX}改{char_name_print}声骸】", at_sender)
     logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name_print}面板数据已保存到本地！")
+    return
 
 def get_breach(level: int):
     if level <= 20:
