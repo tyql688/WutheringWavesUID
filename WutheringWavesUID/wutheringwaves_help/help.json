@@ -220,6 +220,22 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "角色持有率",
+        "desc": "角色持有率",
+        "eg": "角色持有率",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "深塔出场率",
+        "desc": "深塔出场率",
+        "eg": "深塔出场率",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
@@ -531,6 +547,14 @@
         "name": "删除无效token",
         "desc": "删除无效token",
         "eg": "删除无效token",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "压缩面板图",
+        "desc": "压缩面板图",
+        "eg": "压缩面板图",
         "need_ck": false,
         "need_sk": false,
         "need_admin": true

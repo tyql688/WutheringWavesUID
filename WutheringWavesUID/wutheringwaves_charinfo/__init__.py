@@ -14,6 +14,7 @@ from ..utils.error_reply import WAVES_CODE_103, WAVES_CODE_099
 from ..utils.hint import error_reply
 from .draw_char_card import draw_char_detail_img, draw_char_score_img
 from .upload_card import (
+    compress_all_custom_card,
     delete_all_custom_card,
     delete_custom_card,
     get_custom_card_list,
@@ -27,6 +28,7 @@ waves_upload_char = SV("waves上传面板图", priority=5, pm=1)
 waves_char_card_list = SV("waves面板图列表", priority=5, pm=1)
 waves_delete_char_card = SV("waves删除面板图", priority=5, pm=1)
 waves_delete_all_card = SV("waves删除全部面板图", priority=5, pm=1)
+waves_compress_card = SV("waves面板图压缩", priority=5, pm=1)
 
 
 @waves_new_get_char_info.on_fullmatch(
@@ -265,3 +267,8 @@ async def delete_all_char_card(bot: Bot, ev: Event):
     if not char:
         return
     await delete_all_custom_card(bot, ev, char)
+
+
+@waves_compress_card.on_fullmatch("压缩面板图", block=True)
+async def compress_char_card(bot: Bot, ev: Event):
+    await compress_all_custom_card(bot, ev)
