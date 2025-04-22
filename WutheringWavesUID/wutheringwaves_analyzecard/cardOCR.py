@@ -536,6 +536,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         
         # 文本预处理：去除多余的空白符
         text_clean = re.sub(r'\s+', ' ', text).strip()  # 使用 \s+ 匹配所有空白符，并替换为单个空格
+        text_clean = re.sub(r'[，,、,]', '.', text_clean) # 将逗号替换为句号(中文全角逗号（简体和繁体）、英文半角逗号、日文逗号（全角顿号）、韩文逗号)
 
         # 提取属性对
         matches = patterns["echo_value"].findall(text_clean)
