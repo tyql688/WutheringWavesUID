@@ -11,6 +11,7 @@ from ..wutheringwaves_charinfo.draw_char_card import generate_online_role_detail
 from ..utils.ascension.weapon import get_weapon_detail
 from ..utils.refresh_char_detail import save_card_info
 from ..utils.api.model import RoleDetailData
+from ..utils.image import get_attribute_prop
 from ..utils.calc import WuWaCalc
 from ..utils.name_convert import (
     char_id_to_char_name,
@@ -169,8 +170,17 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
     # 检查声骸数据是否异常
     try:
         role_detail = RoleDetailData.model_validate(data)
+        # 检查数值
         calc: WuWaCalc = WuWaCalc(role_detail)
         calc.phantom_pre = calc.prepare_phantom()
+        # 检查词条名
+        if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
+            equipPhantomList = role_detail.phantomData.equipPhantomList
+            for _phantom in equipPhantomList:
+                if _phantom and _phantom.phantomProp:
+                    props = _phantom.get_props()
+                    for _prop in props:
+                        await get_attribute_prop(_prop.attributeName)
     except Exception as e:
         logger.error(f" [鸣潮][dc卡片识别] 角色声骸数据异常：{e}")
         await bot.send("[鸣潮]dc卡片识别数据异常！\n或请使用更高分辨率卡片重新识别！", at_sender)
