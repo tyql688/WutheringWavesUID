@@ -520,10 +520,11 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         # 强化文本清洗
         text_clean = re.sub(r'[^0-9/]', '', text)  # 移除非数字字符
         match = patterns["skill_level"].search(text_clean)
-        level = int(match.group(1))
-        if level:
+        if match:
+            level = int(match.group(1))
             final_result["技能等级"].append(min(level, 10))  # 限制最大等级为10
         else:
+            logger.error(f"[鸣潮][dc卡片识别]无法识别的技能等级：{text}")
             final_result["技能等级"].append(1)
 
     # 处理声骸装备（第8-12个结果）下标：7 8 9 10 11
