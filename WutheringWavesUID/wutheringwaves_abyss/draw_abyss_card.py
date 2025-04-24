@@ -2,22 +2,33 @@ from pathlib import Path
 from typing import Union
 
 from PIL import Image, ImageDraw
-
-from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
-from ..utils.api.model import (
-    AbyssChallenge,
-    AbyssFloor,
-    AccountBaseInfo,
-    RoleDetailData,
-    RoleList,
-)
-from ..utils.api.wwapi import ABYSS_TYPE_MAP, AbyssDetail, AbyssItem
+from ..utils.hint import error_reply
+from ..utils.waves_api import waves_api
+from ..utils.queues.queues import put_item
+from ..wutheringwaves_config import PREFIX
+from ..utils.queues.const import QUEUE_ABYSS_RECORD
 from ..utils.char_info_utils import get_all_roleid_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
+from ..utils.api.wwapi import ABYSS_TYPE_MAP, AbyssItem, AbyssDetail
+from ..utils.api.model import (
+    RoleList,
+    AbyssFloor,
+    AbyssChallenge,
+    RoleDetailData,
+    AccountBaseInfo,
+)
+from ..utils.image import (
+    GOLD,
+    GREY,
+    add_footer,
+    get_waves_bg,
+    get_event_avatar,
+    get_square_avatar,
+)
 from ..utils.fonts.waves_fonts import (
     waves_font_18,
     waves_font_25,
@@ -28,19 +39,6 @@ from ..utils.fonts.waves_fonts import (
     waves_font_40,
     waves_font_42,
 )
-from ..utils.hint import error_reply
-from ..utils.image import (
-    GOLD,
-    GREY,
-    add_footer,
-    get_event_avatar,
-    get_square_avatar,
-    get_waves_bg,
-)
-from ..utils.queues.const import QUEUE_ABYSS_RECORD
-from ..utils.queues.queues import put_item
-from ..utils.waves_api import waves_api
-from ..wutheringwaves_config import PREFIX
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 

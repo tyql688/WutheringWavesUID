@@ -1,6 +1,6 @@
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field, BaseModel
 
 MAIN_URL = "https://top.camellya.xyz"
 # MAIN_URL = "http://127.0.0.1:9001"
@@ -13,6 +13,7 @@ GET_ABYSS_RECORD_URL = f"{MAIN_URL}/top/waves/abyss/record"
 GET_HOLD_RATE_URL = f"{MAIN_URL}/api/waves/hold/rates"
 GET_POOL_LIST = f"{MAIN_URL}/api/waves/pool/list"
 GET_TOWER_APPEAR_RATE = f"{MAIN_URL}/api/waves/abyss/appear_rate"
+UPLOAD_SLASH_RECORD_URL = f"{MAIN_URL}/top/waves/slash/upload"
 
 ABYSS_TYPE = Literal["l4", "m2", "r4", "a"]
 
@@ -135,3 +136,25 @@ class RoleHoldRateResponse(BaseModel):
     code: int
     message: str
     data: List[RoleHoldRate]
+
+
+# ------------------------------------------------------------
+# 冥海记录
+# ------------------------------------------------------------
+
+
+class SlashDetail(BaseModel):
+    buffIcon: str
+    buffName: str
+    buffQuality: int
+    charIds: List[int]
+    score: int
+
+
+class SlashDetailRequest(BaseModel):
+    wavesId: str
+    challengeId: int
+    challengeName: str
+    halfList: List[SlashDetail]
+    rank: str
+    score: int

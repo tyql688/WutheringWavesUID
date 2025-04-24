@@ -1,23 +1,24 @@
-import asyncio
 import copy
-import json as j
 import random
+import asyncio
+import json as j
 from datetime import datetime
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Union, Literal, Optional
 
 import httpx
+from gsuid_core.logger import logger
 from aiohttp import (
+    FormData,
+    TCPConnector,
     ClientSession,
     ClientTimeout,
     ContentTypeError,
-    FormData,
-    TCPConnector,
 )
 
-from gsuid_core.logger import logger
-
-from ...wutheringwaves_config import WutheringWavesConfig
+from ..hint import error_reply
 from ..database.models import WavesUser
+from ...wutheringwaves_config import WutheringWavesConfig
+from ..util import get_public_ip, timed_async_cache, generate_random_string
 from ..error_reply import (
     WAVES_CODE_100,
     WAVES_CODE_101,
@@ -26,42 +27,43 @@ from ..error_reply import (
     WAVES_CODE_998,
     WAVES_CODE_999,
 )
-from ..hint import error_reply
-from ..util import generate_random_string, get_public_ip, timed_async_cache
 from .api import (
-    BASE_DATA_URL,
-    BATCH_ROLE_COST,
-    CALABASH_DATA_URL,
-    CALCULATOR_REFRESH_DATA_URL,
-    CHALLENGE_DATA_URL,
-    CHALLENGE_INDEX_URL,
-    EXPLORE_DATA_URL,
-    GACHA_LOG_URL,
-    GACHA_NET_LOG_URL,
-    GAME_DATA_URL,
     GAME_ID,
-    KURO_ROLE_URL,
     LOGIN_URL,
-    ONLINE_LIST_PHANTOM,
-    ONLINE_LIST_ROLE,
-    ONLINE_LIST_WEAPON,
-    QUERY_OWNED_ROLE,
-    QUERY_USERID_URL,
-    REFRESH_URL,
-    ROLE_CULTIVATE_STATUS,
-    ROLE_DATA_URL,
-    ROLE_DETAIL_URL,
-    ROLE_LIST_URL,
     SERVER_ID,
-    SERVER_ID_NET,
-    SIGNIN_TASK_LIST_URL,
     SIGNIN_URL,
-    TOWER_DETAIL_URL,
-    TOWER_INDEX_URL,
-    WIKI_DETAIL_URL,
-    WIKI_ENTRY_DETAIL_URL,
+    REFRESH_URL,
+    BASE_DATA_URL,
+    GACHA_LOG_URL,
+    GAME_DATA_URL,
+    KURO_ROLE_URL,
+    REQUEST_TOKEN,
+    ROLE_DATA_URL,
+    ROLE_LIST_URL,
+    SERVER_ID_NET,
     WIKI_HOME_URL,
     WIKI_TREE_URL,
+    BATCH_ROLE_COST,
+    ROLE_DETAIL_URL,
+    SLASH_INDEX_URL,
+    TOWER_INDEX_URL,
+    WIKI_DETAIL_URL,
+    EXPLORE_DATA_URL,
+    ONLINE_LIST_ROLE,
+    QUERY_OWNED_ROLE,
+    QUERY_USERID_URL,
+    SLASH_DETAIL_URL,
+    TOWER_DETAIL_URL,
+    CALABASH_DATA_URL,
+    GACHA_NET_LOG_URL,
+    CHALLENGE_DATA_URL,
+    ONLINE_LIST_WEAPON,
+    CHALLENGE_INDEX_URL,
+    ONLINE_LIST_PHANTOM,
+    SIGNIN_TASK_LIST_URL,
+    ROLE_CULTIVATE_STATUS,
+    WIKI_ENTRY_DETAIL_URL,
+    CALCULATOR_REFRESH_DATA_URL,
 )
 
 
@@ -93,6 +95,7 @@ async def _check_response(
 async def get_headers_h5():
     devCode = generate_random_string()
     header = {
+        # "b-at": "",
         "source": "h5",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         "devCode": devCode,
@@ -103,10 +106,11 @@ async def get_headers_h5():
 async def get_headers_ios():
     ip = await get_public_ip()
     header = {
+        # "b-at": "",
         "source": "ios",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.2.4",
-        "devCode": f"{ip}, Mozilla/5.0 (iPhone; CPU iPhone OS 16_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) KurogameBox/2.2.4",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.4.2",
+        "devCode": f"{ip},  Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.4.2",
     }
     return header
 
@@ -483,6 +487,51 @@ class WavesApi:
         }
         return await self._waves_request(TOWER_INDEX_URL, "POST", header, data=data)
 
+    async def get_slash_index(
+        self, roleId: str, token: str, serverId: Optional[str] = None
+    ) -> Union[Dict, int]:
+        """冥海"""
+        header = copy.deepcopy(await get_headers(token))
+        header.update({"token": token})
+        data = {
+            "gameId": GAME_ID,
+            "serverId": self.get_server_id(roleId, serverId),
+            "roleId": roleId,
+        }
+        return await self._waves_request(SLASH_INDEX_URL, "POST", header, data=data)
+
+    async def get_slash_detail(
+        self, roleId: str, token: str, serverId: Optional[str] = None
+    ) -> Union[Dict, int]:
+        """冥海"""
+        header = copy.deepcopy(await get_headers(token))
+        header.update({"token": token})
+        data = {
+            "gameId": GAME_ID,
+            "serverId": self.get_server_id(roleId, serverId),
+            "roleId": roleId,
+        }
+        return await self._waves_request(SLASH_DETAIL_URL, "POST", header, data=data)
+
+    @timed_async_cache(
+        86400,
+        lambda x: isinstance(x, str) and x != "",
+    )
+    async def get_request_token(
+        self, roleId: str, token: str, serverId: Optional[str] = None
+    ) -> Optional[str]:
+        """请求token"""
+        header = copy.deepcopy(await get_headers(token))
+        header.update({"token": token})
+        data = {
+            "serverId": self.get_server_id(roleId, serverId),
+            "roleId": roleId,
+        }
+        raw_data = await self._waves_request(REQUEST_TOKEN, "POST", header, data=data)
+        if isinstance(raw_data, dict) and raw_data.get("code") == 200:
+            return raw_data.get("data", {}).get("accessToken", "")
+        return ""
+
     async def calculator_refresh_data(
         self,
         roleId: str,
@@ -812,4 +861,6 @@ class Wiki:
             res = await client.post(
                 WIKI_ENTRY_DETAIL_URL, headers=headers, data=data, timeout=10
             )
+            return res.json()
+            return res.json()
             return res.json()

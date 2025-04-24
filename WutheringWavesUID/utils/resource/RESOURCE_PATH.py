@@ -1,9 +1,8 @@
 import sys
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
-
 from gsuid_core.data_store import get_res_path
+from jinja2 import Environment, FileSystemLoader
 
 MAIN_PATH = get_res_path() / "WutheringWavesUID"
 sys.path.append(str(MAIN_PATH))
@@ -52,6 +51,7 @@ CUSTOM_MR_CARD_PATH = MAIN_PATH / "custom_mr_role_pile"
 # 其他的素材
 OTHER_PATH = MAIN_PATH / "other"
 CALENDAR_PATH = OTHER_PATH / "calendar"
+SLASH_PATH = OTHER_PATH / "slash"
 
 
 # 别名
