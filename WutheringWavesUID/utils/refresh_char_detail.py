@@ -13,8 +13,8 @@ from ..utils.hint import error_reply
 from ..utils.queues.const import QUEUE_SCORE_RANK
 from ..utils.queues.queues import put_item
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
+from ..utils.util import get_version
 from ..utils.waves_api import waves_api
-from ..version import WWUID_Damage_Version
 from ..wutheringwaves_config import WutheringWavesConfig
 from . import waves_card_cache
 from .resource.constant import SPECIAL_CHAR_INT_ALL
@@ -52,7 +52,7 @@ async def send_card(
             "user_id": user_id,
             "waves_id": f"{account_info.id}",
             "kuro_name": account_info.name,
-            "version": WWUID_Damage_Version,
+            "version": get_version(),
             "char_info": [r.to_rank_dict() for r in waves_char_rank],
             "role_num": account_info.roleNum,
         }

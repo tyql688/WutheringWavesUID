@@ -58,8 +58,8 @@ from ..utils.image import (
 )
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import ATTRIBUTE_ID_MAP, SPECIAL_CHAR_NAME
+from ..utils.util import get_version
 from ..utils.waves_api import waves_api
-from ..version import WWUID_Damage_Version
 from ..wutheringwaves_config import WutheringWavesConfig
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -392,14 +392,12 @@ async def draw_all_rank_card(
     title_draw.text((470, 205), f"{time_str}", GREY, waves_font_20, "lm")
 
     # 版本
-    info_block = Image.new("RGBA", (70, 30), color=(255, 255, 255, 0))
+    info_block = Image.new("RGBA", (100, 30), color=(255, 255, 255, 0))
     info_block_draw = ImageDraw.Draw(info_block)
     info_block_draw.rounded_rectangle(
-        [0, 0, 70, 30], radius=6, fill=(0, 79, 152, int(0.9 * 255))
+        [0, 0, 100, 30], radius=6, fill=(0, 79, 152, int(0.9 * 255))
     )
-    info_block_draw.text(
-        (35, 15), f"v{WWUID_Damage_Version}", "white", waves_font_24, "mm"
-    )
+    info_block_draw.text((50, 15), f"v{get_version()}", "white", waves_font_24, "mm")
     _x = 540 + 31 * len(title_name)
     title.alpha_composite(info_block, (_x, 255))
 
