@@ -1,0 +1,364 @@
+from pathlib import Path
+from typing import Union
+
+from PIL import Image, ImageDraw
+from gsuid_core.models import Event
+from gsuid_core.utils.image.convert import convert_img
+from gsuid_core.utils.image.image_tools import crop_center_img
+from gsuid_core.utils.download_resource.download_file import download
+
+from ..utils.hint import error_reply
+from ..utils.waves_api import waves_api
+from ..utils.ascension.char import get_char_model
+from ..utils.resource.RESOURCE_PATH import SLASH_PATH
+from ..utils.char_info_utils import get_all_roleid_detail_info
+from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
+from ..utils.api.model import (
+    RoleList,
+    SlashDetail,
+    RoleDetailData,
+    AccountBaseInfo,
+)
+from ..utils.image import (
+    GOLD,
+    GREY,
+    SPECIAL_GOLD,
+    add_footer,
+    get_waves_bg,
+    get_event_avatar,
+    get_square_avatar,
+)
+from ..utils.fonts.waves_fonts import (
+    waves_font_18,
+    waves_font_25,
+    waves_font_26,
+    waves_font_30,
+    waves_font_40,
+    waves_font_42,
+)
+
+TEXT_PATH = Path(__file__).parent / "texture2d"
+
+SLASH_ERROR = "数据获取失败，请稍后再试"
+SLASH_ERROR_MESSAGE_NO_DATA = "当前暂无冥歌海墟数据"
+SLASH_ERROR_MESSAGE_NO_UNLOCK = "无冥歌海墟暂未解锁"
+
+
+difficulty_name_map = {
+    "禁忌海域": [1, 2, 3, 4, 5, 6],
+    "再生海域-海隙": [7, 8, 9, 10, 11],
+    "再生海域-湍渊": [12],
+}
+
+challenge_name_map = {
+    "海妖葬地": 1,
+    "无光祸墟": 2,
+    "湮雾深巢": 3,
+    "哀潮雾廊": 4,
+    "陨星流海": 5,
+    "沉骨回湾": 6,
+    "险滩": 7,
+    "涡流": 8,
+    "急潮": 9,
+    "狂澜": 10,
+    "海魇": 11,
+    "无尽湍渊": 12,
+}
+
+
+COLOR_QUALITY = {
+    1: (188, 188, 188),  # 白色 - 更自然的白色
+    2: (76, 175, 80),  # 绿色 - 更柔和的绿色
+    3: (33, 150, 243),  # 蓝色 - 更柔和的蓝色
+    4: (171, 71, 188),  # 紫色 - 修正为紫色
+    5: (255, 193, 7),  # 金色 - 更接近实际的金色
+}
+
+
+async def get_slash_data(
+    uid: str, ck: str, is_self_ck: bool
+) -> Union[SlashDetail, str]:
+    if is_self_ck:
+        slash_data = await waves_api.get_slash_detail(uid, ck)
+    else:
+        slash_data = await waves_api.get_slash_index(uid, ck)
+
+    if not isinstance(slash_data, dict):
+        return SLASH_ERROR
+
+    if slash_data.get("code") == 200:
+        if not slash_data.get("data") or not slash_data["data"].get("isUnlock", False):
+            if not is_self_ck:
+                return SLASH_ERROR_MESSAGE_NO_UNLOCK
+            return SLASH_ERROR_MESSAGE_NO_DATA
+        else:
+            return SlashDetail.model_validate(slash_data["data"])
+    else:
+        msg = error_reply(WAVES_CODE_999)
+        if slash_data.get("msg"):
+            msg = slash_data["msg"]
+        return error_reply(msg=msg)
+
+
+async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]:
+    is_self_ck, ck = await waves_api.get_ck_result(uid, user_id)
+    if not ck:
+        return error_reply(WAVES_CODE_102)
+
+    command = ev.command
+    text = ev.text.strip()
+    challengeIds = [7, 8, 9, 10, 11, 12] if is_self_ck else [12]
+    if "无尽" in text or "无尽" in command:
+        challengeIds = [12]
+    elif "禁忌" in text or "禁忌" in command:
+        challengeIds = [1, 2, 3, 4, 5, 6]
+    elif text.isdigit() and 1 <= int(text) <= 12:
+        challengeIds = [int(text)]
+    else:
+        text = text.replace("层", "")
+        if text.isdigit() and 1 <= int(text) <= 12:
+            challengeIds = [int(text)]
+
+    if is_self_ck:
+        challengeIds = [12]
+
+    # 账户数据
+    succ, account_info = await waves_api.get_base_info(uid, ck)
+    if not succ:
+        return account_info  # type: ignore
+    account_info = AccountBaseInfo.model_validate(account_info)
+
+    # 共鸣者信息
+    succ, role_info = await waves_api.get_role_info(uid, ck)
+    if not succ:
+        return role_info  # type: ignore
+    role_info = RoleList.model_validate(role_info)
+
+    # 冥海数据
+    slash_detail: Union[SlashDetail, str] = await get_slash_data(uid, ck, is_self_ck)
+    if isinstance(slash_detail, str):
+        return slash_detail
+
+    # 绘制图片
+    footer_h = 50
+    card_h = 300
+    title_h = 130
+    info_h = 300
+
+    h = footer_h + card_h + (info_h + title_h) * len(challengeIds)
+    card_img = get_waves_bg(1100, h, "bg9")
+
+    # 绘制个人信息
+    base_info_bg = Image.open(TEXT_PATH / "base_info_bg.png")
+    base_info_draw = ImageDraw.Draw(base_info_bg)
+    base_info_draw.text(
+        (275, 120), f"{account_info.name[:7]}", "white", waves_font_30, "lm"
+    )
+    base_info_draw.text(
+        (226, 173), f"特征码:  {account_info.id}", GOLD, waves_font_25, "lm"
+    )
+    card_img.paste(base_info_bg, (15, 20), base_info_bg)
+
+    # 头像 头像环
+    avatar = await draw_pic_with_ring(ev)
+    avatar_ring = Image.open(TEXT_PATH / "avatar_ring.png")
+    card_img.paste(avatar, (25, 70), avatar)
+    avatar_ring = avatar_ring.resize((180, 180))
+    card_img.paste(avatar_ring, (35, 80), avatar_ring)
+
+    # 账号基本信息，由于可能会没有，放在一起
+    if account_info.is_full:
+        title_bar = Image.open(TEXT_PATH / "title_bar.png")
+        title_bar_draw = ImageDraw.Draw(title_bar)
+        title_bar_draw.text((660, 125), "账号等级", GREY, waves_font_26, "mm")
+        title_bar_draw.text(
+            (660, 78), f"Lv.{account_info.level}", "white", waves_font_42, "mm"
+        )
+
+        title_bar_draw.text((810, 125), "世界等级", GREY, waves_font_26, "mm")
+        title_bar_draw.text(
+            (810, 78), f"Lv.{account_info.worldLevel}", "white", waves_font_42, "mm"
+        )
+        card_img.paste(title_bar, (-20, 70), title_bar)
+
+    # 根据面板数据获取详细信息
+    role_detail_info_map = await get_all_roleid_detail_info(uid)
+    role_detail_info_map = role_detail_info_map if role_detail_info_map else {}
+
+    # 绘制挑战信息
+    # 倒序
+    index = 0
+    slash_detail.difficultyList.reverse()
+    for difficulty in slash_detail.difficultyList:
+        for challenge in difficulty.challengeList:
+            if challenge.challengeId not in challengeIds:
+                continue
+
+            # 获取title
+            title_bar = Image.open(
+                TEXT_PATH / f"difficulty_{difficulty.difficulty}.png"
+            )
+
+            temp_bar_draw = ImageDraw.Draw(title_bar)
+            # 层数
+            if challenge.challengeId != 12:
+                temp_bar_draw.text(
+                    (70, 60),
+                    f"{challenge.challengeId}",
+                    "white",
+                    waves_font_40,
+                    "mm",
+                )
+            # 挑战名称
+            temp_bar_draw.text(
+                (140, 45),
+                f"{challenge.challengeName}",
+                "white",
+                waves_font_40,
+            )
+            score_bar = Image.open(TEXT_PATH / f"score_{challenge.rank}.png")
+            title_bar.paste(score_bar, (600, 10), score_bar)
+
+            temp_bar_draw.text(
+                (700, 50),
+                f"挑战分数：{challenge.score}",
+                SPECIAL_GOLD,
+                waves_font_25,
+            )
+
+            role_bg = Image.open(TEXT_PATH / "role_hang_bg.png")
+            # 获取角色信息
+            for half_index, slash_half in enumerate(challenge.halfList):
+                role_hang_bg = Image.new(
+                    "RGBA", (1100, info_h // 2), (255, 255, 255, 0)
+                )
+                role_hang_bg_draw = ImageDraw.Draw(role_hang_bg)
+                text_dui = "队伍一" if half_index == 0 else "队伍二"
+                role_hang_bg_draw.text(
+                    (150, 30),
+                    f"{text_dui}",
+                    "white",
+                    waves_font_30,
+                )
+                role_hang_bg_draw.text(
+                    (150, 75),
+                    f"{slash_half.score}",
+                    GOLD,
+                    waves_font_25,
+                )
+                team_pic = await get_slash_pic(difficulty.teamIcon)
+                role_hang_bg.alpha_composite(team_pic, (30, 35))
+
+                # buff
+                buff_bg = Image.new("RGBA", (100, 100), (255, 255, 255, 0))
+                buff_bg_draw = ImageDraw.Draw(buff_bg)
+                buff_bg_draw.rounded_rectangle(
+                    [0, 0, 100, 100],
+                    radius=5,
+                    fill=(0, 0, 0, int(0.8 * 255)),
+                )
+                buff_color = COLOR_QUALITY[slash_half.buffQuality]
+                buff_bg_draw.rectangle(
+                    [0, 95, 100, 100],
+                    fill=buff_color,
+                )
+                buff_pic = await get_slash_pic(slash_half.buffIcon)
+                buff_pic = buff_pic.resize((100, 100))
+                buff_bg.paste(buff_pic, (0, 0), buff_pic)
+
+                role_hang_bg.alpha_composite(buff_bg, (870, 20))
+
+                for role_index, slash_role in enumerate(slash_half.roleList):
+                    char_model = get_char_model(slash_role.roleId)
+                    if char_model is None:
+                        continue
+                    avatar = await draw_pic(slash_role.roleId)
+                    char_bg = Image.open(
+                        TEXT_PATH / f"char_bg{char_model.starLevel}.png"
+                    )
+                    char_bg_draw = ImageDraw.Draw(char_bg)
+                    char_bg_draw.text(
+                        (90, 150),
+                        f"{char_model.name}",
+                        "white",
+                        waves_font_18,
+                        "mm",
+                    )
+                    char_bg.paste(avatar, (0, 0), avatar)
+                    if (
+                        role_detail_info_map
+                        and str(slash_role.roleId) in role_detail_info_map
+                    ):
+                        temp: RoleDetailData = role_detail_info_map[
+                            str(slash_role.roleId)
+                        ]
+                        info_block = Image.new(
+                            "RGBA", (40, 20), color=(255, 255, 255, 0)
+                        )
+                        info_block_draw = ImageDraw.Draw(info_block)
+                        info_block_draw.rectangle(
+                            [0, 0, 40, 20], fill=(96, 12, 120, int(0.9 * 255))
+                        )
+                        info_block_draw.text(
+                            (2, 10),
+                            f"{temp.get_chain_name()}",
+                            "white",
+                            waves_font_18,
+                            "lm",
+                        )
+                        char_bg.paste(info_block, (110, 35), info_block)
+
+                    role_hang_bg.alpha_composite(
+                        char_bg, (350 + role_index * info_h // 2, -20)
+                    )
+
+                role_bg.paste(role_hang_bg, (0, info_h // 2 * half_index), role_hang_bg)
+
+            temp_img = Image.new("RGBA", (1000, title_h + info_h), (255, 255, 255, 0))
+            temp_img.paste(title_bar, (0, 0), title_bar)
+            temp_img.paste(role_bg, (0, title_h), role_bg)
+            card_img.paste(
+                temp_img, (50, card_h + index * (info_h + title_h)), temp_img
+            )
+            index += 1
+
+    card_img = add_footer(card_img, 600, 20)
+    card_img = await convert_img(card_img)
+    return card_img
+
+
+async def draw_pic_with_ring(ev: Event):
+    pic = await get_event_avatar(ev)
+
+    mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
+    img = Image.new("RGBA", (180, 180))
+    mask = mask_pic.resize((160, 160))
+    resize_pic = crop_center_img(pic, 160, 160)
+    img.paste(resize_pic, (20, 20), mask)
+
+    return img
+
+
+async def draw_pic(roleId):
+    pic = await get_square_avatar(roleId)
+    mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
+    img = Image.new("RGBA", (180, 180))
+    mask = mask_pic.resize((140, 140))
+    resize_pic = crop_center_img(pic, 140, 140)
+    img.paste(resize_pic, (22, 18), mask)
+
+    return img
+
+
+async def get_slash_pic(pic_url: str) -> Image.Image:
+    _dir = SLASH_PATH
+    _dir.mkdir(parents=True, exist_ok=True)
+
+    name = pic_url.split("/")[-1]
+    _path = _dir / name
+    if not _path.exists():
+        await download(pic_url, _dir, name, tag="[鸣潮]")
+
+    return Image.open(_path).convert("RGBA")
+    return Image.open(_path).convert("RGBA")
+    return Image.open(_path).convert("RGBA")

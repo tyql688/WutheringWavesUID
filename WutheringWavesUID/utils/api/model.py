@@ -603,3 +603,43 @@ class BatchRoleCostResponse(BaseModel):
     weaponNum: int  # 武器数量
     # preview: Dict[str, Optional[List[CultivateCost]]]
     costList: List[RoleCostDetail]  # 每个角色的详细花费
+
+
+class SlashRole(BaseModel):
+    iconUrl: str  # 角色头像
+    roleId: int  # 角色ID
+
+
+class SlashHalf(BaseModel):
+    buffDescription: str  # 描述
+    buffIcon: str  # 图标
+    buffName: str  # 名称
+    buffQuality: int  # 品质
+    roleList: List[SlashRole]  # 角色列表
+    score: int  # 分数
+
+
+class SlashChallenge(BaseModel):
+    challengeId: int  # 挑战ID
+    challengeName: str  # 挑战名称
+    halfList: List[SlashHalf]  # 半场列表
+    rank: str  # 等级
+    score: int  # 分数
+
+
+class SlashDifficulty(BaseModel):
+    allScore: int  # 总分数
+    challengeList: List[SlashChallenge]  # 挑战列表
+    difficulty: int  # 难度
+    difficultyName: str  # 难度名称
+    homePageBG: str  # 首页背景
+    maxScore: int  # 最大分数
+    teamIcon: str  # 团队图标
+
+
+class SlashDetail(BaseModel):
+    """冥海"""
+
+    isUnlock: bool  # 是否解锁
+    seasonEndTime: int  # 赛季结束时间
+    difficultyList: List[SlashDifficulty]  # 难度列表

@@ -256,6 +256,14 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "冥歌海墟",
+        "desc": "查询冥歌海墟",
+        "eg": "冥歌海墟",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
