@@ -219,7 +219,7 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                 "white",
                 waves_font_40,
             )
-            score_bar = Image.open(TEXT_PATH / f"score_{challenge.rank}.png")
+            score_bar = Image.open(TEXT_PATH / f"score_{challenge.rank.lower()}.png")
             title_bar.paste(score_bar, (600, 10), score_bar)
 
             temp_bar_draw.text(
@@ -411,10 +411,9 @@ async def upload_slash_record(
             "challengeId": challenge.challengeId,
             "challengeName": challenge.challengeName,
             "halfList": half_list,
-            "rank": challenge.rank,
+            "rank": challenge.rank.lower(),
             "score": challenge.score,
         }
     )
     # logger.info(f"上传冥海记录: {slash_item.model_dump()}")
-    await put_item(QUEUE_SLASH_RECORD, slash_item.model_dump())
     await put_item(QUEUE_SLASH_RECORD, slash_item.model_dump())
