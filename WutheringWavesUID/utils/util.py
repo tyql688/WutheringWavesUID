@@ -84,3 +84,9 @@ def format_with_defaults(desc: str, params: List[Any], default_value: str = "N/A
     while len(params_list) < num_placeholders:
         params_list.append(default_value)
     return desc.format(*params_list)
+
+
+def get_version():
+    from ..version import WutheringWavesUID_version
+
+    return WutheringWavesUID_version

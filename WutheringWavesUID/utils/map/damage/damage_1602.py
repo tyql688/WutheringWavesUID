@@ -1,18 +1,18 @@
 # 丹瑾
-from typing import Union, List
+from typing import List, Union
 
-from .damage import weapon_damage, echo_damage, phase_damage
 from ...api.model import RoleDetailData
-from ...ascension.char import get_char_detail, WavesCharResult
+from ...ascension.char import WavesCharResult, get_char_detail
 from ...damage.damage import DamageAttribute
 from ...damage.utils import (
-    skill_damage_calc,
-    hit_damage,
-    cast_skill,
     cast_hit,
-    liberation_damage,
     cast_liberation,
+    cast_skill,
+    hit_damage,
+    liberation_damage,
+    skill_damage_calc,
 )
+from .damage import echo_damage, phase_damage, weapon_damage
 
 
 def calc_damage(
@@ -28,6 +28,10 @@ def calc_damage(
 
     phase_damage(attr, role, damage_func, isGroup)
 
+    title = "朱蚀之刻"
+    msg = "丹瑾攻击携带朱蚀之刻的目标时，造成的伤害提升20%"
+    attr.add_dmg_bonus(0.2, title, msg)
+
     chain_num = role.get_chain_num()
     if role_breach and role_breach >= 3:
         # 固有技能
@@ -38,7 +42,7 @@ def calc_damage(
     if chain_num >= 1:
         # 1命
         title = f"{role_name}-一链"
-        msg = f"自身的攻击提升5%*6"
+        msg = "自身的攻击提升5%*6"
         attr.add_atk_percent(0.3, title, msg)
 
     if chain_num >= 2:
@@ -50,7 +54,7 @@ def calc_damage(
     if chain_num >= 3 and cast_liberation in damage_func:
         # 3命
         title = f"{role_name}-三链"
-        msg = f"共鸣解放伤害加成提升30%。"
+        msg = "共鸣解放伤害加成提升30%。"
         attr.add_dmg_bonus(0.3, title, msg)
 
     if chain_num >= 4:
@@ -62,7 +66,7 @@ def calc_damage(
     if chain_num >= 5:
         # 5命
         title = f"{role_name}-五链"
-        msg = f"湮灭伤害加成提升15%，生命低于60%时湮灭伤害加成提升15%。"
+        msg = "湮灭伤害加成提升15%，生命低于60%时湮灭伤害加成提升15%。"
         attr.add_dmg_bonus(0.3, title, msg)
 
     if chain_num >= 6:
@@ -81,7 +85,7 @@ def calc_damage_1(
     role: RoleDetailData,
     isGroup: bool = False,
     skill_type: Union[str, List[str]] = "满能缭乱",
-) -> (str, str):
+) -> tuple[str, str]:
     """
     满能缭乱伤害
     """
@@ -129,7 +133,7 @@ def calc_damage_1(
 
 def calc_damage_4(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
-) -> (str, str):
+) -> tuple[str, str]:
     """
     绯红绽放
     """
