@@ -1,40 +1,40 @@
-import asyncio
 import time
-from datetime import datetime, timedelta
-from pathlib import Path
+import asyncio
 from typing import Dict
-
-from PIL import Image, ImageDraw
+from pathlib import Path
+from datetime import datetime, timedelta
 
 from gsuid_core.bot import Bot
-from gsuid_core.logger import logger
+from PIL import Image, ImageDraw
 from gsuid_core.models import Event
+from gsuid_core.logger import logger
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
-from ..utils.api.model import AccountBaseInfo, DailyData
+
+from ..utils.waves_api import waves_api
+from ..utils.resource.constant import SPECIAL_CHAR
+from ..utils.name_convert import char_name_to_char_id
+from ..utils.api.model import DailyData, AccountBaseInfo
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_102, WAVES_CODE_103
+from ..utils.image import (
+    RED,
+    GOLD,
+    GREY,
+    GREEN,
+    YELLOW,
+    add_footer,
+    get_event_avatar,
+    get_random_waves_role_pile,
+)
 from ..utils.fonts.waves_fonts import (
     waves_font_24,
     waves_font_25,
     waves_font_26,
     waves_font_30,
+    waves_font_32,
     waves_font_42,
 )
-from ..utils.image import (
-    GOLD,
-    GREEN,
-    GREY,
-    RED,
-    YELLOW,
-    add_footer,
-    get_event_avatar,
-    get_random_waves_role_pile,
-    get_small_logo,
-)
-from ..utils.name_convert import char_name_to_char_id
-from ..utils.resource.constant import SPECIAL_CHAR
-from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 YES = Image.open(TEXT_PATH / "yes.png")
@@ -66,17 +66,16 @@ async def process_uid(uid, ev):
     )
 
     (daily_info_res, account_info_res) = results
+    if not isinstance(daily_info_res, (list, tuple)) or not isinstance(
+        account_info_res, (list, tuple)
+    ):
+        return None
 
     if not daily_info_res[0] or not account_info_res[0]:
         return None
 
-    daily_info = DailyData(**daily_info_res[1])
-    account_info = AccountBaseInfo(**account_info_res[1])
-
-    # 处理签到状态
-    # res = await waves_api.sign_in_task_list(uid, ck)
-    # if isinstance(res, dict):
-    #     daily_info.hasSignIn = res.get("data", {}).get("isSigIn", False)
+    daily_info = DailyData.model_validate(daily_info_res[1])
+    account_info = AccountBaseInfo.model_validate(account_info_res[1])
 
     return {
         "daily_info": daily_info,
@@ -160,20 +159,22 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
         char_id = char_name_to_char_id(user.stamina_bg_value)
         if char_id in SPECIAL_CHAR:
             ck = await waves_api.get_self_waves_ck(daily_info.roleId, ev.user_id)
-            for char_id in SPECIAL_CHAR[char_id]:
-                succ, role_detail_info = await waves_api.get_role_detail_info(
-                    char_id, daily_info.roleId, ck
-                )
-                if (
-                    not succ
-                    or "role" not in role_detail_info
-                    or role_detail_info["role"] is None
-                    or "level" not in role_detail_info
-                    or role_detail_info["level"] is None
-                ):
-                    continue
-                pile_id = char_id
-                break
+            if ck:
+                for char_id in SPECIAL_CHAR[char_id]:
+                    succ, role_detail_info = await waves_api.get_role_detail_info(
+                        char_id, daily_info.roleId, ck
+                    )
+                    if (
+                        not succ
+                        or "role" not in role_detail_info
+                        or not isinstance(role_detail_info, dict)
+                        or role_detail_info["role"] is None
+                        or "level" not in role_detail_info
+                        or role_detail_info["level"] is None
+                    ):
+                        continue
+                    pile_id = char_id
+                    break
         else:
             pile_id = char_id
     pile = await get_random_waves_role_pile(pile_id)
@@ -190,27 +191,41 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
 
     title_bar = Image.open(TEXT_PATH / "title_bar.png")
     title_bar_draw = ImageDraw.Draw(title_bar)
-    title_bar_draw.text((510, 125), "战歌重奏", GREY, waves_font_26, "mm")
+    title_bar_draw.text((480, 125), "战歌重奏", GREY, waves_font_26, "mm")
     color = RED if account_info.weeklyInstCount != 0 else GREEN
-    title_bar_draw.text(
-        (510, 78),
-        f"{account_info.weeklyInstCountLimit - account_info.weeklyInstCount} / {account_info.weeklyInstCountLimit}",
-        color,
-        waves_font_42,
-        "mm",
-    )
+    if (
+        account_info.weeklyInstCountLimit is not None
+        and account_info.weeklyInstCount is not None
+    ):
+        title_bar_draw.text(
+            (480, 78),
+            f"{account_info.weeklyInstCountLimit - account_info.weeklyInstCount} / {account_info.weeklyInstCountLimit}",
+            color,
+            waves_font_42,
+            "mm",
+        )
 
-    title_bar_draw.text((660, 125), "先约电台", GREY, waves_font_26, "mm")
+    title_bar_draw.text((630, 125), "先约电台", GREY, waves_font_26, "mm")
     title_bar_draw.text(
-        (660, 78),
+        (630, 78),
         f"Lv.{daily_info.battlePassData[0].cur}",
         "white",
         waves_font_42,
         "mm",
     )
 
-    logo_img = get_small_logo(2)
-    title_bar.alpha_composite(logo_img, dest=(760, 60))
+    # logo_img = get_small_logo(2)
+    # title_bar.alpha_composite(logo_img, dest=(760, 60))
+
+    color = RED if account_info.rougeScore != account_info.rougeScoreLimit else GREEN
+    title_bar_draw.text((810, 125), "千道门扉的异想", GREY, waves_font_26, "mm")
+    title_bar_draw.text(
+        (810, 78),
+        f"{account_info.rougeScore}/{account_info.rougeScoreLimit}",
+        color,
+        waves_font_32,
+        "mm",
+    )
 
     # 体力剩余恢复时间
     active_draw = ImageDraw.Draw(info)
@@ -270,7 +285,13 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
     active_draw.text(
         (348, 230), f"{account_info.storeEnergy}", GREY, waves_font_30, "rm"
     )
-    radio = account_info.storeEnergy / account_info.storeEnergyLimit
+    radio = (
+        account_info.storeEnergy / account_info.storeEnergyLimit
+        if account_info.storeEnergyLimit is not None
+        and account_info.storeEnergy is not None
+        and account_info.storeEnergyLimit != 0
+        else 0
+    )
     color = RED if radio > 0.8 else YELLOW
     active_draw.rectangle((173, 254, int(173 + radio * max_len), 262), color)
 
@@ -338,4 +359,5 @@ async def draw_pic_with_ring(ev: Event):
     resize_pic = crop_center_img(pic, 160, 160)
     img.paste(resize_pic, (20, 20), mask)
 
+    return img
     return img

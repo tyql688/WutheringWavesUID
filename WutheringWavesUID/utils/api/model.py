@@ -110,6 +110,8 @@ class AccountBaseInfo(BaseModel):
     weeklyInstCountLimit: Optional[int] = None  # 周本限制次数
     storeEnergy: Optional[int] = None  # 结晶单质数量
     storeEnergyLimit: Optional[int] = None  # 结晶单质限制
+    rougeScore: Optional[int] = None  # 千道门扉的异想
+    rougeScoreLimit: Optional[int] = None  # 千道门扉的异想限制
 
     @property
     def is_full(self):
