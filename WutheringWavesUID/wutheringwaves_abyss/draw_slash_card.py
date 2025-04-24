@@ -9,7 +9,10 @@ from gsuid_core.utils.download_resource.download_file import download
 
 from ..utils.hint import error_reply
 from ..utils.waves_api import waves_api
+from ..utils.queues.queues import put_item
+from ..utils.api.wwapi import SlashDetailRequest
 from ..utils.ascension.char import get_char_model
+from ..utils.queues.const import QUEUE_SLASH_RECORD
 from ..utils.resource.RESOURCE_PATH import SLASH_PATH
 from ..utils.char_info_utils import get_all_roleid_detail_info
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
@@ -119,7 +122,7 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
         if text.isdigit() and 1 <= int(text) <= 12:
             challengeIds = [int(text)]
 
-    if is_self_ck:
+    if not is_self_ck:
         challengeIds = [12]
 
     # 账户数据
@@ -322,6 +325,8 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
             )
             index += 1
 
+    await upload_slash_record(is_self_ck, uid, slash_detail)
+
     card_img = add_footer(card_img, 600, 20)
     card_img = await convert_img(card_img)
     return card_img
@@ -360,5 +365,56 @@ async def get_slash_pic(pic_url: str) -> Image.Image:
         await download(pic_url, _dir, name, tag="[鸣潮]")
 
     return Image.open(_path).convert("RGBA")
-    return Image.open(_path).convert("RGBA")
-    return Image.open(_path).convert("RGBA")
+
+
+async def upload_slash_record(
+    is_self_ck: bool,
+    waves_id: str,
+    slash_data: SlashDetail,
+):
+    from ..wutheringwaves_config import WutheringWavesConfig
+
+    WavesToken = WutheringWavesConfig.get_config("WavesToken").data
+    if not WavesToken:
+        return
+
+    if not slash_data:
+        return
+    if not slash_data.difficultyList:
+        return
+    if not is_self_ck:
+        return
+
+    # 只要难度12
+    difficulty = next(
+        (k for k in slash_data.difficultyList if k.difficulty == 2),
+        None,
+    )
+    if not difficulty:
+        return
+
+    challenge = difficulty.challengeList[0]
+    half_list = []
+    for half in challenge.halfList:
+        half_list.append(
+            {
+                "buffIcon": half.buffIcon,
+                "buffName": half.buffName,
+                "buffQuality": half.buffQuality,
+                "charIds": [role.roleId for role in half.roleList],
+                "score": half.score,
+            }
+        )
+    slash_item = SlashDetailRequest.model_validate(
+        {
+            "wavesId": waves_id,
+            "challengeId": challenge.challengeId,
+            "challengeName": challenge.challengeName,
+            "halfList": half_list,
+            "rank": challenge.rank,
+            "score": challenge.score,
+        }
+    )
+    # logger.info(f"上传冥海记录: {slash_item.model_dump()}")
+    await put_item(QUEUE_SLASH_RECORD, slash_item.model_dump())
+    await put_item(QUEUE_SLASH_RECORD, slash_item.model_dump())
