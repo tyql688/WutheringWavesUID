@@ -272,10 +272,10 @@ class WavesApi:
         header.update({"token": token})
         data = {
             "type": "1",
-            # "sizeType": "1",
-            # "gameId": gameId,
-            # "serverId": self.get_server_id(roleId),
-            # "roleId": roleId,
+            "sizeType": "2",
+            "gameId": gameId,
+            "serverId": self.get_server_id(roleId),
+            "roleId": roleId,
         }
         raw_data = await self._waves_request(
             MR_REFRESH_URL,
