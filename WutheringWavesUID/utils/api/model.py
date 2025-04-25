@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Union, Literal, Optional
 
-from pydantic import BaseModel, RootModel
+from pydantic import Field, BaseModel, RootModel
 from msgspec import UNSET, Struct, UnsetType, field
 
 
@@ -622,14 +622,19 @@ class SlashHalf(BaseModel):
 class SlashChallenge(BaseModel):
     challengeId: int  # 挑战ID
     challengeName: str  # 挑战名称
-    halfList: List[SlashHalf]  # 半场列表
-    rank: str  # 等级
+    halfList: List[SlashHalf] = Field(default_factory=list)  # 半场列表
+    rank: Optional[str] = Field(default="")  # 等级
     score: int  # 分数
+
+    def get_rank(self):
+        if not self.rank:
+            return ""
+        return self.rank.lower()
 
 
 class SlashDifficulty(BaseModel):
     allScore: int  # 总分数
-    challengeList: List[SlashChallenge]  # 挑战列表
+    challengeList: List[SlashChallenge] = Field(default_factory=list)  # 挑战列表
     difficulty: int  # 难度
     difficultyName: str  # 难度名称
     homePageBG: str  # 首页背景
@@ -642,4 +647,4 @@ class SlashDetail(BaseModel):
 
     isUnlock: bool  # 是否解锁
     seasonEndTime: int  # 赛季结束时间
-    difficultyList: List[SlashDifficulty]  # 难度列表
+    difficultyList: List[SlashDifficulty] = Field(default_factory=list)  # 难度列表
