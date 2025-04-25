@@ -43,6 +43,7 @@ from .api import (
     SERVER_ID_NET,
     WIKI_HOME_URL,
     WIKI_TREE_URL,
+    MR_REFRESH_URL,
     BATCH_ROLE_COST,
     ROLE_DETAIL_URL,
     SLASH_INDEX_URL,
@@ -270,14 +271,14 @@ class WavesApi:
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
         data = {
-            "type": "2",
-            "sizeType": "1",
-            "gameId": gameId,
-            "serverId": self.get_server_id(roleId),
-            "roleId": roleId,
+            "type": "1",
+            # "sizeType": "1",
+            # "gameId": gameId,
+            # "serverId": self.get_server_id(roleId),
+            # "roleId": roleId,
         }
         raw_data = await self._waves_request(
-            GAME_DATA_URL,
+            MR_REFRESH_URL,
             "POST",
             header,
             data=data,
@@ -861,6 +862,7 @@ class Wiki:
             res = await client.post(
                 WIKI_ENTRY_DETAIL_URL, headers=headers, data=data, timeout=10
             )
+            return res.json()
             return res.json()
             return res.json()
             return res.json()
