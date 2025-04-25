@@ -125,6 +125,33 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     if not is_self_ck:
         challengeIds = [12]
 
+    # 冥海数据
+    slash_detail: Union[SlashDetail, str] = await get_slash_data(uid, ck, is_self_ck)
+    if isinstance(slash_detail, str):
+        return slash_detail
+
+    # check 冥海数据
+    if not is_self_ck and not slash_detail.isUnlock:
+        return SLASH_ERROR_MESSAGE_NO_UNLOCK
+
+    owned_challenge_ids = [
+        challenge.challengeId
+        for difficulty in slash_detail.difficultyList
+        for challenge in difficulty.challengeList
+        if len(challenge.halfList) > 0
+    ]
+    if len(owned_challenge_ids) == 0:
+        return SLASH_ERROR_MESSAGE_NO_DATA
+
+    query_challenge_ids = []
+    for challenge_id in challengeIds:
+        if challenge_id not in owned_challenge_ids:
+            continue
+        query_challenge_ids.append(challenge_id)
+
+    if len(query_challenge_ids) == 0:
+        return SLASH_ERROR_MESSAGE_NO_DATA
+
     # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck)
     if not succ:
@@ -137,18 +164,13 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
         return role_info  # type: ignore
     role_info = RoleList.model_validate(role_info)
 
-    # 冥海数据
-    slash_detail: Union[SlashDetail, str] = await get_slash_data(uid, ck, is_self_ck)
-    if isinstance(slash_detail, str):
-        return slash_detail
-
     # 绘制图片
     footer_h = 50
     card_h = 300
     title_h = 130
     info_h = 300
 
-    h = footer_h + card_h + (info_h + title_h) * len(challengeIds)
+    h = footer_h + card_h + (info_h + title_h) * len(query_challenge_ids)
     card_img = get_waves_bg(1100, h, "bg9")
 
     # 绘制个人信息
@@ -194,7 +216,10 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     slash_detail.difficultyList.reverse()
     for difficulty in slash_detail.difficultyList:
         for challenge in difficulty.challengeList:
-            if challenge.challengeId not in challengeIds:
+            if challenge.challengeId not in query_challenge_ids:
+                continue
+
+            if not challenge.halfList:
                 continue
 
             # 获取title
@@ -219,7 +244,7 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                 "white",
                 waves_font_40,
             )
-            score_bar = Image.open(TEXT_PATH / f"score_{challenge.rank.lower()}.png")
+            score_bar = Image.open(TEXT_PATH / f"score_{challenge.get_rank()}.png")
             title_bar.paste(score_bar, (600, 10), score_bar)
 
             temp_bar_draw.text(
@@ -393,7 +418,13 @@ async def upload_slash_record(
     if not difficulty:
         return
 
+    if not difficulty.challengeList:
+        return
+
     challenge = difficulty.challengeList[0]
+    if not challenge.halfList:
+        return
+
     half_list = []
     for half in challenge.halfList:
         half_list.append(
@@ -411,7 +442,7 @@ async def upload_slash_record(
             "challengeId": challenge.challengeId,
             "challengeName": challenge.challengeName,
             "halfList": half_list,
-            "rank": challenge.rank.lower(),
+            "rank": challenge.get_rank(),
             "score": challenge.score,
         }
     )
