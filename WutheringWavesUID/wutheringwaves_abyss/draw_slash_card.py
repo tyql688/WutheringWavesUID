@@ -2,35 +2,22 @@ from pathlib import Path
 from typing import Union
 
 from PIL import Image, ImageDraw
+
 from gsuid_core.models import Event
+from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
-from gsuid_core.utils.download_resource.download_file import download
 
-from ..utils.hint import error_reply
-from ..utils.waves_api import waves_api
-from ..utils.queues.queues import put_item
-from ..utils.api.wwapi import SlashDetailRequest
-from ..utils.ascension.char import get_char_model
-from ..utils.queues.const import QUEUE_SLASH_RECORD
-from ..utils.resource.RESOURCE_PATH import SLASH_PATH
-from ..utils.char_info_utils import get_all_roleid_detail_info
-from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
 from ..utils.api.model import (
+    AccountBaseInfo,
+    RoleDetailData,
     RoleList,
     SlashDetail,
-    RoleDetailData,
-    AccountBaseInfo,
 )
-from ..utils.image import (
-    GOLD,
-    GREY,
-    SPECIAL_GOLD,
-    add_footer,
-    get_waves_bg,
-    get_event_avatar,
-    get_square_avatar,
-)
+from ..utils.api.wwapi import SlashDetailRequest
+from ..utils.ascension.char import get_char_model
+from ..utils.char_info_utils import get_all_roleid_detail_info
+from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
 from ..utils.fonts.waves_fonts import (
     waves_font_18,
     waves_font_25,
@@ -39,6 +26,20 @@ from ..utils.fonts.waves_fonts import (
     waves_font_40,
     waves_font_42,
 )
+from ..utils.hint import error_reply
+from ..utils.image import (
+    GOLD,
+    GREY,
+    SPECIAL_GOLD,
+    add_footer,
+    get_event_avatar,
+    get_square_avatar,
+    get_waves_bg,
+)
+from ..utils.queues.const import QUEUE_SLASH_RECORD
+from ..utils.queues.queues import put_item
+from ..utils.resource.RESOURCE_PATH import SLASH_PATH
+from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -244,8 +245,10 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                 "white",
                 waves_font_40,
             )
-            score_bar = Image.open(TEXT_PATH / f"score_{challenge.get_rank()}.png")
-            title_bar.paste(score_bar, (600, 10), score_bar)
+            rank = challenge.get_rank()
+            if len(rank) != 0:
+                score_bar = Image.open(TEXT_PATH / f"score_{rank}.png")
+                title_bar.paste(score_bar, (600, 10), score_bar)
 
             temp_bar_draw.text(
                 (700, 50),
@@ -423,6 +426,9 @@ async def upload_slash_record(
 
     challenge = difficulty.challengeList[0]
     if not challenge.halfList:
+        return
+
+    if not challenge.get_rank():
         return
 
     half_list = []
