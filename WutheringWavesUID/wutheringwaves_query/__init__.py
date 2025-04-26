@@ -26,9 +26,9 @@ async def handle_char_hold_rate(bot: Bot, ev: Event):
     if "群" in ev.command:
         if not ev.group_id:
             return await bot.send("请在群聊中使用")
-        img = await get_char_hold_rate_img(ev.group_id)
+        img = await get_char_hold_rate_img(ev, ev.group_id)
     else:
-        img = await get_char_hold_rate_img()
+        img = await get_char_hold_rate_img(ev)
     await bot.send(img)
 
 

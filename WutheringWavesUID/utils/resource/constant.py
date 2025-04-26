@@ -14,6 +14,8 @@ NORMAL_LIST = [
     "浩境粼光",
 ]
 
+NORMAL_LIST_IDS = [1104, 1203, 1301, 1405, 1503]
+
 card_sort_map = {
     "生命": "0",
     "攻击": "0",
