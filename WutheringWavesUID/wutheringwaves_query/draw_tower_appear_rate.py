@@ -38,7 +38,7 @@ async def get_tower_appear_rate_data() -> Union[Dict, None]:
             if res.status_code == 200:
                 return res.json().get("data", [])
         except Exception as e:
-            logger.exception(f"获取卡池数据失败: {e}")
+            logger.exception(f"获取深塔出场率数据失败: {e}")
 
 
 async def draw_tower_use_rate(ev: Event):

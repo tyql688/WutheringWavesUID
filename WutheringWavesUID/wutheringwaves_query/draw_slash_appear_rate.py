@@ -38,7 +38,7 @@ async def get_slash_appear_rate_data() -> Union[Dict, None]:
             if res.status_code == 200:
                 return res.json().get("data", [])
         except Exception as e:
-            logger.exception(f"获取卡池数据失败: {e}")
+            logger.exception(f"获取冥海出场率数据失败: {e}")
 
 
 async def draw_slash_use_rate(ev: Event):
@@ -48,7 +48,7 @@ async def draw_slash_use_rate(ev: Event):
 
     filter_type = None
     text = ev.text.strip() if ev.text else ""
-    if "总" in text or "全" in text:
+    if "总" in text or "全" in text or "总" in ev.command:
         filter_type = "all"
     elif "上半" in text or "上" in text or "一" in text or "1" in text:
         filter_type = "1"
