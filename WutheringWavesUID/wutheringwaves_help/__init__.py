@@ -26,12 +26,12 @@ async def send_help_img(bot: Bot, ev: Event):
         WavesButton("刷新面板", "刷新面板"),
         WavesButton("练度统计", "练度统计"),
     ]
-    await bot.send_option(await get_change_help(ev.user_pm), buttons)
+    await bot.send_option(await get_help(ev.user_pm), buttons)
 
 
 @sv_waves_change_help.on_fullmatch((f"替换帮助", f"面板替换帮助"))
 async def send_change_help_img(bot: Bot, ev: Event):
-    await bot.send(await get_help(ev.user_pm))
+    await bot.send(await get_change_help(ev.user_pm))
 
 
 register_help("WutheringWavesUID", f"{PREFIX}帮助", Image.open(ICON))
