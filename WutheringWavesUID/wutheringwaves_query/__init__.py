@@ -3,10 +3,12 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 
 from .draw_char_hold_rate import get_char_hold_rate_img
+from .draw_slash_appear_rate import draw_slash_use_rate
 from .draw_tower_appear_rate import draw_tower_use_rate
 
 sv_char_hold_rate = SV("waves角色持有率")
 sv_tower_appear_rate = SV("waves深塔出场率", priority=1)
+sv_slash_appear_rate = SV("waves冥想出场率", priority=1)
 
 
 # 角色持有率指令
@@ -42,4 +44,33 @@ async def handle_char_hold_rate(bot: Bot, ev: Event):
 )
 async def handle_tower_appear_rate(bot: Bot, ev: Event):
     img = await draw_tower_use_rate(ev)
+    await bot.send(img)
+
+
+# 冥想出场率指令
+@sv_slash_appear_rate.on_command(
+    (
+        "无尽总使用率",
+        "无尽总出场率",
+        "无尽总出场率列表",
+        "无尽使用率",
+        "无尽出场率",
+        "无尽出场率列表",
+        "冥海总使用率",
+        "冥海总出场率",
+        "冥海总出场率列表",
+        "冥海使用率",
+        "冥海出场率",
+        "冥海出场率列表",
+        "冥歌海墟总使用率",
+        "冥歌海墟总出场率",
+        "冥歌海墟总出场率列表",
+        "冥歌海墟使用率",
+        "冥歌海墟出场率",
+        "冥歌海墟出场率列表",
+    ),
+    block=True,
+)
+async def handle_slash_appear_rate(bot: Bot, ev: Event):
+    img = await draw_slash_use_rate(ev)
     await bot.send(img)

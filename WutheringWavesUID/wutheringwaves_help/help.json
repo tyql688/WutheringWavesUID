@@ -219,6 +219,27 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      }
+    ]
+  },
+  "深塔查询": {
+    "desc": "深塔数据查询",
+    "data": [
+      {
+        "name": "深塔",
+        "desc": "查询深塔",
+        "eg": "深塔",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "全息战略",
+        "desc": "查询全息战略",
+        "eg": "全息",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
       },
       {
         "name": "深塔出场率",
@@ -227,41 +248,20 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
-      }
-    ]
-  },
-  "深渊查询": {
-    "desc": "深渊数据查询",
-    "data": [
-      {
-        "name": "深渊",
-        "desc": "查询深渊",
-        "eg": "深渊",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "查询区域深渊",
-        "desc": "查询深渊超载区",
-        "eg": "超载",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
-      },
-      {
-        "name": "全息战略",
-        "desc": "查询全息战略",
-        "eg": "全息战略",
-        "need_ck": true,
-        "need_sk": false,
-        "need_admin": false
       },
       {
         "name": "冥歌海墟",
         "desc": "查询冥歌海墟",
         "eg": "冥歌海墟",
         "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "冥歌海墟出场率",
+        "desc": "冥歌海墟出场率",
+        "eg": "冥海出场率",
+        "need_ck": false,
         "need_sk": false,
         "need_admin": false
       }

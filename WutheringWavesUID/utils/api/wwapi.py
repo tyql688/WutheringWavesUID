@@ -1,6 +1,6 @@
 from typing import Dict, List, Literal, Optional
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
 MAIN_URL = "https://top.camellya.xyz"
 # MAIN_URL = "http://127.0.0.1:9001"
@@ -14,6 +14,7 @@ GET_HOLD_RATE_URL = f"{MAIN_URL}/api/waves/hold/rates"
 GET_POOL_LIST = f"{MAIN_URL}/api/waves/pool/list"
 GET_TOWER_APPEAR_RATE = f"{MAIN_URL}/api/waves/abyss/appear_rate"
 UPLOAD_SLASH_RECORD_URL = f"{MAIN_URL}/top/waves/slash/upload"
+GET_SLASH_APPEAR_RATE = f"{MAIN_URL}/api/waves/slash/appear_rate"
 
 ABYSS_TYPE = Literal["l4", "m2", "r4", "a"]
 
