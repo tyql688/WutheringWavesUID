@@ -82,7 +82,7 @@ async def new_draw_char_hold_rate(ev: Event, data, group_id: str = "") -> bytes:
                 if (
                     char_model.starLevel == 5
                     and int(char["char_id"]) not in NORMAL_LIST_IDS
-                    and char["char_id"] not in SPECIAL_CHAR_NAME
+                    and str(char["char_id"]) not in SPECIAL_CHAR_NAME
                 ):
                     temp.append(char)
             elif filter_type == "五":
