@@ -382,7 +382,7 @@ async def draw_card(uid: str, ev: Event):
 
 
 async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev, is_valid_at=False)
+    pic = await get_event_avatar(ev, is_valid_at_param=False)
 
     mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
     img = Image.new("RGBA", (320, 320))
