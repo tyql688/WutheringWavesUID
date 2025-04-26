@@ -8,7 +8,7 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.image.convert import convert_img
 
-from ..utils.at_help import ruser_id
+from ..utils.at_help import is_valid_at, ruser_id
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
@@ -123,8 +123,7 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
 
     at_sender = True if ev.group_id else False
     if is_pk:
-        if not waves_id and not ev.at:
-            logger.info(f"{waves_id} {ev.at}")
+        if not waves_id and not is_valid_at(ev):
             return await bot.send(
                 f"[鸣潮] [角色面板] 角色【{char}】PK需要指定目标玩家!\n", at_sender
             )

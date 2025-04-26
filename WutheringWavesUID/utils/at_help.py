@@ -11,3 +11,7 @@ def ruser_id(ev: Event) -> str:
         return ev.at if ev.at else ev.user_id
     else:
         return ev.user_id
+
+
+def is_valid_at(ev: Event) -> bool:
+    return ev.user_id != ruser_id(ev)

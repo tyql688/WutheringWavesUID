@@ -28,6 +28,7 @@ from ..utils.ascension.weapon import (
     get_weapon_detail,
     get_weapon_model,
 )
+from ..utils.at_help import is_valid_at
 from ..utils.calc import WuWaCalc
 from ..utils.calculate import (
     calc_phantom_entry,
@@ -1414,7 +1415,7 @@ async def draw_pic_with_ring(ev: Event, is_force_avatar=False, force_resource_id
     if force_resource_id:
         pic = await get_square_avatar(force_resource_id)
     elif not is_force_avatar:
-        pic = await get_event_avatar(ev)
+        pic = await get_event_avatar(ev, is_valid_at=is_valid_at(ev))
     else:
         pic = await get_qq_avatar(ev.user_id)
 
