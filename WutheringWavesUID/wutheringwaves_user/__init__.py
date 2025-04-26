@@ -1,3 +1,5 @@
+from typing import Any, List
+
 from gsuid_core.aps import scheduler
 from gsuid_core.bot import Bot
 from gsuid_core.config import core_config
@@ -6,9 +8,11 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 
+from ..utils.button import WavesButton
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.message import send_diff_msg
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
+from ..wutheringwaves_user.login_succ import login_success_msg
 from .deal import add_cookie, delete_cookie, get_cookie
 
 waves_bind_uid = SV("鸣潮绑定特征码", priority=10)
@@ -24,7 +28,13 @@ waves_del_all_invalid_ck = SV("鸣潮删除无效token", priority=1, pm=1)
 async def send_waves_add_ck_msg(bot: Bot, ev: Event):
     ck = ev.text.strip()
     at_sender = True if ev.group_id else False
-    await bot.send(await add_cookie(ev, ck), at_sender)
+    msg = await add_cookie(ev, ck)
+    if "成功" in msg:
+        user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, "cookie", ck)
+        if user:
+            return await login_success_msg(bot, ev, user)
+
+    await bot.send(msg, at_sender)
 
 
 @waves_del_ck.on_command(
@@ -132,8 +142,11 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
         if retcode == 0:
             uid_list = await WavesBind.get_uid_list_by_game(qid, ev.bot_id)
             if uid_list:
-                return await bot.send(
-                    f"[鸣潮] 切换特征码[{uid_list[0]}]成功！\n", at_sender
+                _buttons: List[Any] = []
+                for uid in uid_list:
+                    _buttons.append(WavesButton(f"{uid}", f"切换{uid}"))
+                return await bot.send_option(
+                    f"[鸣潮] 切换特征码[{uid_list[0]}]成功！\n", _buttons
                 )
             else:
                 return await bot.send("[鸣潮] 尚未绑定任何特征码\n", at_sender)
@@ -143,7 +156,12 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
         uid_list = await WavesBind.get_uid_list_by_game(qid, ev.bot_id)
         if uid_list:
             uids = "\n".join(uid_list)
-            return await bot.send(f"[鸣潮] 绑定的特征码列表为：\n{uids}\n", at_sender)
+            buttons: List[Any] = []
+            for uid in uid_list:
+                buttons.append(WavesButton(f"{uid}", f"切换{uid}"))
+            return await bot.send_option(
+                f"[鸣潮] 绑定的特征码列表为：\n{uids}\n", buttons
+            )
         else:
             return await bot.send("[鸣潮] 尚未绑定任何特征码\n", at_sender)
     elif "删除全部" in ev.command:

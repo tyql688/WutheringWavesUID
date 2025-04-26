@@ -7,15 +7,10 @@ from ..utils import hint
 from ..utils.api.model import KuroWavesUserInfo
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_101, WAVES_CODE_103
-from ..utils.refresh_char_detail import refresh_char
 from ..utils.waves_api import waves_api
 
 
 async def add_cookie(ev: Event, ck: str) -> str:
-    # succ, game_info = await waves_api.get_game_role_info(ck)
-    # if not succ:
-    #     return hint.error_reply(code=WAVES_CODE_101)
-    # data = KuroRoleInfo.model_validate(game_info)
     succ, kuroWavesUserInfos = await waves_api.get_kuro_role_list(ck)
     if not succ or not isinstance(kuroWavesUserInfos, list):
         return hint.error_reply(code=WAVES_CODE_101)
@@ -57,7 +52,7 @@ async def add_cookie(ev: Event, ck: str) -> str:
         if res == 0 or res == -2:
             await WavesBind.switch_uid_by_game(ev.user_id, ev.bot_id, data.roleId)
 
-        await refresh_char(data.roleId, ev.user_id, ck, is_self_ck=True)
+        # await refresh_char(data.roleId, ev.user_id, ck, is_self_ck=True)
 
         role_list.append(
             {
