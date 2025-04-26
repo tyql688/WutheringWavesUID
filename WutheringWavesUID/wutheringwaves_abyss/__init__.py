@@ -4,6 +4,7 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 
+from ..utils.at_help import ruser_id
 from ..utils.button import WavesButton
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
@@ -37,7 +38,7 @@ sv_waves_slash = SV("waves查询冥海")
 async def send_waves_abyss_info(bot: Bot, ev: Event):
     await bot.logger.info("开始执行[鸣潮查询深渊信息]")
 
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))
@@ -69,7 +70,7 @@ async def send_waves_abyss_info(bot: Bot, ev: Event):
 async def send_waves_challenge_info(bot: Bot, ev: Event):
     await bot.logger.info("开始执行[鸣潮查询全息战略信息]")
 
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))
@@ -97,7 +98,7 @@ async def send_waves_challenge_info(bot: Bot, ev: Event):
     block=True,
 )
 async def send_waves_slash_info(bot: Bot, ev: Event):
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))

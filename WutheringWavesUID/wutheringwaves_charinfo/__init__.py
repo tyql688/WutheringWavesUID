@@ -8,6 +8,7 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.image.convert import convert_img
 
+from ..utils.at_help import ruser_id
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
@@ -44,7 +45,7 @@ waves_compress_card = SV("waves面板图压缩", priority=5, pm=1)
     block=True,
 )
 async def send_card_info(bot: Bot, ev: Event):
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
 
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
@@ -62,7 +63,7 @@ async def send_card_info(bot: Bot, ev: Event):
 async def send_char_detail_msg(bot: Bot, ev: Event):
     char = ev.text.strip(" ")
     logger.debug(f"[鸣潮] [角色面板] CHAR: {char}")
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))
@@ -148,7 +149,7 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         if not isinstance(im1, Image.Image):
             return
 
-        user_id = ev.at if ev.at else ev.user_id
+        user_id = ruser_id(ev)
         uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
         if not uid:
             return await bot.send(error_reply(WAVES_CODE_103))
@@ -172,7 +173,7 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         new_im = await convert_img(new_im)
         return await bot.send(new_im)
     else:
-        user_id = ev.at if ev.at else ev.user_id
+        user_id = ruser_id(ev)
         uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
         if not uid:
             return await bot.send(error_reply(WAVES_CODE_103))
@@ -198,7 +199,7 @@ async def send_char_detail_msg2_weight(bot: Bot, ev: Event):
     if waves_id and len(waves_id) != 9:
         return
 
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))
