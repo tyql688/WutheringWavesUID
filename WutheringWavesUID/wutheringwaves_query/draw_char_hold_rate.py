@@ -1,23 +1,18 @@
-import copy
 import asyncio
+import copy
 from pathlib import Path
 from typing import Dict, Union
 
 import httpx
 from PIL import Image, ImageDraw
+
 from gsuid_core.logger import logger
+from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 
-from ..utils.util import timed_async_cache
-from ..utils.database.models import WavesBind
-from ..utils.waves_card_cache import get_card
 from ..utils.api.wwapi import GET_HOLD_RATE_URL
 from ..utils.ascension.char import get_char_model
-from ..utils.resource.constant import (
-    NORMAL_LIST,
-    ATTRIBUTE_ID_MAP,
-    SPECIAL_CHAR_NAME,
-)
+from ..utils.database.models import WavesBind
 from ..utils.fonts.waves_fonts import (
     waves_font_20,
     waves_font_24,
@@ -27,12 +22,20 @@ from ..utils.fonts.waves_fonts import (
 from ..utils.image import (
     GOLD,
     SPECIAL_GOLD,
-    get_ICON,
     add_footer,
-    get_waves_bg,
     get_attribute,
+    get_ICON,
     get_square_avatar,
+    get_waves_bg,
 )
+from ..utils.resource.constant import (
+    ATTRIBUTE_ID_MAP,
+    NORMAL_LIST,
+    NORMAL_LIST_IDS,
+    SPECIAL_CHAR_NAME,
+)
+from ..utils.util import timed_async_cache
+from ..utils.waves_card_cache import get_card
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 bar1 = Image.open(TEXT_PATH / "bar1.png")
@@ -56,9 +59,41 @@ STAR_FIVE = SPECIAL_GOLD
 OTHER_STAR = GOLD
 
 
-async def new_draw_char_hold_rate(data, group_id: str = "") -> bytes:
+async def new_draw_char_hold_rate(ev: Event, data, group_id: str = "") -> bytes:
+    text = ev.text.strip() if ev.text else ""
+    if "4" in text or "四" in text:
+        filter_type = "四"
+    elif "5" in text or "五" in text:
+        filter_type = "五"
+    elif "up" in text or "UP" in text:
+        filter_type = "UP"
+    else:
+        filter_type = ""
+
     # 加载数据
     char_list = data["char_hold_rate"]
+    if filter_type:
+        temp = []
+        for char in char_list:
+            char_model = get_char_model(char["char_id"])
+            if not char_model:
+                continue
+            if filter_type == "UP":
+                if (
+                    char_model.starLevel == 5
+                    and int(char["char_id"]) not in NORMAL_LIST_IDS
+                    and char["char_id"] not in SPECIAL_CHAR_NAME
+                ):
+                    temp.append(char)
+            elif filter_type == "五":
+                if char_model.starLevel == 5:
+                    temp.append(char)
+            elif filter_type == "四":
+                if char_model.starLevel == 4:
+                    temp.append(char)
+            else:
+                temp.append(char)
+        char_list = temp
 
     # 按持有率从高到低排序
     char_list = sorted(char_list, key=lambda x: x["hold_rate"], reverse=True)
@@ -89,7 +124,13 @@ async def new_draw_char_hold_rate(data, group_id: str = "") -> bytes:
     title_mask.paste(icon, (60, 380), icon)
 
     # title
-    title_text = f"#角色持有率{group_id}"
+    if filter_type:
+        if filter_type == "UP":
+            title_text = f"#UP角色持有率{group_id}"
+        else:
+            title_text = f"#{filter_type}星角色持有率{group_id}"
+    else:
+        title_text = f"#角色持有率{group_id}"
     title_mask_draw.text((300, 430), title_text, "white", waves_font_58, "lm")
 
     # count
@@ -329,7 +370,7 @@ async def get_group_char_hold_rate_data(group_id: str) -> Dict:
 
 
 # 主入口函数
-async def get_char_hold_rate_img(group_id: str = "") -> Union[bytes, str]:
+async def get_char_hold_rate_img(ev: Event, group_id: str = "") -> Union[bytes, str]:
     """获取角色持有率图像"""
     if group_id:
         data = await get_group_char_hold_rate_data(group_id)
@@ -340,10 +381,4 @@ async def get_char_hold_rate_img(group_id: str = "") -> Union[bytes, str]:
         if not data:
             return "鸣潮角色持有率数据获取失败，请稍后再试"
 
-    return await new_draw_char_hold_rate(data, group_id=group_id)
-    return await new_draw_char_hold_rate(data, group_id=group_id)
-    return await new_draw_char_hold_rate(data, group_id=group_id)
-    return await new_draw_char_hold_rate(data, group_id=group_id)
-    return await new_draw_char_hold_rate(data, group_id=group_id)
-    return await new_draw_char_hold_rate(data, group_id=group_id)
-    return await new_draw_char_hold_rate(data, group_id=group_id)
+    return await new_draw_char_hold_rate(ev, data, group_id=group_id)
