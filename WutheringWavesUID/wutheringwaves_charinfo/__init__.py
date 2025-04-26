@@ -1,5 +1,4 @@
 import re
-from typing import List
 
 from PIL import Image
 
@@ -9,8 +8,6 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 from gsuid_core.utils.image.convert import convert_img
 
-from ..utils import button
-from ..utils.button import WavesButton
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
@@ -55,10 +52,10 @@ async def send_card_info(bot: Bot, ev: Event):
 
     from .draw_refresh_char_card import draw_refresh_char_detail_img
 
-    buttons: List[WavesButton] = []
+    buttons = []
     msg = await draw_refresh_char_detail_img(bot, ev, user_id, uid, buttons)
     if isinstance(msg, str) or isinstance(msg, bytes):
-        return await bot.send_option(msg, button.safe(buttons))
+        return await bot.send_option(msg, buttons)
 
 
 @waves_char_detail.on_prefix(("角色面板", "查询"))
