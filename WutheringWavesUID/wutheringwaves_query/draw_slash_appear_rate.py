@@ -8,13 +8,13 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 
-from ..utils.api.wwapi import ABYSS_TYPE_MAP_REVERSE, GET_TOWER_APPEAR_RATE
+from ..utils.api.wwapi import GET_SLASH_APPEAR_RATE
 from ..utils.ascension.char import get_char_model
 from ..utils.ascension.model import CharacterModel
 from ..utils.fonts.waves_fonts import (
     waves_font_20,
     waves_font_30,
-    waves_font_36,
+    waves_font_40,
     waves_font_58,
 )
 from ..utils.image import add_footer, get_ICON, get_square_avatar, get_waves_bg
@@ -25,11 +25,11 @@ TEXT_PATH = Path(__file__).parent / "texture2d"
 
 
 @timed_async_cache(expiration=3600, condition=lambda x: isinstance(x, dict))
-async def get_tower_appear_rate_data() -> Union[Dict, None]:
+async def get_slash_appear_rate_data() -> Union[Dict, None]:
     async with httpx.AsyncClient() as client:
         try:
             res = await client.get(
-                GET_TOWER_APPEAR_RATE,
+                GET_SLASH_APPEAR_RATE,
                 headers={
                     "Content-Type": "application/json",
                 },
@@ -38,40 +38,64 @@ async def get_tower_appear_rate_data() -> Union[Dict, None]:
             if res.status_code == 200:
                 return res.json().get("data", [])
         except Exception as e:
-            logger.exception(f"获取深塔出场率数据失败: {e}")
+            logger.exception(f"获取冥海出场率数据失败: {e}")
 
 
-async def draw_tower_use_rate(ev: Event):
-    data = await get_tower_appear_rate_data()
+async def draw_slash_use_rate(ev: Event):
+    data = await get_slash_appear_rate_data()
     if not data:
-        return "暂无深塔出场率数据, 请稍后再试"
+        return "暂无冥海出场率数据, 请稍后再试"
 
     filter_type = None
     text = ev.text.strip() if ev.text else ""
-    if "左" in text or "残响" in text:
-        filter_type = "l4"
-    elif "右" in text or "回音" in text:
-        filter_type = "r4"
-    elif "中" in text or "深境" in text:
-        filter_type = "m2"
+    if "总" in text or "全" in text or "总" in ev.command:
+        filter_type = "all"
+    elif "上半" in text or "上" in text or "一" in text or "1" in text:
+        filter_type = "1"
+    elif "下半" in text or "下" in text or "二" in text or "2" in text:
+        filter_type = "2"
 
+    defaule_filter = 4
     title_h = 500
     bar_star_h = 180
-    tower_name_bg_h = 100
+    slash_name_bg_h = 150
     footer_h = 50
+
     if filter_type is None:
-        totalNum = 9
-        h = title_h + totalNum * bar_star_h + tower_name_bg_h * 3 + footer_h
+        show_data = data["half_rate_list"]
+
+        totalNum = defaule_filter * 2
+        h = title_h + totalNum * bar_star_h + slash_name_bg_h * 2 + footer_h
+
+    elif "1" == filter_type:
+        show_data = []
+        show_data.append(data["half_rate_list"][0])
+
+        char_num = len(data["half_rate_list"][0]["rates"])
+        totalNum = char_num // 4 + (0 if char_num % 4 == 0 else 1)
+
+        h = title_h + totalNum * bar_star_h + slash_name_bg_h + footer_h
+
+    elif "2" == filter_type:
+        show_data = []
+        show_data.append(data["half_rate_list"][1])
+
+        char_num = len(data["half_rate_list"][1]["rates"])
+        totalNum = char_num // 4 + (0 if char_num % 4 == 0 else 1)
+
+        h = title_h + totalNum * bar_star_h + slash_name_bg_h + footer_h
     else:
+        show_data = data["appear_rate_list"]
+
         char_num = len(data["appear_rate_list"][0]["rates"])
         totalNum = char_num // 4 + (0 if char_num % 4 == 0 else 1)
 
-        h = title_h + totalNum * bar_star_h + tower_name_bg_h + footer_h
+        h = title_h + totalNum * bar_star_h + slash_name_bg_h + footer_h
 
     card_img = get_waves_bg(1050, h, "bg9")
 
     # title
-    title_bg = Image.open(TEXT_PATH / "tower.jpg")
+    title_bg = Image.open(TEXT_PATH / "slash.jpg")
     title_bg = title_bg.crop((0, 0, 1050, 500))
 
     # icon
@@ -80,7 +104,7 @@ async def draw_tower_use_rate(ev: Event):
     title_bg.paste(icon, (60, 240), icon)
 
     # title
-    title_text = "#深塔出场率"
+    title_text = "#冥歌海墟出场率"
     title_bg_draw = ImageDraw.Draw(title_bg)
     title_bg_draw.text((220, 290), title_text, "white", waves_font_58, "lm")
 
@@ -93,27 +117,33 @@ async def draw_tower_use_rate(ev: Event):
 
     # 深塔出场率
     start_y = 470
-    appear_rate_list = data["appear_rate_list"]
-    for i in appear_rate_list:
-        area_type: str = i["area_type"]
-        if filter_type is not None and area_type != filter_type:
-            continue
+
+    for index, i in enumerate(show_data):
         rates: List[Dict] = i["rates"]
 
-        tower_name_bg = Image.open(TEXT_PATH / f"tower_name_bg_{area_type}.png")
-        tower_name_bg_draw = ImageDraw.Draw(tower_name_bg)
-        area_type_text = ABYSS_TYPE_MAP_REVERSE.get(area_type, area_type)
-        tower_name_bg_draw.text(
-            (170, 50),
-            f"{area_type_text}",
+        slash_name_bg = Image.open(TEXT_PATH / f"difficulty_2.png")
+        slash_name_bg_draw = ImageDraw.Draw(slash_name_bg)
+        if len(show_data) == 1:
+            text = "无尽湍渊 - 总数据"
+        else:
+            text = f"无尽湍渊 - 上半" if index == 0 else f"无尽湍渊 -下半"
+
+        if filter_type == "1":
+            text = f"无尽湍渊 - 上半"
+        elif filter_type == "2":
+            text = f"无尽湍渊 - 下半"
+
+        slash_name_bg_draw.text(
+            (140, 60),
+            text,
             "white",
-            waves_font_36,
+            waves_font_40,
             "lm",
         )
 
-        card_img.alpha_composite(tower_name_bg, (-50, start_y))
+        card_img.alpha_composite(slash_name_bg, (25, start_y))
 
-        start_y += tower_name_bg_h
+        start_y += slash_name_bg_h
 
         for rIndex, rate_temp in enumerate(rates):
             char_id = rate_temp["char_id"]
@@ -132,11 +162,11 @@ async def draw_tower_use_rate(ev: Event):
                 ),
             )
 
-            if filter_type is None and rIndex >= 11:
+            if filter_type is None and rIndex >= defaule_filter * 4 - 1:
                 break
 
         if filter_type is None:
-            start_y += 180 * 3
+            start_y += 180 * defaule_filter
 
     card_img = add_footer(card_img)
     card_img = await convert_img(card_img)
