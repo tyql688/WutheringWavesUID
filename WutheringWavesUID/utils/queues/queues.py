@@ -1,162 +1,95 @@
 import asyncio
 import threading
-from typing import (
-    Any,
-    Callable,
-    Coroutine,
-    Dict,
-    Generic,
-    List,
-    Optional,
-    TypeVar,
-    Union,
-)
+from typing import Any, Callable, Coroutine, Dict, Union
 
 from gsuid_core.logger import logger
 
 
-class QueueThread:
-    def __init__(self, target: Callable, daemon: bool = True):
-        self.target = target
-        self.daemon = daemon
+class TaskDispatcher:
 
-    def start(self):
+    def __init__(self):
+        self.queue = asyncio.Queue()
+        self.running = False
+        self.handlers: Dict[str, Callable] = {}
+
+    def register_handler(
+        self,
+        task_type: str,
+        handler: Callable[[Any], Union[Any, Coroutine[Any, Any, Any]]],
+    ) -> None:
+        self.handlers[task_type] = handler
+        logger.info(f"注册任务处理器: {task_type}")
+
+    async def dispatch(self, task_type: str, data: Any) -> None:
+        if not self.running:
+            logger.warning("任务分发器未启动或已关闭")
+            return
+        if task_type not in self.handlers:
+            return
+
+        await self.queue.put((task_type, data))
+
+    async def _process(self) -> None:
+        while True:
+            try:
+                # 如果分发器已关闭，退出循环
+                if not self.running:
+                    break
+
+                # 获取队列任务
+                task_type, data = await asyncio.wait_for(self.queue.get(), timeout=3.0)
+
+                # 处理任务
+                handler = self.handlers.get(task_type)
+                if handler:
+                    # 创建异步任务
+                    asyncio.create_task(self._run_task(handler, data, task_type))
+
+                # 标记任务完成
+                self.queue.task_done()
+
+            except asyncio.TimeoutError:
+                continue
+            except Exception as e:
+                logger.exception(f"任务处理异常: {e}")
+
+    async def _run_task(self, handler: Callable, data: Any, task_type: str) -> None:
+        try:
+            result = handler(data)
+            # 如果是协程，等待它完成
+            if asyncio.iscoroutine(result):
+                await result
+        except Exception as e:
+            logger.exception(f"任务执行错误 ({task_type}): {e}")
+
+    def start(self, daemon: bool = True) -> None:
+        if self.running:
+            return
+
+        self.running = True
+
+        # 启动处理线程
         threading.Thread(
-            target=lambda: asyncio.run(self.target()),
-            daemon=self.daemon,
+            target=lambda: asyncio.run(self._process()), daemon=daemon
         ).start()
 
 
-T = TypeVar("T")
+# 创建全局任务分发器实例
+dispatcher = TaskDispatcher()
 
 
-class AsyncQueue(Generic[T]):
-    def __init__(self, maxsize: int = 0):
-        self._queue: asyncio.Queue[T] = asyncio.Queue(maxsize=maxsize)
-        self._closed: bool = False
-        self._pending_tasks: List[asyncio.Task] = []
-
-    async def put(self, item: T) -> None:
-        if self._closed:
-            raise RuntimeError("Cannot put items into a closed queue")
-        await self._queue.put(item)
-
-    def put_nowait(self, item: T) -> None:
-        if self._closed:
-            raise RuntimeError("Cannot put items into a closed queue")
-        self._queue.put_nowait(item)
-
-    async def get(self) -> T:
-        if self._closed and self._queue.empty():
-            return None  # type: ignore
-        return await self._queue.get()
-
-    async def close(self) -> None:
-        self._closed = True
-
-        # Wait for all pending tasks to complete
-        if self._pending_tasks:
-            await asyncio.gather(*self._pending_tasks, return_exceptions=True)
-            self._pending_tasks.clear()
-
-    def task_done(self) -> None:
-        self._queue.task_done()
-
-    async def join(self) -> None:
-        await self._queue.join()
-
-    @property
-    def closed(self) -> bool:
-        return self._closed
-
-    @property
-    def empty(self) -> bool:
-        return self._queue.empty()
-
-    @property
-    def full(self) -> bool:
-        return self._queue.full()
-
-    def qsize(self) -> int:
-        return self._queue.qsize()
-
-    async def process_queue(self, processor: Callable[[T], Any]) -> None:
-        while not (self._closed and self._queue.empty()):
-            try:
-                item = await self.get()
-                if item is None:  # Queue is closed and empty
-                    break
-
-                try:
-                    await processor(item)
-                finally:
-                    self.task_done()
-            except Exception as e:
-                # Log the exception or handle it as needed
-                logger.exception(f"Error processing queue item: {e}")
-
-    def create_processor_task(self, processor: Callable[[T], Any]) -> asyncio.Task:
-        task = asyncio.create_task(self.process_queue(processor))
-        self._pending_tasks.append(task)
-        return task
-
-
-# 全局队列注册表，用于在不同模块间共享队列
-_queue_registry: Dict[str, AsyncQueue] = {}
-
-
-def get_queue(name: str, maxsize: int = 0) -> Optional[AsyncQueue]:
-    if name in _queue_registry:
-        return _queue_registry[name]
-    return None
-
-
-async def put_item(queue_name: str, item: Any) -> None:
-    queue = get_queue(queue_name)
-    if not queue:
-        return
-    await queue.put(item)
-
-
-def put_item_nowait(queue_name: str, item: Any) -> None:
-    queue = get_queue(queue_name)
-    if not queue:
-        return
-    queue.put_nowait(item)
-
-
-async def close_queue(queue_name: str) -> None:
-    if queue_name in _queue_registry:
-        await _queue_registry[queue_name].close()
-
-
-def create_queue_processor(
-    queue_name: str, processor: Callable[[Any], Union[Any, Coroutine[Any, Any, Any]]]
-) -> Optional[asyncio.Task]:
-    queue = AsyncQueue(maxsize=0)
-    _queue_registry[queue_name] = queue
-
-    async def _processor_wrapper(item: Any) -> None:
-        result = processor(item)
-        if asyncio.iscoroutine(result):
-            await result
-
-    return queue.create_processor_task(_processor_wrapper)
-
-
-def start_queue_processor_thread(
-    queue_name: str,
-    processor: Callable[[Any], Union[Any, Coroutine[Any, Any, Any]]],
-    daemon: bool = True,
+# 工具函数
+def register_handler(
+    task_type: str,
+    handler: Callable[[Any], Union[Any, Coroutine[Any, Any, Any]]],
 ) -> None:
-    async def _process_queue() -> None:
-        create_queue_processor(queue_name, processor)
-        # 保持线程运行，直到队列关闭
-        queue = get_queue(queue_name)
-        if not queue:
-            return
-        while not queue.closed:
-            await asyncio.sleep(1)
+    dispatcher.register_handler(task_type, handler)
 
-    logger.info(f"启动队列处理器线程: {queue_name}")
-    QueueThread(target=_process_queue, daemon=daemon).start()
+
+def start_dispatcher(daemon: bool = True) -> None:
+    dispatcher.start(daemon=daemon)
+
+
+# 兼容原有代码的函数
+async def put_item(queue_name: str, item: Any) -> None:
+    await dispatcher.dispatch(queue_name, item)
