@@ -9,6 +9,7 @@ from gsuid_core.sv import SV
 from gsuid_core.utils.image.convert import convert_img
 
 from ..utils.waves_api import waves_api
+from ..utils.at_help import is_valid_at, ruser_id
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103, WAVES_CODE_099
 from ..utils.hint import error_reply
@@ -45,7 +46,7 @@ waves_compress_card = SV("waves面板图压缩", priority=5, pm=1)
     block=True,
 )
 async def send_card_info(bot: Bot, ev: Event):
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
 
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
@@ -55,16 +56,17 @@ async def send_card_info(bot: Bot, ev: Event):
 
     from .draw_refresh_char_card import draw_refresh_char_detail_img
 
-    msg = await draw_refresh_char_detail_img(bot, ev, user_id, uid)
+    buttons = []
+    msg = await draw_refresh_char_detail_img(bot, ev, user_id, uid, buttons)
     if isinstance(msg, str) or isinstance(msg, bytes):
-        return await bot.send(msg)
+        return await bot.send_option(msg, buttons)
 
 
 @waves_char_detail.on_prefix(("角色面板", "查询"))
 async def send_char_detail_msg(bot: Bot, ev: Event):
     char = ev.text.strip(" ")
     logger.debug(f"[鸣潮] [角色面板] CHAR: {char}")
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))
@@ -124,8 +126,7 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
 
     at_sender = True if ev.group_id else False
     if is_pk:
-        if not waves_id and not ev.at:
-            logger.info(f"{waves_id} {ev.at}")
+        if not waves_id and not is_valid_at(ev):
             return await bot.send(
                 f"[鸣潮] [角色面板] 角色【{char}】PK需要指定目标玩家!\n", at_sender
             )
@@ -150,7 +151,7 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         if not isinstance(im1, Image.Image):
             return
 
-        user_id = ev.at if ev.at else ev.user_id
+        user_id = ruser_id(ev)
         uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
         if not uid:
             return await bot.send(error_reply(WAVES_CODE_103))
@@ -174,7 +175,7 @@ async def send_char_detail_msg2(bot: Bot, ev: Event):
         new_im = await convert_img(new_im)
         return await bot.send(new_im)
     else:
-        user_id = ev.at if ev.at else ev.user_id
+        user_id = ruser_id(ev)
         uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
         if not uid:
             return await bot.send(error_reply(WAVES_CODE_103))
@@ -200,7 +201,7 @@ async def send_char_detail_msg2_weight(bot: Bot, ev: Event):
     if waves_id and len(waves_id) != 9:
         return
 
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     if not uid:
         return await bot.send(error_reply(WAVES_CODE_103))

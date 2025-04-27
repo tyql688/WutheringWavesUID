@@ -1,6 +1,7 @@
 import random
 import time
 from pathlib import Path
+from typing import List
 
 from PIL import Image, ImageDraw
 
@@ -10,6 +11,7 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
 from ..utils.api.model import AccountBaseInfo, RoleDetailData
+from ..utils.button import WavesButton
 from ..utils.cache import TimedCache
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import WAVES_CODE_102
@@ -136,7 +138,13 @@ async def send_notify(bot: Bot, ev: Event, user_id: str, uid: str, self_ck: bool
         await bot.send("\n".join(msg), at_sender=at_sender)
 
 
-async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: str):
+async def draw_refresh_char_detail_img(
+    bot: Bot,
+    ev: Event,
+    user_id: str,
+    uid: str,
+    buttons: List[WavesButton],
+):
     time_stamp = can_refresh_card(user_id, uid)
     if time_stamp > 0:
         return get_refresh_interval_notify(time_stamp)
@@ -206,10 +214,40 @@ async def draw_refresh_char_detail_img(bot: Bot, ev: Event, user_id: str, uid: s
     img.alpha_composite(info_block, (500, 400))
 
     waves_char_rank = await get_waves_char_rank(uid, role_detail_list)
-    for rIndex, char_rank in enumerate(waves_char_rank):
+
+    map_update = []
+    map_unchanged = []
+    for _, char_rank in enumerate(waves_char_rank):
         isUpdate = True if char_rank.roleId in waves_map["refresh_update"] else False
-        pic = await draw_pic(char_rank, isUpdate)  # type: ignore
+        if isUpdate:
+            map_update.append(char_rank)
+        else:
+            map_unchanged.append(char_rank)
+
+    map_update.sort(key=lambda x: x.score if x.score else 0, reverse=True)
+    map_unchanged.sort(key=lambda x: x.score if x.score else 0, reverse=True)
+
+    rIndex = 0
+    for char_rank in map_update:
+        pic = await draw_pic(char_rank, True)  # type: ignore
         img.alpha_composite(pic, (80 + 300 * (rIndex % 6), 470 + (rIndex // 6) * 330))
+        rIndex += 1
+        if rIndex <= 5:
+            name = SPECIAL_CHAR_NAME.get(str(char_rank.roleId), char_rank.roleName)
+            b = WavesButton(name, f"{name}面板")  # type: ignore
+            buttons.append(b)
+
+    for char_rank in map_unchanged:
+        pic = await draw_pic(char_rank, False)  # type: ignore
+        img.alpha_composite(pic, (80 + 300 * (rIndex % 6), 470 + (rIndex // 6) * 330))
+        rIndex += 1
+
+        if len(map_update) == 0 and rIndex <= 5:
+            name = SPECIAL_CHAR_NAME.get(str(char_rank.roleId), char_rank.roleName)
+            b = WavesButton(name, f"{name}面板")  # type: ignore
+            buttons.append(b)
+
+    buttons.append(WavesButton("练度统计", "练度统计"))
 
     # 基础信息 名字 特征码
     base_info_bg = Image.open(TEXT_PATH / "base_info_bg.png")

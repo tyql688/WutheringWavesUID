@@ -137,4 +137,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "鸣潮全排行token",
         "",
     ),
+    "AtCheck": GsBoolConfig(
+        "开启可以艾特查询",
+        "开启可以艾特查询",
+        True,
+    ),
 }

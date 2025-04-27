@@ -1,7 +1,10 @@
+from typing import Any, List
+
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 
+from ..utils.button import WavesButton
 from .draw_char_hold_rate import get_char_hold_rate_img
 from .draw_slash_appear_rate import draw_slash_use_rate
 from .draw_tower_appear_rate import draw_tower_use_rate
@@ -29,7 +32,14 @@ async def handle_char_hold_rate(bot: Bot, ev: Event):
         img = await get_char_hold_rate_img(ev, ev.group_id)
     else:
         img = await get_char_hold_rate_img(ev)
-    await bot.send(img)
+    buttons: List[Any] = [
+        WavesButton("UP持有率", "角色持有率UP"),
+        WavesButton("持有率", "角色持有率"),
+        WavesButton("持有率4星", "角色持有率4"),
+        WavesButton("持有率5星", "角色持有率5"),
+        WavesButton("群持有率", "群角色持有率"),
+    ]
+    await bot.send_option(img, buttons)
 
 
 # 深塔出场率指令
@@ -44,7 +54,13 @@ async def handle_char_hold_rate(bot: Bot, ev: Event):
 )
 async def handle_tower_appear_rate(bot: Bot, ev: Event):
     img = await draw_tower_use_rate(ev)
-    await bot.send(img)
+    buttons: List[Any] = [
+        WavesButton("深塔出场率", "深塔使用率"),
+        WavesButton("左4出场率", "深塔出场率左"),
+        WavesButton("右4出场率", "深塔出场率右"),
+        WavesButton("中2出场率", "深塔出场率中"),
+    ]
+    await bot.send_option(img, buttons)
 
 
 # 冥想出场率指令
@@ -73,4 +89,10 @@ async def handle_tower_appear_rate(bot: Bot, ev: Event):
 )
 async def handle_slash_appear_rate(bot: Bot, ev: Event):
     img = await draw_slash_use_rate(ev)
-    await bot.send(img)
+    buttons: List[Any] = [
+        WavesButton("总出场率", "冥海出场率"),
+        WavesButton("总使用率", "冥海总使用率"),
+        WavesButton("上半出场率", "冥海出场率上半"),
+        WavesButton("下半出场率", "冥海出场率下半"),
+    ]
+    await bot.send_option(img, buttons)

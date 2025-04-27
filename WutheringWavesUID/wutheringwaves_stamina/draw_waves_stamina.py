@@ -1,33 +1,21 @@
-import time
 import asyncio
-from typing import Dict
-from pathlib import Path
+import time
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Dict
+
+from PIL import Image, ImageDraw
 
 from gsuid_core.bot import Bot
-from PIL import Image, ImageDraw
-from gsuid_core.models import Event
 from gsuid_core.logger import logger
+from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from ..wutheringwaves_config.set_config import set_push_time
 from gsuid_core.utils.image.image_tools import crop_center_img
 
-from ..utils.waves_api import waves_api
-from ..utils.resource.constant import SPECIAL_CHAR
-from ..utils.name_convert import char_name_to_char_id
-from ..utils.api.model import DailyData, AccountBaseInfo
+from ..utils.api.model import AccountBaseInfo, DailyData
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_102, WAVES_CODE_103
-from ..utils.image import (
-    RED,
-    GOLD,
-    GREY,
-    GREEN,
-    YELLOW,
-    add_footer,
-    get_event_avatar,
-    get_random_waves_role_pile,
-)
 from ..utils.fonts.waves_fonts import (
     waves_font_24,
     waves_font_25,
@@ -36,6 +24,19 @@ from ..utils.fonts.waves_fonts import (
     waves_font_32,
     waves_font_42,
 )
+from ..utils.image import (
+    GOLD,
+    GREEN,
+    GREY,
+    RED,
+    YELLOW,
+    add_footer,
+    get_event_avatar,
+    get_random_waves_role_pile,
+)
+from ..utils.name_convert import char_name_to_char_id
+from ..utils.resource.constant import SPECIAL_CHAR
+from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 YES = Image.open(TEXT_PATH / "yes.png")
@@ -368,7 +369,7 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
 
 
 async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev, is_valid_at=False)
+    pic = await get_event_avatar(ev, is_valid_at_param=False)
 
     mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
     img = Image.new("RGBA", (200, 200))

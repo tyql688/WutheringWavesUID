@@ -81,7 +81,7 @@ def shenhai_node(now: datetime):
 async def draw_calendar_img(ev: Event, uid: str):
     wiki_home = await wiki.get_wiki_home()
     if wiki_home["code"] != 200:
-        return
+        return "获取日历失败"
 
     # 当前时间
     now = datetime.now()

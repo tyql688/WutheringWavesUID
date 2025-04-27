@@ -236,11 +236,17 @@ async def get_qq_avatar(
 async def get_event_avatar(
     ev: Event,
     avatar_path: Optional[Path] = None,
-    is_valid_at: bool = True,
     size: int = 640,
+    is_valid_at_param: bool = True,
 ) -> Image.Image:
     img = None
-    if ev.bot_id == "onebot" and ev.at and is_valid_at:
+
+    if is_valid_at_param:
+        from ..utils.at_help import is_valid_at
+
+        is_valid_at_param = is_valid_at(ev)
+
+    if ev.bot_id == "onebot" and ev.at and is_valid_at_param:
         try:
             img = await get_qq_avatar(ev.at, size=size)
         except Exception:

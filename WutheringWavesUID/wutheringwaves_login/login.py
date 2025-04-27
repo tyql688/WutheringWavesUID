@@ -20,17 +20,16 @@ from gsuid_core.web_app import app
 from ..utils.cache import TimedCache
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.kuro_api import kuro_api
-from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.RESOURCE_PATH import waves_templates
 from ..utils.util import get_public_ip
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 from ..wutheringwaves_user import deal
+from ..wutheringwaves_user.login_succ import login_success_msg
 
 cache = TimedCache(timeout=600, maxsize=10)
 
 game_title = "[鸣潮]"
 msg_error = "[鸣潮] 登录失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据\n"
-login_succ = "[鸣潮] 特征码[{}]登录成功! "
 
 
 async def get_url() -> tuple[str, bool]:
@@ -188,8 +187,7 @@ async def page_login_other(bot: Bot, ev: Event, url):
                 waves_user = await add_cookie(ev, data["ck"])
                 cache.delete(user_token)
                 if waves_user:
-                    msg = login_succ.format(waves_user.uid)
-                    return await bot.send(msg, at_sender=at_sender)
+                    return await login_success_msg(bot, ev, waves_user)
                 else:
                     return await bot.send(msg_error, at_sender=at_sender)
 
@@ -227,13 +225,7 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
     token = result.get("data", {}).get("token", "")
     waves_user = await add_cookie(ev, token)
     if waves_user:
-        if isPage:
-            msg = login_succ.format(waves_user.uid)
-            return await bot.send(msg, at_sender=at_sender)
-        return await bot.send(
-            f"{game_title} 鸣潮特征码:[{waves_user.uid}]登录成功!\n",
-            at_sender=at_sender,
-        )
+        return await login_success_msg(bot, ev, waves_user)
     else:
         return await bot.send(msg_error, at_sender=at_sender)
 
@@ -248,7 +240,7 @@ async def add_cookie(ev, token) -> Union[WavesUser, None]:
             )
             if data == 0 or data == -2:
                 await WavesBind.switch_uid_by_game(ev.user_id, ev.bot_id, user.uid)
-            await refresh_char(user.uid, ev.user_id, token, is_self_ck=True)
+            # await refresh_char(user.uid, ev.user_id, token, is_self_ck=True)
         return user
     return None
 

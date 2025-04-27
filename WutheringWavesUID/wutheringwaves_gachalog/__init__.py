@@ -1,5 +1,6 @@
 import asyncio
 import re
+from typing import Any, List
 
 from async_timeout import timeout
 
@@ -9,6 +10,7 @@ from gsuid_core.models import Event
 from gsuid_core.segment import MessageSegment
 from gsuid_core.sv import SV
 
+from ..utils.button import WavesButton
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import (
     ERROR_CODE,
@@ -86,7 +88,11 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
         is_force = True
     await bot.send(f"UID{uid}开始执行[刷新抽卡记录],需要一定时间...请勿重复触发!")
     im = await save_gachalogs(ev, uid, record_id, is_force)
-    return await bot.send(im)
+    if "抽卡记录" in im:
+        buttons: List[Any] = [WavesButton("查看抽卡记录", "抽卡记录")]
+        await bot.send_option(im, buttons)
+    else:
+        await bot.send(im)
 
 
 @sv_gacha_log.on_fullmatch(

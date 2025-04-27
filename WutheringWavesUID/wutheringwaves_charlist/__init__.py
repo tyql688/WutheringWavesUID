@@ -2,10 +2,12 @@ from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
-from .draw_char_list import draw_char_list_img
+
+from ..utils.at_help import ruser_id
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
+from .draw_char_list import draw_char_list_img
 
 sv_waves_char_list = SV("ww角色练度统计")
 
@@ -21,7 +23,7 @@ sv_waves_char_list = SV("ww角色练度统计")
     )
 )
 async def send_char_list_msg(bot: Bot, ev: Event):
-    user_id = ev.at if ev.at else ev.user_id
+    user_id = ruser_id(ev)
     uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
     logger.info(f"[鸣潮] [练度统计] UID: {uid}")
     if not uid:
