@@ -4,9 +4,13 @@ import httpx
 
 from gsuid_core.logger import logger
 
-from ..api.wwapi import UPLOAD_ABYSS_RECORD_URL, UPLOAD_SLASH_RECORD_URL, UPLOAD_URL
+from ..api.wwapi import (
+    UPLOAD_ABYSS_RECORD_URL,
+    UPLOAD_SLASH_RECORD_URL,
+    UPLOAD_URL,
+)
 from .const import QUEUE_ABYSS_RECORD, QUEUE_SCORE_RANK, QUEUE_SLASH_RECORD
-from .queues import start_queue_processor_thread
+from .queues import register_handler, start_dispatcher
 
 
 async def send_score_rank(item: Any):
@@ -97,6 +101,9 @@ async def send_slash_record(item: Any):
 
 
 def init_queues():
-    start_queue_processor_thread(QUEUE_SCORE_RANK, send_score_rank)
-    start_queue_processor_thread(QUEUE_ABYSS_RECORD, send_abyss_record)
-    start_queue_processor_thread(QUEUE_SLASH_RECORD, send_slash_record)
+    # 注册处理函数
+    register_handler(QUEUE_SCORE_RANK, send_score_rank)
+    register_handler(QUEUE_ABYSS_RECORD, send_abyss_record)
+    register_handler(QUEUE_SLASH_RECORD, send_slash_record)
+    # 启动任务分发器
+    start_dispatcher(daemon=True)
