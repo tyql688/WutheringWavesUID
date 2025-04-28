@@ -75,7 +75,7 @@ SkillTreeMap = {
 }
 
 # 光噪效应
-Spectro_Frazzle_Role_Ids = [1501, 1502, 1506]
+Spectro_Frazzle_Role_Ids = [1501, 1502, 1506, 1507]
 
 
 def skill_damage_calc(
