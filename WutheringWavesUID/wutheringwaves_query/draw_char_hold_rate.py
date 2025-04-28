@@ -20,6 +20,7 @@ from ..utils.fonts.waves_fonts import (
     waves_font_58,
 )
 from ..utils.image import (
+    CHAIN_COLOR_LIST,
     GOLD,
     SPECIAL_GOLD,
     add_footer,
@@ -40,17 +41,6 @@ from ..utils.waves_card_cache import get_card
 TEXT_PATH = Path(__file__).parent / "texture2d"
 bar1 = Image.open(TEXT_PATH / "bar1.png")
 avatar_mask = Image.open(TEXT_PATH / "avatar_mask.png")
-
-
-CONSTELLATION_COLORS = [
-    (87, 159, 242),  # 0命 - 明亮蓝色
-    (80, 227, 194),  # 1命 - 青色
-    (184, 233, 134),  # 2命 - 鲜亮绿色
-    (248, 231, 28),  # 3命 - 黄色
-    (245, 166, 35),  # 4命 - 橙色
-    (219, 68, 255),  # 5命 - 鲜紫色
-    (255, 94, 94),  # 6命 - 亮红色
-]
 
 
 # 常驻颜色
@@ -180,7 +170,7 @@ async def new_draw_char_hold_rate(ev: Event, data, group_id: str = "") -> bytes:
             temp_bg = Image.new("RGBA", (125, 30), (0, 0, 0, 0))
             temp_bg_draw = ImageDraw.Draw(temp_bg)
 
-            c_color_hex = CONSTELLATION_COLORS[i]
+            c_color_hex = CHAIN_COLOR_LIST[i]
             temp_bg_draw.rounded_rectangle(
                 (35, 0, 125, 30), 8, fill=c_color_hex + (100,)
             )

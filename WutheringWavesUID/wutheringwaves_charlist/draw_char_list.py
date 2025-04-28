@@ -13,7 +13,6 @@ from ..utils.char_info_utils import get_all_roleid_detail_info_int
 from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107, WAVES_CODE_099
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
 from ..utils.fonts.waves_fonts import (
-    waves_font_15,
     waves_font_16,
     waves_font_18,
     waves_font_20,
@@ -23,12 +22,14 @@ from ..utils.fonts.waves_fonts import (
     waves_font_26,
     waves_font_30,
     waves_font_34,
+    waves_font_38,
     waves_font_40,
     waves_font_42,
 )
 from ..utils.hint import error_reply
 from ..utils.image import (
     CHAIN_COLOR,
+    CHAIN_COLOR_LIST,
     GOLD,
     GREY,
     SPECIAL_GOLD,
@@ -48,23 +49,68 @@ from ..utils.waves_api import waves_api
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
 
-async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, bytes]:
+async def get_all_roleid_detail_info(
+    uid: str,
+    user_id: str,
+    ck: str,
+    is_refresh: bool = False,
+    is_peek: bool = False,
+):
+    # 根据面板数据获取详细信息
+    if is_refresh or is_peek:
+        await refresh_char(uid, user_id, ck)
+    all_role_detail = await get_all_roleid_detail_info_int(uid)
+    if all_role_detail:
+        return all_role_detail
+
+    if is_refresh or is_peek:
+        # 已经刷新过，但是没有获取到数据
+        return None
+
+    # 尝试刷新
+    await refresh_char(uid, user_id, ck)
+    all_role_detail = await get_all_roleid_detail_info_int(uid)
+    if all_role_detail:
+        return all_role_detail
+
+    return None
+
+
+async def draw_char_list_img(
+    uid: str,
+    ev: Event,
+    user_id: str,
+    is_refresh: bool = False,
+    is_peek: bool = False,
+    user_waves_id: str = "",
+) -> Union[str, bytes]:
     if waves_api.is_net(uid):
         ck = ""
         # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
         account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
     else:
-        _, ck = await waves_api.get_ck_result(uid, user_id)
+        is_self_ck, ck = await waves_api.get_ck_result(user_waves_id, user_id)
         if not ck:
             return error_reply(WAVES_CODE_102)
+
+        if uid == user_waves_id and is_self_ck:
+            is_self_ck = True
+        else:
+            is_self_ck = False
+
         # 账户数据
         succ, account_info = await waves_api.get_base_info(uid, ck)
         if not succ:
-            return account_info
+            return account_info  # type: ignore
         account_info = AccountBaseInfo.model_validate(account_info)
 
-    # 根据面板数据获取详细信息
-    all_role_detail = await get_all_roleid_detail_info_int(uid)
+    all_role_detail = await get_all_roleid_detail_info(
+        uid,
+        user_id,
+        ck,
+        is_refresh,
+        is_peek,
+    )
     if not all_role_detail:
         if waves_api.is_net(uid):
             return error_reply(WAVES_CODE_099)
@@ -93,7 +139,7 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
     card_img.paste(base_info_bg, (15, 20), base_info_bg)
 
     # 头像 头像环
-    avatar = await draw_pic_with_ring(ev)
+    avatar = await draw_pic_with_ring(ev, is_peek)
     avatar_ring = Image.open(TEXT_PATH / "avatar_ring.png")
     card_img.paste(avatar, (25, 70), avatar)
     avatar_ring = avatar_ring.resize((180, 180))
@@ -177,15 +223,25 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
                 role_detail.role.roleId, _skill.skill.name, _skill.skill.iconUrl
             )
             skill_img = skill_img.resize((70, 70))
+            # skill_img = ImageEnhance.Brightness(skill_img).enhance(0.3)
             temp.alpha_composite(skill_img, (25, 25))
 
             temp_draw = ImageDraw.Draw(temp)
-            temp_draw.text(
-                (62, 115), f"{_skill.skill.type}", "white", waves_font_15, "mm"
-            )
-            temp_draw.text(
-                (62, 132), f"Lv.{_skill.level}", "white", waves_font_15, "mm"
-            )
+            # temp_draw.text(
+            #     (62, 45), f"{_skill.skill.type}", "white", waves_font_30, "mm"
+            # )
+            color = "white"
+            if _skill.level == 10:
+                color = CHAIN_COLOR_LIST[-1]
+            elif _skill.level == 9:
+                color = CHAIN_COLOR_LIST[-2]
+            elif _skill.level == 8:
+                color = CHAIN_COLOR_LIST[-3]
+            elif _skill.level == 7:
+                color = CHAIN_COLOR_LIST[-4]
+            elif _skill.level == 6:
+                color = CHAIN_COLOR_LIST[-5]
+            temp_draw.text((62, 120), f"{_skill.level}", color, waves_font_38, "mm")
 
             _x = 100 + i * 65
             skill_img_temp.alpha_composite(temp.resize((70, 82)), dest=(_x, 0))
@@ -283,8 +339,11 @@ async def draw_char_list_img(uid: str, ev: Event, user_id: str) -> Union[str, by
     return card_img
 
 
-async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev)
+async def draw_pic_with_ring(ev: Event, is_peek: bool = False):
+    if is_peek:
+        pic = await get_square_avatar(1505)
+    else:
+        pic = await get_event_avatar(ev)
 
     mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
     img = Image.new("RGBA", (180, 180))

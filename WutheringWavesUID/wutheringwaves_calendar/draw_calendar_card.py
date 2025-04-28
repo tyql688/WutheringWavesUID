@@ -239,7 +239,10 @@ async def draw_calendar_gacha(side_module, gacha_type):
     tabs = side_module["content"]["tabs"]
 
     for tab in tabs:
-        special_images = SpecialImages.model_validate(tab)
+        try:
+            special_images = SpecialImages.model_validate(tab)
+        except Exception as e:
+            continue
         res = {
             "title": side_module["title"],
             "dateRange": tab["countDown"]["dateRange"],
