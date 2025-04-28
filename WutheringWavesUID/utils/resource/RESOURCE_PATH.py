@@ -1,8 +1,9 @@
 import sys
 from pathlib import Path
 
-from gsuid_core.data_store import get_res_path
 from jinja2 import Environment, FileSystemLoader
+
+from gsuid_core.data_store import get_res_path
 
 MAIN_PATH = get_res_path() / "WutheringWavesUID"
 sys.path.append(str(MAIN_PATH))
@@ -36,13 +37,8 @@ MOEALKYNE_GUIDE_PATH = GUIDE_PATH / "Moealkyne"
 JINLINGZI_GUIDE_PATH = GUIDE_PATH / "JinLingZi"
 # 結星 攻略库
 JIEXING_GUIDE_PATH = GUIDE_PATH / "JieXing"
-
-GUIDE_CONFIG_MAP = {
-    "小沐XMu": (XMU_GUIDE_PATH, 10450567, "kuro"),
-    "Moealkyne": (MOEALKYNE_GUIDE_PATH, 533395803, "tap"),
-    "金铃子攻略组": (JINLINGZI_GUIDE_PATH, 487275027, "bilibili"),
-    "結星": (JIEXING_GUIDE_PATH, 10015697, "kuro"),
-}
+# 小羊 攻略库
+XIAOYANG_GUIDE_PATH = GUIDE_PATH / "XiaoYang"
 
 # 自定义背景图
 CUSTOM_CARD_PATH = MAIN_PATH / "custom_role_pile"
@@ -82,6 +78,7 @@ def init_dir():
         MOEALKYNE_GUIDE_PATH,
         JINLINGZI_GUIDE_PATH,
         JIEXING_GUIDE_PATH,
+        XIAOYANG_GUIDE_PATH,
         CUSTOM_CARD_PATH,
         OTHER_PATH,
         CALENDAR_PATH,

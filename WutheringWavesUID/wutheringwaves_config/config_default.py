@@ -36,11 +36,18 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "无限制进排行，群管理可设置",
         [],
     ),
-    "WavesGuideProvideNew": GsStrConfig(
+    "WavesGuide": GsListStrConfig(
         "角色攻略图提供方",
         "使用ww角色攻略时选择的提供方",
-        "金铃子攻略组",
-        options=["all", "金铃子攻略组", "結星", "Moealkyne"],
+        ["all"],
+        options=[
+            "all",
+            "小羊早睡不遭罪",
+            "金铃子攻略组",
+            "結星",
+            "Moealkyne",
+            "小沐XMu",
+        ],
     ),
     "WavesLoginUrl": GsStrConfig(
         "鸣潮登录url",
