@@ -55,11 +55,10 @@ async def get_all_roleid_detail_info(
     ck: str,
     is_refresh: bool = False,
     is_peek: bool = False,
-    is_self_ck: bool = False,
 ):
     # 根据面板数据获取详细信息
     if is_refresh or is_peek:
-        await refresh_char(uid, user_id, ck, is_self_ck=is_self_ck)
+        await refresh_char(uid, user_id, ck)
     all_role_detail = await get_all_roleid_detail_info_int(uid)
     if all_role_detail:
         return all_role_detail
@@ -69,7 +68,7 @@ async def get_all_roleid_detail_info(
         return None
 
     # 尝试刷新
-    await refresh_char(uid, user_id, ck, is_self_ck=is_self_ck)
+    await refresh_char(uid, user_id, ck)
     all_role_detail = await get_all_roleid_detail_info_int(uid)
     if all_role_detail:
         return all_role_detail
@@ -83,10 +82,16 @@ async def draw_char_list_img(
     user_id: str,
     is_refresh: bool = False,
     is_peek: bool = False,
+    user_waves_id: str = "",
 ) -> Union[str, bytes]:
-    is_self_ck, ck = await waves_api.get_ck_result(uid, user_id)
+    is_self_ck, ck = await waves_api.get_ck_result(user_waves_id, user_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
+
+    if uid == user_waves_id and is_self_ck:
+        is_self_ck = True
+    else:
+        is_self_ck = False
 
     # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck)
@@ -100,7 +105,6 @@ async def draw_char_list_img(
         ck,
         is_refresh,
         is_peek,
-        is_self_ck,
     )
     if not all_role_detail:
         return error_reply(WAVES_CODE_107)

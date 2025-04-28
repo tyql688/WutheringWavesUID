@@ -24,7 +24,7 @@ async def send_char_list_msg_new(bot: Bot, ev: Event):
     )
     if not match:
         return
-    waves_id = match.group("waves_id")
+    query_waves_id = match.group("waves_id")
     query_type = match.group("query_type")
 
     is_refresh = False
@@ -32,24 +32,32 @@ async def send_char_list_msg_new(bot: Bot, ev: Event):
         is_refresh = True
 
     is_peek = False
-    if waves_id:
+    if query_waves_id:
         is_peek = True
-        if not waves_id.isdigit() or len(waves_id) != 9:
+        if not query_waves_id.isdigit() or len(query_waves_id) != 9:
             return await bot.send("请输入正确的查询特征码")
 
     user_id = ruser_id(ev)
-    if not waves_id:
-        waves_id = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
+    user_waves_id = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
+    if not query_waves_id:
+        query_waves_id = user_waves_id
 
     # 参数校验
-    if not waves_id:
+    if not query_waves_id:
         return await bot.send(error_reply(WAVES_CODE_103))
 
     if not is_peek:
         # 更新groupid
         await WavesBind.insert_waves_uid(
-            user_id, ev.bot_id, waves_id, ev.group_id, lenth_limit=9
+            user_id, ev.bot_id, query_waves_id, ev.group_id, lenth_limit=9
         )
 
-    im = await draw_char_list_img(waves_id, ev, user_id, is_refresh, is_peek)
+    im = await draw_char_list_img(
+        query_waves_id,
+        ev,
+        user_id,
+        is_refresh,
+        is_peek,
+        user_waves_id,
+    )
     return await bot.send(im)
