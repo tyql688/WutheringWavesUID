@@ -4,13 +4,9 @@ from gsuid_core.sv import SV
 
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_103
-from ..wutheringwaves_config import WutheringWavesConfig
 from .draw_waves_stamina import draw_stamina_img
 
 waves_daily_info = SV("waves查询体力")
-
-
-stamina_push_interval = WutheringWavesConfig.get_config("StaminaPushInterval").data
 
 
 @waves_daily_info.on_fullmatch(
