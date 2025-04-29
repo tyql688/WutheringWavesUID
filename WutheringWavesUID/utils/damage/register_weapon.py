@@ -635,6 +635,20 @@ class Weapon_21040034(WeaponAbstract):
     name = "钢影拳-21丁型"
 
 
+class Weapon_21040036(WeaponAbstract):
+    id = 21040036
+    type = 4
+    name = "焰光裁定"
+
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放普攻"""
+        # 攻击提升12%。施放普攻时，获得以下效果：自身造成伤害无视目标8%防御。
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放普攻技能时，自身造成伤害无视目标{dmg}防御"
+        attr.add_defense_reduction(calc_percent_expression(dmg), title, msg)
+
+
 class Weapon_21040043(WeaponAbstract):
     id = 21040043
     type = 4
@@ -992,6 +1006,7 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21040024.id, Weapon_21040024)
     WavesWeaponRegister.register_class(Weapon_21040026.id, Weapon_21040026)
     WavesWeaponRegister.register_class(Weapon_21040034.id, Weapon_21040034)
+    WavesWeaponRegister.register_class(Weapon_21040036.id, Weapon_21040036)
     WavesWeaponRegister.register_class(Weapon_21040043.id, Weapon_21040043)
     WavesWeaponRegister.register_class(Weapon_21040044.id, Weapon_21040044)
     WavesWeaponRegister.register_class(Weapon_21040053.id, Weapon_21040053)

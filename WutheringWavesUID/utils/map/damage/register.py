@@ -1,4 +1,4 @@
-from ....utils.damage.abstract import DamageRankRegister, DamageDetailRegister
+from ....utils.damage.abstract import DamageDetailRegister, DamageRankRegister
 
 
 def register_damage():
@@ -28,6 +28,7 @@ def register_damage():
     from .damage_1504 import damage_detail as damage_1504
     from .damage_1505 import damage_detail as damage_1505
     from .damage_1506 import damage_detail as damage_1506
+    from .damage_1507 import damage_detail as damage_1507
     from .damage_1601 import damage_detail as damage_1601
     from .damage_1602 import damage_detail as damage_1602
     from .damage_1603 import damage_detail as damage_1603
@@ -95,6 +96,8 @@ def register_damage():
     DamageDetailRegister.register_class("1505", damage_1505)
     # 菲比
     DamageDetailRegister.register_class("1506", damage_1506)
+    # 赞妮
+    DamageDetailRegister.register_class("1507", damage_1507)
 
     # 桃祈
     DamageDetailRegister.register_class("1601", damage_1601)
@@ -139,6 +142,7 @@ def register_rank():
     from .damage_1504 import rank as rank_1504
     from .damage_1505 import rank as rank_1505
     from .damage_1506 import rank as rank_1506
+    from .damage_1507 import rank as rank_1507
     from .damage_1601 import rank as rank_1601
     from .damage_1602 import rank as rank_1602
     from .damage_1603 import rank as rank_1603
@@ -206,7 +210,8 @@ def register_rank():
     DamageRankRegister.register_class("1505", rank_1505)
     # 菲比
     DamageRankRegister.register_class("1506", rank_1506)
-
+    # 赞妮
+    DamageRankRegister.register_class("1507", rank_1507)
     # 桃祈
     DamageRankRegister.register_class("1601", rank_1601)
     # 丹瑾

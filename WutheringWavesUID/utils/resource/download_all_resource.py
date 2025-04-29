@@ -12,6 +12,7 @@ from .RESOURCE_PATH import (
     ROLE_PILE_PATH,
     SHARE_BG_PATH,
     WEAPON_PATH,
+    XIAOYANG_GUIDE_PATH,
     XMU_GUIDE_PATH,
 )
 
@@ -32,5 +33,6 @@ async def download_all_resource():
             "resource/guide/Moealkyne": MOEALKYNE_GUIDE_PATH,
             "resource/guide/JinLingZi": JINLINGZI_GUIDE_PATH,
             "resource/guide/JieXing": JIEXING_GUIDE_PATH,
+            "resource/guide/XiaoYang": XIAOYANG_GUIDE_PATH,
         },
     )
