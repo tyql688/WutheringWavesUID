@@ -86,6 +86,8 @@ async def get_guide_pic(guide_path: Path, pattern: re.Pattern, guide_author: str
 async def process_images_new(_dir: Path):
     imgs = []
     try:
+        from ..wutheringwaves_config import WutheringWavesConfig
+        segment_bool = WutheringWavesConfig.get_config("GuideSegment").data
         from PIL import Image
         with Image.open(_dir) as img:
             width, height = img.size
@@ -102,12 +104,17 @@ async def process_images_new(_dir: Path):
             need_crop = False
             if aspect_ratio > CROP_ASPECT_RATIO:
                 need_crop = True
-                logger.info(f"长宽比 {aspect_ratio:.1f} 超过阈值 {CROP_ASPECT_RATIO}，启动裁切")
+                logger.info(f"长宽比 {aspect_ratio:.1f} 超过阈值 {CROP_ASPECT_RATIO}，需要裁切")
             elif max_side > MAX_SINGLE_SIDE:
                 need_crop = True
-                logger.info(f"单边尺寸 {max_side} 超过阈值 {MAX_SINGLE_SIDE}，启动裁切")
-
-            if not need_crop:
+                logger.info(f"单边尺寸 {max_side} 超过阈值 {MAX_SINGLE_SIDE}，需要裁切")
+            
+            if not segment_bool:
+                # 无需裁切，直接发送原图
+                logger.info("控制台未开启‘攻略切段’功能，发送原图")
+                img_bytes = await convert_img(img, is_base64=True)
+                imgs.append(img_bytes)
+            elif not need_crop:
                 # 无需裁切，直接发送原图
                 img_bytes = await convert_img(img, is_base64=True)
                 imgs.append(img_bytes)
@@ -117,17 +124,43 @@ async def process_images_new(_dir: Path):
                 # 计算裁切的段数 
                 # segments = math.ceil(height / segment_length)
                 segments = (height + segment_length - 1) // segment_length
+                # 计算基准高度和余数
+                base_segment_height = height // segments
+                remainder = height % segments
 
                 # 均匀裁切图片
+                current_top = 0
                 for i in range(segments):
-                    top = int(i * segment_length)
-                    bottom = min(top + segment_length, height)
-                    box = (0, top, width, bottom)
+                    # 计算裁切区域
+                    segment_height = base_segment_height + 1 if i < remainder else base_segment_height
+                    bottom = current_top + segment_height
+                    box = (0, current_top, width, bottom)
 
-                    # 裁切并保存
-                    cropped = img.crop(box)
-                    img_bytes = await convert_img(cropped, is_base64=True)
-                    imgs.append(img_bytes)
+                    try:
+                        # 裁切并立即处理
+                        cropped = img.crop(box)
+                        
+                        # 使用异步处理函数
+                        async def process_crop(crop_obj):
+                            data = await convert_img(crop_obj, is_base64=True)
+                            crop_obj.close()  # 显式关闭
+                            return data
+                        
+                        img_bytes = await process_crop(cropped)
+                        imgs.append(img_bytes)
+
+                    finally:
+                        # 确保资源释放
+                        if 'cropped' in locals():
+                            cropped.close()
+                        
+                        # 每3个分段清理一次
+                        if i % 3 == 0:
+                            del cropped
+                            import gc
+                            gc.collect()
+
+                    current_top = bottom
 
     except Exception as e:
         logger.warning(f"攻略图片读取失败 {_dir}: {e}")

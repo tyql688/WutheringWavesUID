@@ -56,6 +56,7 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
             "小沐XMu",
         ],
     ),
+    "GuideSegment": GsBoolConfig("攻略切段", "避免攻略过长过大", False),
     "WavesLoginUrl": GsStrConfig(
         "鸣潮登录url",
         "用于设置WutheringWavesUID登录界面的配置",
