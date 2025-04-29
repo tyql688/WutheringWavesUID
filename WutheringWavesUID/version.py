@@ -1,1 +1,1 @@
-WutheringWavesUID_version = "2.3.0"
+WutheringWavesUID_version = "2.3.1"
