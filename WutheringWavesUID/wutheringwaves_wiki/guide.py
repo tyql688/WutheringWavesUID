@@ -137,7 +137,7 @@ async def process_images_new(_dir: Path):
 async def send_guide(config, imgs: list, bot: Bot):
     # 处理发送逻辑
     # 裁切了 或者 all
-    if config.data == "all" or len(imgs) > 2:
+    if "all" in config or len(imgs) > 2:
         await bot.send(imgs)
     elif len(imgs) == 2:
         await bot.send(imgs[1])
