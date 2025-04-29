@@ -146,6 +146,14 @@ DETAIL = {
         "name": "坎特蕾拉",
         "fetterDetail": "幽夜隐匿之帷"
     },
+    "1507": {
+        "name": "赞妮",
+        "fetterDetail": "此间永驻之光"
+    },
+    "1407": {
+        "name": "夏空",
+        "fetterDetail": "流云逝尽之空"
+    },
 }
 
 
