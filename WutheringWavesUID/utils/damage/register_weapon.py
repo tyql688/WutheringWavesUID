@@ -1,13 +1,13 @@
-from ..damage.abstract import WavesWeaponRegister, WeaponAbstract
 from .damage import DamageAttribute, calc_percent_expression
+from ..damage.abstract import WeaponAbstract, WavesWeaponRegister
 from .utils import (
     CHAR_ATTR_SIERRA,
     Spectro_Frazzle_Role_Ids,
-    attack_damage,
-    hit_damage,
-    liberation_damage,
-    skill_damage,
     temp_atk,
+    hit_damage,
+    skill_damage,
+    attack_damage,
+    liberation_damage,
 )
 
 
@@ -648,6 +648,12 @@ class Weapon_21040036(WeaponAbstract):
         msg = f"施放普攻技能时，自身造成伤害无视目标{dmg}防御"
         attr.add_defense_reduction(calc_percent_expression(dmg), title, msg)
 
+        if attr.env_spectro_deepen:
+            dmg = f"{self.param(2)}"
+            title = self.get_title()
+            msg = f"自身直接造成的【光噪效应】伤害加深{dmg}"
+            attr.add_dmg_deepen(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21040043(WeaponAbstract):
     id = 21040043
@@ -876,6 +882,20 @@ class Weapon_21050046(WeaponAbstract):
         title = self.get_title()
         msg = f"光噪效应状态下，自身普攻、重击伤害加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+    def cast_extension(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放延奏技能"""
+        if not isGroup:
+            return
+
+        if not attr.env_spectro_deepen:
+            return
+
+        # 施放延奏技能时，使队伍中登场角色周围的目标受到【光噪效应】伤害加深30%，持续30秒
+        dmg = f"{self.param(4)}"
+        title = self.get_title()
+        msg = f"施放延奏技能时，使登场角色【光噪效应】伤害加深{dmg}"
+        attr.add_dmg_deepen(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21050053(WeaponAbstract):

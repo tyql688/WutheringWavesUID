@@ -1,19 +1,19 @@
+from .damage import DamageAttribute
 from ...utils.damage.abstract import (
     CharAbstract,
     WavesCharRegister,
     WavesWeaponRegister,
 )
-from .damage import DamageAttribute
 from .utils import (
-    CHAR_ATTR_CELESTIAL,
-    CHAR_ATTR_FREEZING,
     CHAR_ATTR_MOLTEN,
     CHAR_ATTR_SINKING,
-    attack_damage,
-    hit_damage,
-    liberation_damage,
-    skill_damage,
+    CHAR_ATTR_FREEZING,
+    CHAR_ATTR_CELESTIAL,
     temp_atk,
+    hit_damage,
+    skill_damage,
+    attack_damage,
+    liberation_damage,
 )
 
 
@@ -448,9 +448,42 @@ class Char_1506(CharAbstract):
         attr.add_effect(title, msg)
 
         if attr.char_attr == CHAR_ATTR_CELESTIAL:
-            title = "菲比-延奏技能"
+            title = "菲比-延奏技能-告解"
             msg = "使一定范围内的目标衍射伤害抗性减少10%"
             attr.add_enemy_resistance(-0.1, title, msg)
+
+        if attr.char_template == temp_atk:
+            title = f"{self.name}-合鸣效果-轻云出月"
+            msg = "使用延奏技能后，下一个登场的共鸣者攻击提升22.5%"
+            attr.add_atk_percent(0.225, title, msg)
+
+        # 无常凶鹭
+        title = f"{self.name}-声骸技能-无常凶鹭"
+        msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
+        attr.add_dmg_bonus(0.12, title, msg)
+
+        if attr.env_spectro_deepen:
+            title = f"{self.name}-延奏技能-告解"
+            msg = "下一个变奏登场角色【光噪效应】伤害加深100%。"
+            attr.add_dmg_deepen(1, title, msg)
+
+            if chain >= 2:
+                title = f"{self.name}-二链"
+                msg = "告解状态下，默祷的【光噪效应】伤害加深效果额外提升120%。"
+                attr.add_dmg_deepen(1.2, title, msg)
+
+            if chain >= 4:
+                title = f"{self.name}-四链"
+                msg = "目标衍射伤害抗性降低10%，持续30秒"
+                attr.add_enemy_resistance(-0.1, title, msg)
+
+        # 和光回唱
+        weapon_clz = WavesWeaponRegister.find_class(21050046)
+        if weapon_clz:
+            w = weapon_clz(21050046, 90, 6, resonLevel)
+            method = getattr(w, "cast_extension", None)
+            if callable(method):
+                method(attr, isGroup)
 
 
 class Char_1601(CharAbstract):
