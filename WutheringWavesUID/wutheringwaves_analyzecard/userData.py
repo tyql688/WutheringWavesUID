@@ -1,6 +1,8 @@
 import re
 import copy
+import asyncio
 from typing import Dict
+from pathlib import Path
 from itertools import zip_longest
 
 from gsuid_core.bot import Bot
@@ -11,7 +13,6 @@ from ..wutheringwaves_charinfo.draw_char_card import generate_online_role_detail
 from ..utils.ascension.weapon import get_weapon_detail
 from ..utils.refresh_char_detail import save_card_info
 from ..utils.api.model import RoleDetailData
-from ..utils.image import get_attribute_prop
 from ..utils.calc import WuWaCalc
 from ..utils.name_convert import (
     char_id_to_char_name,
@@ -168,6 +169,17 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         data["weaponData"]["weapon"]["weaponStarLevel"] = weapon_detail.starLevel
 
     # 检查声骸数据是否异常
+    if not await check_phantom_data(data):
+        await bot.send("[鸣潮]dc卡片识别数据异常！\n或请使用更高分辨率卡片重新识别！", at_sender)
+        return
+
+    waves_data.append(data)
+    await save_card_info(uid, waves_data)
+    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n请务必使用：\n【{PREFIX}{char_name_print}面板】检查角色是否识别成功\n【{PREFIX}改{char_name_print}(套装**)(声骸)】修改识别的套装或声骸(影响伤害不影响评分)，例如：【{PREFIX}改{char_name_print}套装高天】或【{PREFIX}改{char_name_print}声骸】", at_sender)
+    logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name_print}面板数据已保存到本地！")
+    return
+
+async def check_phantom_data(data) -> bool:
     try:
         role_detail = RoleDetailData.model_validate(data)
         # 检查数值
@@ -180,17 +192,23 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
                 if _phantom and _phantom.phantomProp:
                     props = _phantom.get_props()
                     for _prop in props:
-                        await get_attribute_prop(_prop.attributeName)
+                        test = await exist_attribute_prop(_prop.attributeName)
+                        if not test:
+                            logger.info(f"[鸣潮][dc卡片识别]词条文本检查异常: {_prop.attributeName}")
+                            return False
+        return True
     except Exception as e:
         logger.error(f" [鸣潮][dc卡片识别] 角色声骸数据异常：{e}")
-        await bot.send("[鸣潮]dc卡片识别数据异常！\n或请使用更高分辨率卡片重新识别！", at_sender)
-        return
+        return False
 
-    waves_data.append(data)
-    await save_card_info(uid, waves_data)
-    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n请务必使用：\n【{PREFIX}{char_name_print}面板】检查角色是否识别成功\n【{PREFIX}改{char_name_print}(套装**)(声骸)】修改识别的套装或声骸(影响伤害不影响评分)，例如：【{PREFIX}改{char_name_print}套装高天】或【{PREFIX}改{char_name_print}声骸】", at_sender)
-    logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name_print}面板数据已保存到本地！")
-    return
+async def exist_attribute_prop(name: str = "") -> bool:
+    TEXT_PATH = Path(__file__).parent.parent / "utils" / "texture2d" / "attribute_prop" 
+    file_path = Path(TEXT_PATH) / f"attr_prop_{name}.png"
+    try:
+        return await asyncio.to_thread(file_path.exists)
+    except Exception as e:
+        logger.error(f"[鸣潮][dc卡片识别]文件检查异常: {name}: {str(e)}")
+        return False
 
 def get_breach(level: int):
     if level <= 20:
