@@ -136,29 +136,10 @@ async def process_images_new(_dir: Path):
                     bottom = current_top + segment_height
                     box = (0, current_top, width, bottom)
 
-                    try:
-                        # 裁切并立即处理
-                        cropped = img.crop(box)
-                        
-                        # 使用异步处理函数
-                        async def process_crop(crop_obj):
-                            data = await convert_img(crop_obj, is_base64=True)
-                            crop_obj.close()  # 显式关闭
-                            return data
-                        
-                        img_bytes = await process_crop(cropped)
-                        imgs.append(img_bytes)
-
-                    finally:
-                        # 确保资源释放
-                        if 'cropped' in locals():
-                            cropped.close()
-                        
-                        # 每3个分段清理一次
-                        if i % 3 == 0:
-                            del cropped
-                            import gc
-                            gc.collect()
+                    # 裁切并保存
+                    cropped = img.crop(box)
+                    img_bytes = await convert_img(cropped, is_base64=True)
+                    imgs.append(img_bytes)
 
                     current_top = bottom
 
