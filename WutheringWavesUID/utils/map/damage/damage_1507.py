@@ -2,26 +2,28 @@
 from typing import Literal
 
 from ...api.model import RoleDetailData
+from .buff import feibi_buff, shouanren_buff
+from .damage import echo_damage, phase_damage, weapon_damage
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute, calc_percent_expression
 from ...damage.utils import (
-    SkillTreeMap,
     SkillType,
-    cast_attack,
+    SkillTreeMap,
     cast_hit,
-    cast_liberation,
     cast_skill,
     hit_damage,
-    liberation_damage,
+    cast_attack,
     skill_damage,
+    cast_liberation,
+    liberation_damage,
     skill_damage_calc,
 )
-from .damage import echo_damage, phase_damage, weapon_damage
 
 
 def calc_damage_1(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
 ) -> tuple[str, str]:
+    attr.set_env_spectro_deepen()
     # 设置角色伤害类型
     attr.set_char_damage(skill_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -45,6 +47,10 @@ def calc_damage_1(
     # 设置角色施放技能
     damage_func = [cast_attack, cast_skill]
     phase_damage(attr, role, damage_func, isGroup)
+
+    title = "斩棘"
+    msg = f"自身直接造成的【光噪效应】伤害加深20%"
+    attr.add_dmg_deepen(0.2, title, msg)
 
     # 设置角色等级
     attr.set_character_level(role.role.level)
@@ -97,6 +103,7 @@ def calc_damage_1(
 def calc_damage_2(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
 ) -> tuple[str, str]:
+    attr.set_env_spectro_deepen()
     # 设置角色伤害类型
     attr.set_char_damage(hit_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -113,7 +120,7 @@ def calc_damage_2(
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], "3", skillLevel
     )
-    title = "重斩·终夜伤害"
+    title = "终夜伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
 
@@ -124,6 +131,10 @@ def calc_damage_2(
     title = "【焰光】增加倍率*40层"
     msg = f"{yanguang_multi}*40"
     attr.add_effect(title, msg)
+
+    title = "斩棘"
+    msg = f"自身直接造成的【光噪效应】伤害加深20%"
+    attr.add_dmg_deepen(0.2, title, msg)
 
     # 设置角色施放技能
     damage_func = [cast_attack, cast_skill, cast_liberation, cast_hit]
@@ -142,9 +153,6 @@ def calc_damage_2(
 
     # 设置角色技能施放是不是也有加成 eg：守岸人
     # 施放解放
-    title = f"{role_name}-灼焰形态"
-    msg = "普攻倍率提升25%"
-    attr.add_skill_ratio(0.25, title, msg)
 
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
@@ -170,7 +178,7 @@ def calc_damage_2(
         title = f"{role_name}-六链"
         msg = f"【焰光】额外增加倍率提升40%"
         attr.add_skill_multi(f"{yanguang_multi}*1.4*40", title, msg)
-        msg = "重斩·终夜倍率提升40%"
+        msg = "终夜倍率提升40%"
         attr.add_skill_ratio(0.4, title, msg)
     else:
         attr.add_skill_multi(f"{yanguang_multi}*40")
@@ -192,8 +200,9 @@ def calc_damage_3(
     attr: DamageAttribute,
     role: RoleDetailData,
     isGroup: bool = False,
-    other_type: Literal["重斩·破晓", "重斩·将明", "重斩·闪裂"] = "重斩·破晓",
+    other_type: Literal["破晓", "将明", "闪裂"] = "破晓",
 ) -> tuple[str, str]:
+    attr.set_env_spectro_deepen()
     # 设置角色伤害类型
     attr.set_char_damage(hit_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -207,11 +216,11 @@ def calc_damage_3(
     # 获取角色技能等级
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
-    if other_type == "重斩·破晓":
+    if other_type == "破晓":
         skillParamId = "1"
-    elif other_type == "重斩·将明":
+    elif other_type == "将明":
         skillParamId = "2"
-    elif other_type == "重斩·闪裂":
+    elif other_type == "闪裂":
         skillParamId = "5"
     skill_multi = skill_damage_calc(
         char_result.skillTrees, SkillTreeMap[skill_type], skillParamId, skillLevel
@@ -219,6 +228,10 @@ def calc_damage_3(
     title = f"{other_type}伤害"
     msg = f"技能倍率{skill_multi}"
     attr.add_skill_multi(skill_multi, title, msg)
+
+    title = "斩棘"
+    msg = f"自身直接造成的【光噪效应】伤害加深20%"
+    attr.add_dmg_deepen(0.2, title, msg)
 
     # 设置角色施放技能
     damage_func = [cast_attack, cast_skill, cast_liberation]
@@ -433,26 +446,57 @@ def calc_damage_5(
     return crit_damage, expected_damage
 
 
+def calc_damage_10(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_env_spectro_deepen()
+    attr.set_char_damage(hit_damage)
+    attr.set_char_template("temp_atk")
+
+    # 菲比buff
+    feibi_buff(attr, 0, 1, isGroup)
+
+    return calc_damage_2(attr, role, isGroup)
+
+
+def calc_damage_11(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_env_spectro_deepen()
+    attr.set_char_damage(hit_damage)
+    attr.set_char_template("temp_atk")
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 菲比buff
+    feibi_buff(attr, 0, 1, isGroup)
+
+    return calc_damage_2(attr, role, isGroup)
+
+
+def calc_damage_12(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_env_spectro_deepen()
+    attr.set_char_damage(hit_damage)
+    attr.set_char_template("temp_atk")
+    # 守岸人buff
+    shouanren_buff(attr, 6, 5, isGroup)
+
+    # 菲比buff
+    feibi_buff(attr, 6, 5, isGroup)
+
+    return calc_damage_2(attr, role, isGroup)
+
+
 damage_detail = [
     {
         "title": "集中压制伤害",
         "func": lambda attr, role: calc_damage_1(attr, role),
     },
     {
-        "title": "重斩·终夜伤害",
+        "title": "终夜伤害",
         "func": lambda attr, role: calc_damage_2(attr, role),
-    },
-    {
-        "title": "重斩·破晓伤害",
-        "func": lambda attr, role: calc_damage_3(attr, role, other_type="重斩·破晓"),
-    },
-    {
-        "title": "重斩·将明伤害",
-        "func": lambda attr, role: calc_damage_3(attr, role, other_type="重斩·将明"),
-    },
-    {
-        "title": "重斩·闪裂伤害",
-        "func": lambda attr, role: calc_damage_3(attr, role, other_type="重斩·闪裂"),
     },
     {
         "title": "重燃伤害",
@@ -462,6 +506,18 @@ damage_detail = [
         "title": "终绝将至之刻2段伤害",
         "func": lambda attr, role: calc_damage_5(attr, role),
     },
+    {
+        "title": "01菲比/终夜伤害",
+        "func": lambda attr, role: calc_damage_10(attr, role),
+    },
+    {
+        "title": "01守/01菲比/终夜伤害",
+        "func": lambda attr, role: calc_damage_11(attr, role),
+    },
+    {
+        "title": "65守/65菲比/终夜伤害",
+        "func": lambda attr, role: calc_damage_12(attr, role),
+    },
 ]
 
-rank = damage_detail[1]
+rank = damage_detail[4]

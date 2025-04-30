@@ -77,6 +77,16 @@ SkillTreeMap = {
 # 光噪效应
 Spectro_Frazzle_Role_Ids = [1501, 1502, 1506, 1507]
 
+# 异常
+AbnormalType = Literal[
+    "SpectroFrazzle",  # 光噪效应
+    "AeroErosion",  # 风蚀效应
+    "HavocBane",  # 虚湮效应
+    "FusionBurst",  # 聚爆效应
+    "GlacioChafe",  # 霜渐效应
+    "ElectroFlare",  # 电磁效应
+]
+
 
 def skill_damage_calc(
     skillTree: Optional[Dict], skillTreeId: str, skillParamId: str, skillLevel: int

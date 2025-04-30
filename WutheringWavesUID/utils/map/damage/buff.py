@@ -87,3 +87,11 @@ def danjin_buff(attr, chain, resonLevel, isGroup):
     if char_clz:
         s = char_clz()
         s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)
+
+
+def feibi_buff(attr, chain, resonLevel, isGroup):
+    # 菲比buff
+    char_clz = WavesCharRegister.find_class(1506)
+    if char_clz:
+        s = char_clz()
+        s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)

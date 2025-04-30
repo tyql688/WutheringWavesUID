@@ -1,7 +1,8 @@
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Union, Literal, Optional
 
 from ...utils.api.model import RoleDetailData
-from ...utils.damage.utils import parse_skill_multi
+from ...utils.damage.utils import AbnormalType, parse_skill_multi
+from .constants import spectro_frazzle_effect_atk, onlineLevel2EquivalentLevel
 
 
 class WavesEffect(object):
@@ -142,6 +143,7 @@ class DamageAttribute:
         enemy_level=90,
         teammate_char_ids: Optional[List[int]] = None,
         env_spectro=False,
+        online_level=1,
     ):
         """
         初始化 DamageAttribute 类的实例。
@@ -243,8 +245,14 @@ class DamageAttribute:
         self.teammate_char_ids = teammate_char_ids if teammate_char_ids else []
         # 光噪效应
         self.env_spectro = env_spectro
+        # 光噪效应伤害加深
+        self.env_spectro_deepen = False
         # 声骸结果
         self.ph_result = False
+        # 联觉等级
+        self.online_level = online_level
+        # 异常类型
+        self.abnormalType = None
 
         if enemy_resistance:
             self.add_enemy_resistance(
@@ -546,6 +554,11 @@ class DamageAttribute:
         self.env_spectro = True
         return self
 
+    def set_env_spectro_deepen(self):
+        """光噪效应伤害加深"""
+        self.env_spectro_deepen = True
+        return self
+
     def set_char_damage(self, char_damage):
         """角色伤害"""
         self.char_damage = char_damage
@@ -694,6 +707,133 @@ class DamageAttribute:
         flat, percent = parse_skill_multi(self.shield_skill_multi)
         return effect_value * (percent * 0.01) * (1 + self.dmg_bonus) + flat * (
             1 + self.dmg_bonus
+        )
+
+
+class AbnormalSpectroFrazzle:
+    """光噪效应"""
+
+    typeId: AbnormalType = "SpectroFrazzle"
+
+    # 基础区
+    # 光噪层数区（技能倍率区）
+    # 防御区
+    # 抗性区 同基础 self.attr.valid_enemy_resistance
+    # 伤害减免区
+    # 光噪伤害加深区
+
+    # 光噪伤害 = 基础区 * 光噪层数区 * 防御区 * 抗性区 * 伤害减免区 * 光噪伤害加深区
+
+    def __init__(
+        self,
+        attr: DamageAttribute,
+        floor: int = 0,
+        env: Literal["大世界", "副本"] = "大世界",
+        dmg_deepen: float = 0,
+        dmg_reduce: float = 0,
+        dmg_increase: float = 0,
+    ):
+        self.attr = attr
+        self.floor = floor
+        self.env = env
+        self.dmg_deepen = dmg_deepen
+        # 受到伤害减少
+        self.dmg_reduce = dmg_reduce
+        # 收到伤害增加
+        self.dmg_increase = dmg_increase
+
+        self.online_level = self.attr.online_level
+        self.attr.add_effect("光噪效应环境", f"{env}")
+        self.attr.add_effect("联觉等级", f"{self.online_level}")
+
+    def add_floor(self, floor: int, title="", msg=""):
+        """增加光噪层数"""
+        self.floor += floor
+        self.attr.add_effect(title, msg)
+        return self
+
+    def add_dmg_deepen(self, dmg_deepen: float, title="", msg=""):
+        """增加光噪伤害加深"""
+        self.dmg_deepen += dmg_deepen
+        self.attr.add_effect(title, msg)
+        return self
+
+    def add_dmg_reduce(self, dmg_reduce: float, title="", msg=""):
+        """增加光噪伤害减免"""
+        self.dmg_reduce += dmg_reduce
+        self.attr.add_effect(title, msg)
+        return self
+
+    def add_dmg_increase(self, dmg_increase: float, title="", msg=""):
+        """增加光噪伤害增加"""
+        self.dmg_increase += dmg_increase
+        self.attr.add_effect(title, msg)
+        return self
+
+    @property
+    def defense_ratio(self):
+        """
+        计算敌人的防御减伤比。
+
+        :return: 防御减伤比
+        """
+        if self.env == "大世界":
+            level = onlineLevel2EquivalentLevel[self.online_level - 1]
+            # 计算公式为 (等级 + 100) / (等级 + 怪物等级 + 199)
+            return (level + 100) / (level + self.attr.enemy_level + 199)
+        else:
+            # 计算公式为 (怪物等级 + 100) / (怪物等级*2 + 199)
+            return (self.attr.enemy_level + 100) / (self.attr.enemy_level * 2 + 199)
+
+    @property
+    def valid_dmg_reduce(self):
+        """
+        计算有效伤害减免。
+
+        :return: 有效伤害减免
+        """
+        return 1 - (self.dmg_reduce + self.dmg_increase)
+
+    @property
+    def valid_floor(self):
+        """
+        计算有效光噪层数。
+        0.2439*层数（技能等级）+0.561
+
+        :return: 有效光噪层数
+        """
+        if self.floor > 10 or self.floor <= 0:
+            floor = 10
+        else:
+            floor = self.floor
+        return 0.2439 * floor + 0.561
+
+    @property
+    def base_damage(self):
+        """
+        计算基础伤害。
+
+        :return: 基础伤害值
+        """
+        if self.attr.role:
+            char_level = self.attr.role.level
+        else:
+            char_level = 90
+        return spectro_frazzle_effect_atk[char_level - 1]
+
+    def calculate_damage(self):
+        """
+        计算伤害。
+
+        :return: 伤害值
+        """
+        return (
+            self.base_damage
+            * self.valid_floor
+            * self.defense_ratio
+            * self.attr.valid_enemy_resistance
+            * self.valid_dmg_reduce
+            * (1 + self.dmg_deepen)
         )
 
 
