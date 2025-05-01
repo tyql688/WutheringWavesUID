@@ -549,6 +549,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
             if re.search(r'暴.(傷害)?', attr):
                 attr = re.sub(r'暴.(傷害)?', r'暴擊\1', attr)
             attr = attr.replace("箓擎傷害", "暴擊傷害").replace("箓擎", "暴擊")
+            attr = re.sub(r'.*效率$', '共鳴效率', attr)
             clean_attr = cc.convert(attr) # 标准繁简转换
             # 验证属性名是否符合预期（至少两个中文字符，且不含数字）
             if len(clean_attr) >= 2 and not re.search(r'[0-9]', clean_attr):
