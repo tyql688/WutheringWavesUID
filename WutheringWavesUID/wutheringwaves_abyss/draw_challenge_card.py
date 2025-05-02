@@ -101,6 +101,22 @@ async def draw_challenge_img(ev: Event, uid: str, user_id: str) -> Union[bytes, 
     challenge_index = 0
     for challenge_id, _challenge in challenge_data.challengeInfo.items():
         max_num = len(_challenge)
+        
+        # 创建边框背景
+        border_bg = Image.new("RGBA", (920, 300), (0, 0, 0, 0))
+        border_draw = ImageDraw.Draw(border_bg)
+        
+        # 绘制简单圆角矩形边框
+        border_draw.rounded_rectangle(
+            [(0, 0), (920, 300)],
+            radius=15,  # 圆角半径
+            outline=(255, 215, 0, 255),  # 金色边框
+            width=2  # 边框宽度
+        )
+        
+        # 将边框粘贴到卡片上
+        card_img.alpha_composite(border_bg, (15, 260 + 330 * challenge_index))
+
         boss_title_bg = Image.new("RGBA", (1000, 100))
         boss_title_bg_draw = ImageDraw.Draw(boss_title_bg)
         boss_difficulty = 1
@@ -117,7 +133,7 @@ async def draw_challenge_img(ev: Event, uid: str, user_id: str) -> Union[bytes, 
             if not _temp.roles:
                 continue
             boss_title_bg_draw.text(
-                (600, 20),
+                (600, 30),
                 f"通关时间：{timedelta(seconds=_temp.passTime)}",
                 "white",
                 waves_font_24,
@@ -169,7 +185,7 @@ async def draw_challenge_img(ev: Event, uid: str, user_id: str) -> Union[bytes, 
             (300, 60), f"Lv.{boss_level}", "white", waves_font_24, "lm"
         )
         boss_title_bg_draw.text(
-            (600, 60),
+            (600, 70),
             f"当前难度：{boss_difficulty}/{max_num}",
             "white",
             waves_font_24,
