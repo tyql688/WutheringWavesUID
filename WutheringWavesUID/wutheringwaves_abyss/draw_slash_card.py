@@ -170,8 +170,9 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     card_h = 300
     title_h = 130
     info_h = 300
+    CHALLENGE_SPACING = 30
 
-    h = footer_h + card_h + (info_h + title_h) * len(query_challenge_ids)
+    h = footer_h + card_h + (info_h + title_h + CHALLENGE_SPACING) * len(query_challenge_ids) - CHALLENGE_SPACING
     card_img = get_waves_bg(1100, h, "bg9")
 
     # 绘制个人信息
@@ -349,7 +350,7 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
             temp_img.paste(title_bar, (0, 0), title_bar)
             temp_img.paste(role_bg, (0, title_h), role_bg)
             card_img.paste(
-                temp_img, (50, card_h + index * (info_h + title_h)), temp_img
+                temp_img, (50, card_h + index * (info_h + title_h + CHALLENGE_SPACING)), temp_img
             )
             index += 1
 
