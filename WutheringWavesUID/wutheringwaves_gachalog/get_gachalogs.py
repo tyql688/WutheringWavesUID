@@ -228,7 +228,7 @@ async def save_gachalogs(
         )
 
     if isinstance(code, int) or not gachalogs_new:
-        return error_reply(code)
+        return "获取抽卡记录失败，请检测链接是否有效"
 
     if record_id:
         await save_record_id(ev.user_id, ev.bot_id, uid, record_id)
