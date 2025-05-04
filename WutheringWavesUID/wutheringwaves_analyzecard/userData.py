@@ -175,7 +175,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
     waves_data.append(data)
     await save_card_info(uid, waves_data)
-    await bot.send(f"[鸣潮]dc卡片数据提取成功！\n请务必使用：\n【{PREFIX}{char_name_print}面板】检查角色是否识别成功\n【{PREFIX}改{char_name_print}(套装**)(声骸)】修改识别的套装或声骸(影响伤害不影响评分)，例如：【{PREFIX}改{char_name_print}套装高天】或【{PREFIX}改{char_name_print}声骸】", at_sender)
+    await bot.send(f"[鸣潮]dc卡片数据提取成功！识别套装使用默认配置(影响伤害计算不影响声骸评分)\n可使用：\n【{PREFIX}{char_name_print}面板】查看您的角色面板\n【{PREFIX}改{char_name_print}套装**(套装名)】修改声骸套装\n【{PREFIX}改{char_name_print}声骸】修改当前套装的首位声骸\n", at_sender)
     logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name_print}面板数据已保存到本地！")
     return
 
