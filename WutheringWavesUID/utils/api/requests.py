@@ -1,24 +1,23 @@
-import copy
-import random
 import asyncio
+import copy
 import json as j
+import random
 from datetime import datetime
-from typing import Any, Dict, List, Union, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import httpx
-from gsuid_core.logger import logger
 from aiohttp import (
-    FormData,
-    TCPConnector,
     ClientSession,
     ClientTimeout,
     ContentTypeError,
+    FormData,
+    TCPConnector,
 )
 
-from ..hint import error_reply
-from ..database.models import WavesUser
+from gsuid_core.logger import logger
+
 from ...wutheringwaves_config import WutheringWavesConfig
-from ..util import get_public_ip, timed_async_cache, generate_random_string
+from ..database.models import WavesUser
 from ..error_reply import (
     WAVES_CODE_100,
     WAVES_CODE_101,
@@ -27,44 +26,45 @@ from ..error_reply import (
     WAVES_CODE_998,
     WAVES_CODE_999,
 )
+from ..hint import error_reply
+from ..util import generate_random_string, get_public_ip, timed_async_cache
 from .api import (
-    GAME_ID,
-    LOGIN_URL,
-    SERVER_ID,
-    SIGNIN_URL,
-    REFRESH_URL,
     BASE_DATA_URL,
-    GACHA_LOG_URL,
-    GAME_DATA_URL,
-    KURO_ROLE_URL,
-    REQUEST_TOKEN,
-    ROLE_DATA_URL,
-    ROLE_LIST_URL,
-    SERVER_ID_NET,
-    WIKI_HOME_URL,
-    WIKI_TREE_URL,
-    MR_REFRESH_URL,
     BATCH_ROLE_COST,
-    ROLE_DETAIL_URL,
-    SLASH_INDEX_URL,
-    TOWER_INDEX_URL,
-    WIKI_DETAIL_URL,
+    CALABASH_DATA_URL,
+    CALCULATOR_REFRESH_DATA_URL,
+    CHALLENGE_DATA_URL,
+    CHALLENGE_INDEX_URL,
     EXPLORE_DATA_URL,
+    GACHA_LOG_URL,
+    GACHA_NET_LOG_URL,
+    GAME_ID,
+    KURO_ROLE_URL,
+    LOGIN_URL,
+    MR_REFRESH_URL,
+    ONLINE_LIST_PHANTOM,
     ONLINE_LIST_ROLE,
+    ONLINE_LIST_WEAPON,
     QUERY_OWNED_ROLE,
     QUERY_USERID_URL,
-    SLASH_DETAIL_URL,
-    TOWER_DETAIL_URL,
-    CALABASH_DATA_URL,
-    GACHA_NET_LOG_URL,
-    CHALLENGE_DATA_URL,
-    ONLINE_LIST_WEAPON,
-    CHALLENGE_INDEX_URL,
-    ONLINE_LIST_PHANTOM,
-    SIGNIN_TASK_LIST_URL,
+    REFRESH_URL,
+    REQUEST_TOKEN,
     ROLE_CULTIVATE_STATUS,
+    ROLE_DATA_URL,
+    ROLE_DETAIL_URL,
+    ROLE_LIST_URL,
+    SERVER_ID,
+    SERVER_ID_NET,
+    SIGNIN_TASK_LIST_URL,
+    SIGNIN_URL,
+    SLASH_DETAIL_URL,
+    SLASH_INDEX_URL,
+    TOWER_DETAIL_URL,
+    TOWER_INDEX_URL,
+    WIKI_DETAIL_URL,
     WIKI_ENTRY_DETAIL_URL,
-    CALCULATOR_REFRESH_DATA_URL,
+    WIKI_HOME_URL,
+    WIKI_TREE_URL,
 )
 
 
@@ -384,10 +384,16 @@ class WavesApi:
     ) -> tuple[bool, Union[Dict, str]]:
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
+        bat = await self.get_request_token(roleId, token)
+        if bat:
+            header.update({"b-at": bat})
+            logger.info(f"[{roleId}] 获取到b-at: {bat}")
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
             "roleId": roleId,
+            "channelId": "19",
+            "countryCode": "1",
             "id": charId,
         }
         raw_data = await self._waves_request(ROLE_DETAIL_URL, "POST", header, data=data)
