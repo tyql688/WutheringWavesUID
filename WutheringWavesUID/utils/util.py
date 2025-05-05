@@ -1,3 +1,4 @@
+import asyncio
 import random
 import string
 import time
@@ -10,6 +11,7 @@ import httpx
 def timed_async_cache(expiration, condition=lambda x: True):
     def decorator(func):
         cache = {}
+        locks = {}
 
         @wraps(func)
         async def wrapper(*args):
@@ -20,15 +22,29 @@ def timed_async_cache(expiration, condition=lambda x: True):
             else:
                 cache_key = func.__name__
 
+            # 为每个缓存键创建一个锁
+            if cache_key not in locks:
+                locks[cache_key] = asyncio.Lock()
+
+            # 检查缓存，如果有效则直接返回
             if cache_key in cache:
                 value, timestamp = cache[cache_key]
                 if current_time - timestamp < expiration:
                     return value
 
-            value = await func(*args)
-            if condition(value):
-                cache[cache_key] = (value, current_time)
-            return value
+            # 获取锁以确保并发安全
+            async with locks[cache_key]:
+                # 双重检查，避免等待锁期间其他协程已经更新了缓存
+                if cache_key in cache:
+                    value, timestamp = cache[cache_key]
+                    if current_time - timestamp < expiration:
+                        return value
+
+                # 执行原始函数
+                value = await func(*args)
+                if condition(value):
+                    cache[cache_key] = (value, current_time)
+                return value
 
         return wrapper
 
