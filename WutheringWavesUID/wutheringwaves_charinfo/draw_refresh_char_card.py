@@ -1,9 +1,8 @@
-import random
 import time
 from pathlib import Path
 from typing import List
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
@@ -13,7 +12,8 @@ from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import AccountBaseInfo, RoleDetailData
 from ..utils.button import WavesButton
 from ..utils.cache import TimedCache
-from ..utils.database.models import WavesBind, WavesUser
+from ..utils.char_info_utils import get_all_role_detail_info_list
+from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
 from ..utils.fonts.waves_fonts import (
@@ -33,8 +33,8 @@ from ..utils.image import (
     add_footer,
     draw_text_with_shadow,
     get_event_avatar,
+    get_random_share_bg_path,
     get_square_avatar,
-    get_waves_bg,
 )
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NAME_ALIAS, SPECIAL_CHAR_NAME
@@ -46,22 +46,14 @@ TEXT_PATH = Path(__file__).parent / "texture2d"
 refresh_char_bg = Image.open(TEXT_PATH / "refresh_char_bg.png")
 refresh_yes = Image.open(TEXT_PATH / "refresh_yes.png")
 refresh_yes = refresh_yes.resize((40, 40))
+refresh_no = Image.open(TEXT_PATH / "refresh_no.png")
+refresh_no = refresh_no.resize((40, 40))
 
-refresh_roleShare_02 = Image.open(TEXT_PATH / "refresh_roleShare_02.png")
-refresh_roleShare_02 = refresh_roleShare_02.crop((560, 300, 2560, 650))
-refresh_roleShare_08 = Image.open(TEXT_PATH / "refresh_roleShare_08.png")
-refresh_roleShare_08 = refresh_roleShare_08.crop((200, 300, 2200, 650))
-refresh_roleShare_12 = Image.open(TEXT_PATH / "refresh_roleShare_12.png")
-refresh_roleShare_12 = refresh_roleShare_12.crop((0, 320, 2000, 670))
-refresh_roleShare_17 = Image.open(TEXT_PATH / "refresh_roleShare_17.png")
-refresh_roleShare_17 = refresh_roleShare_17.crop((200, 120, 2200, 470))
 
-refresh_role_list = [
-    refresh_roleShare_02,
-    refresh_roleShare_08,
-    refresh_roleShare_17,
-    refresh_roleShare_12,
-]
+refresh_role_map = {
+    "share_02.webp": (1000, 180, 2560, 1320),
+    "share_14.webp": (1000, 180, 2560, 1320),
+}
 
 refresh_interval: int = WutheringWavesConfig.get_config("RefreshInterval").data
 
@@ -97,45 +89,21 @@ def get_refresh_interval_notify(time_stamp: int):
         return "请等待{0}s后尝试刷新面板！".format(time_stamp)
 
 
-def get_refresh_role_img():
-    return random.choice(refresh_role_list)
-
-
-async def send_notify(bot: Bot, ev: Event, user_id: str, uid: str, self_ck: bool):
-    RefreshNotify = WutheringWavesConfig.get_config("RefreshNotify").data
-    if not RefreshNotify:
-        return
-    at_sender = True if ev.group_id else False
-    if self_ck:
-        msg = [
-            "[鸣潮]",
-            ">当前暂无数据更新",
-            ">游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟，请耐心等待",
-            "",
-        ]
+async def get_refresh_role_img(width: int, height: int):
+    path = await get_random_share_bg_path()
+    img = Image.open(path).convert("RGBA")
+    if path.name in refresh_role_map:
+        img = img.crop(refresh_role_map[path.name])
     else:
-        cookie = await WavesUser.select_cookie(user_id, uid)
-        if cookie:
-            msg = [
-                "[鸣潮]",
-                ">您当前登录状态已失效",
-                f">使用命令【{PREFIX}登录】重新登录",
-                ">游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟，请耐心等待",
-                "",
-            ]
-        else:
-            msg = [
-                "[鸣潮]",
-                ">您当前为仅绑定鸣潮特征码且当前暂无数据更新",
-                ">游戏内更换声骸后，数据同步到库街区有[5-10分钟]延迟",
-                f">请确认库街区[鸣潮]数据更新后再进行【{PREFIX}刷新面板】",
-                "",
-                "自动同步（推荐）",
-                f">使用命令【{PREFIX}登录】后，直接同步库街区数据，不必手动确认",
-                "",
-            ]
-    if msg:
-        await bot.send("\n".join(msg), at_sender=at_sender)
+        # 2560, 1440
+        img = img.crop((700, 100, 2300, 1340))
+    if height > img.height:
+        img = crop_center_img(img, width, height)
+    else:
+        img = img.resize((width, int(width / img.width * img.height)))
+    img = img.filter(ImageFilter.GaussianBlur(radius=10))
+    img = ImageEnhance.Brightness(img).enhance(0.7)
+    return img
 
 
 async def draw_refresh_char_detail_img(
@@ -162,11 +130,22 @@ async def draw_refresh_char_detail_img(
     )
 
     waves_map = {"refresh_update": {}, "refresh_unchanged": {}}
-    waves_datas = await refresh_char(
-        uid, user_id, ck, waves_map=waves_map, is_self_ck=self_ck
-    )
-    if isinstance(waves_datas, str):
-        return waves_datas
+    if ev.command == "面板":
+        all_waves_datas = await get_all_role_detail_info_list(uid)
+        if not all_waves_datas:
+            return "暂无面板数据"
+        waves_map = {
+            "refresh_update": {},
+            "refresh_unchanged": {
+                i.role.roleId: i.model_dump() for i in all_waves_datas
+            },
+        }
+    else:
+        waves_datas = await refresh_char(
+            uid, user_id, ck, waves_map=waves_map, is_self_ck=self_ck
+        )
+        if isinstance(waves_datas, str):
+            return waves_datas
 
     role_detail_list = [
         RoleDetailData(**r)
@@ -181,13 +160,15 @@ async def draw_refresh_char_detail_img(
     shadow_title = "刷新成功!"
     shadow_color = GOLD
     if role_update == 0:
-        await send_notify(bot, ev, user_id, uid, self_ck)
         shadow_title = "数据未更新"
         shadow_color = RED
 
     role_high = role_len // 6 + (0 if role_len % 6 == 0 else 1)
-    img = get_waves_bg(2000, 470 + 50 + role_high * 330, "bg3")
-    img.alpha_composite(get_refresh_role_img(), (0, 0))
+    height = 470 + 50 + role_high * 330
+    width = 2000
+    # img = get_waves_bg(width, height, "bg3")
+    img = Image.new("RGBA", (width, height))
+    img.alpha_composite(await get_refresh_role_img(width, height), (0, 0))
 
     # 提示文案
     title = f"共刷新{role_update}个角色，可以使用"
@@ -295,8 +276,22 @@ async def draw_refresh_char_detail_img(
         offset=(2, 2),
         anchor="mm",
     )
-    img.paste(refresh_bar, (0, 300), refresh_bar)
+    draw_text_with_shadow(
+        refresh_bar_draw,
+        "登录状态:",
+        1700,
+        20,
+        waves_font_40,
+        shadow_color=GOLD,
+        offset=(2, 2),
+        anchor="mm",
+    )
+    if self_ck:
+        refresh_bar.alpha_composite(refresh_yes.resize((60, 60)), (1800, -8))
+    else:
+        refresh_bar.alpha_composite(refresh_no.resize((60, 60)), (1800, -8))
 
+    img.paste(refresh_bar, (0, 300), refresh_bar)
     img = add_footer(img)
     img = await convert_img(img)
     set_cache_refresh_card(user_id, uid)

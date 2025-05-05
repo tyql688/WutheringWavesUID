@@ -103,11 +103,6 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     "AnnMinuteCheck": GsIntConfig(
         "公告推送时间检测（单位min）", "公告推送时间检测（单位min）", 10, 60
     ),
-    "RefreshNotify": GsBoolConfig(
-        "刷新面板通知文案",
-        "刷新面板通知文案",
-        True,
-    ),
     "RefreshInterval": GsIntConfig(
         "刷新面板间隔，重启生效（单位秒）",
         "刷新面板间隔，重启生效（单位秒）",
