@@ -121,17 +121,17 @@ async def draw_slash_use_rate(ev: Event):
     for index, i in enumerate(show_data):
         rates: List[Dict] = i["rates"]
 
-        slash_name_bg = Image.open(TEXT_PATH / f"difficulty_2.png")
+        slash_name_bg = Image.open(TEXT_PATH / "difficulty_2.png")
         slash_name_bg_draw = ImageDraw.Draw(slash_name_bg)
         if len(show_data) == 1:
             text = "无尽湍渊 - 总数据"
         else:
-            text = f"无尽湍渊 - 上半" if index == 0 else f"无尽湍渊 -下半"
+            text = "无尽湍渊 - 上半" if index == 0 else "无尽湍渊 -下半"
 
         if filter_type == "1":
-            text = f"无尽湍渊 - 上半"
+            text = "无尽湍渊 - 上半"
         elif filter_type == "2":
-            text = f"无尽湍渊 - 下半"
+            text = "无尽湍渊 - 下半"
 
         slash_name_bg_draw.text(
             (140, 60),

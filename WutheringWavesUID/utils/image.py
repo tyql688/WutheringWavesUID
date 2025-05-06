@@ -104,6 +104,11 @@ async def get_random_share_bg():
     return Image.open(f"{SHARE_BG_PATH}/{path}").convert("RGBA")
 
 
+async def get_random_share_bg_path():
+    path = random.choice(os.listdir(f"{SHARE_BG_PATH}"))
+    return SHARE_BG_PATH / path
+
+
 async def get_random_waves_role_pile(char_id: Optional[str] = None):
     if char_id:
         return await get_role_pile_old(char_id, custom=True)
