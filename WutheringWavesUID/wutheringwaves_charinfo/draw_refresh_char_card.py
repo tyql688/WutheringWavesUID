@@ -35,6 +35,7 @@ from ..utils.image import (
     get_event_avatar,
     get_random_share_bg_path,
     get_square_avatar,
+    get_star_bg,
 )
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NAME_ALIAS, SPECIAL_CHAR_NAME
@@ -102,7 +103,7 @@ async def get_refresh_role_img(width: int, height: int):
     else:
         img = img.resize((width, int(width / img.width * img.height)))
     img = img.filter(ImageFilter.GaussianBlur(radius=10))
-    img = ImageEnhance.Brightness(img).enhance(0.7)
+    img = ImageEnhance.Brightness(img).enhance(0.4)
     return img
 
 
@@ -316,6 +317,14 @@ async def draw_pic(char_rank: WavesCharRank, isUpdate=False):
     img = refresh_char_bg.copy()
     img_draw = ImageDraw.Draw(img)
     img.alpha_composite(resize_pic, (50, 50))
+    star_bg = await get_star_bg(char_rank.starLevel)
+    star_bg = star_bg.resize((220, 220))
+    img.alpha_composite(star_bg, (40, 30))
+
+    # 遮罩
+    mask = Image.new("RGBA", (220, 70), color=(0, 0, 0, 128))
+    img.alpha_composite(mask, (40, 255))
+
     # 名字
     roleName = SPECIAL_CHAR_NAME.get(str(char_rank.roleId), char_rank.roleName)
 
