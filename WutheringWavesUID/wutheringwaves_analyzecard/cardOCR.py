@@ -587,6 +587,9 @@ async def which_char(bot: Bot, ev: Event, char: str):
             candidates.append((char_id, info))
     logger.debug(f"[鸣潮][dc卡片识别] 角色匹配结果：{candidates}")
 
+    if len(candidates) == 0:  # 无匹配
+        return char, None
+
     if len(candidates) == 1:  # 唯一匹配
         char_id, info = candidates[0]
         return info["name"], char_id
