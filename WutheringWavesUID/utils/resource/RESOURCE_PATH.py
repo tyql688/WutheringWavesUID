@@ -48,6 +48,7 @@ CUSTOM_MR_CARD_PATH = MAIN_PATH / "custom_mr_role_pile"
 OTHER_PATH = MAIN_PATH / "other"
 CALENDAR_PATH = OTHER_PATH / "calendar"
 SLASH_PATH = OTHER_PATH / "slash"
+CHALLENGE_PATH = OTHER_PATH / "challenge"
 
 
 # 别名

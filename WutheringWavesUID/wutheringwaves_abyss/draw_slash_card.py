@@ -4,7 +4,6 @@ from typing import Union
 from PIL import Image, ImageDraw
 
 from gsuid_core.models import Event
-from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
@@ -35,6 +34,7 @@ from ..utils.image import (
     get_event_avatar,
     get_square_avatar,
     get_waves_bg,
+    pic_download_from_url,
 )
 from ..utils.queues.const import QUEUE_SLASH_RECORD
 from ..utils.queues.queues import put_item
@@ -172,7 +172,12 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     info_h = 300
     CHALLENGE_SPACING = 30
 
-    h = footer_h + card_h + (info_h + title_h + CHALLENGE_SPACING) * len(query_challenge_ids) - CHALLENGE_SPACING
+    h = (
+        footer_h
+        + card_h
+        + (info_h + title_h + CHALLENGE_SPACING) * len(query_challenge_ids)
+        - CHALLENGE_SPACING
+    )
     card_img = get_waves_bg(1100, h, "bg9")
 
     # 绘制个人信息
@@ -278,7 +283,7 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                     GOLD,
                     waves_font_25,
                 )
-                team_pic = await get_slash_pic(difficulty.teamIcon)
+                team_pic = await pic_download_from_url(SLASH_PATH, difficulty.teamIcon)
                 role_hang_bg.alpha_composite(team_pic, (30, 35))
 
                 # buff
@@ -294,7 +299,7 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                     [0, 95, 100, 100],
                     fill=buff_color,
                 )
-                buff_pic = await get_slash_pic(slash_half.buffIcon)
+                buff_pic = await pic_download_from_url(SLASH_PATH, slash_half.buffIcon)
                 buff_pic = buff_pic.resize((100, 100))
                 buff_bg.paste(buff_pic, (0, 0), buff_pic)
 
@@ -350,7 +355,9 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
             temp_img.paste(title_bar, (0, 0), title_bar)
             temp_img.paste(role_bg, (0, title_h), role_bg)
             card_img.paste(
-                temp_img, (50, card_h + index * (info_h + title_h + CHALLENGE_SPACING)), temp_img
+                temp_img,
+                (50, card_h + index * (info_h + title_h + CHALLENGE_SPACING)),
+                temp_img,
             )
             index += 1
 
@@ -382,18 +389,6 @@ async def draw_pic(roleId):
     img.paste(resize_pic, (22, 18), mask)
 
     return img
-
-
-async def get_slash_pic(pic_url: str) -> Image.Image:
-    _dir = SLASH_PATH
-    _dir.mkdir(parents=True, exist_ok=True)
-
-    name = pic_url.split("/")[-1]
-    _path = _dir / name
-    if not _path.exists():
-        await download(pic_url, _dir, name, tag="[鸣潮]")
-
-    return Image.open(_path).convert("RGBA")
 
 
 async def upload_slash_record(

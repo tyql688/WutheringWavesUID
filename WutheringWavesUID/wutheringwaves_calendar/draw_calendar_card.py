@@ -2,13 +2,11 @@ import asyncio
 import random
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Union
 
 from PIL import Image, ImageDraw
 from PIL.ImageFile import ImageFile
 
 from gsuid_core.models import Event
-from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
@@ -21,6 +19,7 @@ from ..utils.image import (
     add_footer,
     get_square_avatar,
     get_square_weapon,
+    pic_download_from_url,
 )
 from ..utils.resource.RESOURCE_PATH import CALENDAR_PATH
 from .calendar_model import SpecialImages, VersionActivity
@@ -217,7 +216,7 @@ async def draw_calendar_img(ev: Event, uid: str):
             #     BytesIO((await sget(cont.contentUrl)).content)
             # ).convert("RGBA")
             #
-            linkUrl = await get_calendar_pic(cont.contentUrl)
+            linkUrl = await pic_download_from_url(CALENDAR_PATH, cont.contentUrl)
 
         else:
             linkUrl = Image.open(TEXT_PATH / cont.contentUrl)
@@ -241,7 +240,7 @@ async def draw_calendar_gacha(side_module, gacha_type):
     for tab in tabs:
         try:
             special_images = SpecialImages.model_validate(tab)
-        except Exception as e:
+        except Exception as _:
             continue
         res = {
             "title": side_module["title"],
@@ -293,7 +292,7 @@ async def draw_banner(wiki_home, img):
             break
 
     # banner_bg = Image.open(BytesIO((await sget(banner_bg)).content)).convert("RGBA")
-    banner_bg = await get_calendar_pic(banner_bg)
+    banner_bg = await pic_download_from_url(CALENDAR_PATH, banner_bg)
 
     banner_bg = banner_bg.resize((1200, 675))  # type: ignore
     banner_mask = Image.open(TEXT_PATH / "banner_mask.png")
@@ -383,18 +382,6 @@ def get_date_range(dateRange, now):
         status = "未开始"
 
     return status, left, color
-
-
-async def get_calendar_pic(pic_url: str) -> Union[Image.Image, str, None]:
-    _dir = CALENDAR_PATH
-    _dir.mkdir(parents=True, exist_ok=True)
-
-    name = pic_url.split("/")[-1]
-    _path = _dir / name
-    if not _path.exists():
-        await download(pic_url, _dir, name, tag="[鸣潮]")
-
-    return Image.open(_path).convert("RGBA")
 
 
 cache = {}

@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Union, Literal, Optional
+from typing import Dict, List, Literal, Optional, Union
 
-from pydantic import Field, BaseModel, RootModel
 from msgspec import UNSET, Struct, UnsetType, field
+from pydantic import BaseModel, Field, RootModel, model_validator
 
 
 class GeneralGeetestData(Struct):
@@ -335,32 +335,46 @@ class AbyssChallenge(BaseModel):
 
 
 class ChallengeRole(BaseModel):
-    roleName: Optional[str]
-    roleHeadIcon: Optional[str]
-    roleLevel: Optional[int]
-    natureId: Optional[int]
-    natureIcon: Optional[Any] = None
+    roleName: str
+    roleHeadIcon: str
+    roleLevel: int
 
 
 class Challenge(BaseModel):
-    bossId: Optional[Any] = None
-    challengeId: Optional[int] = None
-    bossHeadIcon: Optional[str] = None
-    bossIconUrl: Optional[str] = None
-    bossLevel: Optional[int] = None
-    bossName: Optional[str] = None
-    passTime: Optional[int] = None
-    difficulty: Optional[int] = None
+    challengeId: int
+    bossHeadIcon: str
+    bossIconUrl: str
+    bossLevel: int
+    bossName: str
+    passTime: int
+    difficulty: int
     roles: Optional[List[ChallengeRole]] = None
 
 
 class ChallengeArea(BaseModel):
-    areaId: Optional[Any] = None
-    areaName: Optional[Any] = None
-    challengeInfo: Optional[Dict[str, List[Challenge]]] = None
-    open: bool
-    wikiUrl: Optional[Any] = None
-    isUnlock: bool
+    challengeInfo: Dict[str, List[Challenge]]
+    open: bool = False
+    isUnlock: bool = False
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_depending_on_unlock(cls, data):
+        """根据 isUnlock 状态预处理数据"""
+        if isinstance(data, dict):
+            if not data.get("isUnlock", False):
+                # 创建一个新的数据字典，只保留基本字段
+                new_data = {"isUnlock": False, "open": data.get("open", False)}
+
+                # 将 areaId 和 areaName 设置为 None
+                new_data["areaId"] = None
+                new_data["areaName"] = None
+
+                # 创建一个空的 challengeInfo 字典
+                new_data["challengeInfo"] = {}
+
+                return new_data
+
+        return data
 
 
 class ExploreItem(BaseModel):
