@@ -441,3 +441,19 @@ async def draw_avatar_with_star(
 
 async def get_star_bg(star_level: int = 5) -> Image.Image:
     return Image.open(TEXT_PATH / f"star_{star_level}.png")
+
+
+async def pic_download_from_url(
+    path: Path,
+    pic_url: str,
+) -> Image.Image:
+    path.mkdir(parents=True, exist_ok=True)
+
+    name = pic_url.split("/")[-1]
+    _path = path / name
+    if not _path.exists():
+        from gsuid_core.utils.download_resource.download_file import download
+
+        await download(pic_url, path, name, tag="[鸣潮]")
+
+    return Image.open(_path).convert("RGBA")
