@@ -1,25 +1,25 @@
+import asyncio
+import base64
 import copy
 import json
-import base64
-import asyncio
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple, Union, Optional
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
 
-import msgspec
 import aiofiles
-from gsuid_core.models import Event
-from gsuid_core.logger import logger
+import msgspec
 
-from .model import WWUIDGacha
-from ..utils.hint import error_reply
+from gsuid_core.logger import logger
+from gsuid_core.models import Event
+
 from ..utils.api.model import GachaLog
-from ..utils.waves_api import waves_api
-from ..wutheringwaves_config import PREFIX
 from ..utils.database.models import WavesUser
-from ..version import WutheringWavesUID_version
-from .model_for_waves_plugin import WavesPluginGacha
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
+from ..utils.waves_api import waves_api
+from ..version import WutheringWavesUID_version
+from ..wutheringwaves_config import PREFIX
+from .model import WWUIDGacha
+from .model_for_waves_plugin import WavesPluginGacha
 
 gacha_type_meta_data = {
     "角色精准调谐": "1",
@@ -42,6 +42,8 @@ gachalogs_history_meta = {
     "新手自选唤取": [],
     "新手自选唤取（感恩定向唤取）": [],
 }
+
+ERROR_MSG_INVALID_LINK = "当前抽卡链接已经失效，请重新导入抽卡链接"
 
 
 def find_length(A, B) -> int:
@@ -105,7 +107,7 @@ def merge_gacha_logs_by_common_subarray(
 
 async def get_new_gachalog(
     uid: str, record_id: str, full_data: Dict[str, List[GachaLog]], is_force: bool
-) -> tuple[Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]]:
+) -> tuple[Union[str, None], Dict[str, List[GachaLog]], Dict[str, int]]:
     new = {}
     new_count = {}
     for gacha_name, card_pool_type in gacha_type_meta_data.items():
@@ -115,7 +117,11 @@ async def get_new_gachalog(
             or res.get("code") != 0
             or res.get("data", None) is None
         ):
-            continue
+            # 抽卡记录获取失败
+            if res.get("code") == -1:  # type: ignore
+                return ERROR_MSG_INVALID_LINK, None, None  # type: ignore
+            else:
+                continue
 
         gacha_log = [GachaLog(**log) for log in res["data"]]
         for log in gacha_log:
@@ -133,7 +139,7 @@ async def get_new_gachalog(
 async def get_new_gachalog_for_file(
     full_data: Dict[str, List[GachaLog]],
     import_data: Dict[str, List[GachaLog]],
-) -> tuple[Union[int, None], Dict[str, List[GachaLog]], Dict[str, int]]:
+) -> tuple[Union[str, None], Dict[str, List[GachaLog]], Dict[str, int]]:
     new = {}
     new_count = {}
 
@@ -227,8 +233,8 @@ async def save_gachalogs(
             gachalogs_history, import_data  # type: ignore
         )
 
-    if isinstance(code, int) or not gachalogs_new:
-        return "获取抽卡记录失败，请检测链接是否有效"
+    if isinstance(code, str) or not gachalogs_new:
+        return code or ERROR_MSG_INVALID_LINK
 
     if record_id:
         await save_record_id(ev.user_id, ev.bot_id, uid, record_id)

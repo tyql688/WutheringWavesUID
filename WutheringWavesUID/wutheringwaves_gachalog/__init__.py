@@ -1,24 +1,14 @@
-import asyncio
 import re
 from typing import Any, List
 
-from async_timeout import timeout
-
 from gsuid_core.bot import Bot
-from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.segment import MessageSegment
 from gsuid_core.sv import SV
 
 from ..utils.button import WavesButton
-from ..utils.database.models import WavesBind, WavesUser
-from ..utils.error_reply import (
-    ERROR_CODE,
-    WAVES_CODE_103,
-    WAVES_CODE_104,
-    WAVES_CODE_105,
-)
-from ..utils.hint import error_reply
+from ..utils.database.models import WavesBind
+from ..utils.error_reply import ERROR_CODE, WAVES_CODE_103
 from ..wutheringwaves_config import PREFIX
 from .draw_gachalogs import draw_card, draw_card_help
 from .get_gachalogs import export_gachalogs, import_gachalogs, save_gachalogs
@@ -28,6 +18,8 @@ sv_gacha_help_log = SV("waves抽卡记录帮助")
 sv_get_gachalog_by_link = SV("waves导入抽卡链接", area="DIRECT")
 sv_import_gacha_log = SV("waves导入抽卡记录", area="DIRECT")
 sv_export_json_gacha_log = SV("waves导出抽卡记录")
+
+ERROR_MSG_NOTIFY = f"请给出正确的抽卡记录链接, 请重新发送【{PREFIX}导入抽卡链接 链接】"
 
 
 @sv_get_gachalog_by_link.on_command(("导入抽卡链接", "导入抽卡记录"))
@@ -40,17 +32,7 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
 
     raw = ev.text.strip()
     if not raw:
-        try:
-            at_sender = True if ev.group_id else False
-            await bot.send("请于30s内给出正确的抽卡记录链接", at_sender)
-            async with timeout(30):
-                while True:
-                    resp = await bot.receive_resp(timeout=30)
-                    if resp is not None:
-                        raw = resp.text
-                        break
-        except asyncio.TimeoutError:
-            await bot.send(f"时间到！请重新发送 {PREFIX}导入抽卡链接", at_sender)
+        return await bot.send(ERROR_MSG_NOTIFY)
 
     text = re.sub(r'["\n\t ]+', "", raw)
     if "https://" in text:
@@ -72,15 +54,11 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
     player_id = match_player_id.group(1) if match_player_id else None
 
     if not record_id or len(record_id) != 32:
-        return await bot.send(
-            f"请给出正确的抽卡记录链接, 请重新发送 {PREFIX}导入抽卡链接"
-        )
+        return await bot.send(ERROR_MSG_NOTIFY)
 
     if player_id and player_id != uid:
-        logger.info(
-            f"[鸣潮]用户：{ev.user_id} 当前抽卡链接与当前绑定的UID不匹配 player_id:{player_id} uid:{uid}"
-        )
-        return await bot.send(error_reply(WAVES_CODE_104))
+        ERROR_MSG = f"请保证抽卡链接的特征码与当前正在使用的特征码一致\n\n请使用以下命令核查:\n{PREFIX}查看\n{PREFIX}切换{player_id}"
+        return await bot.send(ERROR_MSG)
 
     is_force = False
     if ev.command.startswith("强制"):
@@ -93,23 +71,6 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
         await bot.send_option(im, buttons)
     else:
         await bot.send(im)
-
-
-@sv_gacha_log.on_fullmatch(
-    ("刷新抽卡记录", "更新抽卡记录"),
-)
-async def send_refresh_gachalog_msg(bot: Bot, ev: Event):
-    uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
-    if not uid:
-        return await bot.send(ERROR_CODE[WAVES_CODE_103])
-
-    user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, "uid", uid)
-    if not user or not user.record_id:
-        return await bot.send(ERROR_CODE[WAVES_CODE_105])
-
-    await bot.send(f"开始刷新{uid}抽卡记录，需要一定时间，请勿重复执行.....")
-    im = await save_gachalogs(ev, uid, user.record_id)
-    return await bot.send(im)
 
 
 @sv_gacha_log.on_fullmatch("抽卡记录")
