@@ -76,9 +76,9 @@ def get_level_from_list(ast: int, lst: List) -> int:
 async def draw_card_help():
     warn =  "\n".join(
         [
-            "【注意】",
-            "△请确保您的抽卡记录是【简体中文】，暂不支持其他语言△",
-            "△导入链接前请在浏览器打开抽卡记录链接，并检查是否有数据△",
+            "导入前请检查：",
+            "1.确保您的抽卡记录是【简体中文】，暂不支持其他语言",
+            "2.导入链接前请在浏览器打开抽卡记录链接，并检查是否有记录",
             "\n",
         ]
     )
@@ -112,7 +112,7 @@ async def draw_card_help():
             "3.找到文件`Client.log`并用记事本打开",
             "4.搜索关键字：",
             "国服域名：[aki-gm-resources.aki-game]",
-            "国际服域名：[aki-gm-resources-oversea.aki-game]"
+            "国际服域名：[aki-gm-resources-oversea.aki-game]",
             "5.复制一整行链接",
             "\n",
         ]
