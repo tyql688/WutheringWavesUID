@@ -415,3 +415,29 @@ async def compress_to_webp(
     except Exception as e:
         logger.error(f"压缩图片为webp格式失败: {e}")
         return False, image_path
+
+
+async def draw_avatar_with_star(
+    avatar: Image.Image,
+    star_level: int = 5,
+    need_text: bool = True,
+    img_color: float | tuple[float, ...] | str | None = (0, 0, 0, 255),
+    item_width: int = 144,
+    item_height: int = 170,
+) -> Image.Image:
+    if need_text:
+        img = Image.new("RGBA", (item_width, item_height), img_color)
+    else:
+        img = Image.new("RGBA", (item_width, item_width), img_color)
+
+    # 144*144
+    star_bg = Image.open(TEXT_PATH / f"star_{star_level}.png")
+    avatar = avatar.resize((item_width, item_width))
+
+    img.alpha_composite(avatar, (0, 0))
+    img.alpha_composite(star_bg, (0, 0))
+    return img
+
+
+async def get_star_bg(star_level: int = 5) -> Image.Image:
+    return Image.open(TEXT_PATH / f"star_{star_level}.png")
