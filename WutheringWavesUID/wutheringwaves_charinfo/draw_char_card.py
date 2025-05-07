@@ -68,6 +68,7 @@ from ..utils.image import (
     get_attribute,
     get_attribute_effect,
     get_attribute_prop,
+    get_custom_gaussian_blur,
     get_event_avatar,
     get_role_pile,
     get_small_logo,
@@ -91,7 +92,10 @@ from ..utils.resource.download_file import (
 )
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
-from ..wutheringwaves_config.wutheringwaves_config import WutheringWavesConfig
+from ..wutheringwaves_config.wutheringwaves_config import (
+    ShowConfig,
+    WutheringWavesConfig,
+)
 from .role_info_change import change_role_detail
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -198,9 +202,7 @@ def parse_text_and_number(text):
 
 async def ph_card_draw(
     ph_sum_value,
-    jineng_len,
     role_detail: RoleDetailData,
-    img,
     is_draw=True,
     change_command="",
     enemy_detail: Optional[EnemyDetailData] = None,
@@ -392,8 +394,8 @@ async def ph_card_draw(
                 (50, 90), f"{change_command}", SPECIAL_GOLD, waves_font_18, "lm"
             )
 
-    img.paste(phantom_temp, (0, 1320 + jineng_len), phantom_temp)
-    return calc
+    # img.paste(phantom_temp, (0, 1320 + jineng_len), phantom_temp)
+    return calc, phantom_temp
 
 
 async def get_role_need(
@@ -713,12 +715,102 @@ async def draw_char_detail_img(
             if oneRank and len(oneRank.data) > 0:
                 dd_len += 60 * 2
 
+    # 声骸
+    calc, phantom_temp = await ph_card_draw(
+        ph_sum_value, role_detail, isDraw, change_command, enemy_detail
+    )
+    calc.role_card = calc.enhance_summation_card_value(calc.phantom_card)
+
+    damage_calc_img = None
+    if (
+        damage_calc
+        and damageDetail
+        and role_detail.phantomData
+        and role_detail.phantomData.equipPhantomList
+    ):
+        damage_title = damage_calc["title"]
+        # damageAttribute = card_sort_map_to_attribute(card_map)
+        calc.damageAttribute = calc.card_sort_map_to_attribute(calc.role_card)
+        damageAttributeTemp = copy.deepcopy(calc.damageAttribute)
+        crit_damage, expected_damage = damage_calc["func"](
+            damageAttributeTemp, role_detail
+        )
+        logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
+        logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
+        logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
+
+        damage_high = 100 + (len(damageAttributeTemp.effect) + 3) * 60
+        damage_calc_img = Image.new("RGBA", (1200, damage_high))
+
+        damage_title_bg = damage_bar1.copy()
+        damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
+        damage_title_bg_draw.text(
+            (400, 50), "伤害类型", SPECIAL_GOLD, waves_font_24, "rm"
+        )
+        damage_title_bg_draw.text(
+            (700, 50), "暴击伤害", SPECIAL_GOLD, waves_font_24, "mm"
+        )
+        damage_title_bg_draw.text(
+            (1000, 50), "期望伤害", SPECIAL_GOLD, waves_font_24, "mm"
+        )
+        damage_calc_img.alpha_composite(damage_title_bg, dest=(0, 10))
+
+        damage_bar = damage_bar2.copy()
+        damage_bar_draw = ImageDraw.Draw(damage_bar)
+        damage_bar_draw.text((400, 50), f"{damage_title}", "white", waves_font_24, "rm")
+        if crit_damage and expected_damage:
+            damage_bar_draw.text(
+                (700, 50), f"{crit_damage}", "white", waves_font_24, "mm"
+            )
+            damage_bar_draw.text(
+                (1000, 50), f"{expected_damage}", "white", waves_font_24, "mm"
+            )
+        else:
+            damage_bar_draw.text(
+                (850, 50), f"{expected_damage}", "white", waves_font_24, "mm"
+            )
+        damage_calc_img.alpha_composite(damage_bar, dest=(0, 70))
+
+        damage_title_bg = damage_bar1.copy()
+        damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
+        damage_title_bg_draw.text((600, 50), "buff列表", "white", waves_font_24, "mm")
+        damage_calc_img.alpha_composite(damage_title_bg, dest=(0, 130))
+
+        for dindex, effect in enumerate(damageAttributeTemp.effect):
+            buff_name = effect.element_msg
+            buff_value = effect.element_value
+            damage_bar = damage_bar2.copy() if dindex % 2 == 0 else damage_bar1.copy()
+            damage_bar_draw = ImageDraw.Draw(damage_bar)
+            damage_bar_draw.text(
+                (400, 50), f"{buff_name}", "white", waves_font_24, "rm"
+            )
+            damage_bar_draw.text(
+                (800, 50), f"{buff_value}", "white", waves_font_24, "mm"
+            )
+            damage_calc_img.alpha_composite(
+                damage_bar, dest=(0, 10 + (dindex + 3) * 60)
+            )
+
+        dd_len += damage_calc_img.size[1]
+        # new_img = await get_card_bg(1200, img.size[1] + damage_calc_img.size[1], "bg3")
+        # new_img.paste(img, (0, 0), img)
+        # new_img.alpha_composite(damage_calc_img, (0, img.size[1]))
+        # img = new_img
+
     # 创建背景
-    img = get_waves_bg(
+    img = await get_card_bg(
         1200, 1250 + echo_list + ph_sum_value + jineng_len + dd_len, "bg3"
     )
     # 固定位置
     await draw_fixed_img(img, avatar, account_info, role_detail)
+
+    # 声骸
+    img.paste(phantom_temp, (0, 1320 + jineng_len), phantom_temp)
+
+    if damage_calc_img:
+        img.alpha_composite(
+            damage_calc_img, (0, img.size[1] - 50 - damage_calc_img.size[1])
+        )
 
     # 右侧属性
     right_image_temp = Image.new("RGBA", (600, 1100))
@@ -818,12 +910,6 @@ async def draw_char_detail_img(
         mz_temp.alpha_composite(mz_bg_temp, dest=(i * 190, 0))
 
     img.paste(mz_temp, (0, 1080 + jineng_len), mz_temp)
-
-    # 声骸
-    calc: WuWaCalc = await ph_card_draw(
-        ph_sum_value, jineng_len, role_detail, img, isDraw, change_command, enemy_detail
-    )
-    calc.role_card = calc.enhance_summation_card_value(calc.phantom_card)
 
     if (
         isDraw
@@ -986,79 +1072,6 @@ async def draw_char_detail_img(
         temp_i += 1
     img.alpha_composite(skill_bar, dest=(0, 1150))
 
-    if (
-        damage_calc
-        and damageDetail
-        and role_detail.phantomData
-        and role_detail.phantomData.equipPhantomList
-    ):
-        damage_title = damage_calc["title"]
-        # damageAttribute = card_sort_map_to_attribute(card_map)
-        calc.damageAttribute = calc.card_sort_map_to_attribute(calc.role_card)
-        damageAttributeTemp = copy.deepcopy(calc.damageAttribute)
-        crit_damage, expected_damage = damage_calc["func"](
-            damageAttributeTemp, role_detail
-        )
-        logger.debug(f"{char_name}-{damage_title} 暴击伤害: {crit_damage}")
-        logger.debug(f"{char_name}-{damage_title} 期望伤害: {expected_damage}")
-        logger.debug(f"{char_name}-{damage_title} 属性值: {damageAttributeTemp}")
-
-        damage_high = 100 + (len(damageAttributeTemp.effect) + 3) * 60
-        damage_img = Image.new("RGBA", (1200, damage_high))
-
-        damage_title_bg = damage_bar1.copy()
-        damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
-        damage_title_bg_draw.text(
-            (400, 50), "伤害类型", SPECIAL_GOLD, waves_font_24, "rm"
-        )
-        damage_title_bg_draw.text(
-            (700, 50), "暴击伤害", SPECIAL_GOLD, waves_font_24, "mm"
-        )
-        damage_title_bg_draw.text(
-            (1000, 50), "期望伤害", SPECIAL_GOLD, waves_font_24, "mm"
-        )
-        damage_img.alpha_composite(damage_title_bg, dest=(0, 10))
-
-        damage_bar = damage_bar2.copy()
-        damage_bar_draw = ImageDraw.Draw(damage_bar)
-        damage_title = damage_calc["title"]
-        damage_bar_draw.text((400, 50), f"{damage_title}", "white", waves_font_24, "rm")
-        if crit_damage and expected_damage:
-            damage_bar_draw.text(
-                (700, 50), f"{crit_damage}", "white", waves_font_24, "mm"
-            )
-            damage_bar_draw.text(
-                (1000, 50), f"{expected_damage}", "white", waves_font_24, "mm"
-            )
-        else:
-            damage_bar_draw.text(
-                (850, 50), f"{expected_damage}", "white", waves_font_24, "mm"
-            )
-        damage_img.alpha_composite(damage_bar, dest=(0, 70))
-
-        damage_title_bg = damage_bar1.copy()
-        damage_title_bg_draw = ImageDraw.Draw(damage_title_bg)
-        damage_title_bg_draw.text((600, 50), "buff列表", "white", waves_font_24, "mm")
-        damage_img.alpha_composite(damage_title_bg, dest=(0, 130))
-
-        for dindex, effect in enumerate(damageAttributeTemp.effect):
-            buff_name = effect.element_msg
-            buff_value = effect.element_value
-            damage_bar = damage_bar2.copy() if dindex % 2 == 0 else damage_bar1.copy()
-            damage_bar_draw = ImageDraw.Draw(damage_bar)
-            damage_bar_draw.text(
-                (400, 50), f"{buff_name}", "white", waves_font_24, "rm"
-            )
-            damage_bar_draw.text(
-                (800, 50), f"{buff_value}", "white", waves_font_24, "mm"
-            )
-            damage_img.alpha_composite(damage_bar, dest=(0, 10 + (dindex + 3) * 60))
-
-        new_img = get_waves_bg(1200, img.size[1] + damage_img.size[1], "bg3")
-        new_img.paste(img, (0, 0), img)
-        new_img.alpha_composite(damage_img, (0, img.size[1]))
-        img = new_img
-
     img = add_footer(img)
     if need_convert_img:
         img = await convert_img(img)
@@ -1093,7 +1106,7 @@ async def draw_char_score_img(
         return role_detail
 
     # 创建背景
-    img = get_waves_bg(1200, 3380, "bg3")
+    img = await get_card_bg(1200, 3380, "bg3")
     # 固定位置
     await draw_fixed_img(img, avatar, account_info, role_detail)
 
@@ -1514,3 +1527,22 @@ async def generate_online_role_detail(char_id: str):
     char_template_data["phantomData"] = {"cost": 0, "equipPhantomList": None}
 
     return RoleDetailData.model_validate(char_template_data)
+
+
+async def get_card_bg(
+    w: int,
+    h: int,
+    bg: str = "bg",
+):
+    img: Optional[Image.Image] = None
+    if ShowConfig.get_config("CardBg").data:
+        bg_path = Path(ShowConfig.get_config("CardBgPath").data)
+        if bg_path.exists():
+            img = Image.open(bg_path).convert("RGBA")
+            img = crop_center_img(img, w, h)
+
+    if not img:
+        img = get_waves_bg(w, h, bg)
+
+    img = await get_custom_gaussian_blur(img)
+    return img
