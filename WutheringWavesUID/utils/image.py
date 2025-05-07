@@ -4,7 +4,14 @@ from io import BytesIO
 from pathlib import Path
 from typing import Literal, Optional, Tuple, Union
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import (
+    Image,
+    ImageDraw,
+    ImageEnhance,
+    ImageFilter,
+    ImageFont,
+    ImageOps,
+)
 
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
@@ -457,3 +464,28 @@ async def pic_download_from_url(
         await download(pic_url, path, name, tag="[鸣潮]")
 
     return Image.open(_path).convert("RGBA")
+
+
+async def get_custom_gaussian_blur(img: Image.Image) -> Image.Image:
+    from ..wutheringwaves_config.wutheringwaves_config import ShowConfig
+
+    radius = ShowConfig.get_config("BlurRadius").data
+    if radius > 0:
+        # 应用高斯模糊
+        img = img.filter(ImageFilter.GaussianBlur(radius=radius))
+        # 调整亮度和对比度
+        brightness = ShowConfig.get_config("BlurBrightness").data
+        try:
+            brightness = float(brightness)
+        except Exception:
+            brightness = 1
+        contrast = ShowConfig.get_config("BlurContrast").data
+        try:
+            contrast = float(contrast)
+        except Exception:
+            contrast = 1
+
+        img = ImageEnhance.Brightness(img).enhance(brightness)
+        # 调整对比度
+        img = ImageEnhance.Contrast(img).enhance(contrast)
+    return img

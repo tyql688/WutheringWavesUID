@@ -43,6 +43,7 @@ waves_compress_card = SV("waves面板图压缩", priority=5, pm=1)
         "面包刷新",
         "面板更新",
         "面板",
+        "面包",
     ),
     block=True,
 )
