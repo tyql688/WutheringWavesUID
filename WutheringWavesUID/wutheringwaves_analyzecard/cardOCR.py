@@ -500,6 +500,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
             line_clean = re.sub(r'[^\u4e00-\u9fa50-9\s]', '', line)  # 先删除非数字中英文的符号, 匹配“源能臂铠·测肆”
             line_clean = re.sub(r'\s+', ' ', line_clean).strip()  # 再合并多余空白
             if patterns["name"].search(line_clean):
+                line_clean = re.sub(r'.*古洑流$', '千古洑流', line_clean)
                 final_result["武器信息"]["武器名"] = cc.convert(line_clean)
                 break
                 
