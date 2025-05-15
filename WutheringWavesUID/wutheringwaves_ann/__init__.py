@@ -33,7 +33,7 @@ async def ann_(bot: Bot, ev: Event):
         raise Exception("公告ID不正确")
 
     img = await ann_detail_card(int(ann_id))
-    await bot.send(img)
+    return await bot.send(img)  # type: ignore
 
 
 @sv_ann_sub.on_fullmatch("订阅公告")
@@ -118,7 +118,8 @@ async def check_waves_ann_state():
         return
 
     logger.info("[鸣潮公告] 更新数据库")
-    WutheringWavesConfig.set_config("WavesAnnNewIds", new_ids)
+    save_ids = sorted(list(set(new_ids) | set(ids)), reverse=True)[:30]
+    WutheringWavesConfig.set_config("WavesAnnNewIds", save_ids)
 
     for ann_id in new_ann:
         try:
@@ -126,7 +127,7 @@ async def check_waves_ann_state():
             if isinstance(img, str):
                 continue
             for subscribe in datas:
-                await subscribe.send(img)
+                await subscribe.send(img)  # type: ignore
                 await asyncio.sleep(random.uniform(1, 3))
         except Exception as e:
             logger.exception(e)
