@@ -67,7 +67,10 @@ async def all_check(
                 MessageSegment.text("✅[鸣潮] 推送提醒:\n"),
                 MessageSegment.text(notice),
                 MessageSegment.text(
-                    f"\n📅清完体力请使用[{PREFIX}每日]来更新推送时间！\n"
+                    f"\n🕒当前体力阈值：{push_data[f'{mode}_value']}！\n"
+                ),
+                MessageSegment.text(
+                    f"\n📅请清完体力后使用[{PREFIX}每日]来更新推送时间！\n"
                 ),
             ]
 

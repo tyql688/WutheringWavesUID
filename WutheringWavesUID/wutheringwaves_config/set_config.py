@@ -4,6 +4,7 @@ from gsuid_core.subscribe import gs_subscribe
 
 from ..utils.database.models import WavesPush, WavesUser
 from datetime import datetime
+import time
 
 PUSH_MAP = {
     "体力": "resin",
@@ -118,6 +119,11 @@ async def set_config_func(ev: Event, uid: str = "0"):
             **{
                 f"{PUSH_MAP[config_name.replace('推送', '')]}_push": option,
             },
+        )
+        timestamp = time.time()
+        time_push = datetime.fromtimestamp(int(timestamp))
+        await WavesPush.update_data_by_uid(
+            uid=uid, bot_id=ev.bot_id, **{f"{PUSH_MAP['时间']}_value": time_push}
         )
         if option == "off":
             await gs_subscribe.delete_subscribe("single", task_name_resin, ev)
