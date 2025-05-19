@@ -386,7 +386,7 @@ class WavesApi:
         bat = await self.get_request_token(roleId, token)
         if bat:
             header.update({"b-at": bat})
-            logger.info(f"[{roleId}] 获取到b-at: {bat}")
+            # logger.info(f"[{roleId}] 获取到b-at: {bat}")
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
