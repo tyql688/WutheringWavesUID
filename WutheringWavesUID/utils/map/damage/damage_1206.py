@@ -60,17 +60,11 @@ def calc_damage_1(
 
     # 设置角色技能施放是不是也有加成 eg：守岸人
     if attr.energy_regen > 1.5:
-        # title = f"{role_name}-戏中人生"
-        # atk_flat = int((attr.energy_regen - 1.5) * 1200)
-        # msg = f"每超1%为12点攻击提升，上限为1560，当前提升{atk_flat}"
-        # if atk_flat > 1560:
-        #     atk_flat = 1560
-        # attr.add_atk_flat(atk_flat, title, msg)
         title = f"{role_name}-「我」的人生"
         atk_flat = int((attr.energy_regen - 1.5) * 2000)
-        msg = f"每超1%为20点攻击提升，上限为2600，当前提升{atk_flat}"
         if atk_flat > 2600:
             atk_flat = 2600
+        msg = f"每超1%为20点攻击提升，上限为2600，当前提升{atk_flat}"
         attr.add_atk_flat(atk_flat, title, msg)
 
     # 设置声骸属性
@@ -150,11 +144,11 @@ def calc_damage_2(
 
     # 设置角色技能施放是不是也有加成 eg：守岸人
     if attr.energy_regen > 1.5:
-        title = f"{role_name}-「我」的人生"
-        atk_flat = int((attr.energy_regen - 1.5) * 2000)
-        msg = f"每超1%为20点攻击提升，上限为2600，当前提升{atk_flat}"
-        if atk_flat > 2600:
-            atk_flat = 2600
+        title = f"{role_name}-戏中人生"
+        atk_flat = int((attr.energy_regen - 1.5) * 1200)
+        if atk_flat > 1560:
+            atk_flat = 1560
+        msg = f"每超1%为12点攻击提升，上限为1560，当前提升{atk_flat}"
         attr.add_atk_flat(atk_flat, title, msg)
 
     # 设置声骸属性

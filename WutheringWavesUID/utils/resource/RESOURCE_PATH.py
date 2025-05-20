@@ -39,6 +39,8 @@ JINLINGZI_GUIDE_PATH = GUIDE_PATH / "JinLingZi"
 JIEXING_GUIDE_PATH = GUIDE_PATH / "JieXing"
 # 小羊 攻略库
 XIAOYANG_GUIDE_PATH = GUIDE_PATH / "XiaoYang"
+# 吃我无痕 攻略库
+WUHEN_GUIDE_PATH = GUIDE_PATH / "WuHen"
 
 # 自定义背景图
 CUSTOM_CARD_PATH = MAIN_PATH / "custom_role_pile"
