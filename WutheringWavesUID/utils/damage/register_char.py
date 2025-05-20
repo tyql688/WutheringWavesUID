@@ -1,19 +1,20 @@
-from .damage import DamageAttribute
 from ...utils.damage.abstract import (
     CharAbstract,
     WavesCharRegister,
     WavesWeaponRegister,
 )
+from .damage import DamageAttribute
 from .utils import (
+    CHAR_ATTR_CELESTIAL,
+    CHAR_ATTR_FREEZING,
     CHAR_ATTR_MOLTEN,
     CHAR_ATTR_SINKING,
-    CHAR_ATTR_FREEZING,
-    CHAR_ATTR_CELESTIAL,
-    temp_atk,
-    hit_damage,
-    skill_damage,
+    CHAR_ATTR_VOID,
     attack_damage,
+    hit_damage,
     liberation_damage,
+    skill_damage,
+    temp_atk,
 )
 
 
@@ -231,6 +232,39 @@ class Char_1302(CharAbstract):
     id = 1302
     name = "吟霖"
     starLevel = 5
+
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        if attr.char_template == temp_atk:
+            if chain >= 4:
+                title = "吟霖-四链"
+                msg = "共鸣回路审判之雷命中时，队伍中的角色攻击提升20%"
+                attr.add_atk_percent(0.2, title, msg)
+
+            title = "吟霖-合鸣效果-轻云出月"
+            msg = "使用延奏技能后，下一个登场的共鸣者攻击提升22.5%"
+            attr.add_atk_percent(0.225, title, msg)
+
+        # 无常凶鹭
+        title = "吟霖-声骸技能-无常凶鹭"
+        msg = "施放延奏技能，则可使下一个变奏登场的角色伤害提升12%"
+        attr.add_dmg_bonus(0.12, title, msg)
+
+        # 下一位登场角色导电伤害加深20%，共鸣解放伤害加深25%
+        if attr.char_attr == CHAR_ATTR_VOID:
+            title = "吟霖-延奏技能"
+            msg = "下一位登场角色导电伤害加深20%"
+            attr.add_dmg_deepen(0.2, title, msg)
+
+        if liberation_damage == attr.char_damage:
+            title = "吟霖-延奏技能"
+            msg = "下一位登场角色共鸣解放伤害加深25%"
+            attr.add_dmg_deepen(0.25, title, msg)
 
 
 class Char_1303(CharAbstract):

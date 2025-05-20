@@ -1,4 +1,4 @@
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from ...utils.damage.damage import DamageAttribute
 
@@ -79,6 +79,9 @@ class WeaponAbstract(object):
         if attr.env_spectro:
             func_list.append("env_spectro")
 
+        if attr.env_aero_erosion:
+            func_list.append("env_aero_erosion")
+
         for func_name in func_list:
             method = getattr(self, func_name, None)
             if callable(method):
@@ -129,6 +132,10 @@ class WeaponAbstract(object):
 
     def env_spectro(self, attr: DamageAttribute, isGroup: bool = False):
         """光噪效应"""
+        pass
+
+    def env_aero_erosion(self, attr: DamageAttribute, isGroup: bool = False):
+        """风蚀效应"""
         pass
 
     def cast_healing(self, attr: DamageAttribute, isGroup: bool = False):
