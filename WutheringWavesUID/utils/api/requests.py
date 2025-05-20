@@ -868,6 +868,3 @@ class Wiki:
                 WIKI_ENTRY_DETAIL_URL, headers=headers, data=data, timeout=10
             )
             return res.json()
-            return res.json()
-            return res.json()
-            return res.json()
