@@ -1,8 +1,8 @@
-from typing import Any, Dict, List, Union, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from ...utils.api.model import RoleDetailData
 from ...utils.damage.utils import AbnormalType, parse_skill_multi
-from .constants import spectro_frazzle_effect_atk, onlineLevel2EquivalentLevel
+from .constants import onlineLevel2EquivalentLevel, spectro_frazzle_effect_atk
 
 
 class WavesEffect(object):
@@ -247,6 +247,10 @@ class DamageAttribute:
         self.env_spectro = env_spectro
         # 光噪效应伤害加深
         self.env_spectro_deepen = False
+        # 风蚀效应
+        self.env_aero_erosion = False
+        # 风蚀效应伤害加深
+        self.env_aero_erosion_deepen = False
         # 声骸结果
         self.ph_result = False
         # 联觉等级
@@ -557,6 +561,16 @@ class DamageAttribute:
     def set_env_spectro_deepen(self):
         """光噪效应伤害加深"""
         self.env_spectro_deepen = True
+        return self
+
+    def set_env_aero_erosion(self):
+        """风蚀效应"""
+        self.env_aero_erosion = True
+        return self
+
+    def set_env_aero_erosion_deepen(self):
+        """风蚀效应伤害加深"""
+        self.env_aero_erosion_deepen = True
         return self
 
     def set_char_damage(self, char_damage):

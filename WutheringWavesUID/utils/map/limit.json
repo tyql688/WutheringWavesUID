@@ -506,6 +506,20 @@
             "name": "赞妮",
             "weaponId": 21040036,
             "sonataLibId": 14
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1301,
+            "name": "卡卡罗",
+            "weaponId": 21010015,
+            "sonataLibId": 13
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1407,
+            "name": "夏空",
+            "weaponId": 21030026,
+            "sonataLibId": 11
         }
     ]
  }

@@ -54,6 +54,7 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
             "結星",
             "Moealkyne",
             "小沐XMu",
+            "吃我无痕",
         ],
     ),
     "GuideSegment": GsBoolConfig("攻略切段", "避免攻略过长过大", False),

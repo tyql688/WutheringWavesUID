@@ -1,13 +1,13 @@
+from ..damage.abstract import WavesWeaponRegister, WeaponAbstract
 from .damage import DamageAttribute, calc_percent_expression
-from ..damage.abstract import WeaponAbstract, WavesWeaponRegister
 from .utils import (
     CHAR_ATTR_SIERRA,
     Spectro_Frazzle_Role_Ids,
-    temp_atk,
-    hit_damage,
-    skill_damage,
     attack_damage,
+    hit_damage,
     liberation_damage,
+    skill_damage,
+    temp_atk,
 )
 
 
@@ -475,6 +475,23 @@ class Weapon_21030024(WeaponAbstract):
     id = 21030024
     type = 3
     name = "华彩乐段"
+
+
+class Weapon_21030026(WeaponAbstract):
+    id = 21030026
+    type = 3
+    name = "林间的咏叹调"
+
+    def env_aero_erosion(self, attr: DamageAttribute, isGroup: bool = False):
+        """风蚀效应"""
+        if attr.char_attr != CHAR_ATTR_SIERRA:
+            return
+
+        # 为目标添加【风蚀效应】后，自身气动伤害加成提升24%。
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"为目标添加【风蚀效应】后，自身气动伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21030034(WeaponAbstract):
@@ -1008,6 +1025,7 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21030016.id, Weapon_21030016)
     WavesWeaponRegister.register_class(Weapon_21030023.id, Weapon_21030023)
     WavesWeaponRegister.register_class(Weapon_21030024.id, Weapon_21030024)
+    WavesWeaponRegister.register_class(Weapon_21030026.id, Weapon_21030026)
     WavesWeaponRegister.register_class(Weapon_21030034.id, Weapon_21030034)
     WavesWeaponRegister.register_class(Weapon_21020036.id, Weapon_21020036)
     WavesWeaponRegister.register_class(Weapon_21030043.id, Weapon_21030043)

@@ -1285,7 +1285,7 @@
         "unlocked": true
       },
       {
-        "description": "处于灼焰形态时每消耗1点【焰光】，使本次共鸣解放终绝将至之刻最后一段的倍率增加8%，最多增加1200%。",
+        "description": "处于灼焰形态时每消耗1点【焰光】，本次共鸣解放终绝将至之刻最后一段伤害倍率增加8%，最多增加1200%。",
         "iconUrl": "",
         "name": "日复一日的通勤",
         "order": 3,
@@ -1629,7 +1629,7 @@
       {
         "level": 10,
         "skill": {
-          "description": "标准防卫预案\n攻击目标造成衍射伤害并进入格挡状态，若切换至其他角色则提前退出。\n一定时间内短按普攻可衔接普攻第3段，命中时额外获得10点【冗余动能】，同时停滞目标。\n若格挡期间受到敌方目标攻击，此次伤害降低100%同时停滞周围的目标，并施放精准反击，造成衍射伤害，额外削减其5%共振度。赞妮在2秒内受到伤害降低30%。\n\n危机处理预案\n赞妮未进入灼焰形态且【冗余动能】充满时，共鸣技能替换为共鸣技能危机处理预案。\n按住共鸣技能可进入准备架势，准备架势期间免疫打断，若切换至其他角色则提前退出。准备架势期间松开共鸣技能或持续时间结束后，消耗全部【冗余动能】施放集中压制造成衍射伤害，此次伤害同时视为【光噪效应】伤害。\n若进入准备架势一定时间内受到敌方目标攻击，此次伤害降低100%同时停滞周围的目标，并消耗全部【冗余动能】施放破袭反击，造成衍射伤害，此次伤害同时视为【光噪效应】伤害，额外削减其5%共振度。赞妮在2秒内受到伤害降低30%。\n施放集中压制或破袭反击时，进入斩棘状态，对命中的目标附加1层【烈阳余烬】。最后一段攻击施放后自身获得【焰光】。\n\n斩棘\n自身直接造成的【光噪效应】伤害加深20%。",
+          "description": "标准防卫预案\n攻击目标造成衍射伤害并进入格挡状态，若切换至其他角色则提前退出。\n一定时间内短按普攻可衔接普攻第3段，命中时额外获得10点【冗余动能】，同时停滞目标。\n若格挡期间受到敌方目标攻击，此次伤害降低100%同时停滞周围的目标，并施放精准反击，造成衍射伤害，额外削减其5%共振度。赞妮在2秒内受到伤害降低30%。\n\n危机处理预案\n赞妮未进入灼焰形态且【冗余动能】充满时，共鸣技能替换为共鸣技能危机处理预案。\n按住共鸣技能可进入准备架势，准备架势期间免疫打断，若切换至其他角色则提前退出。准备架势期间松开共鸣技能或持续时间结束后，消耗全部【冗余动能】施放集中压制造成衍射伤害，此次伤害同时视为【光噪效应】伤害。\n若进入准备架势一定时间内受到敌方目标攻击，此次伤害降低100%同时停滞周围的目标，并消耗全部【冗余动能】施放破袭反击，造成衍射伤害，此次伤害同时视为【光噪效应】伤害。额外削减其5%共振度。赞妮在2秒内受到伤害降低30%。\n施放集中压制或破袭反击时，进入斩棘状态，对命中的目标附加1层【烈阳余烬】。最后一段攻击施放后自身获得【焰光】。\n\n斩棘\n自身直接造成的【光噪效应】伤害加深20%。",
           "iconUrl": "",
           "id": 0,
           "name": "无眠守望",
@@ -1688,6 +1688,429 @@
         "weaponName": "焰光裁定",
         "weaponStarLevel": 5,
         "weaponType": 4
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
+        "description": "施放共鸣技能谐律速奏时，夏空获得免疫打断的效果，持续3秒；施放普攻时，夏空的攻击提升35%，持续10秒。",
+        "iconUrl": "",
+        "name": "故风的吟游序曲",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣解放歌者的三重华彩持续期间队伍中的角色气动伤害加成提升40%。",
+        "iconUrl": "",
+        "name": "四季的连奏之音",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "施放普攻第4段时可额外获得1格【音律】；共鸣技能谐律速奏可使用次数增加1次。",
+        "iconUrl": "",
+        "name": "星烁此时的即兴演奏",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "夏空重击四拍重奏造成伤害时无视敌人45%的防御；\n夏空造成共鸣解放伤害时无视敌人45%的防御。",
+        "iconUrl": "",
+        "name": "托卡塔与赋格",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "夏空共鸣解放伤害加成提升40%；\n夏空共鸣解放歌者的三重华彩附近范围内的角色受到的伤害降低30%。",
+        "iconUrl": "",
+        "name": "献予长夏的永恒叙诗",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "夏空或合奏音影在进入音律独奏状态时可以对周围目标造成220%的气动伤害，该伤害视为共鸣解放伤害。",
+        "iconUrl": "",
+        "name": "终曲未终",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "气动伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "流云逝尽之空",
+            "num": 5,
+            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "共鸣回响·芙露德莉斯",
+            "phantomId": 6000106,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "气动伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "流云逝尽之空",
+            "num": 5,
+            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "气动伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "重塑雕像的拳砾",
+            "phantomId": 6000096,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "气动伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "流云逝尽之空",
+            "num": 5,
+            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "气动伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "飓力熊",
+            "phantomId": 6000097,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "气动伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "流云逝尽之空",
+            "num": 5,
+            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "卫冕节使",
+            "phantomId": 6000098,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "气动伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "流云逝尽之空",
+            "num": 5,
+            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "小翼龙·气动",
+            "phantomId": 6000101,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 4,
+      "attributeName": "气动",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1407,
+      "roleName": "夏空",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 3,
+      "weaponTypeName": "佩枪",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n进行最多4段的连续攻击，造成气动伤害。普攻第4段可为命中的目标添加一层【风蚀效应】。\n·使用闪避打断普攻前三段时，一定时间内短按普攻，将会施放对应段数的普攻。\n·普攻第4段结束后，夏空会进入音律独奏状态。夏空在主动或被动打断普攻第4段或音律独奏状态时，会生成一个合奏音影。\n\n音律独奏\n夏空或合奏音影在进入音律独奏状态时能够以自身为中心，使附近队伍中所有角色的气动伤害加成提升24%，该效果不可叠加。\n\n合奏音影\n场上最多存在2个合奏音影。\n若夏空的普攻第4段被打断，合奏音影将代替夏空完成这次攻击，并进入音律独奏状态。\n若夏空的音律独奏状态被打断，合奏音影将代替夏空继续音律独奏状态。\n通过共鸣技能生成合奏音影时，除上述两种情况外，合奏音影将代替夏空完成这次攻击，但不进入音律独奏状态。\n\n重击\n消耗耐力并跃向空中，攻击目标，造成气动伤害。\n\n瞄准攻击\n短按瞄准键，进入瞄准状态，可以进行射击。\n蓄力完成后攻击目标，造成气动伤害，此次伤害为重击伤害。\n\n空中攻击\n消耗耐力进行最多2段的攻击，造成气动伤害。\n施放第2段空中攻击后一定时间内短按普攻，将会施放第4段普攻。\n\n闪避反击\n成功闪避时，一定时间内短按普攻，将会攻击目标，造成气动伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "四拍的舞曲",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "进行一段位移，对目标造成气动伤害，为命中的目标添加一层【风蚀效应】。\n施放后一定时间内短按普攻，将会施放第2段普攻。\n·夏空使用共鸣技能打断普攻、重击、空中攻击和音律独奏状态时，可生成一个合奏音影。\n·夏空的共鸣技能可以在空中施放。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "谐律速奏",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "夏空与合奏音影共同演绎即兴的交响诗，对周围目标造成一次气动伤害并进入演绎状态。\n\n演绎状态\n演绎状态下，当音波进入判定圈范围时，短按绿色或黄色按钮可生成对应颜色的交响诗·主音，并回复一定协奏能量。\n·演绎状态持续期间，切换至其他角色不会结束演绎状态并可自动生成交响诗·主音，自动生成的主音的颜色由切换角色前最后一个生成的主音的颜色决定。在未通过按钮交互生成交响诗·主音时直接切换至其他角色，默认自动生成绿色的主音。\n·演绎状态持续期间，夏空免疫受击，受到的伤害降低50%。\n·演绎状态持续期间，再次短按共鸣解放，或在切换至其他角色后再切换至夏空，可提前结束演绎状态。\n·演绎状态下的合奏音影可触发音律独奏的气动伤害加成提升效果。\n\n交响诗·主音\n主音为绿色时：对周围的目标造成气动伤害，并为命中的目标添加一层【风蚀效应】。\n主音为黄色时：对周围的目标造成气动伤害，并为命中的目标添加一层【光噪效应】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "歌者的三重华彩",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成气动伤害，为目标附加一层【风蚀效应】。\n施放后一定时间内短按普攻，将会施放第3段普攻。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "携风吟游",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "重击·四拍重奏\n持有3格【音律】时，夏空的重击替换为重击·四拍重奏。\n向前射出重奏音符，消耗所有【音律】，造成气动伤害，持续牵引周围的目标，并为命中的目标添加一层【风蚀效应】。\n重击·四拍重奏可在低空施放。\n\n【音律】的获取规则\n【音律】上限3格。\n施放普攻第4段和变奏技能时，可获得1格【音律】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "风与诗乐的交响",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "队伍中登场角色周围的目标受到【风蚀效应】的伤害加深100%，持续30秒。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "和声引风",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "攻击提升24%。为目标添加【风蚀效应】后，自身气动伤害加成提升48%，持续10秒。攻击命中带有【风蚀效应】的敌人时，降低对方16%的气动抗性，持续20秒，同名效果之间不可叠加。",
+        "weaponIcon": "",
+        "weaponId": 21030026,
+        "weaponName": "林间的咏叹调",
+        "weaponStarLevel": 5,
+        "weaponType": 3
       }
     }
   },
@@ -6341,6 +6764,429 @@
         "weaponName": "和光回唱",
         "weaponStarLevel": 5,
         "weaponType": 5
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
+        "description": "共鸣技能灭杀指令命中目标时，额外回复10点共鸣能量，每20秒可触发1次。",
+        "iconUrl": "",
+        "name": "隐秘谈判",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "施放变奏技能全境通缉或变奏技能「必要的手段」后，共鸣技能伤害加成提升30%，持续15秒。",
+        "iconUrl": "",
+        "name": "零和博弈",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣解放杀戮武装状态持续期间，卡卡罗的导电伤害加成提升25%。",
+        "iconUrl": "",
+        "name": "铁腕外交",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "施放延奏技能掠影奇袭时，队伍中的角色导电伤害加成提升20%，持续30秒。",
+        "iconUrl": "",
+        "name": "集群威胁",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "变奏技能全境通缉及变奏技能「必要的手段」的伤害提升50%。",
+        "iconUrl": "",
+        "name": "替代协议",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "施放重击「死告」时，卡卡罗将会召唤2个猎杀影进行协同攻击，每个猎杀影可造成卡卡罗100.00%攻击的导电伤害，此次伤害为共鸣解放伤害。",
+        "iconUrl": "",
+        "name": "最后通牒",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "导电伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "彻空冥雷",
+            "num": 5,
+            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "梦魇·云闪之鳞",
+            "phantomId": 6000088,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "导电伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "彻空冥雷",
+            "num": 5,
+            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "奏谕乐师",
+            "phantomId": 390077022,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "导电伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "彻空冥雷",
+            "num": 5,
+            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "导电伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "紫羽鹭",
+            "phantomId": 390077004,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "导电伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "彻空冥雷",
+            "num": 5,
+            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "通行灯偶",
+            "phantomId": 6000050,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "导电伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "彻空冥雷",
+            "num": 5,
+            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "湮灭棱镜",
+            "phantomId": 390077017,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 3,
+      "attributeName": "导电",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1301,
+      "roleName": "卡卡罗",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 1,
+      "weaponTypeName": "长刃",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n最多进行4段攻击，造成导电伤害。\n\n重击\n消耗耐力攻击目标，造成导电伤害。\n\n空中攻击\n消耗耐力进行空中下落攻击，造成导电伤害。\n\n闪避反击\n成功闪避后一定时间内短按普攻，将会攻击目标，造成导电伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "猎犬剑技·獠牙撕扯",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "进行最多3段攻击，造成导电伤害。\n若切换至其他角色或者一定时间内没有施放共鸣技能灭杀指令，则技能进入冷却状态。\n共鸣技能灭杀指令不会打断普攻段数。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "灭杀指令",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成导电伤害，并进入杀戮武装状态。状态结束后，卡卡罗下次变奏技能替换为变奏技能「必要的手段」，造成导电伤害，此次伤害为变奏技能伤害。\n\n杀戮武装\n·普攻将变为普攻猎犬剑技·狂噬影狱；\n·重击的伤害提升，此次伤害为共鸣解放伤害；\n·闪避反击的伤害提升，此次伤害为共鸣解放伤害。\n\n普攻·猎犬剑技·狂噬影狱\n进行最多5段的连续攻击，造成导电伤害，此次伤害为普攻伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "幻影蚀刻",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成导电伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "全境通缉",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "重击·「仁慈」\n持有3点【残忍】时，重击替换为重击「仁慈」。\n施放重击「仁慈」时，消耗3点【残忍】，造成导电伤害，此次伤害为重击伤害，并额外回复共鸣能量和协奏能量。\n\n残忍的获取规则\n【残忍】上限3点。\n共鸣解放杀戮武装状态下，无法获得【残忍】。\n共鸣技能灭杀指令命中目标时，获得1点【残忍】。\n\n重击·「死告」\n持有5点【杀意】时，普攻替换为重击「死告」。\n施放重击「死告」时，消耗5点【杀意】，造成导电伤害，此次伤害为共鸣解放伤害，并额外回复共鸣能量和协奏能量。\n\n【杀意】的获取规则\n共鸣解放杀戮武装状态下，特殊能量替换为【杀意】。\n【杀意】上限5点。\n普攻猎犬剑技·狂噬影狱命中目标时，回复1点【杀意】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "猎杀使命",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "卡卡罗召唤猎杀影支援共鸣者，挥刀肃清前方的目标。猎杀影的攻击将造成卡卡罗195.98%+391.96%攻击的导电伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "掠影奇袭",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "共鸣效率提升25.6%。施放共鸣技能时，共鸣解放伤害加成提升14%，可叠加3层，持续12秒。",
+        "weaponIcon": "",
+        "weaponId": 21010015,
+        "weaponName": "浩境粼光",
+        "weaponStarLevel": 5,
+        "weaponType": 1
       }
     }
   },
