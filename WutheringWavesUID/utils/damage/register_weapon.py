@@ -1143,7 +1143,7 @@ class Weapon_21050027(WeaponAbstract):
             return
         if attr.char_attr != CHAR_ATTR_CELESTIAL:
             return
-        dmg = f"{self.param(1)*4}"
+        dmg = f"{self.param(0)*4}"
         title = self.get_title()
         msg = f"对带有【光噪效应】的敌人造成伤害时获得效果：自身衍射伤害提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
