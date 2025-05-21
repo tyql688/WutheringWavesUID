@@ -493,6 +493,12 @@ class Weapon_21030026(WeaponAbstract):
         msg = f"为目标添加【风蚀效应】后，自身气动伤害加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
+        # 攻击命中带有【风蚀效应】的敌人时，降低对方10%的气动抗性
+        dmg = f"{self.param(3)}"
+        title = self.get_title()
+        msg = f"攻击命中带有【风蚀效应】的敌人时，降低对方{dmg}的气动抗性"
+        attr.add_enemy_resistance(-calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21030034(WeaponAbstract):
     id = 21030034
