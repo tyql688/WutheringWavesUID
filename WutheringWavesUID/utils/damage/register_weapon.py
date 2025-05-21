@@ -246,7 +246,7 @@ class Weapon_21010094(WeaponAbstract):
         if not attr.is_env_abnormal:
             return
         if attr.char_template == temp_atk:
-            dmg = f"{self.param(0)*self.param(2)}"
+            dmg = f"{self.param(0)}*{self.param(2)}"
             title = self.get_title()
             msg = f"对带有【异常效应】的怪物造成伤害时，自身攻击提升{dmg}"
             attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
@@ -494,7 +494,7 @@ class Weapon_21020064(WeaponAbstract):
         isGroup: bool = False,
     ):
         if attr.char_template == temp_atk:
-            dmg = f"{self.param(1)*self.param(2)}"
+            dmg = f"{self.param(1)}*{self.param(2)}"
             title = self.get_title()
             msg = f"角色登场后获得{self.param(0)}层【守誓】效果，使攻击提升{dmg}"
             attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
@@ -509,13 +509,13 @@ class Weapon_21020074(WeaponAbstract):
     def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣技能"""
         if attr.char_damage == attack_damage:
-            dmg = f"{self.param(0)*self.param(1)}"
+            dmg = f"{self.param(0)}*{self.param(1)}"
             title = self.get_title()
             msg = f"施放共鸣技能时，自身普攻加成提升{dmg}"
             attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
         if attr.char_damage == hit_damage:
-            dmg = f"{self.param(0)*self.param(1)}"
+            dmg = f"{self.param(0)}*{self.param(1)}"
             title = self.get_title()
             msg = f"施放共鸣技能时，自身重击加成提升{dmg}"
             attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
@@ -552,7 +552,7 @@ class Weapon_21020094(WeaponAbstract):
         if not attr.is_env_abnormal:
             return
         if attr.char_template == temp_atk:
-            dmg = f"{self.param(0)*self.param(2)}"
+            dmg = f"{self.param(0)}*{self.param(2)}"
             title = self.get_title()
             msg = f"对带有【异常效应】的怪物造成伤害时，自身攻击提升{dmg}"
             attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
@@ -693,7 +693,7 @@ class Weapon_21030064(WeaponAbstract):
         if attr.char_template != temp_atk:
             return
 
-        dmg = f"{self.param(0)*self.param(2)}"
+        dmg = f"{self.param(0)}*{self.param(2)}"
         title = self.get_title()
         msg = f"角色冲刺或闪避时，攻击提升{dmg}"
         attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
@@ -709,7 +709,7 @@ class Weapon_21030074(WeaponAbstract):
         """施放普攻"""
         if attr.char_damage != skill_damage:
             return
-        dmg = f"{self.param(0)*self.param(1)}"
+        dmg = f"{self.param(0)}*{self.param(1)}"
         title = self.get_title()
         msg = f"造成普攻或重击伤害时，自身共鸣技能伤害加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
@@ -719,7 +719,7 @@ class Weapon_21030074(WeaponAbstract):
         """施放重击"""
         if attr.char_damage != skill_damage:
             return
-        dmg = f"{self.param(0)*self.param(1)}"
+        dmg = f"{self.param(0)}*{self.param(1)}"
         title = self.get_title()
         msg = f"造成普攻或重击伤害时，自身共鸣技能伤害加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
@@ -757,7 +757,7 @@ class Weapon_21030094(WeaponAbstract):
         if not attr.is_env_abnormal:
             return
         if attr.char_template == temp_atk:
-            dmg = f"{self.param(0)*self.param(2)}"
+            dmg = f"{self.param(0)}*{self.param(2)}"
             title = self.get_title()
             msg = f"对带有【异常效应】的怪物造成伤害时，自身攻击提升{dmg}"
             attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
@@ -945,12 +945,12 @@ class Weapon_21040064(WeaponAbstract):
     def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣解放"""
         if attr.char_template == temp_atk:
-            dmg = f"{self.param(1)*self.param(0)}"
+            dmg = f"{self.param(1)}*{self.param(0)}"
             title = self.get_title()
             msg = f"施放共鸣解放时，获得3层【铁甲】效果，使攻击提升{dmg}"
             attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
-        dmg = f"{self.param(1)*self.param(0)}"
+        dmg = f"{self.param(1)}*{self.param(0)}"
         title = self.get_title()
         msg = f"施放共鸣解放时，获得3层【铁甲】效果，使防御提升{dmg}"
         attr.add_def_percent(calc_percent_expression(dmg), title, msg)
@@ -1003,7 +1003,7 @@ class Weapon_21040094(WeaponAbstract):
         if not attr.is_env_abnormal:
             return
         if attr.char_template == temp_atk:
-            dmg = f"{self.param(0)*self.param(2)}"
+            dmg = f"{self.param(0)}*{self.param(2)}"
             title = self.get_title()
             msg = f"对带有【异常效应】的怪物造成伤害时，自身攻击提升{dmg}"
             attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
@@ -1294,7 +1294,7 @@ class Weapon_21050064(WeaponAbstract):
         """造成普攻伤害"""
         if attr.char_damage != heal_bonus:
             return
-        dmg = f"{self.param(0)*self.param(2)}"
+        dmg = f"{self.param(0)}*{self.param(2)}"
         title = self.get_title()
         msg = f"造成普攻伤害时，治疗效果加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
@@ -1304,7 +1304,7 @@ class Weapon_21050064(WeaponAbstract):
         """造成重击伤害"""
         if attr.char_damage != heal_bonus:
             return
-        dmg = f"{self.param(0)*self.param(2)}"
+        dmg = f"{self.param(0)}*{self.param(2)}"
         title = self.get_title()
         msg = f"造成重击伤害时，治疗效果加成提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
