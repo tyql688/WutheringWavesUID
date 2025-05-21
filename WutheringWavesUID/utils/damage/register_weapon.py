@@ -1,4 +1,4 @@
-from typing import List, Union, override
+from typing import List, Union
 
 from ..damage.abstract import WavesWeaponRegister, WeaponAbstract
 from .damage import DamageAttribute, calc_percent_expression
@@ -236,7 +236,6 @@ class Weapon_21010094(WeaponAbstract):
     name = "容赦的沉思录"
 
     # 对带有【异常效应】的怪物造成伤害时，自身攻击提升4%，持续10秒，每秒可触发1次，可叠加4层。
-    @override
     def do_action(
         self,
         func_list: Union[List[str], str],
@@ -381,7 +380,6 @@ class Weapon_21020034(WeaponAbstract):
 
     # 生命低于40%时，重击伤害加成提升18%
 
-    @override
     def do_action(
         self,
         func_list: Union[List[str], str],
@@ -486,7 +484,6 @@ class Weapon_21020064(WeaponAbstract):
     # 角色登场后获得6层【守誓】效果，每层使攻击提升2%
     # ps: 不计算击败目标
 
-    @override
     def do_action(
         self,
         func_list: Union[List[str], str],
@@ -542,7 +539,6 @@ class Weapon_21020094(WeaponAbstract):
     name = "风流的寓言诗"
 
     # 对带有【异常效应】的怪物造成伤害时，自身攻击提升4%，持续10秒，每秒可触发1次，可叠加4层。
-    @override
     def do_action(
         self,
         func_list: Union[List[str], str],
@@ -747,7 +743,6 @@ class Weapon_21030094(WeaponAbstract):
     name = "叙别的罗曼史"
 
     # 对带有【异常效应】的怪物造成伤害时，自身攻击提升4%，持续10秒，每秒可触发1次，可叠加4层。
-    @override
     def do_action(
         self,
         func_list: Union[List[str], str],
@@ -993,7 +988,6 @@ class Weapon_21040094(WeaponAbstract):
     name = "酩酊的英雄志"
 
     # 对带有【异常效应】的怪物造成伤害时，自身攻击提升4%，持续10秒，每秒可触发1次，可叠加4层。
-    @override
     def do_action(
         self,
         func_list: Union[List[str], str],
@@ -1143,7 +1137,7 @@ class Weapon_21050027(WeaponAbstract):
             return
         if attr.char_attr != CHAR_ATTR_CELESTIAL:
             return
-        dmg = f"{self.param(1)*4}"
+        dmg = f"{self.param(0)*4}"
         title = self.get_title()
         msg = f"对带有【光噪效应】的敌人造成伤害时获得效果：自身衍射伤害提升{dmg}"
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
