@@ -553,6 +553,15 @@ class DamageAttribute:
         self.sync_strike = True
         return self
 
+    def is_env_abnormal(self):
+        """是否有异常效果"""
+        return any(
+            [
+                self.env_spectro,
+                self.env_aero_erosion,
+            ]
+        )
+
     def set_env_spectro(self):
         """光噪效应"""
         self.env_spectro = True

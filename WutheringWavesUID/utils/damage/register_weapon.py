@@ -1,13 +1,18 @@
+from typing import List, Union, override
+
 from ..damage.abstract import WavesWeaponRegister, WeaponAbstract
 from .damage import DamageAttribute, calc_percent_expression
 from .utils import (
+    CHAR_ATTR_CELESTIAL,
     CHAR_ATTR_SIERRA,
     Spectro_Frazzle_Role_Ids,
     attack_damage,
+    heal_bonus,
     hit_damage,
     liberation_damage,
     skill_damage,
     temp_atk,
+    temp_life,
 )
 
 
@@ -115,6 +120,19 @@ class Weapon_21010034(WeaponAbstract):
     type = 1
     name = "重破刃-41型"
 
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        # 生命大于80%时，攻击提升12%。
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(1)}"
+            title = self.get_title()
+            msg = f"生命大于{self.param(0)}时，攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21010043(WeaponAbstract):
     id = 21010043
@@ -126,6 +144,24 @@ class Weapon_21010044(WeaponAbstract):
     id = 21010044
     type = 1
     name = "永夜长明"
+
+    def cast_variation(
+        self,
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        """施放变奏技能"""
+        # 施放变奏技能时，自身攻击提升8%，防御提升15%
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(0)}"
+            title = self.get_title()
+            msg = f"施放变奏技能时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放变奏技能时，自身防御提升{dmg}"
+        attr.add_def_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21010053(WeaponAbstract):
@@ -144,6 +180,15 @@ class Weapon_21010064(WeaponAbstract):
     id = 21010064
     type = 1
     name = "东落"
+
+    # 施放共鸣技能后12秒内，每2秒攻击提升3%，可叠加4层。
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(2)}*{self.param(3)}"
+            title = self.get_title()
+            msg = f"施放共鸣技能后，每2秒攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21010074(WeaponAbstract):
@@ -175,11 +220,36 @@ class Weapon_21010084(WeaponAbstract):
     type = 1
     name = "凋亡频移"
 
+    # 施放共鸣技能时，获得6点共鸣能量，且攻击提升10%，持续16秒。
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，获得{self.param(0)}点共鸣能量，且攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21010094(WeaponAbstract):
     id = 21010094
     type = 1
     name = "容赦的沉思录"
+
+    # 对带有【异常效应】的怪物造成伤害时，自身攻击提升4%，持续10秒，每秒可触发1次，可叠加4层。
+    @override
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        if not attr.is_env_abnormal:
+            return
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(0)*self.param(2)}"
+            title = self.get_title()
+            msg = f"对带有【异常效应】的怪物造成伤害时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21020011(WeaponAbstract):
@@ -309,6 +379,21 @@ class Weapon_21020034(WeaponAbstract):
     type = 2
     name = "瞬斩刀-18型"
 
+    # 生命低于40%时，重击伤害加成提升18%
+
+    @override
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        if attr.char_damage == hit_damage:
+            dmg = f"{self.param(1)}"
+            title = self.get_title()
+            msg = f"生命低于{self.param(0)}时，重击伤害加成提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21020036(WeaponAbstract):
     id = 21020036
@@ -348,6 +433,19 @@ class Weapon_21020044(WeaponAbstract):
     type = 2
     name = "不归孤军"
 
+    def cast_variation(
+        self,
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        """施放变奏技能"""
+        # 施放变奏技能时，自身攻击提升15%
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(0)}"
+            title = self.get_title()
+            msg = f"施放变奏技能时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21020046(WeaponAbstract):
     id = 21020046
@@ -385,11 +483,42 @@ class Weapon_21020064(WeaponAbstract):
     type = 2
     name = "西升"
 
+    # 角色登场后获得6层【守誓】效果，每层使攻击提升2%
+    # ps: 不计算击败目标
+
+    @override
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(1)*self.param(2)}"
+            title = self.get_title()
+            msg = f"角色登场后获得{self.param(0)}层【守誓】效果，使攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21020074(WeaponAbstract):
     id = 21020074
     type = 2
     name = "飞景"
+
+    # 施放共鸣技能时，自身普攻和重击伤害加成提升20%。
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_damage == attack_damage:
+            dmg = f"{self.param(0)*self.param(1)}"
+            title = self.get_title()
+            msg = f"施放共鸣技能时，自身普攻加成提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+        if attr.char_damage == hit_damage:
+            dmg = f"{self.param(0)*self.param(1)}"
+            title = self.get_title()
+            msg = f"施放共鸣技能时，自身重击加成提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21020084(WeaponAbstract):
@@ -397,11 +526,36 @@ class Weapon_21020084(WeaponAbstract):
     type = 2
     name = "永续坍缩"
 
+    # 施放共鸣技能时，获得6点共鸣能量，且攻击提升10%，持续16秒。
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，获得{self.param(0)}点共鸣能量，且攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21020094(WeaponAbstract):
     id = 21020094
     type = 2
     name = "风流的寓言诗"
+
+    # 对带有【异常效应】的怪物造成伤害时，自身攻击提升4%，持续10秒，每秒可触发1次，可叠加4层。
+    @override
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        if not attr.is_env_abnormal:
+            return
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(0)*self.param(2)}"
+            title = self.get_title()
+            msg = f"对带有【异常效应】的怪物造成伤害时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21030011(WeaponAbstract):
@@ -529,11 +683,47 @@ class Weapon_21030064(WeaponAbstract):
     type = 3
     name = "飞逝"
 
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        # 角色冲刺或闪避时，攻击提升4%，持续8秒，可叠加3层。
+        if attr.char_template != temp_atk:
+            return
+
+        dmg = f"{self.param(0)*self.param(2)}"
+        title = self.get_title()
+        msg = f"角色冲刺或闪避时，攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21030074(WeaponAbstract):
     id = 21030074
     type = 3
     name = "奔雷"
+
+    # 造成普攻或重击伤害时，自身共鸣技能伤害加成提升7%，可叠加3层，持续10秒。
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放普攻"""
+        if attr.char_damage != skill_damage:
+            return
+        dmg = f"{self.param(0)*self.param(1)}"
+        title = self.get_title()
+        msg = f"造成普攻或重击伤害时，自身共鸣技能伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
+
+    def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放重击"""
+        if attr.char_damage != skill_damage:
+            return
+        dmg = f"{self.param(0)*self.param(1)}"
+        title = self.get_title()
+        msg = f"造成普攻或重击伤害时，自身共鸣技能伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
 
 
 class Weapon_21030084(WeaponAbstract):
@@ -541,11 +731,36 @@ class Weapon_21030084(WeaponAbstract):
     type = 3
     name = "悖论喷流"
 
+    # 施放共鸣技能时，获得6点共鸣能量，且攻击提升10%，持续16秒。
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，获得{self.param(0)}点共鸣能量，且攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21030094(WeaponAbstract):
     id = 21030094
     type = 3
     name = "叙别的罗曼史"
+
+    # 对带有【异常效应】的怪物造成伤害时，自身攻击提升4%，持续10秒，每秒可触发1次，可叠加4层。
+    @override
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        if not attr.is_env_abnormal:
+            return
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(0)*self.param(2)}"
+            title = self.get_title()
+            msg = f"对带有【异常效应】的怪物造成伤害时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21040011(WeaponAbstract):
@@ -657,6 +872,21 @@ class Weapon_21040034(WeaponAbstract):
     type = 4
     name = "钢影拳-21丁型"
 
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        # 闪避或冲刺时，攻击提升8%。
+        if attr.char_template != temp_atk:
+            return
+
+        dmg = f"{self.param(0)}"
+        title = self.get_title()
+        msg = f"冲刺或冲刺时，攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21040036(WeaponAbstract):
     id = 21040036
@@ -689,6 +919,16 @@ class Weapon_21040044(WeaponAbstract):
     type = 4
     name = "袍泽之固"
 
+    # 施放变奏技能时，自身共鸣解放伤害加成提升20%
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放变奏技能"""
+        if attr.char_damage != liberation_damage:
+            return
+        dmg = f"{self.param(0)}"
+        title = self.get_title()
+        msg = f"施放变奏技能时，自身共鸣解放伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21040053(WeaponAbstract):
     id = 21040053
@@ -700,6 +940,20 @@ class Weapon_21040064(WeaponAbstract):
     id = 21040064
     type = 4
     name = "骇行"
+
+    # 施放共鸣解放时，获得3层【铁甲】效果，每层使攻击和防御提升3%
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣解放"""
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(1)*self.param(0)}"
+            title = self.get_title()
+            msg = f"施放共鸣解放时，获得3层【铁甲】效果，使攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+
+        dmg = f"{self.param(1)*self.param(0)}"
+        title = self.get_title()
+        msg = f"施放共鸣解放时，获得3层【铁甲】效果，使防御提升{dmg}"
+        attr.add_def_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21040074(WeaponAbstract):
@@ -723,11 +977,36 @@ class Weapon_21040084(WeaponAbstract):
     type = 4
     name = "尘云旋臂"
 
+    # 施放共鸣技能时，获得6点共鸣能量，且攻击提升10%，持续16秒。
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，获得{self.param(0)}点共鸣能量，且攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21040094(WeaponAbstract):
     id = 21040094
     type = 4
     name = "酩酊的英雄志"
+
+    # 对带有【异常效应】的怪物造成伤害时，自身攻击提升4%，持续10秒，每秒可触发1次，可叠加4层。
+    @override
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        if not attr.is_env_abnormal:
+            return
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(0)*self.param(2)}"
+            title = self.get_title()
+            msg = f"对带有【异常效应】的怪物造成伤害时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21050011(WeaponAbstract):
@@ -793,6 +1072,17 @@ class Weapon_21050017(WeaponAbstract):
     type = 5
     name = "渊海回声"
 
+    # 施放共鸣解放时，自身治疗效果加成提升16%
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣解放"""
+        if attr.char_damage != heal_bonus:
+            return
+
+        dmg = f"{self.param(0)}"
+        title = self.get_title()
+        msg = f"施放共鸣解放时，自身治疗效果加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21050023(WeaponAbstract):
     id = 21050023
@@ -842,11 +1132,37 @@ class Weapon_21050027(WeaponAbstract):
     type = 5
     name = "大海的馈赠"
 
+    # 对带有【光噪效应】的敌人造成伤害时获得效果：自身衍射伤害提升6%，每1秒可获得1层，持续6秒，可叠加4层。
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        if not attr.env_spectro:
+            return
+        if attr.char_attr != CHAR_ATTR_CELESTIAL:
+            return
+        dmg = f"{self.param(1)*4}"
+        title = self.get_title()
+        msg = f"对带有【光噪效应】的敌人造成伤害时获得效果：自身衍射伤害提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
 
 class Weapon_21050034(WeaponAbstract):
     id = 21050034
     type = 5
     name = "鸣动仪-25型"
+
+    # 施放共鸣技能时，若角色生命低于60%，回复角色5%生命值，每8秒可触发1次；若角色生命高于60%，则攻击提升12%，持续10秒。
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_template != temp_atk:
+            return
+        dmg = f"{self.param(5)}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，若角色生命高于{self.param(4)}，则攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21050036(WeaponAbstract):
@@ -874,6 +1190,21 @@ class Weapon_21050044(WeaponAbstract):
     id = 21050044
     type = 5
     name = "今州守望"
+
+    # 施放变奏技能时，自身攻击提升8%，生命提升10%
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放变奏技能"""
+        if attr.char_template == temp_atk:
+            dmg = f"{self.param(0)}"
+            title = self.get_title()
+            msg = f"施放变奏技能时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+
+        if attr.char_template == temp_life:
+            dmg = f"{self.param(1)}"
+            title = self.get_title()
+            msg = f"施放变奏技能时，自身生命提升{dmg}"
+            attr.add_life_percent(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21050046(WeaponAbstract):
@@ -958,6 +1289,27 @@ class Weapon_21050064(WeaponAbstract):
     type = 5
     name = "异度"
 
+    # 造成普攻或重击伤害时，治疗效果加成提升3%
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成普攻伤害"""
+        if attr.char_damage != heal_bonus:
+            return
+        dmg = f"{self.param(0)*self.param(2)}"
+        title = self.get_title()
+        msg = f"造成普攻伤害时，治疗效果加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
+
+    def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成重击伤害"""
+        if attr.char_damage != heal_bonus:
+            return
+        dmg = f"{self.param(0)*self.param(2)}"
+        title = self.get_title()
+        msg = f"造成重击伤害时，治疗效果加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21050074(WeaponAbstract):
     id = 21050074
@@ -981,11 +1333,33 @@ class Weapon_21050084(WeaponAbstract):
     type = 5
     name = "核熔星盘"
 
+    # 施放共鸣技能时，获得6点共鸣能量，且攻击提升10%，持续16秒。
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，获得{self.param(0)}点共鸣能量，且攻击提升{dmg}"
+        attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
+        return True
+
 
 class Weapon_21050094(WeaponAbstract):
     id = 21050094
     type = 5
     name = "虚饰的华尔兹"
+
+    # 对带有【异常效应】的怪物造成伤害时，自身攻击提升4%，持续10秒，每秒可触发1次，可叠加4层。
+    def do_action(
+        self,
+        func_list: Union[List[str], str],
+        attr: DamageAttribute,
+        isGroup: bool = False,
+    ):
+        if attr.is_env_abnormal:
+            dmg = f"{self.param(0)}*{self.param(2)}"
+            title = self.get_title()
+            msg = f"对带有【异常效应】的怪物造成伤害时，自身攻击提升{dmg}"
+            attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
 def register_weapon():
