@@ -437,7 +437,7 @@ async def draw_bot_rank_img(
         weapon_bg_temp_draw = ImageDraw.Draw(weapon_bg_temp)
         weapon_bg_temp_draw.text(
             (200, 30),
-            f"{weaponData.weapon.weaponName}",
+            f"{weaponData.weapon.weaponName[:5]}",
             SPECIAL_GOLD,
             waves_font_40,
             "lm",
@@ -446,8 +446,8 @@ async def draw_bot_rank_img(
             (203, 75), f"Lv.{weaponData.level}/90", "white", waves_font_30, "lm"
         )
 
-        _x = 220
-        _y = 120
+        _x = 220 + 43 * len(weaponData.weapon.weaponName)
+        _y = 37
         wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)
         weapon_bg_temp_draw.rounded_rectangle(
             [_x - 15, _y - 15, _x + 50, _y + 15], radius=7, fill=wrc_fill
@@ -456,11 +456,11 @@ async def draw_bot_rank_img(
             (_x, _y), f"精{weaponData.resonLevel}", "white", waves_font_24, "lm"
         )
 
-        # weapon_breach = get_breach(weaponData.breach, weaponData.level)
-        # for i in range(0, weapon_breach):
-        #     weapon_bg_temp.alpha_composite(
-        #         promote_icon.copy(), dest=(200 + 40 * i, 100)
-        #     )
+        weapon_breach = get_breach(weaponData.breach, weaponData.level)
+        for i in range(0, weapon_breach):
+            weapon_bg_temp.alpha_composite(
+                promote_icon.copy(), dest=(200 + 40 * i, 100)
+            )
 
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
