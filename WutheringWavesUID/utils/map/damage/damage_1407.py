@@ -51,6 +51,9 @@ def calc_damage_1(
     role_breach = role.role.breach
 
     # 设置角色技能施放是不是也有加成 eg：守岸人
+    title = "音律独奏"
+    msg = "音律独奏状态时,使附近队伍中所有角色的气动伤害加成提升24%"
+    attr.add_dmg_bonus(0.24, title, msg)
 
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
@@ -129,6 +132,9 @@ def calc_damage_2(
         attr.add_dmg_bonus(0.3, title, msg)
 
     # 设置角色技能施放是不是也有加成 eg：守岸人
+    title = "音律独奏"
+    msg = "音律独奏状态时,使附近队伍中所有角色的气动伤害加成提升24%"
+    attr.add_dmg_bonus(0.24, title, msg)
 
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()

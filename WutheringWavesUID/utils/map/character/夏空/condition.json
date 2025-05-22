@@ -1,14 +1,14 @@
 [
   {
-    "choose": "calc-新光套.json",
+    "choose": "calc-主c.json",
     "key": "ph",
     "op": "=",
-    "value": "此间永驻之光"
+    "value": "啸谷长风"
   },
   {
     "choose": "calc.json",
     "key": "ph",
     "op": "=",
-    "value": "轻云出月"
+    "value": "流云逝尽之空"
   }
 ]
