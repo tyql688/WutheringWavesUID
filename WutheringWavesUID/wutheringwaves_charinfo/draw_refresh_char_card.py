@@ -102,9 +102,50 @@ async def get_refresh_role_img(width: int, height: int):
         img = crop_center_img(img, width, height)
     else:
         img = img.resize((width, int(width / img.width * img.height)))
-    img = img.filter(ImageFilter.GaussianBlur(radius=10))
-    img = ImageEnhance.Brightness(img).enhance(0.4)
-    return img
+
+    # 创建毛玻璃效果
+    blur_img = img.filter(ImageFilter.GaussianBlur(radius=2))
+    blur_img = ImageEnhance.Brightness(blur_img).enhance(0.2)
+    blur_img = ImageEnhance.Contrast(blur_img).enhance(0.9)
+
+    # 合并图层
+    result = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    result.paste(blur_img, (0, 0))
+
+    # 计算角色区域位置和尺寸
+    char_panel_y = 470  # 角色区域开始的Y坐标
+    char_panel_height = height - char_panel_y - 50  # 角色区域高度
+    char_panel_width = 1900  # 角色区域宽度
+
+    # 创建毛玻璃面板
+    char_panel = Image.new("RGBA", (char_panel_width, char_panel_height), (0, 0, 0, 0))
+    char_panel_draw = ImageDraw.Draw(char_panel)
+
+    # 绘制圆角矩形毛玻璃背景
+    char_panel_draw.rounded_rectangle(
+        [(0, 0), (char_panel_width, char_panel_height)],
+        radius=30,
+        fill=(255, 255, 255, 40),
+    )
+
+    # 添加内部渐变效果
+    inner_panel = Image.new(
+        "RGBA", (char_panel_width - 20, char_panel_height - 20), (0, 0, 0, 0)
+    )
+    inner_panel_draw = ImageDraw.Draw(inner_panel)
+    inner_panel_draw.rounded_rectangle(
+        [(0, 0), (char_panel_width - 20, char_panel_height - 20)],
+        radius=25,
+        fill=(255, 255, 255, 20),
+    )
+
+    # 合并渐变到角色面板
+    char_panel.alpha_composite(inner_panel, (10, 10))
+
+    # 添加角色面板到结果图像
+    result.alpha_composite(char_panel, (50, char_panel_y))
+
+    return result
 
 
 async def draw_refresh_char_detail_img(
@@ -221,7 +262,7 @@ async def draw_refresh_char_detail_img(
 
     for char_rank in map_unchanged:
         pic = await draw_pic(char_rank, False)  # type: ignore
-        img.alpha_composite(pic, (80 + 300 * (rIndex % 6), 470 + (rIndex // 6) * 330))
+        img.alpha_composite(pic, (95 + 300 * (rIndex % 6), 470 + (rIndex // 6) * 330))
         rIndex += 1
 
         if len(map_update) == 0 and rIndex <= 5:
@@ -293,7 +334,7 @@ async def draw_refresh_char_detail_img(
         refresh_bar.alpha_composite(refresh_no.resize((60, 60)), (1800, -8))
 
     img.paste(refresh_bar, (0, 300), refresh_bar)
-    img = add_footer(img)
+    img = add_footer(img, 600, 20)
     img = await convert_img(img)
     set_cache_refresh_card(user_id, uid)
     return img
