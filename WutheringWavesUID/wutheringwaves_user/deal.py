@@ -11,7 +11,7 @@ from ..utils.waves_api import waves_api
 
 
 async def add_cookie(ev: Event, ck: str) -> str:
-    succ, kuroWavesUserInfos = await waves_api.get_kuro_role_list(ck)
+    succ, platform, kuroWavesUserInfos = await waves_api.get_kuro_role_list(ck)
     if not succ or not isinstance(kuroWavesUserInfos, list):
         return hint.error_reply(code=WAVES_CODE_101)
 
@@ -19,15 +19,15 @@ async def add_cookie(ev: Event, ck: str) -> str:
     for kuroWavesUserInfo in kuroWavesUserInfos:
         data = KuroWavesUserInfo.model_validate(kuroWavesUserInfo)
 
-        platform_list = ["h5", "ios"]
-        for platform in platform_list:
-            succ, _ = await waves_api.refresh_data_for_platform(
-                data.roleId, ck, data.serverId, platform
-            )
-            if succ:
-                break
-        else:
-            return hint.error_reply(code=WAVES_CODE_101)
+        # platform_list = ["h5", "ios"]
+        # for platform in platform_list:
+        #     succ, _ = await waves_api.refresh_data_for_platform(
+        #         data.roleId, ck, data.serverId, platform
+        #     )
+        #     if succ:
+        #         break
+        # else:
+        #     return hint.error_reply(code=WAVES_CODE_101)
 
         user = await WavesUser.get_user_by_attr(
             ev.user_id, ev.bot_id, "uid", data.roleId

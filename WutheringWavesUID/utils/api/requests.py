@@ -239,19 +239,26 @@ class WavesApi:
 
     async def get_kuro_role_list(
         self, token: str
-    ) -> tuple[bool, Union[List, str, int]]:
+    ) -> tuple[bool, str, Union[List, str, int]]:
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
         data = {"gameId": GAME_ID}
-        raw_data = await self._waves_request(ROLE_LIST_URL, "POST", header, data=data)
-        if isinstance(raw_data, dict):
-            if raw_data.get("code") == 200 and raw_data.get("data"):
-                return True, raw_data["data"]
 
-            logger.warning(f"get_kuro_role_list -> msg: {raw_data}")
-            if raw_data.get("msg"):
-                return False, raw_data["msg"]
-        return False, error_reply(WAVES_CODE_999)
+        err_msg = error_reply(WAVES_CODE_999)
+        for i in ["h5", "ios"]:
+            header["source"] = i
+            raw_data = await self._waves_request(
+                ROLE_LIST_URL, "POST", header, data=data
+            )
+            if isinstance(raw_data, dict):
+                if raw_data.get("code") == 200 and raw_data.get("data"):
+                    return True, i, raw_data["data"]
+
+                logger.warning(f"get_kuro_role_list -> msg: {raw_data}")
+                if raw_data.get("msg"):
+                    err_msg = raw_data["msg"]
+                    continue
+        return False, "", err_msg
 
     async def get_game_role_info(
         self, token: str, gameId: Union[str, int] = GAME_ID, kuro_uid: str = ""
