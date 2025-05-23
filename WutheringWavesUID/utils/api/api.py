@@ -61,6 +61,13 @@ BATCH_PHANTOM_COST = f"{MAIN_URL}/aki/calculator/batchPhantomCost"
 QUERY_OWNED_ROLE = f"{MAIN_URL}/aki/calculator/queryOwnedRole"
 
 
+# 资源简报
+PERIOD_LIST_URL = f"{MAIN_URL}/aki/resource/period/list"
+MONTH_LIST_URL = f"{MAIN_URL}/aki/resource/month"
+WEEK_LIST_URL = f"{MAIN_URL}/aki/resource/week"
+VERSION_LIST_URL = f"{MAIN_URL}/aki/resource/version"
+
+
 WIKI_CATALOGUE_MAP = {
     "共鸣者": "1105",
     "武器": "1106",
