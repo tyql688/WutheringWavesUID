@@ -105,7 +105,7 @@ async def parse_weapon_material_content(weapon_model: WeaponModel, card_img):
         material_img.alpha_composite(material, (30 + index * 80, 50))
         index += 1
 
-    card_img.alpha_composite(material_img, (625, 15))
+    card_img.alpha_composite(material_img, (680, 15))
 
 
 async def parse_weapon_detail_content(weapon_model: WeaponModel, card_img):
