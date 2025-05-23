@@ -25,7 +25,7 @@ TEXT_PATH = Path(__file__).parent / "texture2d"
 
 
 based_w = 750
-based_h = 850
+based_h = 930
 
 # 定义颜色列表
 colors = [
@@ -119,7 +119,9 @@ async def draw_period_img(bot: Bot, ev: Event):
 
         if len(valid_period_list) == 0:
             msg = [res for res in results if isinstance(res, str)]
-            return "\n".join(msg)
+            if msg:
+                return "\n".join(msg)
+            return MSG_TOKEN.format(PREFIX)
 
         # 开始绘图任务
         task = []
@@ -168,11 +170,11 @@ async def _draw_period_img(ev: Event, valid: Dict):
     avatar_img = await draw_pic_with_ring(ev)
     title_img.paste(avatar_img, (27, 8), avatar_img)
 
-    img.paste(title_img, (0, 0), title_img)
+    img.paste(title_img, (0, 30), title_img)
 
     # 绘制slagon.png
     slagon_img = Image.open(TEXT_PATH / "slagon.png")
-    img.paste(slagon_img, (500, 65), slagon_img)
+    img.paste(slagon_img, (500, 95), slagon_img)
 
     # 绘制底板
     home_bg = await crop_home_img()
@@ -207,7 +209,7 @@ async def _draw_period_img(ev: Event, valid: Dict):
 
     # source
     source_bg = Image.open(TEXT_PATH / "txt-source.png")
-    home_bg.alpha_composite(source_bg, (0, 250))
+    home_bg.alpha_composite(source_bg, (0, 270))
 
     # 饼图数据
     pie_data = {
@@ -221,18 +223,18 @@ async def _draw_period_img(ev: Event, valid: Dict):
 
     # 获取合成后的饼图
     pie_placeholder = create_pie_chart_with_placeholder(pie_data)
-    home_bg.paste(pie_placeholder, (380, 280), pie_placeholder)
+    home_bg.paste(pie_placeholder, (380, 320), pie_placeholder)
 
     # 在左侧绘制图例
-    draw_legend_on_home_bg(home_bg, pie_data, 50, 315)
+    draw_legend_on_home_bg(home_bg, pie_data, 50, 345)
 
-    img.paste(home_bg, (30, 205), home_bg)
+    img.paste(home_bg, (30, 235), home_bg)
     img = add_footer(img, 600, 25)
     return img
 
 
 async def crop_home_img():
-    img = Image.new("RGBA", (718, 600), (0, 0, 0, 0))
+    img = Image.new("RGBA", (718, 650), (0, 0, 0, 0))
     # 绘制底板
     # 718*56
     home_main_1 = Image.open(TEXT_PATH / "home-main-p1.png")
@@ -243,12 +245,12 @@ async def crop_home_img():
     img.paste(home_main_2, (0, 56), home_main_2)
 
     home_main_2_1 = Image.open(TEXT_PATH / "home-main-p2.png")
-    home_main_2_1 = home_main_2_1.crop((0, 0, 718, 180))
+    home_main_2_1 = home_main_2_1.crop((0, 0, 718, 230))
     img.paste(home_main_2_1, (0, 336), home_main_2_1)
 
     # 718*86
     home_main_3 = Image.open(TEXT_PATH / "home-main-p3.png")
-    img.paste(home_main_3, (0, 516), home_main_3)
+    img.paste(home_main_3, (0, 566), home_main_3)
 
     return img
 
@@ -275,7 +277,7 @@ def draw_legend_on_home_bg(
 
         # 绘制颜色圆点
         color = colors[i % len(colors)]
-        draw.ellipse([x, current_y, x + 20, current_y + 20], fill=color)
+        draw.ellipse([x + 5, current_y + 5, x + 20, current_y + 20], fill=color)
 
         # 绘制标签
         percentage = f"{value:.1f}%"
