@@ -662,3 +662,32 @@ class SlashDetail(BaseModel):
     isUnlock: bool  # 是否解锁
     seasonEndTime: int  # 赛季结束时间
     difficultyList: List[SlashDifficulty] = Field(default_factory=list)  # 难度列表
+
+
+class Period(BaseModel):
+    """资源简报"""
+
+    title: str  # 标题
+    index: int  # 索引
+
+
+class PeriodList(BaseModel):
+    """资源简报"""
+
+    weeks: List[Period] = Field(default_factory=list)  # 周报列表
+    months: List[Period] = Field(default_factory=list)  # 月报列表
+    versions: List[Period] = Field(default_factory=list)  # 版本列表
+
+
+class PeriodNode(BaseModel):
+    type: str
+    num: int
+
+
+class PeriodDetail(BaseModel):
+    """资源简报详情"""
+
+    totalCoin: int
+    totalStar: int
+    coinList: List[PeriodNode] = Field(default_factory=list)
+    starList: List[PeriodNode] = Field(default_factory=list)

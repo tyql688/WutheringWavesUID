@@ -378,4 +378,3 @@ async def draw_pic_with_ring(ev: Event):
     img.paste(resize_pic, (20, 20), mask)
 
     return img
-    return img

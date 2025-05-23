@@ -2,7 +2,6 @@ import asyncio
 import copy
 import json as j
 import random
-from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import httpx
@@ -40,10 +39,12 @@ from .api import (
     GAME_ID,
     KURO_ROLE_URL,
     LOGIN_URL,
+    MONTH_LIST_URL,
     MR_REFRESH_URL,
     ONLINE_LIST_PHANTOM,
     ONLINE_LIST_ROLE,
     ONLINE_LIST_WEAPON,
+    PERIOD_LIST_URL,
     QUERY_OWNED_ROLE,
     QUERY_USERID_URL,
     REFRESH_URL,
@@ -54,12 +55,12 @@ from .api import (
     ROLE_LIST_URL,
     SERVER_ID,
     SERVER_ID_NET,
-    SIGNIN_TASK_LIST_URL,
-    SIGNIN_URL,
     SLASH_DETAIL_URL,
     SLASH_INDEX_URL,
     TOWER_DETAIL_URL,
     TOWER_INDEX_URL,
+    VERSION_LIST_URL,
+    WEEK_LIST_URL,
     WIKI_DETAIL_URL,
     WIKI_ENTRY_DETAIL_URL,
     WIKI_HOME_URL,
@@ -109,8 +110,8 @@ async def get_headers_ios():
         # "b-at": "",
         "source": "ios",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.4.2",
-        "devCode": f"{ip},  Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.4.2",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
+        "devCode": f"{ip},  Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
     }
     return header
 
@@ -655,34 +656,41 @@ class WavesApi:
         raw_data = await self._waves_request(BATCH_ROLE_COST, "POST", header, data=data)
         return await _check_response(raw_data, roleId)
 
-    async def sign_in(
-        self, roleId: str, token: str, serverId: Optional[str] = None
-    ) -> Union[Dict, int]:
-        """签到"""
+    async def get_period_list(
+        self,
+        roleId: str,
+        token: str,
+    ) -> tuple[bool, Union[Dict, str]]:
+        """资源简报列表"""
         header = copy.deepcopy(await get_headers(token))
-        header.update({"token": token, "devcode": ""})
-        data = {
-            "gameId": GAME_ID,
-            "serverId": self.get_server_id(roleId, serverId),
-            "roleId": roleId,
-            "reqMonth": f"{datetime.now().month:02}",
-        }
-        return await self._waves_request(SIGNIN_URL, "POST", header, data=data)
+        header.update({"token": token})
+        raw_data = await self._waves_request(PERIOD_LIST_URL, "GET", header)
+        return await _check_response(raw_data, roleId)
 
-    async def sign_in_task_list(
-        self, roleId: str, token: str, serverId: Optional[str] = None
-    ) -> Union[Dict, int]:
-        """签到"""
+    async def get_period_detail(
+        self,
+        type: Literal["month", "week", "version"],
+        period: Union[str, int],
+        roleId: str,
+        token: str,
+        serverId: Optional[str] = None,
+    ) -> tuple[bool, Union[Dict, str]]:
+        """资源简报详情"""
         header = copy.deepcopy(await get_headers(token))
-        header.update({"token": token, "devcode": ""})
+        header.update({"token": token})
         data = {
-            "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
             "roleId": roleId,
+            "period": period,
         }
-        return await self._waves_request(
-            SIGNIN_TASK_LIST_URL, "POST", header, data=data
-        )
+        if type == "month":
+            url = MONTH_LIST_URL
+        elif type == "week":
+            url = WEEK_LIST_URL
+        elif type == "version":
+            url = VERSION_LIST_URL
+        raw_data = await self._waves_request(url, "POST", header, data=data)
+        return await _check_response(raw_data, roleId)
 
     async def get_gacha_log(
         self,

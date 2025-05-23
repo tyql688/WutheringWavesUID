@@ -45,7 +45,7 @@
     ]
   },
   "库街区登录": {
-    "desc": "在执行查询之前请库街区登录，暂不支持国际服",
+    "desc": "在执行查询之前请库街区登录，暂不支持国际服(括号内容为可选参数)",
     "data": [
       {
         "name": "推荐->登录页登录",
@@ -110,11 +110,19 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "星声统计",
+        "desc": "星声",
+        "eg": "星声(5月/2.3版本)",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
   "信息查询": {
-    "desc": "在执行查询之前请绑定账号",
+    "desc": "在执行查询之前请绑定账号(括号内容为可选参数)",
     "data": [
       {
         "name": "国际服dc卡片分析",
@@ -188,7 +196,6 @@
         "need_sk": false,
         "need_admin": false
       },
-      
       {
         "name": "日历",
         "desc": "日历",
@@ -216,7 +223,7 @@
       {
         "name": "卡池倒计时",
         "desc": "卡池倒计时",
-        "eg": "未复刻角色/武器(4)",
+        "eg": "未复刻角色/武器(5/4)",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -224,7 +231,7 @@
       {
         "name": "角色持有率",
         "desc": "角色持有率",
-        "eg": "角色持有率",
+        "eg": "(群)角色持有率(up/5/4)",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -277,7 +284,7 @@
     ]
   },
   "排行查询": {
-    "desc": "排行查询",
+    "desc": "排行查询(括号内容为可选参数)",
     "data": [
       {
         "name": "群伤害排行",
@@ -306,7 +313,7 @@
       {
         "name": "全服评分排行",
         "desc": "全服评分排行",
-        "eg": "长离评分总排行",
+        "eg": "长离评分总排行(5)",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
