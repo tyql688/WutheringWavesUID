@@ -148,6 +148,16 @@ def alias_to_weapon_name(weapon_name: str) -> str:
     for i in weapon_alias_data:
         if (weapon_name in i) or (weapon_name in weapon_alias_data[i]):
             return i
+
+    if "专武" in weapon_name:
+        char_name = weapon_name.replace("专武", "")
+        name = alias_to_char_name(char_name)
+        weapon_name = f"{name}专武"
+
+    for i in weapon_alias_data:
+        if (weapon_name in i) or (weapon_name in weapon_alias_data[i]):
+            return i
+
     return weapon_name
 
 
