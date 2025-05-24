@@ -43,5 +43,5 @@ class ImageItem(BaseModel):
 
 
 class SpecialImages(BaseModel):
-    # ['content']['tab']
+    name: str
     imgs: List[ImageItem]
