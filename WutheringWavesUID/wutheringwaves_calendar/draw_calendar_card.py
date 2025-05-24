@@ -22,7 +22,7 @@ from ..utils.image import (
     pic_download_from_url,
 )
 from ..utils.resource.RESOURCE_PATH import CALENDAR_PATH
-from .calendar_model import SpecialImages, VersionActivity
+from .calendar_model import ImageItem, SpecialImages, VersionActivity
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 time_icon = Image.open(TEXT_PATH / "time_icon.png")
@@ -211,6 +211,51 @@ async def draw_calendar_img(ev: Event, uid: str):
             # 状态
             event_bg_draw.text((190, 130), f"{status}", "white", ww_font_20, "lm")
 
+            # 添加进度条
+            progress_x = 25
+            progress_y = 155
+            progress_width = 485
+            progress_height = 8
+
+            # 计算进度百分比
+            if status == "已结束":
+                # 已结束
+                progress = 1
+                fill_color = "white"
+            else:
+                # 进行中
+                total_duration = (end_time - start_time).total_seconds()
+                elapsed_duration = (now - start_time).total_seconds()
+                progress = (
+                    elapsed_duration / total_duration if total_duration > 0 else 0
+                )
+                fill_color = "gold" if color == "white" else color
+
+            # 绘制进度条背景
+            event_bg_draw.rectangle(
+                [
+                    progress_x,
+                    progress_y,
+                    progress_x + progress_width,
+                    progress_y + progress_height,
+                ],
+                fill=(100, 100, 100),  # 灰色背景
+            )
+
+            # 绘制进度条前景
+            if progress > 0:
+                progress_fill_width = int(progress_width * progress)
+
+                event_bg_draw.rectangle(
+                    [
+                        progress_x,
+                        progress_y,
+                        progress_x + progress_fill_width,
+                        progress_y + progress_height,
+                    ],
+                    fill=fill_color,
+                )
+
         if "http" in cont.contentUrl:
             # linkUrl = Image.open(
             #     BytesIO((await sget(cont.contentUrl)).content)
@@ -249,14 +294,21 @@ async def draw_calendar_gacha(side_module, gacha_type):
             "nodes": [],
         }
 
-        async def process_item(img_item):
-            item_detail = await get_unsafe_entry_detail(img_item.linkConfig.entryId)
-            if not item_detail:
-                return None
-            if item_detail["code"] != 200:
+        async def process_item(img_item: ImageItem, special_images: SpecialImages):
+            if img_item.linkConfig.linkType == 1:
+                item_detail = await get_unsafe_entry_detail(img_item.linkConfig.entryId)
+                if not item_detail:
+                    return None
+                if item_detail["code"] != 200:
+                    return None
+
+                name = item_detail["data"]["name"]
+            else:
+                name = special_images.name
+
+            if not name:
                 return None
 
-            name = item_detail["data"]["name"]
             if gacha_type == "角色":
                 id = get_char_id(name)
                 if id is None:
@@ -271,7 +323,9 @@ async def draw_calendar_gacha(side_module, gacha_type):
             pic = pic.resize((180, 180))
             return {"name": name, "id": id, "pic": pic}
 
-        tasks = [process_item(img_item) for img_item in special_images.imgs]
+        tasks = [
+            process_item(img_item, special_images) for img_item in special_images.imgs
+        ]
         nodes = await asyncio.gather(*tasks, return_exceptions=True)
 
         res["nodes"].extend(filter(None, nodes))
