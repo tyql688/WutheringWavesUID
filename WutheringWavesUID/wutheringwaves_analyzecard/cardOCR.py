@@ -511,7 +511,8 @@ async def ocr_results_to_dict(chain_num, ocr_results):
                         final_result["角色信息"]["角色名"] = cc.convert(name)
                 
                 # 等级提取
-                level_match = patterns["level"].search(line_clean)
+                line_num = re.sub(r'[^0-9\s]', '', line_clean)
+                level_match = patterns["level"].search(line_num)
                 if level_match and not final_result["角色信息"].get("等级"):
                     final_result["角色信息"]["等级"] = int(level_match.group(1))
                 
