@@ -207,7 +207,7 @@ async def exist_attribute_prop(name: str = "") -> bool:
     try:
         return await asyncio.to_thread(file_path.exists)
     except Exception as e:
-        logger.error(f"[鸣潮][dc卡片识别]文件检查异常: {name}: {str(e)}")
+        logger.error(f"[鸣潮][dc卡片识别]文件检查异常: {name}: {e}")
         return False
 
 def get_breach(level: int):

@@ -102,7 +102,7 @@ async def check_ocr_link_accessible(key="helloworld") -> bool:
         session = await get_global_session()  # 复用全局会话
         async with session.get(url, data=payload, timeout=10) as response:
             data = await response.json()
-            logger.info(f"[鸣潮]OCR.space示例链接访问成功，状态码为 {response.status}\n内容：{data}")
+            logger.debug(f"[鸣潮]OCR.space示例链接访问成功，状态码为 {response.status}\n内容：{data}")
             return response.status == 200
     except (aiohttp.ClientError, asyncio.TimeoutError):
         logger.info("[鸣潮]OCR.space 访问示例链接失败，请检查网络或服务状态。")
@@ -360,25 +360,33 @@ async def images_ocrspace(api_key, cropped_images):
             img.save(buffered, format='PNG')
             img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
         except Exception as e:
-            print(f"图像转换错误: {e}")
+            logger.debug(f"图像转换错误: {e}")
             continue
                 
         # 构建请求参数
+        """
+        language: 仅繁体中文（正确参数值）
+        isOverlayRequired: 需要坐标信息
+        OCREngine: 使用引擎2, 识别效果更好，声骸识别差一些
+        isTable: 启用表格识别模式
+        detectOrientation: 自动检测方向
+        scale: 图像缩放增强
+        """
         payload = {
             'apikey': API_KEY,
-            'language': 'cht',          # 仅繁体中文（正确参数值）
-            'isOverlayRequired': 'True', # 需要坐标信息
+            'language': 'cht',          
+            'isOverlayRequired': False, 
             'base64Image': f'data:image/png;base64,{img_base64}',
-            'OCREngine': 2,             # 使用引擎2, 识别效果更好，声骸识别差一些
-            'isTable': 'True',    # 启用表格识别模式
-            'detectOrientation': 'True', # 自动检测方向
-            'scale': 'True'              # 图像缩放增强
+            'OCREngine': 1,             
+            'isTable': True,    
+            'detectOrientation': False, 
+            'scale': False              
         }
 
         tasks.append(fetch_ocr_result(session, API_URL, payload))
 
     # 限制并发数为1防止超过API限制
-    semaphore = asyncio.Semaphore(1)
+    semaphore = asyncio.Semaphore(3)
     # 修改返回结果处理
     results = await asyncio.gather(*(process_with_semaphore(task, semaphore) for task in tasks))
         
@@ -399,32 +407,21 @@ async def fetch_ocr_result(session, url, payload):
                 return [{'error': f'HTTP Error {response.status}', 'text': None}]
                 
             data = await response.json()
-                
-            # 检查API错误
-            if data.get('IsErroredOnProcessing', False):
-                return [{'error': data.get('ErrorMessage', '未知错误'), 'text': None}]
-                
+            
             # 解析结果
             if not data.get('ParsedResults'):
                 return [{'error': 'No Results', 'text': None}]
                 
-            output = []
-                
             # 提取识别结果
             for result in data.get('ParsedResults', []):
                 # 补充完整文本
-                if parsed_text := result.get('ParsedText'):
-                    output.append({
-                        'text': parsed_text,
-                        'error': None  # 统一数据结构
-                    })
+                if result.get('ParsedText'):
+                    return [{'error': None, 'text': result.get('ParsedText')}]
                 
-            return output
+            return [{'error': 'No Results', 'text': None}]
                 
-    except aiohttp.ClientError as e:
-        return [{'error': f'Network Error:{str(e)}', 'text': None}]
     except Exception as e:
-        return [{'error': f'Processing Error:{str(e)}', 'text': None}]
+        return [{'error': f'Processing Error:{e}', 'text': None}]
 
 async def ocr_results_to_dict(chain_num, ocr_results):
     """
@@ -448,9 +445,9 @@ async def ocr_results_to_dict(chain_num, ocr_results):
     patterns = {
         "name": re.compile(r'^([A-Za-z\u4e00-\u9fa5\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7A3\u00C0-\u00FF]+)'), # 支持英文、中文、日文、韩文，以及西班牙文、德文和法文中的扩展拉丁字符，为后续逻辑判断用
         "level": re.compile(r'(?i)(.V?\.?)\s*(\d+)'),
-        "skill_level": re.compile(r'[LV]*\.?\s*(\d+)\s*/\s*10'),  # 兼容 L.10/10、LV.10/10 等格式
+        "skill_level": re.compile(r'(\d+)\s*/\s*\d*'),  # 兼容 L.10/10、LV.10/1 等格式
         "player_info": re.compile(r'玩家名稱\s*[:：]?\s*(\S+)'),
-        "uid_info": re.compile(r'特.碼\s*[:：]?\s*(\d+)'),
+        "uid_info": re.compile(r'.[馬碼]\s*[:：]?\s*(\d+)'),
         "echo_value": re.compile(r'([\u4e00-\u9fa5]+)\s*\D*([\d.]+%?)'), # 不支持英文词条(空格不好处理), 支持处理"暴擊傷害 器44%", "攻擊 ×18%"
         "weapon_info": re.compile(r'([\u4e00-\u9fa5]+)\s+LV\.(\d+)')
     }
@@ -543,7 +540,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         
         # 文本预处理：去除多余的空白符
         text_clean = re.sub(r'\s+', ' ', text).strip()  # 使用 \s+ 匹配所有空白符，并替换为单个空格
-        text_clean = re.sub(r'[，,、,]', '.', text_clean) # 将逗号替换为句号(中文全角逗号（简体和繁体）、英文半角逗号、日文逗号（全角顿号）、韩文逗号)
+        text_clean = re.sub(r'[·，,、,]', '.', text_clean) # 将·与逗号替换为句号(中文全角逗号（简体和繁体）、英文半角逗号、日文逗号（全角顿号）、韩文逗号)
 
         # 提取属性对
         matches = patterns["echo_value"].findall(text_clean)
