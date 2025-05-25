@@ -89,14 +89,14 @@ async def get_global_session():
         logger.info("[鸣潮]已创建新的全局 OCR 会话")
     return OCR_SESSION
 
-async def check_ocr_link_accessible() -> bool:
+async def check_ocr_link_accessible(key="helloworld") -> bool:
     """
     检查OCR.space示例链接是否能正常访问，返回布尔值。
     """
     url = "https://api.ocr.space/parse/imageurl"
     payload = {
         'url': 'https://dl.a9t9.com/ocr/solarcell.jpg',
-        'apikey': 'helloworld',
+        'apikey': f'{key}',
     }
     try:
         session = await get_global_session()  # 复用全局会话
@@ -123,6 +123,11 @@ async def async_ocr(bot: Bot, ev: Event):
         await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
         return False
 
+    # 检查API_KEY是否可达
+    if not await check_ocr_link_accessible(API_KEY):
+        await bot.send("[鸣潮] OCRspace API密钥不可用！")
+        return False
+
     bool_i, image = await upload_discord_bot_card(ev)
     if not bool_i:
         await bot.send("[鸣潮]获取dc卡片图失败！卡片分析已停止。")
@@ -134,8 +139,8 @@ async def async_ocr(bot: Bot, ev: Event):
     logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
 
     if ocr_results[0]['error']:
-        logger.info("[鸣潮]OCRspace识别失败！请检查控制台API密钥是否正确，或服务器网络是否正常。")
-        await bot.send("[鸣潮]OCRspace识别失败！请检查控制台API密钥是否正确，或服务器网络是否正常。")
+        logger.info("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
+        await bot.send("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
         return False
 
     bool_d, final_result = await ocr_results_to_dict(chain_num, ocr_results)
