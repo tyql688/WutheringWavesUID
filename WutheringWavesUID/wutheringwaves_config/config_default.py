@@ -131,13 +131,13 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
     "MaxBindNum": GsIntConfig(
         "绑定特征码限制数量（未登录）", "绑定特征码限制数量（未登录）", 2, 100
     ),
-    "OCRspaceApiKey": GsListStrConfig(
-        "OCRspace API Key",
-        "用于设置discord_bot角色卡片ocr识别的OCRspace的配置",
+    "OCRspaceApiKeyList": GsListStrConfig(
+        "OCRspace API Key List",
+        "用于ocr识别discord_bot角色卡片",
         [],
         options=[
+            "可输入多个key",
             "输入后回车",
-            "不能请删除data/wuwa/json",
         ],
     ),
     "WavesToken": GsStrConfig(
