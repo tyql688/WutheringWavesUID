@@ -130,7 +130,7 @@ async def check_ocr_engine_accessible() -> int:
                 if len(cells) >=4 and "Free OCR API" in cells[0].text:
                     status_1 = cells[2].text.strip().upper()
                     status_2 = cells[3].text.strip().upper()
-                    logger.info(f"[鸣潮] OcrEngine_1:{status_1}, OcrEngine_1:{status_2}")
+                    logger.info(f"[鸣潮] OcrEngine_1:{status_1}, OcrEngine_2:{status_2}")
                     return 2 if status_2 == "UP" else 1
                     
             logger.info("[鸣潮] 未找到状态行")
@@ -586,6 +586,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
             if re.search(r'暴.(傷害)?', attr):
                 attr = re.sub(r'暴.(傷害)?', r'暴擊\1', attr)
             attr = attr.replace("箓擎傷害", "暴擊傷害").replace("箓擎", "暴擊")
+            attr = re.sub(r'攻.*$', '攻擊', attr)
             attr = re.sub(r'.*效率$', '共鳴效率', attr)
             clean_attr = cc.convert(attr) # 标准繁简转换
             # 验证属性名是否符合预期（至少两个中文字符，且不含数字）
