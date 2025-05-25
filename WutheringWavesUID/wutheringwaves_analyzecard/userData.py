@@ -33,6 +33,8 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         uid = result_dict["用户信息"]["UID"]
 
         chain_num = result_dict["角色信息"]["共鸣链"]
+
+        char_level = result_dict["角色信息"]["等级"]
         
         char_id = result_dict["角色信息"]["角色ID"]
         char_name = char_id_to_char_name(char_id)
@@ -44,6 +46,8 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
             return
         weapon_name = alias_to_weapon_name(result_dict["武器信息"]["武器名"])
         weapon_id = weapon_name_to_weapon_id(result_dict["武器信息"]["武器名"])
+
+        wepon_level = result_dict["武器信息"]["等级"]
 
     except Exception as e:
         logger.error(f" [鸣潮][dc卡片识别] 识别结果结构错误：{e}")
@@ -70,7 +74,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         })
         
     # 处理 `level` 的数据
-    data["level"] = result_dict["角色信息"]["等级"]
+    data["level"] = char_level
         
     # 处理 `phantomData` 的数据
     data["phantomData"] = {
@@ -161,11 +165,11 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
     }
     if weapon_id is not None:
         # breach 突破、resonLevel 精炼
-        data["weaponData"]["level"] = result_dict["武器信息"]["等级"]
-        data["weaponData"]["breach"] = get_breach(result_dict["武器信息"]["等级"])
+        data["weaponData"]["level"] = wepon_level
+        data["weaponData"]["breach"] = get_breach(wepon_level)
         data["weaponData"]["weapon"]["weaponName"] = weapon_name
         data["weaponData"]["weapon"]["weaponId"] = weapon_id
-        weapon_detail = get_weapon_detail(weapon_id, result_dict["武器信息"]["等级"])
+        weapon_detail = get_weapon_detail(weapon_id, wepon_level)
         data["weaponData"]["weapon"]["weaponStarLevel"] = weapon_detail.starLevel
 
     # 检查声骸数据是否异常

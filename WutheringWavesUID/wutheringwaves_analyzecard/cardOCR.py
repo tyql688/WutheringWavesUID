@@ -108,6 +108,34 @@ async def check_ocr_link_accessible(key="helloworld") -> bool:
         logger.info("[鸣潮]OCR.space 访问示例链接失败，请检查网络或服务状态。")
         return False
 
+async def check_ocr_engine_accessible() -> int:
+    """
+    检查OCR.space示例链接是否能正常访问，返回布尔值。
+    """
+    url = "https://status.ocr.space"
+    #try:
+    session = await get_global_session()  # 复用全局会话
+    async with session.get(url) as response:
+        # 先检查状态码
+            if response.status != 200:
+                logger.info(f"[鸣潮]OCR.space 访问失败，状态码: {response.status}")
+                return 0
+                
+            # 检查Content-Type是否为JSON
+            content_type = response.headers.get('Content-Type', '')
+            if 'application/json' not in content_type:
+                # 如果不是JSON，尝试直接读取文本内容
+                text_data = await response.text()
+                logger.debug(f"[鸣潮] 收到非JSON响应，内容类型: {content_type}\n内容片段: {text_data}...")
+                return 1 if "running" in text_data.lower() else 0  # 根据实际内容判断
+            
+            # 如果是JSON再解析
+            data = await response.json()
+            logger.debug(f"[鸣潮]OCR.space访问成功，状态码: {response.status}\n内容: {data}")
+            return 1
+    # except (aiohttp.ClientError, asyncio.TimeoutError):
+    #     logger.info("[鸣潮]OCR.space 访问示例链接失败，请检查网络或服务状态。")
+    #     return 0
 async def async_ocr(bot: Bot, ev: Event):
     """
     异步OCR识别函数
@@ -119,6 +147,7 @@ async def async_ocr(bot: Bot, ev: Event):
         return False
 
     # 检查示例链接是否可达
+    # num = await check_ocr_engine_accessible()
     if not await check_ocr_link_accessible():
         await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
         return False
@@ -444,7 +473,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
     # 增强正则模式（适配多行文本处理）
     patterns = {
         "name": re.compile(r'^([A-Za-z\u4e00-\u9fa5\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7A3\u00C0-\u00FF]+)'), # 支持英文、中文、日文、韩文，以及西班牙文、德文和法文中的扩展拉丁字符，为后续逻辑判断用
-        "level": re.compile(r'(?i)(.V?\.?)\s*(\d+)'),
+        "level": re.compile(r'(?i)^(?:.*?V)?\s*?(\d+)$'), # 兼容纯数字
         "skill_level": re.compile(r'(\d+)\s*/\s*\d*'),  # 兼容 L.10/10、LV.10/1 等格式
         "player_info": re.compile(r'玩家名稱\s*[:：]?\s*(\S+)'),
         "uid_info": re.compile(r'.[馬碼]\s*[:：]?\s*(\d+)'),
@@ -484,7 +513,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
                 # 等级提取
                 level_match = patterns["level"].search(line_clean)
                 if level_match and not final_result["角色信息"].get("等级"):
-                    final_result["角色信息"]["等级"] = int(level_match.group(2))
+                    final_result["角色信息"]["等级"] = int(level_match.group(1))
                 
                 # UID提取
                 uid_match = patterns["uid_info"].search(line_clean)
@@ -499,19 +528,17 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         # 武器名称（取第一行有效文本）
         for line in lines:
             # 文本预处理：删除非数字中英文的符号及多余空白
-            line_clean = re.sub(r'[^\u4e00-\u9fa50-9\s]', '', line)  # 先删除非数字中英文的符号, 匹配“源能臂铠·测肆”
+            line_clean = re.sub(r'[^0-9\u4e00-\u9fa5\s]', '', line)  # 先删除非数字中英文的符号, 匹配“源能臂铠·测肆”
             line_clean = re.sub(r'\s+', ' ', line_clean).strip()  # 再合并多余空白
             if patterns["name"].search(line_clean):
                 line_clean = re.sub(r'.*古洑流$', '千古洑流', line_clean)
                 final_result["武器信息"]["武器名"] = cc.convert(line_clean)
-                break
-                
-        # 武器等级
-        for line in lines:
-            level_match = patterns["level"].search(line)
+                continue
+
+            level_match = patterns["level"].search(line_clean)
             if level_match:
-                final_result["武器信息"]["等级"] = int(level_match.group(2))
-                break
+                final_result["武器信息"]["等级"] = int(level_match.group(1))
+                continue
 
     # 处理技能等级（第3-7个结果）下标：2 3 4 5 6
     for idx in range(2, 7):
