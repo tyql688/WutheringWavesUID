@@ -146,8 +146,8 @@ async def async_ocr(bot: Bot, ev: Event):
     """
     异步OCR识别函数
     """
-    API_KEY = WutheringWavesConfig.get_config("OCRspaceApiKey").data  # 从控制台获取OCR.space的API密钥
-    if not API_KEY:
+    api_key_list = WutheringWavesConfig.get_config("OCRspaceApiKey").data  # 从控制台获取OCR.space的API密钥
+    if api_key_list is None:
         logger.info("[鸣潮] OCRspace API密钥为空！请检查控制台。")
         await bot.send("[鸣潮] OCRspace API密钥未配置，请检查控制台。")
         return False
@@ -158,7 +158,13 @@ async def async_ocr(bot: Bot, ev: Event):
     if not await check_ocr_link_accessible():
         await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
         return False
-    if not await check_ocr_link_accessible(API_KEY):
+    # 检查key
+    API_KEY = None
+    for key in api_key_list:
+        if await check_ocr_link_accessible(key):
+            API_KEY = key
+            break
+    if API_KEY is None:
         await bot.send("[鸣潮] OCRspace API密钥不可用！请等待额度恢复或更换密钥")
         return False
 
