@@ -110,32 +110,38 @@ async def check_ocr_link_accessible(key="helloworld") -> bool:
 
 async def check_ocr_engine_accessible() -> int:
     """
-    检查OCR.space示例链接是否能正常访问，返回布尔值。
+    检查OcrEngine_2状态（通过解析HTML表格）
+    返回1表示UP，0表示DOWN或其他错误
     """
+    from bs4 import BeautifulSoup
     url = "https://status.ocr.space"
-    #try:
-    session = await get_global_session()  # 复用全局会话
-    async with session.get(url) as response:
-        # 先检查状态码
-            if response.status != 200:
-                logger.info(f"[鸣潮]OCR.space 访问失败，状态码: {response.status}")
-                return 0
-                
-            # 检查Content-Type是否为JSON
-            content_type = response.headers.get('Content-Type', '')
-            if 'application/json' not in content_type:
-                # 如果不是JSON，尝试直接读取文本内容
-                text_data = await response.text()
-                logger.debug(f"[鸣潮] 收到非JSON响应，内容类型: {content_type}\n内容片段: {text_data}...")
-                return 1 if "running" in text_data.lower() else 0  # 根据实际内容判断
+    try:
+        session = await get_global_session()
+        async with session.get(url, timeout=10) as response:
+            html = await response.text()
+            soup = BeautifulSoup(html, 'html.parser')
             
-            # 如果是JSON再解析
-            data = await response.json()
-            logger.debug(f"[鸣潮]OCR.space访问成功，状态码: {response.status}\n内容: {data}")
+            # 定位目标表格
+            target_table = soup.find('h4', string='API Access Points').find_next('table')
+            
+            # 查找包含"Free OCR API"的行
+            for row in target_table.find_all('tr'):
+                cells = row.find_all('td')
+                if len(cells) >=4 and "Free OCR API" in cells[0].text:
+                    status_1 = cells[2].text.strip().upper()
+                    status_2 = cells[3].text.strip().upper()
+                    logger.info(f"[鸣潮] OcrEngine_1:{status_1}, OcrEngine_1:{status_2}")
+                    return 2 if status_2 == "UP" else 1
+                    
+            logger.info("[鸣潮] 未找到状态行")
             return 1
-    # except (aiohttp.ClientError, asyncio.TimeoutError):
-    #     logger.info("[鸣潮]OCR.space 访问示例链接失败，请检查网络或服务状态。")
-    #     return 0
+            
+    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+        logger.info(f"[鸣潮] 网络错误: {e}")
+        return 1
+    except Exception as e:
+        logger.error(f"[鸣潮] 解析异常: {e}")
+        return 1
 async def async_ocr(bot: Bot, ev: Event):
     """
     异步OCR识别函数
@@ -147,14 +153,13 @@ async def async_ocr(bot: Bot, ev: Event):
         return False
 
     # 检查示例链接是否可达
-    # num = await check_ocr_engine_accessible()
+    engine_num = await check_ocr_engine_accessible()
+    logger.info(f"[鸣潮]OCR.space服务engine：{engine_num}")
     if not await check_ocr_link_accessible():
         await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
         return False
-
-    # 检查API_KEY是否可达
     if not await check_ocr_link_accessible(API_KEY):
-        await bot.send("[鸣潮] OCRspace API密钥不可用！")
+        await bot.send("[鸣潮] OCRspace API密钥不可用！请等待额度恢复或更换密钥")
         return False
 
     bool_i, image = await upload_discord_bot_card(ev)
@@ -164,7 +169,7 @@ async def async_ocr(bot: Bot, ev: Event):
 
     # 获取dc卡片识别结果,使用API_KEY
     chain_num, cropped_images = await cut_card_to_ocr(image)
-    ocr_results = await images_ocrspace(API_KEY, cropped_images)
+    ocr_results = await images_ocrspace(API_KEY, engine_num, cropped_images)
     logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
 
     if ocr_results[0]['error']:
@@ -373,11 +378,12 @@ async def cut_card_to_ocr(image):
     # 调用 images_ocrspace 函数并获取识别结果
     return chain_num, cropped_images
 
-async def images_ocrspace(api_key, cropped_images):
+async def images_ocrspace(api_key, engine_num, cropped_images):
     """
     使用 OCR.space 免费API识别碎块图片
     """
     API_KEY = api_key
+    ENGINE_NUM = engine_num
     API_URL = 'https://api.ocr.space/parse/image'
 
     session = await get_global_session()  # 复用全局会话
@@ -404,12 +410,12 @@ async def images_ocrspace(api_key, cropped_images):
         payload = {
             'apikey': API_KEY,
             'language': 'cht',          
-            'isOverlayRequired': False, 
+            'isOverlayRequired': True, 
             'base64Image': f'data:image/png;base64,{img_base64}',
-            'OCREngine': 1,             
+            'OCREngine': ENGINE_NUM,             
             'isTable': True,    
-            'detectOrientation': False, 
-            'scale': False              
+            'detectOrientation': True, 
+            'scale': True              
         }
 
         tasks.append(fetch_ocr_result(session, API_URL, payload))
