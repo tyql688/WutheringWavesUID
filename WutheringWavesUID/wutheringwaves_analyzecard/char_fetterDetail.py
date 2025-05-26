@@ -70,7 +70,7 @@ async def echo_data_to_cost(char_id, mainProps_first, cost4_counter=0) -> tuple[
         tuple (echo_id, cost)
     """
     # ---------- 常量定义 ----------
-    # 主词条阈值配置 . change from utils.rmap.calc_score_script.py
+    # 主词条阈值配置 . change from utils.map.calc_score_script.py
     phantom_main_value = [
         {"name": "攻击", "values": ["18%", "30%", "33%"]},
         {"name": "生命", "values": ["22.8%", "30%", "33%"]},

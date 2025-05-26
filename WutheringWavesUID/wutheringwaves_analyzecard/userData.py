@@ -1,8 +1,6 @@
 import re
 import copy
-import asyncio
 from typing import Dict
-from pathlib import Path
 from itertools import zip_longest
 
 from gsuid_core.bot import Bot
@@ -12,8 +10,6 @@ from gsuid_core.logger import logger
 from ..wutheringwaves_charinfo.draw_char_card import generate_online_role_detail
 from ..utils.ascension.weapon import get_weapon_detail
 from ..utils.refresh_char_detail import save_card_info
-from ..utils.api.model import RoleDetailData
-from ..utils.calc import WuWaCalc
 from ..utils.name_convert import (
     char_id_to_char_name,
     alias_to_weapon_name,
@@ -22,6 +18,7 @@ from ..utils.name_convert import (
 )
 
 from ..wutheringwaves_config import PREFIX
+from .Phantom_check import PhantomValidator
 from .char_fetterDetail import get_fetterDetail_from_char, echo_data_to_cost
 
 
@@ -173,11 +170,12 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         data["weaponData"]["weapon"]["weaponStarLevel"] = weapon_detail.starLevel
 
     # 检查声骸数据是否异常
-    if not await check_phantom_data(data):
+    is_valid, corrected_data = await check_phantom_data(data)
+    if not is_valid:
         await bot.send("[鸣潮]dc卡片识别数据异常！\n或请使用更高分辨率卡片重新识别！", at_sender)
         return
 
-    waves_data.append(data)
+    waves_data.append(corrected_data)
     await save_card_info(uid, waves_data)
     await bot.send(f"[鸣潮]dc卡片数据提取成功！识别套装使用默认配置(影响伤害计算不影响声骸评分)\n可使用：\n【{PREFIX}{char_name_print}面板】查看您的角色面板\n【{PREFIX}改{char_name_print}套装**(套装名)】修改声骸套装\n【{PREFIX}改{char_name_print}声骸】修改当前套装的首位声骸\n", at_sender)
     logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name_print}面板数据已保存到本地！")
@@ -185,34 +183,22 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
 async def check_phantom_data(data) -> bool:
     try:
-        role_detail = RoleDetailData.model_validate(data)
-        # 检查数值
-        calc: WuWaCalc = WuWaCalc(role_detail)
-        calc.phantom_pre = calc.prepare_phantom()
-        # 检查词条名
-        if role_detail.phantomData and role_detail.phantomData.equipPhantomList:
-            equipPhantomList = role_detail.phantomData.equipPhantomList
-            for _phantom in equipPhantomList:
-                if _phantom and _phantom.phantomProp:
-                    props = _phantom.get_props()
-                    for _prop in props:
-                        test = await exist_attribute_prop(_prop.attributeName)
-                        if not test:
-                            logger.info(f"[鸣潮][dc卡片识别]词条文本检查异常: {_prop.attributeName}")
-                            return False
-        return True
-    except Exception as e:
-        logger.error(f" [鸣潮][dc卡片识别] 角色声骸数据异常：{e}")
-        return False
+        processed_data = copy.deepcopy(data)
+        # 检查词条内容，修正词条数据
+        if processed_data.get("phantomData") and processed_data["phantomData"].get("equipPhantomList"):
+            equipPhantomList = processed_data["phantomData"].get("equipPhantomList")
+            validator = PhantomValidator(equipPhantomList)
+            # 分离验证与修正
+            is_valid, corrected_list = await validator.validate_phatom_list()
+            if not is_valid:
+                return False, data
+            processed_data["phantomData"]["equipPhantomList"] = corrected_list
 
-async def exist_attribute_prop(name: str = "") -> bool:
-    TEXT_PATH = Path(__file__).parent.parent / "utils" / "texture2d" / "attribute_prop" 
-    file_path = Path(TEXT_PATH) / f"attr_prop_{name}.png"
-    try:
-        return await asyncio.to_thread(file_path.exists)
+        return True, processed_data
     except Exception as e:
-        logger.error(f"[鸣潮][dc卡片识别]文件检查异常: {name}: {e}")
-        return False
+        logger.info(f" [鸣潮][dc卡片识别] 角色声骸数据异常：{e}")
+        return False, data
+
 
 def get_breach(level: int):
     if level <= 20:
