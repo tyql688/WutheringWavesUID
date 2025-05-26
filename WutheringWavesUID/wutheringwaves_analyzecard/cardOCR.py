@@ -147,7 +147,7 @@ async def async_ocr(bot: Bot, ev: Event):
     异步OCR识别函数
     """
     api_key_list = WutheringWavesConfig.get_config("OCRspaceApiKeyList").data  # 从控制台获取OCR.space的API密钥
-    if api_key_list is None:
+    if api_key_list == []:
         logger.info("[鸣潮] OCRspace API密钥为空！请检查控制台。")
         await bot.send("[鸣潮] OCRspace API密钥未配置，请检查控制台。")
         return False
@@ -486,7 +486,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
     patterns = {
         "name": re.compile(r'^([A-Za-z\u4e00-\u9fa5\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7A3\u00C0-\u00FF]+)'), # 支持英文、中文、日文、韩文，以及西班牙文、德文和法文中的扩展拉丁字符，为后续逻辑判断用
         "level": re.compile(r'(?i)^(?:.*?V)?\s*?(\d+)$'), # 兼容纯数字
-        "skill_level": re.compile(r'(\d+)\s*/\s*\d*'),  # 兼容 L.10/10、LV.10/1 等格式
+        "skill_level": re.compile(r'(\d+)\s*[/ ]\s*\d*'),  # 兼容 L.10/10、LV.10/1、4 10、4/ 等格式
         "player_info": re.compile(r'玩家名稱\s*[:：]?\s*(\S+)'),
         "uid_info": re.compile(r'.[馬碼]\s*[:：]?\s*(\d+)'),
         "echo_value": re.compile(r'([\u4e00-\u9fa5]+)\s*\D*([\d.]+%?)'), # 不支持英文词条(空格不好处理), 支持处理"暴擊傷害 器44%", "攻擊 ×18%"
@@ -561,7 +561,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
             
         text = ocr_results[idx]['text']
         # 强化文本清洗
-        text_clean = re.sub(r'[^0-9/]', '', text)  # 移除非数字字符
+        text_clean = re.sub(r'[^0-9/]', ' ', text)  # 将非数字字符替换为空格
         match = patterns["skill_level"].search(text_clean)
         if match:
             level = int(match.group(1))
