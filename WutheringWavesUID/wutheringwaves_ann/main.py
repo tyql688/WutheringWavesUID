@@ -3,6 +3,8 @@ import copy
 
 import httpx
 
+from gsuid_core.logger import logger
+
 from ..utils.api.api import ANN_CONTENT_URL, ANN_LIST_URL, GAME_ID
 
 
@@ -33,7 +35,9 @@ class ann:
             res = await client.post(
                 ANN_LIST_URL, headers=headers, data=data, timeout=10
             )
-            return res.json(object_hook=_Dict)
+            value = res.json(object_hook=_Dict)
+            logger.debug(f"公告数据查询: {value}")
+            return value
 
     async def _get_ann_detail(self, post_id: int):
         headers = copy.deepcopy(self._headers)
