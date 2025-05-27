@@ -25,7 +25,12 @@ from ..error_reply import (
     WAVES_CODE_999,
 )
 from ..hint import error_reply
-from ..util import generate_random_string, get_public_ip, timed_async_cache
+from ..util import (
+    generate_random_string,
+    get_public_ip,
+    send_master_info,
+    timed_async_cache,
+)
 from .api import (
     BASE_DATA_URL,
     BATCH_ROLE_COST,
@@ -86,9 +91,11 @@ async def _check_response(
             return False, res.get("msg", "登录已过期")
 
         if res.get("msg") and "访问被阻断" in res["msg"]:
+            await send_master_info(res.get("msg", "未知错误"))
             return False, error_reply(WAVES_CODE_998)
 
         if res.get("msg"):
+            await send_master_info(res.get("msg", "未知错误"))
             return False, error_reply(WAVES_CODE_999)
     return False, error_reply(WAVES_CODE_999)
 
