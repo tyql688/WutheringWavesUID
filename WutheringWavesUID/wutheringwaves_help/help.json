@@ -573,6 +573,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": true
+      },
+      {
+        "name": "联系主人",
+        "desc": "联系主人",
+        "eg": "联系主人",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
       }
     ]
   }

@@ -6,6 +6,7 @@ from functools import wraps
 from typing import Any, List
 
 import httpx
+from subscribe import gs_subscribe
 
 
 def timed_async_cache(expiration, condition=lambda x: True):
@@ -106,3 +107,13 @@ def get_version():
     from ..version import WutheringWavesUID_version
 
     return WutheringWavesUID_version
+
+
+@timed_async_cache(300)
+async def send_master_info(msg: str):
+    subscribes = await gs_subscribe.get_subscribe("联系主人")
+    if not subscribes:
+        return
+    if subscribes:
+        for sub in subscribes:
+            await sub.send(f"【联系主人】：{msg}")
