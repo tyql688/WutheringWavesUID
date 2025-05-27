@@ -98,8 +98,6 @@ async def check_waves_ann_state():
     datas = await gs_subscribe.get_subscribe(task_name_ann)
     if not datas:
         logger.info("[鸣潮公告] 暂无群订阅")
-        # new_ids = await ann().get_ann_ids()
-        # WutheringWavesConfig.set_config("WavesAnnNewIds", new_ids)
         return
 
     ids = WutheringWavesConfig.get_config("WavesAnnNewIds").data
@@ -110,8 +108,12 @@ async def check_waves_ann_state():
         WutheringWavesConfig.set_config("WavesAnnNewIds", ids)
         logger.info("[鸣潮公告] 初始成功, 将在下个轮询中更新.")
         return
+
     new_ids = await ann().get_ann_ids()
-    new_ann = set(ids) ^ set(new_ids)
+    new_ann = []
+    for i in new_ids:
+        if i not in ids:
+            new_ann.append(i)
 
     if not new_ann:
         logger.info("[鸣潮公告] 没有最新公告")
