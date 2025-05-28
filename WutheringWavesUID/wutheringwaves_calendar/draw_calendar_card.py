@@ -10,7 +10,6 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
-from ..utils.api.requests import Wiki
 from ..utils.ascension.char import get_char_id
 from ..utils.ascension.weapon import get_weapon_id
 from ..utils.fonts.waves_fonts import ww_font_20, ww_font_24, ww_font_30
@@ -22,11 +21,11 @@ from ..utils.image import (
     pic_download_from_url,
 )
 from ..utils.resource.RESOURCE_PATH import CALENDAR_PATH
+from ..utils.waves_api import waves_api
 from .calendar_model import ImageItem, SpecialImages, VersionActivity
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 time_icon = Image.open(TEXT_PATH / "time_icon.png")
-wiki = Wiki()
 
 
 def tower_node(now: datetime):
@@ -78,7 +77,7 @@ def shenhai_node(now: datetime):
 
 
 async def draw_calendar_img(ev: Event, uid: str):
-    wiki_home = await wiki.get_wiki_home()
+    wiki_home = await waves_api.get_wiki_home()
     if wiki_home["code"] != 200:
         return "获取日历失败"
 
@@ -444,7 +443,7 @@ cache = {}
 async def get_unsafe_entry_detail(entryId):
     if entryId in cache:
         return cache[entryId]
-    item_detail = await wiki.get_entry_detail(entryId)
+    item_detail = await waves_api.get_entry_detail(entryId)
     if item_detail["code"] != 200:
         return None
 

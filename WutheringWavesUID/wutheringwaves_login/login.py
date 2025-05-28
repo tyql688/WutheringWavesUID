@@ -19,9 +19,9 @@ from gsuid_core.web_app import app
 
 from ..utils.cache import TimedCache
 from ..utils.database.models import WavesBind, WavesUser
-from ..utils.kuro_api import kuro_api
 from ..utils.resource.RESOURCE_PATH import waves_templates
 from ..utils.util import get_public_ip
+from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 from ..wutheringwaves_user import deal
 from ..wutheringwaves_user.login_succ import login_success_msg
@@ -215,7 +215,7 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
             at_sender=at_sender,
         )
 
-    result = await kuro_api.login(phone_number, code)
+    result = await waves_api.login(phone_number, code)
     if (
         not isinstance(result, dict)
         or result.get("code") != 200

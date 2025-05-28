@@ -7,11 +7,10 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.subscribe import gs_subscribe
 from gsuid_core.sv import SV
-from gsuid_core.utils.image.convert import convert_img
 
+from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import WutheringWavesConfig
 from .ann_card import ann_detail_card, ann_list_card
-from .main import ann
 
 sv_ann = SV("鸣潮公告")
 sv_ann_sub = SV("订阅鸣潮公告", pm=3)
@@ -25,7 +24,6 @@ async def ann_(bot: Bot, ev: Event):
     ann_id = ev.text
     if not ann_id:
         img = await ann_list_card()
-        img = await convert_img(img)
         return await bot.send(img)
 
     ann_id = ann_id.replace("#", "")
@@ -101,31 +99,32 @@ async def check_waves_ann_state():
         return
 
     ids = WutheringWavesConfig.get_config("WavesAnnNewIds").data
+    new_ann_list = await waves_api.get_ann_list()
+    if not new_ann_list:
+        return
+
+    new_ann_ids = [x["id"] for x in new_ann_list]
     if not ids:
-        ids = await ann().get_ann_ids()
-        if not ids:
-            raise Exception("获取鸣潮公告ID列表错误,请检查接口")
-        WutheringWavesConfig.set_config("WavesAnnNewIds", ids)
+        WutheringWavesConfig.set_config("WavesAnnNewIds", new_ann_ids)
         logger.info("[鸣潮公告] 初始成功, 将在下个轮询中更新.")
         return
 
-    new_ids = await ann().get_ann_ids()
-    new_ann = []
-    for i in new_ids:
-        if i not in ids:
-            new_ann.append(i)
+    new_ann_need_send = []
+    for ann_id in new_ann_ids:
+        if ann_id not in ids:
+            new_ann_need_send.append(ann_id)
 
-    if not new_ann:
+    if not new_ann_need_send:
         logger.info("[鸣潮公告] 没有最新公告")
         return
 
-    logger.info("[鸣潮公告] 更新数据库")
-    save_ids = sorted(ids, reverse=True)[:50] + new_ids
+    logger.info(f"[鸣潮公告] 更新公告id: {new_ann_need_send}")
+    save_ids = sorted(ids, reverse=True)[:50] + new_ann_ids
     WutheringWavesConfig.set_config("WavesAnnNewIds", list(set(save_ids)))
 
-    for ann_id in new_ann:
+    for ann_id in new_ann_need_send:
         try:
-            img = await ann_detail_card(ann_id)
+            img = await ann_detail_card(ann_id, is_check_time=True)
             if isinstance(img, str):
                 continue
             for subscribe in datas:
