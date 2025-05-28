@@ -4,7 +4,6 @@ import json as j
 import random
 from typing import Any, Dict, List, Literal, Optional, Union
 
-import httpx
 from aiohttp import (
     ClientSession,
     ClientTimeout,
@@ -32,6 +31,8 @@ from ..util import (
     timed_async_cache,
 )
 from .api import (
+    ANN_CONTENT_URL,
+    ANN_LIST_URL,
     BASE_DATA_URL,
     BATCH_ROLE_COST,
     CALABASH_DATA_URL,
@@ -106,7 +107,9 @@ async def get_headers_h5():
         # "b-at": "",
         "source": "h5",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
         "devCode": devCode,
+        "version": "2.5.0",
     }
     return header
 
@@ -140,6 +143,11 @@ async def get_headers(ck: Optional[str] = None, platform: Optional[str] = None) 
 
 class WavesApi:
     ssl_verify = True
+    ann_map = {}
+    ann_list_data = []
+    event_type = {"2": "资讯", "3": "公告", "1": "活动"}
+
+    entry_detail_map = {}
 
     def is_net(self, roleId):
         _temp = int(roleId)
@@ -725,6 +733,76 @@ class WavesApi:
         url = GACHA_NET_LOG_URL if self.is_net(roleId) else GACHA_LOG_URL
         return await self._waves_request(url, "POST", header, json=data)
 
+    async def get_ann_list_by_type(
+        self, eventType: str = "", pageSize: Optional[int] = None
+    ):
+        """获取公告列表"""
+        data: Dict[str, Any] = {"gameId": GAME_ID}
+        if eventType:
+            data.update({"eventType": eventType})
+        if pageSize:
+            data.update({"pageSize": pageSize})
+        headers = copy.deepcopy(await get_headers())
+        return await self._waves_request(ANN_LIST_URL, "POST", headers, data=data)
+
+    async def get_ann_detail(self, post_id: str):
+        """获取公告详情"""
+        if post_id in self.ann_map:
+            return self.ann_map[post_id]
+
+        headers = copy.deepcopy(await get_headers())
+        headers.update({"token": "", "devcode": ""})
+        data = {"isOnlyPublisher": 1, "postId": post_id, "showOrderType": 2}
+        res = await self._waves_request(ANN_CONTENT_URL, "POST", headers, data=data)
+        if isinstance(res, dict) and res.get("code") == 200:
+            self.ann_map[post_id] = res["data"]["postDetail"]
+            return res["data"]["postDetail"]
+        return {}
+
+    async def get_ann_list(self, is_cache: bool = False):
+        """获取公告列表"""
+        if is_cache and self.ann_list_data:
+            return self.ann_list_data
+
+        self.ann_list_data = []
+        for _event in self.event_type.keys():
+            res = await self.get_ann_list_by_type(eventType=_event, pageSize=5)
+            if isinstance(res, dict) and res.get("code") == 200:
+                value = [{**x, "id": int(x["id"])} for x in res["data"]["list"]]
+                self.ann_list_data.extend(value)
+
+        return self.ann_list_data
+
+    async def get_wiki_home(self):
+        """获取wiki首页"""
+        headers = copy.deepcopy(await get_headers())
+        headers.update({"wiki_type": "9"})
+        res = await self._waves_request(WIKI_HOME_URL, "POST", headers)
+        if isinstance(res, dict) and res.get("code") == 200:
+            return res
+        return {}
+
+    async def get_entry_detail(self, entry_id: str):
+        """获取entry详情"""
+        if entry_id in self.entry_detail_map:
+            return self.entry_detail_map[entry_id]
+
+        headers = copy.deepcopy(await get_headers())
+        headers.update({"wiki_type": "9"})
+        data = {"id": entry_id}
+        res = await self._waves_request(
+            WIKI_ENTRY_DETAIL_URL, "POST", headers, data=data
+        )
+        if isinstance(res, dict) and res.get("code") == 200:
+            self.entry_detail_map[entry_id] = res
+            return res
+        return {}
+
+    async def login(self, mobile: int | str, code: str):
+        header = copy.deepcopy(await get_headers())
+        data = {"mobile": mobile, "code": code}
+        return await self._waves_request(LOGIN_URL, "POST", header, data=data)
+
     async def _waves_request(
         self,
         url: str,
@@ -768,7 +846,9 @@ class WavesApi:
                                 raw_data["data"] = des_data
                             except Exception:
                                 pass
-                        logger.debug(f"url:[{url}] raw_data:{raw_data}")
+                        logger.debug(
+                            f"url:[{url}] params:[{params}] data:[{data}] raw_data:{raw_data}"
+                        )
                         return raw_data
             except Exception as e:
                 logger.exception(f"url:[{url}] attempt {attempt + 1} failed", e)
@@ -776,117 +856,3 @@ class WavesApi:
                     await asyncio.sleep(retry_delay)
 
         return {"code": WAVES_CODE_999, "data": "请求服务器失败"}
-
-
-class KuroLogin:
-    ssl_verify = True
-
-    async def login(self, mobile: int | str, code: str):
-        header = copy.deepcopy(await get_headers())
-        data = {"mobile": mobile, "code": code}
-        return await self._kuro_request(LOGIN_URL, "POST", header, data=data)
-
-    async def _kuro_request(
-        self,
-        url: str,
-        method: Literal["GET", "POST"] = "GET",
-        header=None,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        data: Optional[Union[FormData, Dict[str, Any]]] = None,
-        max_retries: int = 3,
-        retry_delay: float = 1.0,
-    ) -> Union[Dict, int]:
-        if header is None:
-            header = await get_headers()
-
-        for attempt in range(max_retries):
-            try:
-                async with ClientSession(
-                    connector=TCPConnector(verify_ssl=self.ssl_verify)
-                ) as client:
-                    async with client.request(
-                        method,
-                        url=url,
-                        headers=header,
-                        params=params,
-                        json=json,
-                        data=data,
-                        timeout=ClientTimeout(total=10),
-                    ) as resp:
-                        try:
-                            raw_data = await resp.json()
-                        except ContentTypeError:
-                            _raw_data = await resp.text()
-                            raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                        logger.debug(f"url:{url} raw_data:{raw_data}")
-                        return raw_data
-            except Exception as e:
-                logger.exception(f"url:[{url}] attempt {attempt + 1} failed", e)
-                if attempt < max_retries - 1:
-                    await asyncio.sleep(retry_delay)
-
-        return {"code": WAVES_CODE_999, "data": "请求服务器失败"}
-
-
-class Wiki:
-    _HEADER = {
-        "source": "h5",
-        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        "wiki_type": "9",
-    }
-
-    async def get_wiki_home(self):
-        headers = copy.deepcopy(self._HEADER)
-        async with httpx.AsyncClient(timeout=None) as client:
-            res = await client.post(WIKI_HOME_URL, headers=headers, timeout=10)
-            return res.json()
-
-    async def get_wiki_catalogue(self, catalogueId: str):
-        headers = copy.deepcopy(self._HEADER)
-        data = {"catalogueId": catalogueId, "limit": 1000}
-        async with httpx.AsyncClient(timeout=None) as client:
-            res = await client.post(
-                WIKI_DETAIL_URL, headers=headers, data=data, timeout=10
-            )
-            return res.json()
-
-    async def get_entry_id(self, name: str, catalogueId: str):
-        catalogue_data = await self.get_wiki_catalogue(catalogueId)
-        if catalogue_data["code"] != 200:
-            return
-        char_record = next(
-            (
-                i
-                for i in catalogue_data["data"]["results"]["records"]
-                if i["name"] == name
-            ),
-            None,
-        )
-        # logger.debug(f'【鸣潮WIKI】 名字:【{name}】: {char_record}')
-        if not char_record:
-            return
-
-        return char_record["entryId"]
-
-    async def get_entry_detail_by_name(self, name: str, catalogueId: str):
-        entry_id = await self.get_entry_id(name, catalogueId)
-        if not entry_id:
-            return
-
-        headers = copy.deepcopy(self._HEADER)
-        data = {"id": entry_id}
-        async with httpx.AsyncClient(timeout=None) as client:
-            res = await client.post(
-                WIKI_ENTRY_DETAIL_URL, headers=headers, data=data, timeout=10
-            )
-            return res.json()
-
-    async def get_entry_detail(self, entry_id: str):
-        headers = copy.deepcopy(self._HEADER)
-        data = {"id": entry_id}
-        async with httpx.AsyncClient(timeout=None) as client:
-            res = await client.post(
-                WIKI_ENTRY_DETAIL_URL, headers=headers, data=data, timeout=10
-            )
-            return res.json()

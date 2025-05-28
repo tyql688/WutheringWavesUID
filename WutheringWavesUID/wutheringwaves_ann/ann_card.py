@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 from typing import List, Union
 
@@ -17,8 +18,8 @@ from ..utils.fonts.waves_fonts import (
     ww_font_24,
     ww_font_26,
 )
+from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
-from .main import ann
 
 assets_dir = Path(__file__).parent / "assets"
 list_item = Image.open(assets_dir / "item.png").resize((384, 96)).convert("RGBA")
@@ -29,7 +30,7 @@ def filter_list(plist, func):
 
 
 async def ann_list_card() -> bytes:
-    ann_list = await ann().get_ann_list()
+    ann_list = await waves_api.get_ann_list()
     if not ann_list:
         raise Exception("获取游戏公告失败,请检查接口是否正常")
     grouped_ann = {}
@@ -56,7 +57,7 @@ async def ann_list_card() -> bytes:
             x = 899
 
         new_item = list_item.copy()
-        subtitle = ann().event_type[str(event_type)]
+        subtitle = waves_api.event_type[str(event_type)]
         draw_text_by_line(
             new_item, (30, 30), subtitle, ww_font_24, "#3b4354", 270, True
         )
@@ -139,8 +140,10 @@ async def ann_batch_card(post_content: List, drow_height: float) -> bytes:
     return await convert_img(im)
 
 
-async def ann_detail_card(ann_id: int) -> Union[bytes, str, List[bytes]]:
-    ann_list = await ann().get_ann_list()
+async def ann_detail_card(
+    ann_id: int, is_check_time=False
+) -> Union[bytes, str, List[bytes]]:
+    ann_list = await waves_api.get_ann_list(True)
     if not ann_list:
         raise Exception("获取游戏公告失败,请检查接口是否正常")
     content = filter_list(ann_list, lambda x: x["id"] == ann_id)
@@ -148,9 +151,14 @@ async def ann_detail_card(ann_id: int) -> Union[bytes, str, List[bytes]]:
         return "未找到该公告"
 
     postId = content[0]["postId"]
-    res = await ann().get_ann_detail(postId)
+    res = await waves_api.get_ann_detail(postId)
     if not res:
         return "未找到该公告"
+
+    if is_check_time:
+        if int(res["createTimestamp"]) // 1000 < int(time.time()) - 86400:
+            return "该公告已过期"
+
     post_content = res["postContent"]
     content_type2_first = filter_list(post_content, lambda x: x["contentType"] == 2)
     if not content_type2_first and "coverImages" in res:
