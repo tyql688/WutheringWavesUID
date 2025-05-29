@@ -4,13 +4,22 @@ GAME_ID = 3
 SERVER_ID = "76402e5b20be2c39f095a152090afddc"
 SERVER_ID_NET = "919752ae5ea09c1ced910dd668a63ffb"
 
-MAIN_URL = "https://api.kurobbs.com"
-KURO_GET_CODE_URL = "https://api.kurobbs.com/user/getSmsCode"
+
+def get_main_url():
+    from ...wutheringwaves_config import WutheringWavesConfig
+
+    KuroUrlProxyUrl = WutheringWavesConfig.get_config("KuroUrlProxyUrl").data
+    return KuroUrlProxyUrl or "https://api.kurobbs.com"
+
+
+MAIN_URL = get_main_url()
+
 GACHA_LOG_URL = "https://gmserver-api.aki-game2.com/gacha/record/query"
 GACHA_NET_LOG_URL = "https://gmserver-api.aki-game2.net/gacha/record/query"
 
 REQUEST_TOKEN = f"{MAIN_URL}/aki/roleBox/requestToken"
-LOGIN_URL = f"{MAIN_URL}/user/sdkLoginForH5"
+LOGIN_URL = f"{MAIN_URL}/user/sdkLogin"
+LOGIN_H5_URL = f"{MAIN_URL}/user/sdkLoginForH5"
 KURO_ROLE_URL = f"{MAIN_URL}/gamer/role/default"
 ROLE_LIST_URL = f"{MAIN_URL}/gamer/role/list"
 QUERY_USERID_URL = f"{MAIN_URL}/gamer/role/queryUserId"
@@ -82,3 +91,12 @@ WIKI_CATALOGUE_MAP = {
     "特殊道具": "1223",
     "活动": "1293",
 }
+
+
+def get_local_proxy_url():
+    from ...wutheringwaves_config import WutheringWavesConfig
+
+    LocalProxyUrl = WutheringWavesConfig.get_config("LocalProxyUrl").data
+    if LocalProxyUrl:
+        return LocalProxyUrl
+    return None

@@ -117,3 +117,10 @@ async def send_master_info(msg: str):
     if subscribes:
         for sub in subscribes:
             await sub.send(f"【联系主人】：{msg}")
+
+
+def login_platform() -> str:
+    from ..wutheringwaves_config import WutheringWavesConfig
+
+    LoginType = WutheringWavesConfig.get_config("WavesLoginType").data
+    return LoginType if LoginType else "h5"

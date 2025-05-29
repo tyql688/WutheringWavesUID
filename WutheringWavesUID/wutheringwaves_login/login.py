@@ -252,10 +252,17 @@ async def waves_login_index(auth: str):
         template = waves_templates.get_template("404.html")
         return HTMLResponse(template.render())
     else:
+        from ..utils.api.api import MAIN_URL
+
         url, _ = await get_url()
         template = waves_templates.get_template("index.html")
         return HTMLResponse(
-            template.render(server_url=url, auth=auth, userId=temp.get("user_id", ""))
+            template.render(
+                server_url=url,
+                auth=auth,
+                userId=temp.get("user_id", ""),
+                kuro_url=MAIN_URL,
+            )
         )
 
 
