@@ -355,7 +355,7 @@
       }
       result.captcha_id = captchaId
       $.ajax({
-        url: '{{ kuro_url }}/user/getSmsCodeForH5',
+        url: 'https://api.kurobbs.com/user/getSmsCodeForH5',
         type: 'POST', // 通常发送数据使用 POST
         data: {"mobile": phoneInput.value, "geeTestData": JSON.stringify(result)},
         headers: headers,
