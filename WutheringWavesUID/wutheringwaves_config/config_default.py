@@ -150,4 +150,20 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "开启可以艾特查询",
         True,
     ),
+    "WavesLoginType": GsStrConfig(
+        "库洛登录可选择h5、ios",
+        "库洛登录可选择h5、ios",
+        "h5",
+        options=["h5", "ios"],
+    ),
+    "KuroUrlProxyUrl": GsStrConfig(
+        "库洛域名代理（重启生效）",
+        "库洛域名代理（重启生效）",
+        "",
+    ),
+    "LocalProxyUrl": GsStrConfig(
+        "本地代理地址",
+        "本地代理地址",
+        "",
+    ),
 }

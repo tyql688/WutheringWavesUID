@@ -2,6 +2,7 @@ import asyncio
 import copy
 import json as j
 import random
+import uuid
 from typing import Any, Dict, List, Literal, Optional, Union
 
 from aiohttp import (
@@ -26,7 +27,7 @@ from ..error_reply import (
 from ..hint import error_reply
 from ..util import (
     generate_random_string,
-    get_public_ip,
+    login_platform,
     send_master_info,
     timed_async_cache,
 )
@@ -44,6 +45,7 @@ from .api import (
     GACHA_NET_LOG_URL,
     GAME_ID,
     KURO_ROLE_URL,
+    LOGIN_H5_URL,
     LOGIN_URL,
     MONTH_LIST_URL,
     MR_REFRESH_URL,
@@ -71,6 +73,7 @@ from .api import (
     WIKI_ENTRY_DETAIL_URL,
     WIKI_HOME_URL,
     WIKI_TREE_URL,
+    get_local_proxy_url,
 )
 
 
@@ -104,7 +107,6 @@ async def _check_response(
 async def get_headers_h5():
     devCode = generate_random_string()
     header = {
-        # "b-at": "",
         "source": "h5",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
@@ -115,13 +117,13 @@ async def get_headers_h5():
 
 
 async def get_headers_ios():
-    ip = await get_public_ip()
+    devCode = uuid.uuid4()
     header = {
-        # "b-at": "",
         "source": "ios",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
-        "devCode": f"{ip},  Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
+        "User-Agent": "KuroGameBox/1 CFNetwork/3826.500.111.2.2 Darwin/24.4.0",
+        "devCode": f"{devCode}",
+        "version": "2.5.0",
     }
     return header
 
@@ -799,9 +801,14 @@ class WavesApi:
         return {}
 
     async def login(self, mobile: int | str, code: str):
-        header = copy.deepcopy(await get_headers())
+        platform = login_platform()
+        header = copy.deepcopy(await get_headers(platform=platform))
         data = {"mobile": mobile, "code": code}
-        return await self._waves_request(LOGIN_URL, "POST", header, data=data)
+        if platform == "h5":
+            url = LOGIN_H5_URL
+        else:
+            url = LOGIN_URL
+        return await self._waves_request(url, "POST", header, data=data)
 
     async def _waves_request(
         self,
@@ -817,6 +824,7 @@ class WavesApi:
         if header is None:
             header = await get_headers()
 
+        proxy_url = get_local_proxy_url()
         for attempt in range(max_retries):
             try:
                 async with ClientSession(
@@ -829,6 +837,7 @@ class WavesApi:
                         params=params,
                         json=json,
                         data=data,
+                        proxy=proxy_url,
                         timeout=ClientTimeout(total=10),
                     ) as resp:
                         try:
