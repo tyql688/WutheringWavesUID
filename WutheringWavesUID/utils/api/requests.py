@@ -26,6 +26,7 @@ from ..error_reply import (
 )
 from ..hint import error_reply
 from ..util import (
+    generate_random_ipv6_manual,
     generate_random_string,
     login_platform,
     send_master_info,
@@ -111,6 +112,7 @@ async def get_headers_h5():
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
         "devCode": devCode,
+        "X-Forwarded-For": generate_random_ipv6_manual(),
         "version": "2.5.0",
     }
     return header
@@ -123,6 +125,7 @@ async def get_headers_ios():
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         "User-Agent": "KuroGameBox/1 CFNetwork/3826.500.111.2.2 Darwin/24.4.0",
         "devCode": f"{devCode}",
+        "X-Forwarded-For": generate_random_ipv6_manual(),
         "version": "2.5.0",
     }
     return header

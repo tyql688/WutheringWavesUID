@@ -84,6 +84,10 @@ def generate_random_string(length=32):
     return random_string
 
 
+def generate_random_ipv6_manual():
+    return ":".join([hex(random.randint(0, 0xFFFF))[2:].zfill(4) for _ in range(8)])
+
+
 def hide_uid(uid: str) -> str:
     from ..wutheringwaves_config import WutheringWavesConfig
 
