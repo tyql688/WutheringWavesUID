@@ -88,8 +88,9 @@ async def echo_data_to_cost(char_id, mainProps_first, cost4_counter=0) -> tuple[
     ECHO_ID_COST_THREE = 6000050
 
     # ---------- 初始化 ----------
-    key = mainProps_first["attributeName"]
-    value = float(mainProps_first["attributeValue"].strip('%'))
+    key = mainProps_first[0]["attributeName"]
+    value = float(mainProps_first[0]["attributeValue"].strip('%'))
+    key_little = mainProps_first[1]["attributeName"] # 小词条
     
     # ---------- 获取角色配置 ----------
     try:
@@ -132,8 +133,10 @@ async def echo_data_to_cost(char_id, mainProps_first, cost4_counter=0) -> tuple[
                 return select_cost4_id(), 4
             elif value > t1:
                 return ECHO_ID_COST_THREE, 3
-            else:
+            elif key_little == "生命": # 声骸没拉满时
                 return ECHO_ID_COST_ONE, 1
+            else:
+                return ECHO_ID_COST_THREE, 3
         except (KeyError, IndexError, ValueError) as e:
             logger.error(f"[鸣潮]阈值处理异常: {e}")
             return ECHO_ID_COST_ONE, 1  # 降级处理

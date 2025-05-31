@@ -94,7 +94,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         echo["subProps"] = echo_value.get("subProps", [])
 
         # 根据主词条判断声骸cost并适配id
-        echo_id, cost = await echo_data_to_cost(char_id, echo["mainProps"][0], cost4_counter)
+        echo_id, cost = await echo_data_to_cost(char_id, echo["mainProps"], cost4_counter)
         cost_sum += cost
 
         echo["phantomProp"]["name"] = f"识别默认{cost}c"
