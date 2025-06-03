@@ -377,7 +377,7 @@ def draw_text_with_shadow(
     image.text((_x, _y), text, font=font, fill=fill_color, anchor=anchor)
 
 
-async def compress_to_webp(
+def compress_to_webp(
     image_path: Path, quality: int = 80, delete_original: bool = False
 ) -> tuple[bool, Path]:
     try:
