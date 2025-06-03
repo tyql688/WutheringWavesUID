@@ -137,7 +137,7 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
             "level": role_detail.role.level,
             "chain": role_detail.get_chain_num(),
             "chainName": role_detail.get_chain_name(),
-            "score": round(phantom_score, 2),
+            "score": round(int(phantom_score * 100) / 100, ndigits=2),
             "score_bg": phantom_bg,
             "expected_damage": expected_damage,
             "expected_damage_int": int(expected_damage.replace(",", "")),
@@ -408,7 +408,11 @@ async def draw_rank_img(
             score_bg = Image.open(TEXT_PATH / f"score_{rank.score_bg}.png")
             bar_bg.alpha_composite(score_bg, (320, 2))
             bar_star_draw.text(
-                (466, 45), f"{rank.score.__round__(1)}", "white", waves_font_34, "mm"
+                (466, 45),
+                f"{int(rank.score * 100) / 100:.1f}",
+                "white",
+                waves_font_34,
+                "mm",
             )
             bar_star_draw.text((466, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
 
