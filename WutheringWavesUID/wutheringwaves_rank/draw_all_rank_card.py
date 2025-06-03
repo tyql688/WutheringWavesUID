@@ -216,7 +216,7 @@ async def draw_all_rank_card(
             bar_bg.alpha_composite(score_bg, (550, 2))
             bar_star_draw.text(
                 (716, 45),
-                f"{rank.phantom_score.__round__(1)}",
+                f"{int(rank.phantom_score * 100) / 100:.1f}",
                 "white",
                 waves_font_34,
                 "mm",
