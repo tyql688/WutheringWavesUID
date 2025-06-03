@@ -1,14 +1,16 @@
+import math
 from pathlib import Path
 from typing import Dict, List, Union
 
 from msgspec import json as msgjson
 
 from gsuid_core.logger import logger
+
+from ..utils.api.model import Props
 from .expression_evaluator import find_first_matching_expression
-from .image import WAVES_VOID, SPECIAL_GOLD, WAVES_MOLTEN, WAVES_SIERRA
+from .image import SPECIAL_GOLD, WAVES_MOLTEN, WAVES_SIERRA, WAVES_VOID
 from .map.calc_score_script import phantom_sub_value_map as ph_sub_map
 from .resource.constant import ID_FULL_CHAR_NAME
-from ..utils.api.model import Props
 
 MAP_PATH = Path(__file__).parent / "map/character"
 
@@ -90,7 +92,7 @@ def calc_phantom_entry(index, prop, cost: int, calc_map):
 
     max_score, props_grade = get_max_score(cost, calc_map)
     percent_score = score / max_score
-    final_score = round(percent_score * fix_max_score, 1)
+    final_score = math.floor(percent_score * fix_max_score * 100) / 100
     return score, final_score
 
 
@@ -127,7 +129,7 @@ def calc_phantom_score(
         if percent_score >= _temp_per:
             _temp = index
 
-    final_score = round(percent_score * fix_max_score, 1)
+    final_score = math.floor(percent_score * fix_max_score * 100) / 100
     score_level = score_interval[_temp]
     # logger.debug(f"{char_name} [声骸评分]: {final_score} [声骸评分等级]: {score_level}")
     return final_score, score_level

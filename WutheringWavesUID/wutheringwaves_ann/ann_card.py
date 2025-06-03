@@ -1,9 +1,11 @@
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import List, Union
 
 from PIL import Image, ImageDraw, ImageOps
 
+from gsuid_core.logger import logger
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import (
     draw_text_by_line,
@@ -156,7 +158,12 @@ async def ann_detail_card(
         return "未找到该公告"
 
     if is_check_time:
-        if int(res["createTimestamp"]) // 1000 < int(time.time()) - 86400:
+        post_time = format_post_time(res["postTime"])
+        now_time = int(time.time())
+        logger.debug(
+            f"公告id: {ann_id}, post_time: {post_time}, now_time: {now_time}, delta: {now_time-post_time}"
+        )
+        if post_time < now_time - 86400:
             return "该公告已过期"
 
     post_content = res["postContent"]
@@ -255,25 +262,17 @@ def get_duanluo(text: str):
     return duanluo, line_height, line_count
 
 
-# def sub_ann(bot_id: str, group: str):
-#     groups = WutheringWavesConfig.get_config('WavesAnnGroups').data
-#     if bot_id not in groups:
-#         groups[bot_id] = []
-#     if group in groups[bot_id]:
-#         return '已经订阅了'
-#     else:
-#         groups[bot_id].append(group)
-#         WutheringWavesConfig.set_config('WavesAnnGroups', groups)
-#     return '成功订阅鸣潮公告'
-#
-#
-# def unsub_ann(bot_id: str, group: str):
-#     groups = WutheringWavesConfig.get_config('WavesAnnGroups').data
-#     if bot_id not in groups:
-#         groups[bot_id] = []
-#     if group in groups[bot_id]:
-#         groups[bot_id].remove(group)
-#         WutheringWavesConfig.set_config('WavesAnnGroups', groups)
-#         return '成功取消订阅鸣潮公告'
-#     else:
-#         return '已经不在订阅中了'
+def format_post_time(post_time: str) -> int:
+    try:
+        timestamp = datetime.strptime(post_time, "%Y-%m-%d %H:%M").timestamp()
+        return int(timestamp)
+    except ValueError:
+        pass
+
+    try:
+        timestamp = datetime.strptime(post_time, "%Y-%m-%d %H:%M:%S").timestamp()
+        return int(timestamp)
+    except ValueError:
+        pass
+
+    return 0

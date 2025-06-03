@@ -13,7 +13,6 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
 from ..utils.api.model import RoleDetailData, WeaponData
-from ..utils.ascension.char import get_breach
 from ..utils.cache import TimedCache
 from ..utils.calc import WuWaCalc
 from ..utils.calculate import (
@@ -113,22 +112,6 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
         role_detail.role.roleName, phantom_score, calc.calc_temp
     )
 
-    # 面板
-    # temp_card_sort_map = copy.deepcopy(card_sort_map)
-    # card_map = enhance_summation_card_value(
-    #     role_detail.role.roleId,
-    #     role_detail.role.level,
-    #     role_detail.role.breach,
-    #     role_detail.role.attributeName,
-    #     weaponData.weapon.weaponId,
-    #     weaponData.level,
-    #     weaponData.breach,
-    #     weaponData.resonLevel,
-    #     phantom_sum_value,
-    #     temp_card_sort_map,
-    # )
-    # damageAttribute = card_sort_map_to_attribute(card_map)
-
     calc.role_card = calc.enhance_summation_card_value(calc.phantom_card)
     calc.damageAttribute = calc.card_sort_map_to_attribute(calc.role_card)
 
@@ -140,9 +123,11 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
         expected_damage = "0"
 
     sonata_name = ""
-    for ph in calc.phantom_card.get("ph_detail", []):
-        if ph["ph_num"] == 5:
-            sonata_name = ph["ph_name"]
+    ph_detail = calc.phantom_card.get("ph_detail", [])
+    if isinstance(ph_detail, list):
+        for ph in ph_detail:
+            if ph.get("ph_num") == 5:
+                sonata_name = ph.get("ph_name", "")
 
     rankInfo = RankInfo(
         **{
@@ -163,15 +148,21 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
 
 
 async def find_role_detail(
-    uid: str, char_id: Union[int, List[int]]
+    uid: str, char_id: Union[int, str, List[str], List[int]]
 ) -> Optional[RoleDetailData]:
     role_details = await get_card(uid)
     if role_details is None:
         return None
 
+    # 将char_id转换为字符串列表进行匹配
+    if isinstance(char_id, (int, str)):
+        char_id_list = [str(char_id)]
+    else:
+        char_id_list = [str(cid) for cid in char_id]
+
     # 使用生成器来进行过滤
     return next(
-        (role for role in role_details if str(role.role.roleId) in char_id), None
+        (role for role in role_details if str(role.role.roleId) in char_id_list), None
     )
 
 
@@ -310,14 +301,20 @@ async def draw_rank_img(
     try:
         self_uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
         if self_uid:
-            role_detail: RoleDetailData = await find_role_detail(self_uid, find_char_id)
-            char_id = str(role_detail.role.roleId)
+            role_detail = await find_role_detail(self_uid, find_char_id)
+            if role_detail:
+                char_id = str(role_detail.role.roleId)
     except Exception as _:
         pass
 
     damage_title = (rankDetail and rankDetail["title"]) or "无"
     rankInfoList = await get_all_rank_info(
-        users, char_id, find_char_id, rankDetail, tokenLimitFlag, wavesTokenUsersMap
+        list(users),
+        char_id,
+        find_char_id,
+        rankDetail,
+        tokenLimitFlag,
+        wavesTokenUsersMap,
     )
     if len(rankInfoList) == 0:
         msg = []
@@ -377,14 +374,14 @@ async def draw_rank_img(
     for index, temp in enumerate(zip(rankInfoList, results)):
         rank, role_avatar = temp
         rank: RankInfo
-        role_detail: RoleDetailData = rank.roleDetail
+        rank_role_detail: RoleDetailData = rank.roleDetail
         bar_bg = bar.copy()
         bar_star_draw = ImageDraw.Draw(bar_bg)
         # role_avatar = await get_avatar(ev, rank.qid, role_detail.role.roleId)
         bar_bg.paste(role_avatar, (100, 0), role_avatar)
 
         role_attribute = await get_attribute(
-            role_detail.role.attributeName, is_simple=True
+            rank_role_detail.role.attributeName or "导电", is_simple=True
         )
         role_attribute = role_attribute.resize((40, 40)).convert("RGBA")
         bar_bg.alpha_composite(role_attribute, (300, 20))
@@ -419,8 +416,6 @@ async def draw_rank_img(
         if rank.sonata_name:
             effect_image = await get_attribute_effect(rank.sonata_name)
             effect_image = effect_image.resize((50, 50))
-            # sonata_color = WAVES_ECHO_MAP.get(rank.sonata_name, (0, 0, 0))
-            # effect_image = await change_color(effect_image, sonata_color)
             bar_bg.alpha_composite(effect_image, (533, 15))
             sonata_name = rank.sonata_name
         else:
@@ -434,7 +429,7 @@ async def draw_rank_img(
         # 武器
         weapon_bg_temp = Image.new("RGBA", (600, 300))
 
-        weaponData: WeaponData = role_detail.weaponData
+        weaponData: WeaponData = rank_role_detail.weaponData
         weapon_icon = await get_square_weapon(weaponData.weapon.weaponId)
         weapon_icon = crop_center_img(weapon_icon, 110, 110)
         weapon_icon_bg = get_weapon_icon_bg(weaponData.weapon.weaponStarLevel)
@@ -452,21 +447,17 @@ async def draw_rank_img(
             (203, 75), f"Lv.{weaponData.level}/90", "white", waves_font_30, "lm"
         )
 
-        _x = 220 + 43 * len(weaponData.weapon.weaponName)
-        _y = 37
-        wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel] + (int(0.8 * 255),)
+        _x = 220
+        _y = 120
+        wrc_fill = WEAPON_RESONLEVEL_COLOR[weaponData.resonLevel or 0] + (
+            int(0.8 * 255),
+        )
         weapon_bg_temp_draw.rounded_rectangle(
             [_x - 15, _y - 15, _x + 50, _y + 15], radius=7, fill=wrc_fill
         )
         weapon_bg_temp_draw.text(
             (_x, _y), f"精{weaponData.resonLevel}", "white", waves_font_24, "lm"
         )
-
-        weapon_breach = get_breach(weaponData.breach, weaponData.level)
-        for i in range(0, weapon_breach):
-            weapon_bg_temp.alpha_composite(
-                promote_icon.copy(), dest=(200 + 40 * i, 100)
-            )
 
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
@@ -502,19 +493,19 @@ async def draw_rank_img(
             bar_bg.alpha_composite(info_rank, dest)
 
         rank_id = index + 1
-        if rank_id > rank_length:
+        if rankId is not None and rank_id > rank_length:
             rank_id = rankId
 
-        if rank_id > 999:
+        if rank_id is not None and rank_id > 999:
             draw_rank_id("999+", size=(100, 50), draw=(50, 24), dest=(10, 30))
-        elif rank_id > 99:
+        elif rank_id is not None and rank_id > 99:
             draw_rank_id(rank_id, size=(75, 50), draw=(37, 24), dest=(25, 30))
         else:
-            draw_rank_id(rank_id, size=(50, 50), draw=(24, 24), dest=(40, 30))
+            draw_rank_id(rank_id or 0, size=(50, 50), draw=(24, 24), dest=(40, 30))
 
         # uid
         uid_color = "white"
-        if rankId == rank_id:
+        if rankId is not None and rankId == rank_id:
             uid_color = RED
         bar_star_draw.text(
             (210, 75), f"{hide_uid(rank.uid)}", uid_color, waves_font_20, "lm"
@@ -523,11 +514,11 @@ async def draw_rank_img(
         # 贴到背景
         card_img.paste(bar_bg, (0, title_h + index * bar_star_h), bar_bg)
 
-        if rank_id <= rank_length:
+        if rank_id is not None and rank_id <= rank_length:
             total_score += rank.score
             total_damage += rank.expected_damage_int
 
-    if rankId and rankId > rank_length:
+    if rankId is not None and rankId > rank_length:
         totalNum -= 1
 
     avg_score = f"{total_score / totalNum:.1f}" if totalNum != 0 else "0"

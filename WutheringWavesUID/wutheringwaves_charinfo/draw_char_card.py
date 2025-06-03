@@ -276,15 +276,15 @@ async def ph_card_draw(
                 sh_temp.alpha_composite(ph_level_img, (128, 58))
 
                 # 声骸分数背景
-                ph_score_img = Image.new("RGBA", (92, 30), (255, 255, 255, 0))
+                ph_score_img = Image.new("RGBA", (100, 30), (255, 255, 255, 0))
                 ph_score_img_draw = ImageDraw.Draw(ph_score_img)
                 ph_score_img_draw.rounded_rectangle(
-                    [0, 0, 92, 30], radius=8, fill=(186, 55, 42, int(0.8 * 255))
+                    [0, 0, 100, 30], radius=8, fill=(186, 55, 42, int(0.8 * 255))
                 )
                 ph_score_img_draw.text(
-                    (5, 13), f"{_score}分", "white", waves_font_24, "lm"
+                    (50, 13), f"{_score}分", "white", waves_font_24, "mm"
                 )
-                sh_temp.alpha_composite(ph_score_img, (228, 58))
+                sh_temp.alpha_composite(ph_score_img, (223, 58))
 
                 # sh_temp_draw.text((142, 70), f'Lv.{_phantom.level}', 'white', waves_font_24, 'lm')
                 # sh_temp_draw.text((242, 70), f'{_score}分', 'white', waves_font_24, 'lm')
