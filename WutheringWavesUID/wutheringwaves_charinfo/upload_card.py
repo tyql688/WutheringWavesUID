@@ -3,7 +3,9 @@ import hashlib
 import shutil
 import ssl
 import time
+import os
 from typing import List, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import httpx
 
@@ -213,6 +215,10 @@ async def delete_all_custom_card(bot: Bot, ev: Event, char: str):
 
 async def compress_all_custom_card(bot: Bot, ev: Event):
     count = 0
+    use_cores = max(os.cpu_count() - 2, 1) # 避免2c服务器卡死
+    await bot.send(f"[鸣潮] 开始压缩面板图, 使用 {use_cores} 核心")
+    
+    task_list = []
     for char_id_path in CUSTOM_CARD_PATH.iterdir():
         if not char_id_path.is_dir():
             continue
@@ -220,11 +226,21 @@ async def compress_all_custom_card(bot: Bot, ev: Event):
             if not img_path.is_file():
                 continue
             if img_path.suffix.lower() in [".jpg", ".png", ".jpeg"]:
-                success, new_path = await compress_to_webp(
-                    img_path, delete_original=True
-                )
+                task_list.append((img_path, 80, True))
+                
+    with ThreadPoolExecutor(max_workers=use_cores) as executor:
+        future_to_file = {executor.submit(compress_to_webp, *task): task for task in task_list}
+
+        for future in as_completed(future_to_file):
+            file_info = future_to_file[future]
+            try:
+                success, _ = future.result()
                 if success:
                     count += 1
+                
+            except Exception as exc:
+                print(f"Error processing {file_info[0]}: {exc}")
+
     if count > 0:
         return await bot.send(f"[鸣潮] 压缩【{count}】张面板图成功！\n")
     else:
