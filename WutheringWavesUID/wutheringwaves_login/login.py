@@ -1,6 +1,7 @@
 import asyncio
 import hashlib
 import re
+import uuid
 from pathlib import Path
 from typing import Union
 
@@ -184,12 +185,16 @@ async def page_login_other(bot: Bot, ev: Event, url):
                 if not data.get("ck"):
                     await asyncio.sleep(1)
                     continue
-                waves_user = await add_cookie(ev, data["ck"])
+
+                waves_user = await add_cookie(ev, data["ck"], data["did"])
                 cache.delete(user_token)
-                if waves_user:
+                if waves_user and isinstance(waves_user, WavesUser):
                     return await login_success_msg(bot, ev, waves_user)
                 else:
-                    return await bot.send(msg_error, at_sender=at_sender)
+                    if isinstance(waves_user, str):
+                        return await bot.send(waves_user, at_sender=at_sender)
+                    else:
+                        return await bot.send(msg_error, at_sender=at_sender)
 
 
 async def page_login(bot: Bot, ev: Event):
@@ -215,23 +220,32 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
             at_sender=at_sender,
         )
 
-    result = await waves_api.login(phone_number, code)
+    did = str(uuid.uuid4()).upper()
+    result = await waves_api.login(phone_number, code, did)
     if (
         not isinstance(result, dict)
         or result.get("code") != 200
         or result.get("data") is None
     ):
-        return await bot.send(f"{game_title} 登录失败\n", at_sender=at_sender)
+        send_msg = (
+            result.get("msg", "")
+            if isinstance(result, dict)
+            else f"{game_title} 登录失败\n"
+        )
+        return await bot.send(send_msg, at_sender=at_sender)
     token = result.get("data", {}).get("token", "")
-    waves_user = await add_cookie(ev, token)
-    if waves_user:
+    waves_user = await add_cookie(ev, token, did)
+    if waves_user and isinstance(waves_user, WavesUser):
         return await login_success_msg(bot, ev, waves_user)
     else:
-        return await bot.send(msg_error, at_sender=at_sender)
+        if isinstance(waves_user, str):
+            return await bot.send(waves_user, at_sender=at_sender)
+        else:
+            return await bot.send(msg_error, at_sender=at_sender)
 
 
-async def add_cookie(ev, token) -> Union[WavesUser, None]:
-    ck_res = await deal.add_cookie(ev, token)
+async def add_cookie(ev, token, did) -> Union[WavesUser, str, None]:
+    ck_res = await deal.add_cookie(ev, token, did)
     if "成功" in ck_res:
         user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, "cookie", token)
         if user:
@@ -240,9 +254,8 @@ async def add_cookie(ev, token) -> Union[WavesUser, None]:
             )
             if data == 0 or data == -2:
                 await WavesBind.switch_uid_by_game(ev.user_id, ev.bot_id, user.uid)
-            # await refresh_char(user.uid, ev.user_id, token, is_self_ck=True)
         return user
-    return None
+    return ck_res
 
 
 @app.get("/waves/i/{auth}")

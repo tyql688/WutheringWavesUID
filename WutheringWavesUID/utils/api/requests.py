@@ -2,7 +2,6 @@ import asyncio
 import copy
 import json as j
 import random
-import uuid
 from typing import Any, Dict, List, Literal, Optional, Union
 
 from aiohttp import (
@@ -28,6 +27,7 @@ from ..hint import error_reply
 from ..util import (
     generate_random_ipv6_manual,
     generate_random_string,
+    get_public_ip,
     login_platform,
     send_master_info,
     timed_async_cache,
@@ -40,7 +40,6 @@ from .api import (
     CALABASH_DATA_URL,
     CALCULATOR_REFRESH_DATA_URL,
     CHALLENGE_DATA_URL,
-    CHALLENGE_INDEX_URL,
     EXPLORE_DATA_URL,
     GACHA_LOG_URL,
     GACHA_NET_LOG_URL,
@@ -55,7 +54,6 @@ from .api import (
     ONLINE_LIST_WEAPON,
     PERIOD_LIST_URL,
     QUERY_OWNED_ROLE,
-    QUERY_USERID_URL,
     REFRESH_URL,
     REQUEST_TOKEN,
     ROLE_CULTIVATE_STATUS,
@@ -119,31 +117,47 @@ async def get_headers_h5():
 
 
 async def get_headers_ios():
-    devCode = uuid.uuid4()
+    ip = await get_public_ip()
     header = {
         "source": "ios",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        "User-Agent": "KuroGameBox/1 CFNetwork/3826.500.111.2.2 Darwin/24.4.0",
-        "devCode": f"{devCode}",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
+        "devCode": f"{ip}, Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
         "X-Forwarded-For": generate_random_ipv6_manual(),
-        "version": "2.5.0",
+        "Access-Control-Request-Header": "b-at,devcode,did,source,token",
     }
     return header
 
 
-async def get_headers(ck: Optional[str] = None, platform: Optional[str] = None) -> Dict:
+async def get_headers(
+    ck: Optional[str] = None,
+    platform: Optional[str] = None,
+) -> Dict:
+    bat = ""
+    did = ""
+    roleId = ""
     if ck and not platform:
         try:
             waves_user = await WavesUser.select_data_by_cookie(cookie=ck)
             if waves_user:
                 platform = waves_user.platform
+                bat = waves_user.bat
+                did = waves_user.did
+                roleId = waves_user.uid
         except Exception as _:
             pass
 
     if platform == "ios":
-        return await get_headers_ios()
+        header = await get_headers_ios()
     else:
-        return await get_headers_h5()
+        header = await get_headers_h5()
+    if bat:
+        header.update({"b-at": bat})
+    if did:
+        header.update({"did": did})
+    if roleId:
+        header.update({"roleId": roleId})
+    return header
 
 
 class WavesApi:
@@ -172,14 +186,6 @@ class WavesApi:
             return True, ck
         ck = await self.get_waves_random_cookie(uid, user_id)
         return False, ck
-
-    # async def _get_ck(
-    #     self, uid: str, user_id, mode: Literal["OWNER", "RANDOM"] = "RANDOM"
-    # ) -> Optional[str]:
-    #     if mode == "RANDOM":
-    #         return await self.get_waves_random_cookie(uid, user_id)
-    #     else:
-    #         return await self.get_self_waves_ck(uid, user_id)
 
     async def get_self_waves_ck(self, uid: str, user_id) -> Optional[str]:
         cookie = await WavesUser.select_cookie(user_id, uid)
@@ -265,7 +271,7 @@ class WavesApi:
         data = {"gameId": GAME_ID}
 
         err_msg = error_reply(WAVES_CODE_999)
-        for i in ["h5", "ios"]:
+        for i in ["ios"]:
             header["source"] = i
             raw_data = await self._waves_request(
                 ROLE_LIST_URL, "POST", header, data=data
@@ -326,45 +332,51 @@ class WavesApi:
         raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
         return await _check_response(raw_data, roleId)
 
-    async def refresh_query_data(
-        self, roleId: str, token: str, serverId: Optional[str] = None
-    ) -> tuple[bool, Union[Dict, str]]:
-        """刷新数据"""
-        header = copy.deepcopy(await get_headers(token))
-        header.update({"token": token})
-        data = {
-            "gameId": GAME_ID,
-            "serverId": self.get_server_id(roleId, serverId),
-            "roleId": roleId,
-        }
-        raw_data = await self._waves_request(
-            QUERY_USERID_URL, "POST", header, data=data
-        )
-        return await _check_response(raw_data, roleId)
+    # async def refresh_query_data(
+    #     self, roleId: str, token: str, serverId: Optional[str] = None
+    # ) -> tuple[bool, Union[Dict, str]]:
+    #     """刷新数据"""
+    #     header = copy.deepcopy(await get_headers(token))
+    #     header.update({"token": token})
+    #     data = {
+    #         "gameId": GAME_ID,
+    #         "serverId": self.get_server_id(roleId, serverId),
+    #         "roleId": roleId,
+    #     }
+    #     raw_data = await self._waves_request(
+    #         QUERY_USERID_URL, "POST", header, data=data
+    #     )
+    #     return await _check_response(raw_data, roleId)
 
-    async def refresh_data_for_platform(
-        self,
-        roleId: str,
-        token: str,
-        serverId: Optional[str] = None,
-        platform: str = "h5",
-    ) -> tuple[bool, Union[Dict, str]]:
-        """刷新数据"""
-        header = copy.deepcopy(await get_headers(token, platform))
-        header.update({"token": token})
-        data = {
-            "gameId": GAME_ID,
-            "serverId": self.get_server_id(roleId, serverId),
-            "roleId": roleId,
-        }
-        raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
-        return await _check_response(raw_data, roleId)
+    # async def refresh_data_for_platform(
+    #     self,
+    #     roleId: str,
+    #     token: str,
+    #     serverId: Optional[str] = None,
+    #     platform: str = "h5",
+    # ) -> tuple[bool, Union[Dict, str]]:
+    #     """刷新数据"""
+    #     header = copy.deepcopy(await get_headers(token, platform))
+    #     header.update({"token": token})
+    #     data = {
+    #         "gameId": GAME_ID,
+    #         "serverId": self.get_server_id(roleId, serverId),
+    #         "roleId": roleId,
+    #     }
+    #     raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
+    #     return await _check_response(raw_data, roleId)
 
     async def get_base_info(
         self, roleId: str, token: str, serverId: Optional[str] = None
     ) -> tuple[bool, Union[Dict, str]]:
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
+        if header.get("roleId", "") != roleId:
+            succ, b_at = await self.get_request_token(
+                roleId, token, header.get("did", "")
+            )
+            if succ:
+                header["b-at"] = b_at
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -382,6 +394,12 @@ class WavesApi:
     ) -> tuple[bool, Union[Dict, str]]:
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
+        if header.get("roleId", "") != roleId:
+            succ, b_at = await self.get_request_token(
+                roleId, token, header.get("did", "")
+            )
+            if succ:
+                header["b-at"] = b_at
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -411,10 +429,12 @@ class WavesApi:
     ) -> tuple[bool, Union[Dict, str]]:
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
-        bat = await self.get_request_token(roleId, token)
-        if bat:
-            header.update({"b-at": bat})
-            # logger.info(f"[{roleId}] 获取到b-at: {bat}")
+        if header.get("roleId", "") != roleId:
+            succ, b_at = await self.get_request_token(
+                roleId, token, header.get("did", "")
+            )
+            if succ:
+                header["b-at"] = b_at
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -432,6 +452,12 @@ class WavesApi:
         """数据坞"""
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
+        if header.get("roleId", "") != roleId:
+            succ, b_at = await self.get_request_token(
+                roleId, token, header.get("did", "")
+            )
+            if succ:
+                header["b-at"] = b_at
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -452,6 +478,12 @@ class WavesApi:
         """探索度"""
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
+        if header.get("roleId", "") != roleId:
+            succ, b_at = await self.get_request_token(
+                roleId, token, header.get("did", "")
+            )
+            if succ:
+                header["b-at"] = b_at
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -469,6 +501,12 @@ class WavesApi:
         """全息"""
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
+        if header.get("roleId", "") != roleId:
+            succ, b_at = await self.get_request_token(
+                roleId, token, header.get("did", "")
+            )
+            if succ:
+                header["b-at"] = b_at
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -479,21 +517,21 @@ class WavesApi:
         )
         return await _check_response(raw_data, roleId)
 
-    async def get_challenge_index(
-        self, roleId: str, token: str, serverId: Optional[str] = None
-    ) -> tuple[bool, Union[Dict, str]]:
-        """全息"""
-        header = copy.deepcopy(await get_headers(token))
-        header.update({"token": token})
-        data = {
-            "gameId": GAME_ID,
-            "serverId": self.get_server_id(roleId, serverId),
-            "roleId": roleId,
-        }
-        raw_data = await self._waves_request(
-            CHALLENGE_INDEX_URL, "POST", header, data=data
-        )
-        return await _check_response(raw_data, roleId)
+    # async def get_challenge_index(
+    #     self, roleId: str, token: str, serverId: Optional[str] = None
+    # ) -> tuple[bool, Union[Dict, str]]:
+    #     """全息"""
+    #     header = copy.deepcopy(await get_headers(token))
+    #     header.update({"token": token})
+    #     data = {
+    #         "gameId": GAME_ID,
+    #         "serverId": self.get_server_id(roleId, serverId),
+    #         "roleId": roleId,
+    #     }
+    #     raw_data = await self._waves_request(
+    #         CHALLENGE_INDEX_URL, "POST", header, data=data
+    #     )
+    #     return await _check_response(raw_data, roleId)
 
     async def get_abyss_data(
         self, roleId: str, token: str, serverId: Optional[str] = None
@@ -514,6 +552,12 @@ class WavesApi:
         """深渊"""
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
+        if header.get("roleId", "") != roleId:
+            succ, b_at = await self.get_request_token(
+                roleId, token, header.get("did", "")
+            )
+            if succ:
+                header["b-at"] = b_at
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -527,6 +571,12 @@ class WavesApi:
         """冥海"""
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
+        if header.get("roleId", "") != roleId:
+            succ, b_at = await self.get_request_token(
+                roleId, token, header.get("did", "")
+            )
+            if succ:
+                header["b-at"] = b_at
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -547,24 +597,47 @@ class WavesApi:
         }
         return await self._waves_request(SLASH_DETAIL_URL, "POST", header, data=data)
 
-    @timed_async_cache(
-        86400,
-        lambda x: isinstance(x, str) and x != "",
-    )
     async def get_request_token(
-        self, roleId: str, token: str, serverId: Optional[str] = None
-    ) -> Optional[str]:
+        self, roleId: str, token: str, did: str, serverId: Optional[str] = None
+    ) -> tuple[bool, str]:
         """请求token"""
         header = copy.deepcopy(await get_headers(token))
-        header.update({"token": token})
+        header.update(
+            {
+                "token": token,
+                "Access-Control-Request-Header": "b-at,devcode,did,source,token",
+                "did": did,
+            }
+        )
+        header["b-at"] = ""
+        # del header["X-Forwarded-For"]
         data = {
             "serverId": self.get_server_id(roleId, serverId),
             "roleId": roleId,
         }
         raw_data = await self._waves_request(REQUEST_TOKEN, "POST", header, data=data)
         if isinstance(raw_data, dict) and raw_data.get("code") == 200:
-            return raw_data.get("data", {}).get("accessToken", "")
-        return ""
+            content_data = raw_data.get("data")
+            access_token = ""
+            if isinstance(content_data, str):
+                try:
+                    json_data = j.loads(content_data)
+                    access_token = json_data.get("accessToken", "")
+                except Exception as e:
+                    logger.error(f"[{roleId}] 获取token失败: {e}")
+            elif isinstance(content_data, dict):
+                access_token = content_data.get("accessToken", "")
+            else:
+                logger.error(f"[{roleId}] 获取token失败: {content_data}")
+
+            if not access_token:
+                return False, raw_data.get("msg", "") or ""
+            return True, access_token
+        else:
+            if isinstance(raw_data, dict):
+                return False, raw_data.get("msg", "") or ""
+            else:
+                return False, ""
 
     async def calculator_refresh_data(
         self,
@@ -803,10 +876,14 @@ class WavesApi:
             return res
         return {}
 
-    async def login(self, mobile: int | str, code: str):
+    async def login(self, mobile: int | str, code: str, did: str):
         platform = login_platform()
         header = copy.deepcopy(await get_headers(platform=platform))
-        data = {"mobile": mobile, "code": code}
+        data = {
+            "mobile": mobile,
+            "code": code,
+            "devCode": did,
+        }
         if platform == "h5":
             url = LOGIN_H5_URL
         else:
@@ -826,6 +903,8 @@ class WavesApi:
     ) -> Union[Dict, int]:
         if header is None:
             header = await get_headers()
+        if header:
+            header.pop("roleId", None)
 
         proxy_url = get_local_proxy_url()
         for attempt in range(max_retries):
@@ -859,7 +938,7 @@ class WavesApi:
                             except Exception:
                                 pass
                         logger.debug(
-                            f"url:[{url}] params:[{params}] data:[{data}] raw_data:{raw_data}"
+                            f"url:[{url}] params:[{params}] headers:[{header}] data:[{data}] raw_data:{raw_data}"
                         )
                         return raw_data
             except Exception as e:
