@@ -51,6 +51,7 @@ OTHER_PATH = MAIN_PATH / "other"
 CALENDAR_PATH = OTHER_PATH / "calendar"
 SLASH_PATH = OTHER_PATH / "slash"
 CHALLENGE_PATH = OTHER_PATH / "challenge"
+ANN_CARD_PATH = OTHER_PATH / "ann_card"
 
 
 # 别名
@@ -85,6 +86,7 @@ def init_dir():
         CUSTOM_CARD_PATH,
         OTHER_PATH,
         CALENDAR_PATH,
+        ANN_CARD_PATH,
         ALIAS_PATH,
         CUSTOM_MR_CARD_PATH,
     ]:
