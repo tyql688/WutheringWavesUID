@@ -78,6 +78,7 @@ from .api import (
 
 async def _check_response(
     res: Union[Dict, int],
+    token: Optional[str] = None,
     roleId=None,
 ) -> tuple[bool, Union[Dict, str]]:
     if isinstance(res, dict):
@@ -91,6 +92,8 @@ async def _check_response(
         logger.warning(f"msg: {res.get('msg')} - data: {res.get('data')}")
 
         if res.get("msg") and ("重新登录" in res["msg"] or "登录已过期" in res["msg"]):
+            if token:
+                await WavesUser.mark_invalid(token, "无效")
             return False, res.get("msg", "登录已过期")
 
         if res.get("msg") and "访问被阻断" in res["msg"]:
@@ -316,7 +319,7 @@ class WavesApi:
             header,
             data=data,
         )
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, token)
 
     async def refresh_data(
         self, roleId: str, token: str, serverId: Optional[str] = None
@@ -330,7 +333,7 @@ class WavesApi:
             "roleId": roleId,
         }
         raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     # async def refresh_query_data(
     #     self, roleId: str, token: str, serverId: Optional[str] = None
@@ -346,7 +349,7 @@ class WavesApi:
     #     raw_data = await self._waves_request(
     #         QUERY_USERID_URL, "POST", header, data=data
     #     )
-    #     return await _check_response(raw_data, roleId)
+    #     return await _check_response(raw_data, token, roleId)
 
     # async def refresh_data_for_platform(
     #     self,
@@ -364,7 +367,7 @@ class WavesApi:
     #         "roleId": roleId,
     #     }
     #     raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
-    #     return await _check_response(raw_data, roleId)
+    #     return await _check_response(raw_data, token, roleId)
 
     async def get_base_info(
         self, roleId: str, token: str, serverId: Optional[str] = None
@@ -383,11 +386,11 @@ class WavesApi:
             "roleId": roleId,
         }
         raw_data = await self._waves_request(BASE_DATA_URL, "POST", header, data=data)
-        # flag, res = await _check_response(raw_data)
+        # flag, res = await _check_response(raw_data, token)
         # if flag and res.get('creatTime') is None:
         #     return False, error_reply(WAVES_CODE_106)
         # return flag, res
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     async def get_role_info(
         self, roleId: str, token: str, serverId: Optional[str] = None
@@ -406,7 +409,7 @@ class WavesApi:
             "roleId": roleId,
         }
         raw_data = await self._waves_request(ROLE_DATA_URL, "POST", header, data=data)
-        flag, res = await _check_response(raw_data, roleId)
+        flag, res = await _check_response(raw_data, token, roleId)
         if flag and isinstance(res, Dict) and res.get("roleList") is None:
             return False, error_reply(WAVES_CODE_107)
         return flag, res
@@ -444,7 +447,7 @@ class WavesApi:
             "id": charId,
         }
         raw_data = await self._waves_request(ROLE_DETAIL_URL, "POST", header, data=data)
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, token)
 
     async def get_calabash_data(
         self, roleId: str, token: str, serverId: Optional[str] = None
@@ -466,7 +469,7 @@ class WavesApi:
         raw_data = await self._waves_request(
             CALABASH_DATA_URL, "POST", header, data=data
         )
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     async def get_explore_data(
         self,
@@ -493,7 +496,7 @@ class WavesApi:
         raw_data = await self._waves_request(
             EXPLORE_DATA_URL, "POST", header, data=data
         )
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     async def get_challenge_data(
         self, roleId: str, token: str, serverId: Optional[str] = None
@@ -515,7 +518,7 @@ class WavesApi:
         raw_data = await self._waves_request(
             CHALLENGE_DATA_URL, "POST", header, data=data
         )
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     # async def get_challenge_index(
     #     self, roleId: str, token: str, serverId: Optional[str] = None
@@ -531,7 +534,7 @@ class WavesApi:
     #     raw_data = await self._waves_request(
     #         CHALLENGE_INDEX_URL, "POST", header, data=data
     #     )
-    #     return await _check_response(raw_data, roleId)
+    #     return await _check_response(raw_data, token, roleId)
 
     async def get_abyss_data(
         self, roleId: str, token: str, serverId: Optional[str] = None
@@ -654,7 +657,7 @@ class WavesApi:
         raw_data = await self._waves_request(
             CALCULATOR_REFRESH_DATA_URL, "POST", header, data=data
         )
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     @timed_async_cache(
         86400,
@@ -668,7 +671,7 @@ class WavesApi:
         raw_data = await self._waves_request(
             ONLINE_LIST_ROLE, "POST", header, data=data
         )
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, token)
 
     @timed_async_cache(
         86400,
@@ -682,7 +685,7 @@ class WavesApi:
         raw_data = await self._waves_request(
             ONLINE_LIST_WEAPON, "POST", header, data=data
         )
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, token)
 
     @timed_async_cache(
         86400,
@@ -698,7 +701,7 @@ class WavesApi:
         raw_data = await self._waves_request(
             ONLINE_LIST_PHANTOM, "POST", header, data=data
         )
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, token)
 
     async def get_owned_role(
         self,
@@ -716,7 +719,7 @@ class WavesApi:
         raw_data = await self._waves_request(
             QUERY_OWNED_ROLE, "POST", header, data=data
         )
-        return await _check_response(raw_data)
+        return await _check_response(raw_data, token)
 
     async def get_develop_role_cultivate_status(
         self,
@@ -736,7 +739,7 @@ class WavesApi:
         raw_data = await self._waves_request(
             ROLE_CULTIVATE_STATUS, "POST", header, data=data
         )
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     async def get_batch_role_cost(
         self,
@@ -754,7 +757,7 @@ class WavesApi:
             "content": j.dumps(content),
         }
         raw_data = await self._waves_request(BATCH_ROLE_COST, "POST", header, data=data)
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     async def get_period_list(
         self,
@@ -765,7 +768,7 @@ class WavesApi:
         header = copy.deepcopy(await get_headers(token))
         header.update({"token": token})
         raw_data = await self._waves_request(PERIOD_LIST_URL, "GET", header)
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     async def get_period_detail(
         self,
@@ -790,7 +793,7 @@ class WavesApi:
         elif type == "version":
             url = VERSION_LIST_URL
         raw_data = await self._waves_request(url, "POST", header, data=data)
-        return await _check_response(raw_data, roleId)
+        return await _check_response(raw_data, token, roleId)
 
     async def get_gacha_log(
         self,
