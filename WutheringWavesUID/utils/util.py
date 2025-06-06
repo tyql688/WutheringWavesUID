@@ -2,11 +2,14 @@ import asyncio
 import random
 import string
 import time
+import uuid
 from functools import wraps
 from typing import Any, List
 
 import httpx
 from subscribe import gs_subscribe
+
+from gsuid_core.logger import logger
 
 
 def timed_async_cache(expiration, condition=lambda x: True):
@@ -54,7 +57,16 @@ def timed_async_cache(expiration, condition=lambda x: True):
 
 # 使用示例
 @timed_async_cache(86400)
-async def get_public_ip(host="127.0.0.1"):
+async def get_public_ip(host="127.127.127.127"):
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.get("https://event.kurobbs.com/event/ip", timeout=4)
+            ip = r.text
+            return ip
+    except Exception as e:
+        logger.error(f"获取kuro ip失败: {e}")
+        pass
+
     # 尝试从 ipify 获取 IP 地址
     try:
         async with httpx.AsyncClient() as client:
@@ -86,6 +98,10 @@ def generate_random_string(length=32):
 
 def generate_random_ipv6_manual():
     return ":".join([hex(random.randint(0, 0xFFFF))[2:].zfill(4) for _ in range(8)])
+
+
+def generate_random_ipv4_manual():
+    return ".".join([str(random.randint(0, 255)) for _ in range(4)])
 
 
 def hide_uid(uid: str) -> str:
@@ -124,7 +140,8 @@ async def send_master_info(msg: str):
 
 
 def login_platform() -> str:
-    from ..wutheringwaves_config import WutheringWavesConfig
+    # from ..wutheringwaves_config import WutheringWavesConfig
 
-    LoginType = WutheringWavesConfig.get_config("WavesLoginType").data
-    return LoginType if LoginType else "h5"
+    # LoginType = WutheringWavesConfig.get_config("WavesLoginTypeNew").data
+    # return LoginType if LoginType else "ios"
+    return "ios"

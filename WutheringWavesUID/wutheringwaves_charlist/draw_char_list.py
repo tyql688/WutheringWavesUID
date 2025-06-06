@@ -50,6 +50,7 @@ TEXT_PATH = Path(__file__).parent / "texture2d"
 
 
 async def get_all_roleid_detail_info(
+    ev: Event,
     uid: str,
     user_id: str,
     ck: str,
@@ -58,7 +59,7 @@ async def get_all_roleid_detail_info(
 ):
     # 根据面板数据获取详细信息
     if is_refresh or is_peek:
-        await refresh_char(uid, user_id, ck)
+        await refresh_char(ev, uid, user_id, ck)
     all_role_detail = await get_all_roleid_detail_info_int(uid)
     if all_role_detail:
         return all_role_detail
@@ -68,7 +69,7 @@ async def get_all_roleid_detail_info(
         return None
 
     # 尝试刷新
-    await refresh_char(uid, user_id, ck)
+    await refresh_char(ev, uid, user_id, ck)
     all_role_detail = await get_all_roleid_detail_info_int(uid)
     if all_role_detail:
         return all_role_detail
@@ -89,7 +90,7 @@ async def draw_char_list_img(
         # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
         account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
     else:
-        is_self_ck, ck = await waves_api.get_ck_result(user_waves_id, user_id)
+        is_self_ck, ck = await waves_api.get_ck_result(user_waves_id, user_id, ev.bot_id)
         if not ck:
             return error_reply(WAVES_CODE_102)
 
@@ -105,6 +106,7 @@ async def draw_char_list_img(
         account_info = AccountBaseInfo.model_validate(account_info)
 
     all_role_detail = await get_all_roleid_detail_info(
+        ev,
         uid,
         user_id,
         ck,

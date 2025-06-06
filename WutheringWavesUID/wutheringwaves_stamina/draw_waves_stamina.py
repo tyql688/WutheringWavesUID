@@ -56,7 +56,7 @@ async def seconds2hours(seconds: int) -> str:
 
 
 async def process_uid(uid, ev):
-    ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
+    ck = await waves_api.get_self_waves_ck(uid, ev.user_id, ev.bot_id)
     if not ck:
         return None
 
@@ -160,7 +160,9 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
     if user and user.stamina_bg_value:
         char_id = char_name_to_char_id(user.stamina_bg_value)
         if char_id in SPECIAL_CHAR:
-            ck = await waves_api.get_self_waves_ck(daily_info.roleId, ev.user_id)
+            ck = await waves_api.get_self_waves_ck(
+                daily_info.roleId, ev.user_id, ev.bot_id
+            )
             if ck:
                 for char_id in SPECIAL_CHAR[char_id]:
                     succ, role_detail_info = await waves_api.get_role_detail_info(

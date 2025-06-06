@@ -62,7 +62,7 @@ async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
         # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
         account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
     else:
-        _, ck = await waves_api.get_ck_result(uid, user_id)
+        _, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
         if not ck:
             return hint.error_reply(WAVES_CODE_102)
             # 账户数据

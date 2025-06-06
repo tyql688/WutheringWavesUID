@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Union
 import aiofiles
 
 from gsuid_core.logger import logger
+from gsuid_core.models import Event
 
 from ..utils.api.model import AccountBaseInfo, RoleList
 from ..utils.error_reply import WAVES_CODE_101, WAVES_CODE_102, WAVES_CODE_999
@@ -123,6 +124,7 @@ async def save_card_info(
 
 
 async def refresh_char(
+    ev: Event,
     uid: str,
     user_id: str,
     ck: Optional[str] = None,  # type: ignore
@@ -131,7 +133,7 @@ async def refresh_char(
 ) -> Union[str, List]:
     waves_datas = []
     if not ck:
-        is_self_ck, ck = await waves_api.get_ck_result(uid, user_id)
+        is_self_ck, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 共鸣者信息

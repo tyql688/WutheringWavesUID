@@ -646,7 +646,7 @@ async def draw_char_detail_img(
     is_online_user = False
     ck = ""
     if not is_limit_query and not waves_api.is_net(uid):
-        _, ck = await waves_api.get_ck_result(uid, user_id)
+        _, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
         if not ck:
             return hint.error_reply(WAVES_CODE_102)
 
@@ -1098,7 +1098,7 @@ async def draw_char_score_img(
         )
     char_name = alias_to_char_name(char)
     
-    _, ck = await waves_api.get_ck_result(uid, user_id)
+    _, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
     if not ck and not waves_api.is_net(uid):
         return hint.error_reply(WAVES_CODE_102)
 

@@ -46,7 +46,7 @@ PREFIX = get_plugin_available_prefix("WutheringWavesUID")
 async def process_uid(
     uid, ev, period_param: Optional[Union[int, str]]
 ) -> Optional[Union[Dict[str, Any], str]]:
-    ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
+    ck = await waves_api.get_self_waves_ck(uid, ev.user_id, ev.bot_id)
     if not ck:
         return None
 

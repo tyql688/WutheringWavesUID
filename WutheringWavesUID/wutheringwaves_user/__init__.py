@@ -22,13 +22,42 @@ waves_get_ck = SV("waves获取ck", area="DIRECT")
 waves_del_all_invalid_ck = SV("鸣潮删除无效token", priority=1, pm=1)
 
 
+def get_ck_and_devcode(text: str, split_str: str = ",") -> tuple[str, str]:
+    ck, devcode = "", ""
+    try:
+        ck, devcode = text.split(split_str)
+        devcode = devcode.strip()
+        ck = ck.strip()
+    except ValueError:
+        pass
+    return ck, devcode
+
+
 @waves_add_ck.on_prefix(
     ("添加CK", "添加ck", "添加Token", "添加token", "添加TOKEN"), block=True
 )
 async def send_waves_add_ck_msg(bot: Bot, ev: Event):
-    ck = ev.text.strip()
     at_sender = True if ev.group_id else False
-    msg = await add_cookie(ev, ck)
+    text = ev.text.strip()
+
+    ck, did = "", ""
+    for i in ["，", ","]:
+        ck, did = get_ck_and_devcode(text, split_str=i)
+        if ck and did:
+            break
+
+    if len(did) == 36 or len(did) == 40:
+        pass
+    else:
+        did = ""
+
+    if not ck or not did:
+        return await bot.send(
+            f"[鸣潮] 该命令末尾需要跟正确的token和did! \n例如【{PREFIX}添加token token,did】\n",
+            at_sender,
+        )
+
+    msg = await add_cookie(ev, ck, did)
     if "成功" in msg:
         user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, "cookie", ck)
         if user:

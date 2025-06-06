@@ -8,38 +8,39 @@ from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 from gsuid_core.utils.image.utils import sget
+
 from ..utils import hint
 from ..utils.api.model import (
     AccountBaseInfo,
-    ExploreList,
     AreaInfo,
-    ExploreItem,
     ExploreArea,
+    ExploreItem,
+    ExploreList,
 )
 from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import (
-    waves_font_30,
+    waves_font_24,
     waves_font_25,
     waves_font_26,
-    waves_font_42,
+    waves_font_30,
     waves_font_36,
-    waves_font_24,
+    waves_font_42,
 )
 from ..utils.image import (
-    get_event_avatar,
-    get_waves_bg,
     GOLD,
-    add_footer,
     GREY,
-    YELLOW,
-    change_color,
     WAVES_FREEZING,
+    WAVES_LINGERING,
     WAVES_MOLTEN,
+    WAVES_MOONLIT,
     WAVES_SIERRA,
     WAVES_SINKING,
     WAVES_VOID,
-    WAVES_MOONLIT,
-    WAVES_LINGERING,
+    YELLOW,
+    add_footer,
+    change_color,
+    get_event_avatar,
+    get_waves_bg,
 )
 from ..utils.waves_api import waves_api
 
@@ -80,19 +81,19 @@ def get_progress_color(progress):
 
 
 async def draw_explore_img(ev: Event, uid: str, user_id: str):
-    is_self_ck, ck = await waves_api.get_ck_result(uid, user_id)
+    is_self_ck, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
     # 账户数据
     succ, account_info = await waves_api.get_base_info(uid, ck)
     if not succ:
         return account_info
-    account_info = AccountBaseInfo(**account_info)
+    account_info = AccountBaseInfo.model_validate(account_info)
 
     succ, explore_data = await waves_api.get_explore_data(uid, ck)
     if not succ:
         return explore_data
-    explore_data = ExploreList(**explore_data)
+    explore_data = ExploreList.model_validate(explore_data)
     if not is_self_ck and not explore_data.open:
         return hint.error_reply(msg="探索数据未开启")
 
@@ -103,9 +104,13 @@ async def draw_explore_img(ev: Event, uid: str, user_id: str):
     explore_title_h = 200
     explore_frame_h = 500
 
+    if not explore_data.exploreList:
+        return hint.error_reply(msg="探索数据为空")
+
     for mi, _explore in enumerate(explore_data.exploreList):
         h += explore_title_h
-        h += math.ceil(len(_explore.areaInfoList) / 3) * explore_frame_h
+        if _explore.areaInfoList:
+            h += math.ceil(len(_explore.areaInfoList) / 3) * explore_frame_h
 
     img = get_waves_bg(2000, h, "bg3")
 
@@ -175,7 +180,7 @@ async def draw_explore_img(ev: Event, uid: str, user_id: str):
 
         img.paste(_explore_title, (0, hi), _explore_title)
 
-        for ni, _subArea in enumerate(_explore.areaInfoList):
+        for ni, _subArea in enumerate(_explore.areaInfoList or []):
             _subArea: AreaInfo
             _explore_frame = explore_frame.copy()
             _explore_frame = await change_color(
@@ -241,7 +246,7 @@ async def draw_explore_img(ev: Event, uid: str, user_id: str):
             img.alpha_composite(_explore_frame, (_w, _h))
 
         hi += (
-            math.ceil(len(_explore.areaInfoList) / 3) * explore_frame_h
+            math.ceil(len(_explore.areaInfoList or []) / 3) * explore_frame_h
             + explore_title_h
         )
 

@@ -19,6 +19,8 @@ exec_list.extend(
         'ALTER TABLE WavesUser ADD COLUMN platform TEXT DEFAULT ""',
         'ALTER TABLE WavesUser ADD COLUMN stamina_bg_value TEXT DEFAULT ""',
         'ALTER TABLE WavesUser ADD COLUMN bbs_sign_switch TEXT DEFAULT "off"',
+        'ALTER TABLE WavesUser ADD COLUMN bat TEXT DEFAULT ""',
+        'ALTER TABLE WavesUser ADD COLUMN did TEXT DEFAULT ""',
     ]
 )
 
@@ -112,19 +114,44 @@ class WavesUser(User, table=True):
     platform: str = Field(default="", title="ck平台")
     stamina_bg_value: str = Field(default="", title="体力背景")
     bbs_sign_switch: str = Field(default="off", title="自动社区签到")
+    bat: str = Field(default="", title="bat")
+    did: str = Field(default="", title="did")
 
     @classmethod
     @with_session
     async def select_cookie(
         cls: Type[T_WavesUser],
         session: AsyncSession,
-        user_id: str,
         uid: str,
+        user_id: str,
+        bot_id: str,
     ) -> Optional[str]:
-        sql = select(cls).where(cls.user_id == user_id, cls.uid == uid)
+        sql = select(cls).where(
+            cls.user_id == user_id,
+            cls.uid == uid,
+            cls.bot_id == bot_id,
+        )
         result = await session.execute(sql)
         data = result.scalars().all()
         return data[0].cookie if data else None
+
+    @classmethod
+    @with_session
+    async def select_waves_user(
+        cls: Type[T_WavesUser],
+        session: AsyncSession,
+        uid: str,
+        user_id: str,
+        bot_id: str,
+    ) -> Optional[T_WavesUser]:
+        sql = select(cls).where(
+            cls.user_id == user_id,
+            cls.uid == uid,
+            cls.bot_id == bot_id,
+        )
+        result = await session.execute(sql)
+        data = result.scalars().all()
+        return data[0] if data else None
 
     @classmethod
     @with_session
@@ -195,6 +222,25 @@ class WavesUser(User, table=True):
         """删除所有无效缓存"""
         sql = delete(cls).where(
             or_(col(cls.status) == "无效", col(cls.cookie) == ""),
+        )
+        result = await session.execute(sql)
+        return result.rowcount
+
+    @classmethod
+    @with_session
+    async def delete_cookie(
+        cls,
+        session: AsyncSession,
+        uid: str,
+        user_id: str,
+        bot_id: str,
+    ):
+        sql = delete(cls).where(
+            and_(
+                col(cls.user_id) == user_id,
+                col(cls.uid) == uid,
+                col(cls.bot_id) == bot_id,
+            )
         )
         result = await session.execute(sql)
         return result.rowcount
