@@ -42,6 +42,7 @@ from ..utils.image import (
 from ..utils.resource.download_file import get_phantom_img
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
+from ..wutheringwaves_analyzecard.user_info_utils import get_user_detail_info
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -58,16 +59,7 @@ class WavesEchoRank(BaseModel):
 
 
 async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
-    if waves_api.is_net(uid):
-        # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
-        account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
-    else:
-        _, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
-        if not ck:
-            return hint.error_reply(WAVES_CODE_102)
-            # 账户数据
-        succ, account_info = await waves_api.get_base_info(uid, ck)
-        account_info = AccountBaseInfo.model_validate(account_info)
+    account_info= await get_user_detail_info(uid)
 
     all_role_detail: Optional[Dict[str, RoleDetailData]] = (
         await get_all_role_detail_info(uid)

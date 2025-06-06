@@ -39,6 +39,7 @@ from ..utils.resource.constant import (
     SPECIAL_CHAR_INT,
 )
 from ..utils.waves_api import waves_api
+from ..wutheringwaves_analyzecard.user_info_utils import get_user_detail_info
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -63,8 +64,9 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
     )
     
     if waves_api.is_net(uid):
-        # 填充用户信息,name固定以免误会。没有creatTime 是为了跳过.is_full的逻辑
-        account_info= AccountBaseInfo(name="国际服用户", id=uid)
+        account_info= await get_user_detail_info(uid)
+        # 拒绝掉无用数据，不走is_full
+        account_info.creatTime = None
     else:
         # 账户数据
         succ, account_info = await waves_api.get_base_info(uid, ck)

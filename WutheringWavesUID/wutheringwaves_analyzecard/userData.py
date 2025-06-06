@@ -20,6 +20,7 @@ from ..utils.name_convert import (
 from ..wutheringwaves_config import PREFIX
 from .Phantom_check import PhantomValidator
 from .char_fetterDetail import get_fetterDetail_from_char, echo_data_to_cost
+from .user_info_utils import save_user_info
 
 
 async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
@@ -28,6 +29,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
     try:
         uid = result_dict["用户信息"]["UID"]
+        user_name = result_dict["用户信息"]["玩家名称"]
 
         chain_num = result_dict["角色信息"]["共鸣链"]
 
@@ -51,6 +53,8 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         await bot.send("[鸣潮]识别结果结构错误", at_sender)
         return
 
+    # 存储用户昵称
+    await save_user_info(uid, user_name)
 
     # char_id = "1506" # 菲比..utils\map\detail_json\char\1506.json
     result = await generate_online_role_detail(char_id)

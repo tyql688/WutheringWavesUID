@@ -466,13 +466,8 @@ async def draw_uid_avatar(uid, ev, card_img):
         card_img.paste(title, (0, 0), title)
 
     else:
-        _, ck = await waves_api.get_ck_result(uid, ev.user_id, ev.bot_id)
-        if not ck:
-            return hint.error_reply(WAVES_CODE_102)
-        succ, account_info = await waves_api.get_base_info(uid, ck)
-        if not succ:
-            return account_info
-        account_info = AccountBaseInfo.model_validate(account_info)
+        from ..wutheringwaves_analyzecard.user_info_utils import get_user_detail_info
+        account_info= await get_user_detail_info(uid)
 
         base_info_bg = Image.open(TEXT_PATH / "base_info_bg.png")
         base_info_draw = ImageDraw.Draw(base_info_bg)

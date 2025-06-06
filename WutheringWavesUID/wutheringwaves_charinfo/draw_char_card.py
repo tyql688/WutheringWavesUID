@@ -97,6 +97,7 @@ from ..wutheringwaves_config.wutheringwaves_config import (
     WutheringWavesConfig,
 )
 from .role_info_change import change_role_detail
+from ..wutheringwaves_analyzecard.user_info_utils import get_user_detail_info
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -647,34 +648,21 @@ async def draw_char_detail_img(
     ck = ""
     if not is_limit_query and not waves_api.is_net(uid):
         _, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
-        if not ck:
-            return hint.error_reply(WAVES_CODE_102)
-
-        succ, online_list = await waves_api.get_online_list_role(ck)
-        if succ and online_list:
-            online_list_role_model = OnlineRoleList.model_validate(online_list)
-            online_role_map = {str(i.roleId): i for i in online_list_role_model}
-            if char_id in online_role_map:
-                is_online_user = True
+        if ck:
+            succ, online_list = await waves_api.get_online_list_role(ck)
+            if succ and online_list:
+                online_list_role_model = OnlineRoleList.model_validate(online_list)
+                online_role_map = {str(i.roleId): i for i in online_list_role_model}
+                if char_id in online_role_map:
+                    is_online_user = True
 
     # 账户数据
     if waves_id:
         uid = waves_id
 
     if not is_limit_query:
-        if not waves_api.is_net(uid):
-            _, ck = await waves_api.get_ck_result(uid, user_id)
-            if not ck:
-                return hint.error_reply(WAVES_CODE_102)
-            succ, account_info = await waves_api.get_base_info(uid, ck)
-            if not succ:
-                return account_info
-            account_info = AccountBaseInfo.model_validate(account_info)
-            force_resource_id = None
-        else:
-            # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
-            account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
-            force_resource_id = None
+        account_info = await get_user_detail_info(uid)
+        force_resource_id = None
     else:
         account_info = AccountBaseInfo.model_validate(
             {
@@ -1105,14 +1093,9 @@ async def draw_char_score_img(
     # 账户数据
     if waves_id:
         uid = waves_id
-    if waves_api.is_net(uid):
-        # 填充用户信息,name固定以免误会。creatTime=1 是为了满足.is_full的逻辑
-        account_info= AccountBaseInfo(name="国际服用户", id=uid, creatTime=1, level=0, worldLevel=0)
-    else:
-        succ, account_info = await waves_api.get_base_info(uid, ck)
-        if not succ:
-            return account_info
-        account_info = AccountBaseInfo.model_validate(account_info)
+
+    account_info =  await get_user_detail_info(uid)
+
     # 获取数据
     avatar, role_detail = await get_role_need(ev, char_id, ck, uid, char_name, waves_id)
     if isinstance(role_detail, str):
