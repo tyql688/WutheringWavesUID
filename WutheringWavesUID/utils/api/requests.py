@@ -16,13 +16,7 @@ from gsuid_core.logger import logger
 
 from ...wutheringwaves_config import WutheringWavesConfig
 from ..database.models import WavesUser
-from ..error_reply import (
-    WAVES_CODE_100,
-    WAVES_CODE_101,
-    WAVES_CODE_107,
-    WAVES_CODE_998,
-    WAVES_CODE_999,
-)
+from ..error_reply import WAVES_CODE_107, WAVES_CODE_998, WAVES_CODE_999
 from ..hint import error_reply
 from ..util import (
     generate_random_ipv6_manual,
@@ -44,7 +38,6 @@ from .api import (
     GACHA_LOG_URL,
     GACHA_NET_LOG_URL,
     GAME_ID,
-    KURO_ROLE_URL,
     LOGIN_H5_URL,
     LOGIN_URL,
     MONTH_LIST_URL,
@@ -106,6 +99,19 @@ async def _check_response(
     return False, error_reply(WAVES_CODE_999)
 
 
+async def get_common_header(platform: str = "ios"):
+    devCode = generate_random_string()
+    header = {
+        "source": platform,
+        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
+        "devCode": devCode,
+        "X-Forwarded-For": generate_random_ipv6_manual(),
+        "version": "2.5.0",
+    }
+    return header
+
+
 async def get_headers_h5():
     devCode = generate_random_string()
     header = {
@@ -136,24 +142,25 @@ async def get_headers(
     ck: Optional[str] = None,
     platform: Optional[str] = None,
 ) -> Dict:
+    if not ck and not platform:
+        return await get_headers_h5()
+
     bat = ""
     did = ""
     roleId = ""
-    if ck and not platform:
-        try:
-            waves_user = await WavesUser.select_data_by_cookie(cookie=ck)
-            if waves_user:
-                platform = waves_user.platform
-                bat = waves_user.bat
-                did = waves_user.did
-                roleId = waves_user.uid
-        except Exception as _:
-            pass
+    platform = "ios"
+    if ck:
+        waves_user = await WavesUser.select_data_by_cookie(cookie=ck)
+        if waves_user:
+            platform = waves_user.platform
+            bat = waves_user.bat
+            did = waves_user.did
+            roleId = waves_user.uid
 
     if platform == "ios":
         header = await get_headers_ios()
     else:
-        header = await get_headers_h5()
+        header = await get_common_header(platform or "ios")
     if bat:
         header.update({"b-at": bat})
     if did:
@@ -249,32 +256,10 @@ class WavesApi:
         if len(ck_list) > 0:
             return random.choices(ck_list, k=1)[0]
 
-    async def get_kuro_role_info(
-        self, token: str, kuro_uid: str = ""
-    ) -> tuple[bool, Union[Dict, str]]:
-        header = copy.deepcopy(await get_headers(token))
-        header.update({"token": token})
-        data = {}
-        if kuro_uid:
-            data.update({"queryUserId": kuro_uid})
-        raw_data = await self._waves_request(KURO_ROLE_URL, "POST", header, data=data)
-        if isinstance(raw_data, dict):
-            if raw_data.get("code") == 200 and raw_data.get("data"):
-                return True, raw_data["data"]
-
-            if int(raw_data.get("code", 0)) == 500:
-                # ? 服了
-                await WavesUser.mark_invalid(token, "无效")
-                return False, error_reply(WAVES_CODE_101)
-
-            if raw_data.get("msg"):
-                return False, raw_data["msg"]
-        return False, error_reply(WAVES_CODE_999)
-
     async def get_kuro_role_list(
         self, token: str
     ) -> tuple[bool, str, Union[List, str, int]]:
-        header = copy.deepcopy(await get_headers(token))
+        header = await get_common_header(platform="ios")
         header.update({"token": token})
         data = {"gameId": GAME_ID}
 
@@ -293,17 +278,6 @@ class WavesApi:
                     err_msg = raw_data["msg"]
                     continue
         return False, "", err_msg
-
-    async def get_game_role_info(
-        self, token: str, gameId: Union[str, int] = GAME_ID, kuro_uid: str = ""
-    ) -> tuple[bool, Union[Dict, str, int]]:
-        succ, data = await self.get_kuro_role_info(token, kuro_uid)
-        if not succ or not isinstance(data, Dict):
-            return succ, data
-        for role in data["defaultRoleList"]:
-            if role["gameId"] == gameId:
-                return True, role
-        return False, WAVES_CODE_100
 
     async def get_daily_info(
         self, roleId: str, token: str, gameId: Union[str, int] = GAME_ID
