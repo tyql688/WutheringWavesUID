@@ -28,7 +28,7 @@ async def send_config_ev(bot: Bot, ev: Event):
     if "体力背景" in ev.text:
         from ..utils.waves_api import waves_api
 
-        ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
+        ck = await waves_api.get_self_waves_ck(uid, ev.user_id, ev.bot_id)
         if not ck:
             from ..utils.error_reply import ERROR_CODE, WAVES_CODE_102
 

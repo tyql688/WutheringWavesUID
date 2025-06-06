@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Optional, Union
 
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
@@ -26,6 +26,16 @@ async def add_cookie(ev: Event, ck: str, did: str) -> str:
             ev.user_id, ev.bot_id, "uid", data.roleId
         )
 
+        bat = ""
+        if user and user.bat:
+            bat = user.bat
+        else:
+            succ, bat = await waves_api.get_request_token(
+                data.roleId, ck, did, data.serverId
+            )
+            if not succ or not bat:
+                return bat
+
         if user:
             await WavesUser.update_data_by_data(
                 select_data={
@@ -47,16 +57,6 @@ async def add_cookie(ev: Event, ck: str, did: str) -> str:
                 uid=data.roleId,
                 platform=platform,
             )
-
-        bat = ""
-        if user and user.bat:
-            bat = user.bat
-        else:
-            succ, bat = await waves_api.get_request_token(
-                data.roleId, ck, did, data.serverId
-            )
-            if not succ or not bat:
-                return bat
 
         # 更新bat
         await WavesUser.update_data_by_data(
@@ -91,14 +91,9 @@ async def add_cookie(ev: Event, ck: str, did: str) -> str:
 
 
 async def delete_cookie(ev: Event, uid: str) -> str:
-    user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, "uid", uid)
-    if not user or not user.cookie:
+    count = await WavesUser.delete_cookie(uid, ev.user_id, ev.bot_id)
+    if count == 0:
         return f"[鸣潮] 特征码[{uid}]的token删除失败!\n❌不存在该特征码的token!\n"
-
-    await WavesUser.update_data_by_data(
-        select_data={"user_id": ev.user_id, "bot_id": ev.bot_id, "uid": uid},
-        update_data={"cookie": ""},
-    )
     return f"[鸣潮] 特征码[{uid}]的token删除成功!\n"
 
 
@@ -109,11 +104,19 @@ async def get_cookie(bot: Bot, ev: Event) -> Union[List[str], str]:
 
     msg = []
     for uid in uid_list:
-        ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
+        waves_user: Optional[WavesUser] = await WavesUser.select_waves_user(
+            uid, ev.user_id, ev.bot_id
+        )
+        if not waves_user:
+            continue
+
+        ck = await waves_api.get_self_waves_ck(uid, ev.user_id, ev.bot_id)
         if not ck:
             continue
         msg.append(f"鸣潮uid: {uid}")
-        msg.append(ck)
+        msg.append(f"token: {waves_user.cookie}")
+        msg.append(f"did: {waves_user.did}")
+        msg.append("--------------------------------")
 
     if not msg:
         return "您当前未绑定token或者token已全部失效\n"

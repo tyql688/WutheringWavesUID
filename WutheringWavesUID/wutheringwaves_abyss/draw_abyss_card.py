@@ -78,7 +78,7 @@ async def get_abyss_data(uid: str, ck: str, is_self_ck: bool):
 
 
 async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]:
-    is_self_ck, ck = await waves_api.get_ck_result(uid, user_id)
+    is_self_ck, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
 

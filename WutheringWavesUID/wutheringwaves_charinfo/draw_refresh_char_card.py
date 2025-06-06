@@ -158,7 +158,7 @@ async def draw_refresh_char_detail_img(
     time_stamp = can_refresh_card(user_id, uid)
     if time_stamp > 0:
         return get_refresh_interval_notify(time_stamp)
-    self_ck, ck = await waves_api.get_ck_result(uid, user_id)
+    self_ck, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 账户数据
@@ -184,7 +184,7 @@ async def draw_refresh_char_detail_img(
         }
     else:
         waves_datas = await refresh_char(
-            uid, user_id, ck, waves_map=waves_map, is_self_ck=self_ck
+            ev, uid, user_id, ck, waves_map=waves_map, is_self_ck=self_ck
         )
         if isinstance(waves_datas, str):
             return waves_datas

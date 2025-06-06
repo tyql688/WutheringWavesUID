@@ -183,15 +183,20 @@ class WavesApi:
         else:
             return SERVER_ID
 
-    async def get_ck_result(self, uid, user_id) -> tuple[bool, Optional[str]]:
-        ck = await self.get_self_waves_ck(uid, user_id)
+    async def get_ck_result(self, uid, user_id, bot_id) -> tuple[bool, Optional[str]]:
+        ck = await self.get_self_waves_ck(uid, user_id, bot_id)
         if ck:
             return True, ck
         ck = await self.get_waves_random_cookie(uid, user_id)
         return False, ck
 
-    async def get_self_waves_ck(self, uid: str, user_id) -> Optional[str]:
-        cookie = await WavesUser.select_cookie(user_id, uid)
+    async def get_self_waves_ck(
+        self,
+        uid: str,
+        user_id: str,
+        bot_id: str,
+    ) -> Optional[str]:
+        cookie = await WavesUser.select_cookie(uid, user_id, bot_id)
         if not cookie:
             return
 
@@ -335,40 +340,6 @@ class WavesApi:
         raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
         return await _check_response(raw_data, token, roleId)
 
-    # async def refresh_query_data(
-    #     self, roleId: str, token: str, serverId: Optional[str] = None
-    # ) -> tuple[bool, Union[Dict, str]]:
-    #     """刷新数据"""
-    #     header = copy.deepcopy(await get_headers(token))
-    #     header.update({"token": token})
-    #     data = {
-    #         "gameId": GAME_ID,
-    #         "serverId": self.get_server_id(roleId, serverId),
-    #         "roleId": roleId,
-    #     }
-    #     raw_data = await self._waves_request(
-    #         QUERY_USERID_URL, "POST", header, data=data
-    #     )
-    #     return await _check_response(raw_data, token, roleId)
-
-    # async def refresh_data_for_platform(
-    #     self,
-    #     roleId: str,
-    #     token: str,
-    #     serverId: Optional[str] = None,
-    #     platform: str = "h5",
-    # ) -> tuple[bool, Union[Dict, str]]:
-    #     """刷新数据"""
-    #     header = copy.deepcopy(await get_headers(token, platform))
-    #     header.update({"token": token})
-    #     data = {
-    #         "gameId": GAME_ID,
-    #         "serverId": self.get_server_id(roleId, serverId),
-    #         "roleId": roleId,
-    #     }
-    #     raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
-    #     return await _check_response(raw_data, token, roleId)
-
     async def get_base_info(
         self, roleId: str, token: str, serverId: Optional[str] = None
     ) -> tuple[bool, Union[Dict, str]]:
@@ -386,10 +357,6 @@ class WavesApi:
             "roleId": roleId,
         }
         raw_data = await self._waves_request(BASE_DATA_URL, "POST", header, data=data)
-        # flag, res = await _check_response(raw_data, token)
-        # if flag and res.get('creatTime') is None:
-        #     return False, error_reply(WAVES_CODE_106)
-        # return flag, res
         return await _check_response(raw_data, token, roleId)
 
     async def get_role_info(

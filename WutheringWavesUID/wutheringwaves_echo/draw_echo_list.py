@@ -58,7 +58,7 @@ class WavesEchoRank(BaseModel):
 
 
 async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
-    _, ck = await waves_api.get_ck_result(uid, user_id)
+    _, ck = await waves_api.get_ck_result(uid, user_id, ev.bot_id)
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
         # 账户数据

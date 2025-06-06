@@ -456,7 +456,7 @@ async def draw_uid_avatar(uid, ev, card_img):
         card_img.paste(title, (0, 0), title)
 
     else:
-        _, ck = await waves_api.get_ck_result(uid, ev.user_id)
+        _, ck = await waves_api.get_ck_result(uid, ev.user_id, ev.bot_id)
         if not ck:
             return hint.error_reply(WAVES_CODE_102)
         succ, account_info = await waves_api.get_base_info(uid, ck)

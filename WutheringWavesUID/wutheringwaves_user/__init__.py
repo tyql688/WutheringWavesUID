@@ -46,6 +46,11 @@ async def send_waves_add_ck_msg(bot: Bot, ev: Event):
         if ck and did:
             break
 
+    if len(did) == 36 or len(did) == 40:
+        pass
+    else:
+        did = ""
+
     if not ck or not did:
         return await bot.send(
             f"[鸣潮] 该命令末尾需要跟正确的token和did! \n例如【{PREFIX}添加token token,did】\n",

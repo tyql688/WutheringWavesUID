@@ -120,7 +120,7 @@ async def draw_all_rank_card(
     self_uid = ""
     try:
         self_uid = await WavesBind.get_uid_by_game(ev.user_id, ev.bot_id)
-        is_self_ck, ck = await waves_api.get_ck_result(self_uid, ev.user_id)
+        is_self_ck, ck = await waves_api.get_ck_result(self_uid, ev.user_id, ev.bot_id)
     except Exception:
         pass
     char_id = char_name_to_char_id(char)
