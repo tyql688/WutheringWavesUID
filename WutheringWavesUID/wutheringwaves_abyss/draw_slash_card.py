@@ -87,6 +87,9 @@ async def get_slash_data(
     else:
         slash_data = await waves_api.get_slash_index(uid, ck)
 
+    if isinstance(slash_data, str):
+        return slash_data
+
     if not isinstance(slash_data, dict):
         return SLASH_ERROR
 
