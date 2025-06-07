@@ -96,6 +96,12 @@ async def _check_response(
                 await WavesUser.mark_invalid(token, "无效")
             return False, res_msg
 
+        if isinstance(res_data, str) and (
+            "RABC" in res_data or "access denied" in res_data
+        ):
+            await send_master_info(res_data)
+            return False, error_reply(WAVES_CODE_998)
+
         if res_msg and "访问被阻断" in res_msg:
             await send_master_info(res_msg)
             return False, error_reply(WAVES_CODE_998)
@@ -266,24 +272,21 @@ class WavesApi:
     async def get_kuro_role_list(
         self, token: str
     ) -> tuple[bool, str, Union[List, str, int]]:
-        header = await get_common_header(platform="ios")
+        platform = login_platform()
+        header = await get_common_header(platform=platform)
         header.update({"token": token})
         data = {"gameId": GAME_ID}
 
         err_msg = error_reply(WAVES_CODE_999)
-        for i in ["ios"]:
-            header["source"] = i
-            raw_data = await self._waves_request(
-                ROLE_LIST_URL, "POST", header, data=data
-            )
-            if isinstance(raw_data, dict):
-                if raw_data.get("code") == 200 and raw_data.get("data"):
-                    return True, i, raw_data["data"]
+        raw_data = await self._waves_request(ROLE_LIST_URL, "POST", header, data=data)
+        if isinstance(raw_data, dict):
+            if raw_data.get("code") == 200 and raw_data.get("data"):
+                return True, platform, raw_data["data"]
 
-                logger.warning(f"get_kuro_role_list -> msg: {raw_data}")
-                if raw_data.get("msg"):
-                    err_msg = raw_data["msg"]
-                    continue
+            logger.warning(f"get_kuro_role_list -> msg: {raw_data}")
+            if raw_data.get("msg"):
+                err_msg = raw_data["msg"]
+                return False, "", err_msg
         return False, "", err_msg
 
     async def get_daily_info(
