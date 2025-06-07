@@ -1,5 +1,6 @@
 from typing import Dict, List, Union
 
+from gsuid_core.logger import logger
 from gsuid_core.segment import MessageSegment
 
 from ..utils.database.models import WavesPush, WavesUser
@@ -16,6 +17,7 @@ async def get_notice_list() -> Dict[str, Dict[str, Dict]]:
     msg_dict = {"private_msg_dict": {}, "group_msg_dict": {}}
 
     user_list: List[WavesUser] = await WavesUser.get_all_push_user_list()
+    logger.debug(f"[鸣潮] 推送列表: {user_list}")
     for user in user_list:
         if not user.uid or not user.cookie or user.status or not user.bot_id:
             continue

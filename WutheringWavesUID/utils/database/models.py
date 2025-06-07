@@ -217,6 +217,11 @@ class WavesUser(User, table=True):
         return list(data)
 
     @classmethod
+    async def get_all_push_user_list(cls: Type[T_WavesUser]) -> List[T_WavesUser]:
+        data = await cls.get_waves_all_user()
+        return [user for user in data if user.push_switch != "off"]
+
+    @classmethod
     @with_session
     async def delete_all_invalid_cookie(cls, session: AsyncSession):
         """删除所有无效缓存"""
