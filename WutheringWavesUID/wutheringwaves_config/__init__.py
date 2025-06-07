@@ -27,7 +27,7 @@ async def open_switch_func(bot: Bot, ev: Event):
 
     from ..utils.waves_api import waves_api
 
-    ck = await waves_api.get_self_waves_ck(uid, ev.user_id)
+    ck = await waves_api.get_self_waves_ck(uid, ev.user_id, ev.bot_id)
     if not ck:
         from ..utils.error_reply import WAVES_CODE_102, ERROR_CODE
 

@@ -4,12 +4,28 @@ import aiofiles
 
 from gsuid_core.logger import logger
 
-from ..utils.waves_api import waves_api
 from ..utils.api.model import AccountBaseInfo
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 
 
 # creatTime 是为了满足.is_full的逻辑
+# 1 5 6 7 8 9
+# 国美欧亚港澳台SEA东南亚
+
+def get_region_by_uid(uid: str) -> str:
+    if not uid:
+        return "未知"
+    
+    first_char = uid[0]
+    region_map = {
+        '1': '国',
+        '5': '美',
+        '6': '欧',
+        '7': '亚',
+        '8': '港澳台',
+        '9': '东南亚'
+    }
+    return region_map.get(first_char, "未知")
 
 
 async def get_user_detail_info(
@@ -18,9 +34,9 @@ async def get_user_detail_info(
     path = PLAYER_PATH / uid / "userData.json"
     if not path.exists():
         # 用户数据不存在时返回默认信息
-        is_global = waves_api.is_net(uid)
+        iregion = get_region_by_uid(uid)  # 获取用户地区
         return AccountBaseInfo(
-            name="国际服用户" if is_global else "国服用户",
+            name=f"{iregion}服用户",
             id=uid,
             creatTime=1,  # 固定为1以满足.is_full逻辑
             level=0,
