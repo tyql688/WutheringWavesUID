@@ -79,26 +79,35 @@ async def _check_response(
     roleId=None,
 ) -> tuple[bool, Union[Dict, str]]:
     if isinstance(res, dict):
-        if res.get("code") == 200 and res.get("data"):
-            return True, res["data"]
+        res_code = res.get("code")
+        res_msg = res.get("msg")
+        res_data = res.get("data")
+        if res_code == 200 and res_data:
+            return True, res_data
 
-        if res.get("msg") and res.get("msg") == "请求成功":
+        if res_msg and (res_msg == "请求成功" or res_msg == "系统繁忙，请稍后再试"):
             msg = f"\n鸣潮账号id: 【{roleId}】未绑定库街区!!!\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮账号数据\n"
             return False, error_reply(None, msg)
 
-        logger.warning(f"msg: {res.get('msg')} - data: {res.get('data')}")
+        logger.warning(f"[wwuid] code: {res_code} msg: {res_msg} data: {res_data}")
 
-        if res.get("msg") and ("重新登录" in res["msg"] or "登录已过期" in res["msg"]):
+        if res_msg and ("重新登录" in res_msg or "登录已过期" in res_msg):
             if token:
                 await WavesUser.mark_invalid(token, "无效")
-            return False, res.get("msg", "登录已过期")
+            return False, res_msg
 
-        if res.get("msg") and "访问被阻断" in res["msg"]:
-            await send_master_info(res.get("msg", "未知错误"))
+        if isinstance(res_data, str) and (
+            "RABC" in res_data or "access denied" in res_data
+        ):
+            await send_master_info(res_data)
             return False, error_reply(WAVES_CODE_998)
 
-        if res.get("msg"):
-            await send_master_info(res.get("msg", "未知错误"))
+        if res_msg and "访问被阻断" in res_msg:
+            await send_master_info(res_msg)
+            return False, error_reply(WAVES_CODE_998)
+
+        if res_msg:
+            await send_master_info(res_msg)
             return False, error_reply(WAVES_CODE_999)
     return False, error_reply(WAVES_CODE_999)
 
@@ -137,7 +146,6 @@ async def get_headers_ios():
         "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
         "devCode": f"{ip}, Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
         "X-Forwarded-For": generate_random_ipv6_manual(),
-        "Access-Control-Request-Header": "b-at,devcode,did,source,token",
     }
     return header
 
@@ -264,24 +272,21 @@ class WavesApi:
     async def get_kuro_role_list(
         self, token: str
     ) -> tuple[bool, str, Union[List, str, int]]:
-        header = await get_common_header(platform="ios")
+        platform = login_platform()
+        header = await get_common_header(platform=platform)
         header.update({"token": token})
         data = {"gameId": GAME_ID}
 
         err_msg = error_reply(WAVES_CODE_999)
-        for i in ["ios"]:
-            header["source"] = i
-            raw_data = await self._waves_request(
-                ROLE_LIST_URL, "POST", header, data=data
-            )
-            if isinstance(raw_data, dict):
-                if raw_data.get("code") == 200 and raw_data.get("data"):
-                    return True, i, raw_data["data"]
+        raw_data = await self._waves_request(ROLE_LIST_URL, "POST", header, data=data)
+        if isinstance(raw_data, dict):
+            if raw_data.get("code") == 200 and raw_data.get("data"):
+                return True, platform, raw_data["data"]
 
-                logger.warning(f"get_kuro_role_list -> msg: {raw_data}")
-                if raw_data.get("msg"):
-                    err_msg = raw_data["msg"]
-                    continue
+            logger.warning(f"get_kuro_role_list -> msg: {raw_data}")
+            if raw_data.get("msg"):
+                err_msg = raw_data["msg"]
+                return False, "", err_msg
         return False, "", err_msg
 
     async def get_daily_info(
