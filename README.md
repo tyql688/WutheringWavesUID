@@ -15,7 +15,7 @@
 > **注意：该插件为[早柚核心(gsuid_core)](https://github.com/Genshin-bots/gsuid_core)
 > 的扩展，具体安装方式可参考[GenshinUID](https://github.com/KimigaiiWuyi/GenshinUID)**
 >
-> **如果已经是最新版本的 `gsuid_core`, 可以直接对bot发送 `core安装插件WutheringWavesUID`，然后重启core以应用安装**
+> **使用方式：如果已经是最新版本的 `gsuid_core`, 需在`plugins`文件夹`clone`本项目，后续可以直接对bot发送 `core更新插件wwuid`直接更新插件**
 >
 > 如使用命令缺失素材可尝试使用命令 `ww下载全部资源`
 >
