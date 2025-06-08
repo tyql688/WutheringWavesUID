@@ -487,7 +487,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         "name": re.compile(r'^([A-Za-z\u4e00-\u9fa5\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7A3\u00C0-\u00FF]+)'), # 支持英文、中文、日文、韩文，以及西班牙文、德文和法文中的扩展拉丁字符，为后续逻辑判断用
         "level": re.compile(r'(?i)^(?:.*?V)?\s*?(\d+)$'), # 兼容纯数字
         "skill_level": re.compile(r'(\d+)\s*[/ ]\s*\d*'),  # 兼容 L.10/10、LV.10/1、4 10、4/ 等格式
-        "player_info": re.compile(r'玩家名稱\s*[:：]?\s*(\S+)'),
+        "player_info": re.compile(r'玩家名稱\s*[:：]?\s*(.*)$'),
         "uid_info": re.compile(r'.[馬碼]\s*[:：]?\s*(\d+)'),
         "echo_value": re.compile(r'([\u4e00-\u9fa5]+)\s*\D*([\d.]+%?)'), # 不支持英文词条(空格不好处理), 支持处理"暴擊傷害 器44%", "攻擊 ×18%"
         "weapon_info": re.compile(r'([\u4e00-\u9fa5]+)\s+LV\.(\d+)')
@@ -565,6 +565,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         match = patterns["skill_level"].search(text_clean)
         if match:
             level = int(match.group(1))
+            level = level if level > 0 else 1 # 限制最小等级为1
             final_result["技能等级"].append(min(level, 10))  # 限制最大等级为10
         else:
             logger.error(f"[鸣潮][dc卡片识别]无法识别的技能等级：{text}")
