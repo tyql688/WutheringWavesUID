@@ -82,6 +82,8 @@ async def set_push_time(bot_id: str, uid: str, value: int):
         return False
     
     data = await WavesPush.select_data_by_uid(uid)
+    if not data: 
+        return False
     push_data = data.__dict__
     resin_push = push_data[f"{mode}_value"]
 
