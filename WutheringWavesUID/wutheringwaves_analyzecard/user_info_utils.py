@@ -27,6 +27,23 @@ def get_region_by_uid(uid: str) -> str:
     }
     return region_map.get(first_char, "未知")
 
+def get_region_for_rank(uid: str) -> tuple[str, tuple[int, int, int]]:
+    """
+    返回元组：(显示文本, 背景颜色)
+    """
+    if not uid:
+        return ("未知", (128, 128, 128))  # 灰色
+    
+    first_char = uid[0]
+    region_map = {
+        '1': ("国服", (220, 60, 60)),    # 红色系
+        '5': ("美服", (60, 100, 220)),   # 蓝色系
+        '6': ("欧服", (80, 180, 80)),    # 绿色系
+        '7': ("亚服", (220, 140, 60)),   # 橙色系
+        '8': ("港澳台", (160, 60, 220)), # 紫色系
+        '9': ("SEA", (60, 180, 220))     # 青色系
+    }
+    return region_map.get(first_char, ("未知", (128, 128, 128)))
 
 async def get_user_detail_info(
     uid: str,

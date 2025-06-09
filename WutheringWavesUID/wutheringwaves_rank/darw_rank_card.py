@@ -394,6 +394,19 @@ async def draw_rank_img(
         info_block_draw.text((5, 10), f"{rank.chainName}", "white", waves_font_18, "lm")
         bar_bg.alpha_composite(info_block, (190, 30))
 
+        # 区服
+        from ..wutheringwaves_analyzecard.user_info_utils import get_region_for_rank
+        region_text, region_color = get_region_for_rank(rank.uid)
+        region_width = 60  # 固定宽度，确保所有区服标签宽度一致
+        region_block = Image.new("RGBA", (region_width, 20), color=(255, 255, 255, 0))
+        region_draw = ImageDraw.Draw(region_block)
+        region_bg = region_color + (int(0.9 * 255),)
+        region_draw.rounded_rectangle([0, 0, region_width, 20], radius=6, fill=region_bg)
+        text_width = region_draw.textlength(region_text, font=waves_font_18)
+        text_x = (region_width - text_width) / 2  # 文本居中显示
+        region_draw.text((text_x, 10), region_text, "white", waves_font_18, "lm")
+        bar_bg.alpha_composite(region_block, (90, 80))
+
         # 等级
         info_block = Image.new("RGBA", (60, 20), color=(255, 255, 255, 0))
         info_block_draw = ImageDraw.Draw(info_block)
@@ -551,7 +564,7 @@ async def draw_rank_img(
 
     # 备注
     rank_row_title = "入榜条件"
-    rank_row = f"1.本群内使用命令【{PREFIX}刷新面板】刷新过面板"
+    rank_row = f"1.本群内使用过命令 {PREFIX}卡片 {PREFIX}练度"
     title_draw.text((20, 420), f"{rank_row_title}", SPECIAL_GOLD, waves_font_16, "lm")
     title_draw.text((90, 420), f"{rank_row}", GREY, waves_font_16, "lm")
     if tokenLimitFlag:
