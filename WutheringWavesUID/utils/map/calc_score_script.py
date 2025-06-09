@@ -1,5 +1,6 @@
 import copy
 import json
+import math
 from pathlib import Path
 from typing import List, Optional
 
@@ -197,7 +198,8 @@ def calc_sub_max_score(
         _phantom_value = float(_phantom_value)
         score += sub_props[i] * _phantom_value * ratio
 
-    return round(score, 2)
+    # return round(score, 2)
+    return math.floor(score * 1000) / 1000
 
 
 def calc_main_max_score(_temp, main_props):
@@ -218,7 +220,8 @@ def calc_main_max_score(_temp, main_props):
             _phantom_value = float(_phantom_value)
             _score += main_props.get(str(cost)).get(i, 0) * _phantom_value
 
-        score.append(round(_score, 2))
+        # score.append(round(_score, 2))
+        score.append(math.floor(_score * 1000) / 1000)
 
     return score
 
@@ -240,7 +243,9 @@ def read_calc_json_files(directory):
                 main_max = calc_main_max_score(
                     data["max_main_props"], data["main_props"]
                 )
-                score_max = [round(sub_max + i, 2) for i in main_max]
+                # score_max = [round(sub_max + i, @) for i in main_max]
+                score_max = [math.floor((sub_max + i) * 1000) / 1000 for i in main_max]
+
                 logger.info(
                     f"{file.parents[0].name}/{file.name} - 技能分: {jineng} - "
                     f"副词条最大: {sub_max} - "
