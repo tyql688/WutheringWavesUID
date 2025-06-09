@@ -3435,12 +3435,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "共鸣效率提升10%",
             "groupId": 0,
             "iconUrl": "",
-            "name": "彻空冥雷",
+            "name": "高天共奏之曲",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
           },
           "level": 25,
           "mainProps": [
@@ -3480,8 +3480,8 @@
           "phantomProp": {
             "cost": 4,
             "iconUrl": "",
-            "name": "梦魇·云闪之鳞",
-            "phantomId": 6000088,
+            "name": "赫卡忒",
+            "phantomId": 6000085,
             "phantomPropId": 0,
             "quality": 5,
             "skillDescription": ""
@@ -3491,68 +3491,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "共鸣效率提升10%",
             "groupId": 0,
             "iconUrl": "",
-            "name": "彻空冥雷",
+            "name": "高天共奏之曲",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
-          },
-          "level": 25,
-          "mainProps": [
-            {
-              "attributeName": "攻击",
-              "attributeValue": "30%",
-              "iconUrl": ""
-            },
-            {
-              "attributeName": "攻击",
-              "attributeValue": "100",
-              "iconUrl": ""
-            }
-          ],
-          "subProps": [
-            {
-              "attributeName": "暴击",
-              "attributeValue": "10.5%"
-            },
-            {
-              "attributeName": "暴击伤害",
-              "attributeValue": "21.0%"
-            },
-            {
-              "attributeName": "攻击",
-              "attributeValue": "11.6%"
-            },
-            {
-              "attributeName": "攻击",
-              "attributeValue": "60"
-            },
-            {
-              "attributeName": "共鸣技能伤害加成",
-              "attributeValue": "11.6%"
-            }
-          ],
-          "phantomProp": {
-            "cost": 3,
-            "iconUrl": "",
-            "name": "奏谕乐师",
-            "phantomId": 390077022,
-            "phantomPropId": 0,
-            "quality": 5,
-            "skillDescription": ""
-          },
-          "quality": 5
-        },
-        {
-          "cost": 3,
-          "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
-            "groupId": 0,
-            "iconUrl": "",
-            "name": "彻空冥雷",
-            "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
           },
           "level": 25,
           "mainProps": [
@@ -3592,8 +3536,64 @@
           "phantomProp": {
             "cost": 3,
             "iconUrl": "",
-            "name": "紫羽鹭",
-            "phantomId": 390077004,
+            "name": "暗夜骑士",
+            "phantomId": 6000075,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "共鸣效率提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "高天共奏之曲",
+            "num": 5,
+            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "导电伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣技能伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "琉璃刀伶",
+            "phantomId": 6000080,
             "phantomPropId": 0,
             "quality": 5,
             "skillDescription": ""
@@ -3603,12 +3603,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "共鸣效率提升10%",
             "groupId": 0,
             "iconUrl": "",
-            "name": "彻空冥雷",
+            "name": "高天共奏之曲",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
           },
           "level": 25,
           "mainProps": [
@@ -3648,8 +3648,8 @@
           "phantomProp": {
             "cost": 1,
             "iconUrl": "",
-            "name": "通行灯偶",
-            "phantomId": 6000050,
+            "name": "雷鬃狼",
+            "phantomId": 6000062,
             "phantomPropId": 0,
             "quality": 5,
             "skillDescription": ""
@@ -3659,12 +3659,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "共鸣效率提升10%",
             "groupId": 0,
             "iconUrl": "",
-            "name": "彻空冥雷",
+            "name": "高天共奏之曲",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
           },
           "level": 25,
           "mainProps": [
@@ -3704,8 +3704,8 @@
           "phantomProp": {
             "cost": 1,
             "iconUrl": "",
-            "name": "湮灭棱镜",
-            "phantomId": 390077017,
+            "name": "釉变幼岩",
+            "phantomId": 6000094,
             "phantomPropId": 0,
             "quality": 5,
             "skillDescription": ""
@@ -4225,6 +4225,389 @@
         "weaponId": 21050016,
         "weaponName": "掣傀之手",
         "weaponStarLevel": 5,
+        "weaponType": 5
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
+        "description": "施放延奏技能盛放时，队伍中登场角色额外获得持续回复生命效果，每5秒回复维里奈20%攻击的生命值，持续30秒。",
+        "iconUrl": "",
+        "name": "萌芽的一瞬",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "施放共鸣技能扩繁试验时，额外获得1点【光合能量】和10点协奏能量。",
+        "iconUrl": "",
+        "name": "抽叶的思考",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣解放光合标记的治疗效果加成提升12%。",
+        "iconUrl": "",
+        "name": "生长的选择",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "施放重击星星花绽放、空中攻击星星花绽放、共鸣解放草木生长或延奏技能盛放时，队伍中的角色衍射伤害加成提升15%，持续24秒。",
+        "iconUrl": "",
+        "name": "盛放的拥抱",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "治疗生命值低于50%的角色时，维里奈的治疗效果加成提升20%。",
+        "iconUrl": "",
+        "name": "结果的奇迹",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "重击星星花绽放及空中攻击星星花绽放的伤害提升20%，命中目标时触发1次协同攻击，并为附近队伍中所有角色回复生命值，此次协同攻击伤害和回复生命值等同于共鸣解放光合标记。",
+        "iconUrl": "",
+        "name": "丰收的喜悦",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "治疗效果提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "隐世回光",
+            "num": 5,
+            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "治疗效果加成",
+              "attributeValue": "26.4%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "无归的谬误",
+            "phantomId": 6000060,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "治疗效果提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "隐世回光",
+            "num": 5,
+            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "32%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "冥渊守卫",
+            "phantomId": 390077025,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "治疗效果提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "隐世回光",
+            "num": 5,
+            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "32%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "坚岩斗士",
+            "phantomId": 390077021,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "治疗效果提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "隐世回光",
+            "num": 5,
+            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "裂变幼岩",
+            "phantomId": 390070052,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "治疗效果提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "隐世回光",
+            "num": 5,
+            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "呼咻咻",
+            "phantomId": 390070068,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 5,
+      "attributeName": "衍射",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1503,
+      "roleName": "维里奈",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 5,
+      "weaponTypeName": "音感仪",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n培育藤蔓进行最多5段攻击，造成衍射伤害。\n\n重击\n消耗耐力往前冲刺，并造成衍射伤害。\n\n空中攻击\n消耗耐力，在空中进行最多3段的连续攻击，造成衍射伤害。\n\n空中重击\n在空中长按普攻，消耗耐力进行空中下落攻击，造成衍射伤害。\n\n闪避反击\n成功闪避后一定时间内短按普攻，将会攻击目标，造成衍射伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "育苗",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "向前方集聚能量，让部分植物急速生长，在范围内造成衍射伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "扩繁试验",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "促使周围的草木急速生长，造成衍射伤害，回复附近队伍中所有角色的生命值，命中目标时给目标附加光合标记。\n\n光合标记\n附近队伍中所有角色攻击命中携带光合标记的目标时，维里奈都会进行协同攻击，造成衍射伤害，并为造成伤害的附近队伍登场角色回复生命值，每秒可触发1次。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "草木生长",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成衍射伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "蔓延",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "重击·星星花绽放\n施放重击时，若拥有【光合能量】，则消耗1层【光合能量】，回复协奏能量，并回复附近队伍中所有角色的生命值；\n重击星星花绽放命中目标时，造成衍射伤害，此次伤害为重击伤害。\n\n空中攻击·星星花绽放\n施放空中攻击时，若拥有【光合能量】，则消耗1层【光合能量】，回复协奏能量，并回复附近队伍中所有角色的生命值；\n空中攻击星星花绽放命中目标时，造成衍射伤害，此次伤害为普攻伤害。\n施放重击星星花绽放后短按普攻，可以施放空中攻击星星花绽放。\n\n光合能量获取规则\n【光合能量】上限4层。\n第5段普攻命中目标时，获得1层【光合能量】。\n施放共鸣技能扩繁试验时，获得1层【光合能量】。\n施放变奏技能蔓延时，获得1层【光合能量】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "星星花绽放",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "持续为下一位登场角色回复生命值，每秒回复维里奈19%攻击的生命值，持续6秒。附近队伍中所有角色全伤害加深15%，持续30秒。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "盛放",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "施放共鸣技能时，回复16点协奏能量，每20秒可触发1次。",
+        "weaponIcon": "",
+        "weaponId": 21050024,
+        "weaponName": "奇幻变奏",
+        "weaponStarLevel": 4,
         "weaponType": 5
       }
     }
@@ -5918,6 +6301,429 @@
         "weaponName": "死与舞",
         "weaponStarLevel": 5,
         "weaponType": 3
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
+        "description": "共鸣解放终末回环展开的星域获得加强：\n·治疗和增益效果生效范围增加150%。\n·持续时间增加10秒。\n·施放变奏技能洞悉后不再结束星域。",
+        "iconUrl": "",
+        "name": "不语者假想",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "浅析星域新增额外效果：附近队伍中的角色攻击提升40%。",
+        "iconUrl": "",
+        "name": "夜幕的赠予与拒绝",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "施放共鸣解放终末回环时，守岸人额外回复20点协奏能量，每25秒可触发1次。",
+        "iconUrl": "",
+        "name": "无限正将我等待",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "施放共鸣技能混沌理论时，治疗效果加成提升70%。",
+        "iconUrl": "",
+        "name": "万物寂静满溢",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "普攻第三段牵引范围增加50%，共鸣回路演绎牵引范围增加30%。",
+        "iconUrl": "",
+        "name": "来自缄默的回声",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "变奏技能洞悉伤害倍率提升42%。施放变奏技能洞悉时，守岸人的暴击伤害提升500%。",
+        "iconUrl": "",
+        "name": "我所驶向的新世界",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "衍射伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "浮星祛暗",
+            "num": 5,
+            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "生命",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "580"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "哀声鸷",
+            "phantomId": 6000045,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "衍射伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "浮星祛暗",
+            "num": 5,
+            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "生命",
+              "attributeValue": "22.8%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "生命",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "580"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "寂寞小姐",
+            "phantomId": 6000070,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "衍射伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "浮星祛暗",
+            "num": 5,
+            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "生命",
+              "attributeValue": "22.8%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "生命",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "580"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "破霜猎手",
+            "phantomId": 390070070,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "衍射伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "浮星祛暗",
+            "num": 5,
+            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "生命",
+              "attributeValue": "22.8%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "生命",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "580"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "湮灭棱镜",
+            "phantomId": 390077017,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "衍射伤害提升10%",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "浮星祛暗",
+            "num": 5,
+            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "生命",
+              "attributeValue": "22.8%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "生命",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "580"
+            },
+            {
+              "attributeName": "共鸣效率",
+              "attributeValue": "12.4%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "咕咕河豚",
+            "phantomId": 390070076,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 5,
+      "attributeName": "衍射",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1505,
+      "roleName": "守岸人",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 5,
+      "weaponTypeName": "音感仪",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n进行最多4段的连续攻击，造成衍射伤害。攻击命中目标时生成坍缩核。\n\n重击\n长按普攻持续消耗耐力，进入解限状态，在该状态下：\n·每1秒积蓄1段演算数据。\n·可以自动采集一定范围内的植物类采集物。\n·耐力不足或通过点按普攻等方式结束解限状态时，对目标造成衍射伤害，同时已积累的每1段演算数据转化为1段【实论数据】并生成1枚坍缩核。\n\n空中攻击\n消耗耐力进行空中下落攻击。攻击命中目标时生成1枚坍缩核。一定时间内短按普攻将会施放普攻第2段。\n\n闪避反击\n成功闪避后一定时间内短按普攻，将会攻击目标，造成衍射伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "真源构演",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "回复附近队伍中所有角色的生命值，并召唤5只黯星·蝶。黯星·蝶将自动追踪目标，造成衍射伤害。一定时间内短按普攻将会施放普攻第2段。\n可在空中施放。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "混沌理论",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "浅析星域\n展开浅析星域，持续为处于星域生效范围内的附近队伍中登场角色回复生命值，每3秒可触发1次。\n\n深潜星域\n浅析星域持续期间，当附近队伍中的角色使用变奏技能时，将进入深潜星域。深潜星域生效范围内附近队伍中所有角色暴击提升：守岸人自身每0.2%共鸣效率计算为0.01%暴击提升，上限12.5%。\n深潜星域继承浅析星域的所有效果。\n\n解限星域\n深潜星域持续期间，当附近队伍中的角色使用变奏技能时，将进入解限星域。解限星域生效范围内附近队伍中所有角色暴击伤害提升：守岸人自身每0.1%共鸣效率计算为0.01%暴击伤害提升，上限25%。\n解限星域继承浅析星域和深潜星域的所有效果。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "终末回环",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "启迪\n守岸人出现，回复附近队伍中所有角色的生命值，并召唤5只黯星·蝶。黯星·蝶将自动追踪目标，造成衍射伤害，此次伤害为共鸣技能伤害。\n\n洞悉\n解限星域持续期间，守岸人的变奏技能启迪替换为变奏技能洞悉。施放时对应星域状态结束，回复附近队伍中所有角色的生命值，并攻击目标造成衍射伤害。此次伤害为共鸣解放伤害，并且必定暴击。同一个解限星域中仅可触发1次变奏技能洞悉。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "故此证明",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "耀星·蝶\n常态攻击命中目标时，生成坍缩核悬浮在空中，并在6秒后演化为耀星·蝶。耀星·蝶将自动追踪目标，造成衍射伤害。若场上坍缩核的数量已达到5枚，守岸人下一次普攻会催生坍缩核，使之提前演化为耀星·蝶。\n\n演绎\n持有5段【实论数据】时，施放重击将消耗所有【实论数据】，牵引周围的目标，造成衍射伤害，并使所有坍缩核立即演化为耀星·蝶。\n\n衍变\n持有5段【实论数据】时，施放空中攻击将消耗所有【实论数据】，造成衍射伤害，并使所有坍缩核立即演化为耀星·蝶。一定时间内短按普攻将会施放普攻第2段。\n\n实论数据获取规则\n【实论数据】上限5段。\n普攻第1段、普攻第2段、普攻第4段命中目标时，获得1段【实论数据】。\n普攻第3段命中目标时，获得2段【实论数据】。\n空中攻击命中目标时，获得1段【实论数据】。\n闪避反击命中目标时，获得1段【实论数据】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "群星漫响",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "守岸人召唤一只耀星·蝶和一只黯星·蝶环绕队伍中登场角色，最多存在30秒，并获得以下效果：\n·若队伍中登场角色处于受击或被击飞状态中，点按闪避将脱离受击状态或被击飞状态，并视为闪避成功，若处于低空，则会回到地面。该效果最多可触发5次。\n·队伍中的角色全伤害加深15%。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "双联合相",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "生命提升24%。施放共鸣解放时，回复自身16点协奏能量，每20秒可触发1次。共鸣技能造成治疗时，使附近队伍中所有角色的攻击提升28%，持续30秒，同名效果之间不可叠加。",
+        "weaponIcon": "",
+        "weaponId": 21050036,
+        "weaponName": "星序协响",
+        "weaponStarLevel": 5,
+        "weaponType": 5
       }
     }
   },
