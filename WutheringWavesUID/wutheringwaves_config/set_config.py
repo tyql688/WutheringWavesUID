@@ -36,7 +36,7 @@ async def set_waves_user_value(ev: Event, func: str, uid: str, value: str):
     else:
         return "设置失败!\n请检查参数是否正确!\n"
 
-async def set_push_value(bot_id: str, func: str, uid: str, value: int):
+async def set_push_value(ev: Event, func: str, uid: str, value: int):
     if func in PUSH_MAP:
         status = PUSH_MAP[func]
     else:
@@ -44,10 +44,27 @@ async def set_push_value(bot_id: str, func: str, uid: str, value: int):
     logger.info("[设置推送阈值]func: {}, value: {}".format(status, value))
     if (
         await WavesPush.update_data_by_uid(
-            uid=uid, bot_id=bot_id, **{f"{status}_value": value}
+            uid=uid, bot_id=ev.bot_id, **{f"{status}_value": value}
         )
         == 0
     ):
+        data = await WavesPush.select_data_by_uid(uid)
+        push_data = data.__dict__
+        if not push_data["push_time_value"]:
+            logger.info("[开启体力推送] uid:{}".format(uid))
+            option = ev.group_id if ev.group_id else "on"
+            await WavesUser.update_data_by_uid(
+                uid=uid, bot_id=ev.bot_id, **{"push_switch": option},
+            )
+            await WavesPush.update_data_by_uid(
+                uid=uid, bot_id=ev.bot_id, **{f"{PUSH_MAP['体力']}_push": option},
+            )
+            timestamp = time.time()
+            time_push = datetime.fromtimestamp(int(timestamp))
+            await WavesPush.update_data_by_uid(
+                uid=uid, bot_id=ev.bot_id, **{f"{PUSH_MAP['时间']}_value": time_push}
+            )
+
         return f"设置成功!\n当前{func}推送阈值:{value}\n"
     else:
         return "设置失败!\n请检查参数是否正确!\n"
@@ -65,8 +82,6 @@ async def set_push_time(bot_id: str, uid: str, value: int):
         return False
     
     data = await WavesPush.select_data_by_uid(uid)
-    if data is None:
-        return logger.info("[推送时间]设置失败!\n请先绑定UID!\n")
     push_data = data.__dict__
     resin_push = push_data[f"{mode}_value"]
 
