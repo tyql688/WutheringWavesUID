@@ -36,8 +36,8 @@
 #### 丨选择直接使用
 
 - QQ群：[1037977938](https://qm.qq.com/cgi-bin/qm/qr?authKey=slEX2BdUTZLlDcIxQ6X%2FfK20955frbHuysDHtZpRzaiOyKg6i4BlimWCyNFMYOpC&k=LoFWlKzrv-nrd1dfBPfjo2GZ256octsB&noverify=0&group_code=1037977938)
-- Lark Group: [wuwa](https://applink.larksuite.com/client/chat/chatter/add_by_link?link_token=00bld93f-427b-45c8-b104-c6be61ougc7m) `对wwuid的支持并不完整，可以的话请加QQ群使用`
-- Discord Group: [None] `由于网络限制，并没有部署bot`
+- Lark Group: [wuwa](https://applink.larksuite.com/client/chat/chatter/add_by_link?link_token=00bld93f-427b-45c8-b104-c6be61ougc7m) --`对wwuid的支持并不完整，可以的话请加QQ群使用`
+- Discord Group: [共鸣基地](https://discord.gg/bp9ygDCBS7) --`解释权归`[YashajinAlice](https://github.com/YashajinAlice)`所有`
 
 ## 丨功能
 
