@@ -6,7 +6,7 @@ from gsuid_core.models import Event
 from ..utils.button import WavesButton
 from ..utils.database.models import WavesUser
 
-login_succ = "[鸣潮] 特征码[{}]登录成功! "
+login_fail = "[鸣潮] 登录失败，请稍后重试\n请检查库街区能否查询特征码[{}]的鸣潮账号数据"
 
 
 async def login_success_msg(bot: Bot, ev: Event, waves_user: WavesUser):
@@ -27,4 +27,5 @@ async def login_success_msg(bot: Bot, ev: Event, waves_user: WavesUser):
     if isinstance(msg, bytes):
         return await bot.send_option(msg, buttons)
     else:
-        return await bot.send(login_succ.format(waves_user.uid))
+        at_sender = True if ev.group_id else False
+        return await bot.send(login_fail.format(waves_user.uid), at_sender=at_sender)
