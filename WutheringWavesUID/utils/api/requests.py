@@ -246,25 +246,25 @@ class WavesApi:
         user_id: str,
         bot_id: str,
     ) -> Optional[str]:
-        cookie = await WavesUser.select_cookie(uid, user_id, bot_id)
-        if not cookie:
-            return
-
-        if not await WavesUser.cookie_validate(uid):
+        waves_user = await WavesUser.select_waves_user(uid, user_id, bot_id)
+        if not waves_user or not waves_user.cookie:
             return ""
 
-        succ, data = await self.login_log(uid, cookie)
+        if waves_user.status == "无效":
+            return ""
+
+        succ, data = await self.login_log(uid, waves_user.cookie)
         if not succ:
             if "重新登录" in data or "登录已过期" in data:
-                await WavesUser.mark_cookie_invalid(uid, cookie, "无效")
+                await WavesUser.mark_cookie_invalid(uid, waves_user.cookie, "无效")
             return ""
 
-        succ, data = await self.refresh_data(uid, cookie)
+        succ, data = await self.refresh_data(uid, waves_user.cookie)
         if succ:
-            return cookie
+            return waves_user.cookie
 
         if "重新登录" in data or "登录已过期" in data:
-            await WavesUser.mark_cookie_invalid(uid, cookie, "无效")
+            await WavesUser.mark_cookie_invalid(uid, waves_user.cookie, "无效")
             return ""
 
         if isinstance(data, str):
