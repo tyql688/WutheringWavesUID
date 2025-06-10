@@ -71,7 +71,9 @@ async def get_user_detail_info(
 
 
 async def save_user_info(uid: str, name: str, level=0, worldLevel=0):
-    path = PLAYER_PATH / uid / "userData.json"
+    _dir = PLAYER_PATH / uid
+    _dir.mkdir(parents=True, exist_ok=True)
+    path = _dir / "userData.json"
 
     # 准备保存的数据
     save_data = {
