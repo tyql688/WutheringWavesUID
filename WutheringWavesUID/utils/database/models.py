@@ -183,6 +183,16 @@ class WavesUser(User, table=True):
         return data[0] if data else None
 
     @classmethod
+    @with_session
+    async def select_data_by_cookie_and_uid(
+        cls: Type[T_WavesUser], session: AsyncSession, cookie: str, uid: str
+    ) -> Optional[T_WavesUser]:
+        sql = select(cls).where(cls.cookie == cookie, cls.uid == uid)
+        result = await session.execute(sql)
+        data = result.scalars().all()
+        return data[0] if data else None
+
+    @classmethod
     async def get_user_by_attr(
         cls: Type[T_WavesUser],
         user_id: str,
