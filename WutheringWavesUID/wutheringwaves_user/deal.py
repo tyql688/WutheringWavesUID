@@ -120,8 +120,7 @@ async def get_cookie(bot: Bot, ev: Event) -> Union[List[str], str]:
         if not ck:
             continue
         msg.append(f"鸣潮uid: {uid}")
-        msg.append(f"token: {waves_user.cookie}")
-        msg.append(f"did: {waves_user.did}")
+        msg.append(f"token, did: {waves_user.cookie}, {waves_user.did}")
         msg.append("--------------------------------")
 
     if not msg:
