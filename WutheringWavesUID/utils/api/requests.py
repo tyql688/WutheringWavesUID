@@ -44,6 +44,7 @@ from .api import (
     GACHA_NET_LOG_URL,
     GAME_ID,
     LOGIN_H5_URL,
+    LOGIN_LOG_URL,
     LOGIN_URL,
     MONTH_LIST_URL,
     MR_REFRESH_URL,
@@ -93,7 +94,9 @@ async def _check_response(
         logger.warning(f"[wwuid] code: {res_code} msg: {res_msg} data: {res_data}")
 
         if res_msg and ("重新登录" in res_msg or "登录已过期" in res_msg):
-            if token:
+            if token and roleId:
+                await WavesUser.mark_cookie_invalid(roleId, token, "无效")
+            elif token:
                 await WavesUser.mark_invalid(token, "无效")
             return False, res_msg
 
@@ -114,6 +117,9 @@ async def _check_response(
     return False, error_reply(WAVES_CODE_999)
 
 
+KURO_VERSION = "2.5.0"
+
+
 async def get_common_header(platform: str = "ios"):
     devCode = generate_random_string()
     header = {
@@ -122,7 +128,7 @@ async def get_common_header(platform: str = "ios"):
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
         "devCode": devCode,
         "X-Forwarded-For": generate_random_ipv6_manual(),
-        "version": "2.5.0",
+        "version": KURO_VERSION,
     }
     return header
 
@@ -135,7 +141,7 @@ async def get_headers_h5():
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
         "devCode": devCode,
         "X-Forwarded-For": generate_random_ipv6_manual(),
-        "version": "2.5.0",
+        "version": KURO_VERSION,
     }
     return header
 
@@ -247,12 +253,18 @@ class WavesApi:
         if not await WavesUser.cookie_validate(uid):
             return ""
 
+        succ, data = await self.login_log(uid, cookie)
+        if not succ:
+            if "重新登录" in data or "登录已过期" in data:
+                await WavesUser.mark_cookie_invalid(uid, cookie, "无效")
+            return ""
+
         succ, data = await self.refresh_data(uid, cookie)
         if succ:
             return cookie
 
         if "重新登录" in data or "登录已过期" in data:
-            await WavesUser.mark_invalid(cookie, "无效")
+            await WavesUser.mark_cookie_invalid(uid, cookie, "无效")
             return ""
 
         if isinstance(data, str):
@@ -273,10 +285,17 @@ class WavesApi:
         for user in user_list:
             if not await WavesUser.cookie_validate(user.uid):
                 continue
+
+            succ, data = await self.login_log(user.uid, user.cookie)
+            if not succ:
+                if "重新登录" in data or "登录已过期" in data:
+                    await WavesUser.mark_cookie_invalid(user.uid, user.cookie, "无效")
+                continue
+
             succ, data = await self.refresh_data(user.uid, user.cookie)
             if not succ:
                 if "重新登录" in data or "登录已过期" in data:
-                    await WavesUser.mark_invalid(user.cookie, "无效")
+                    await WavesUser.mark_cookie_invalid(user.uid, user.cookie, "无效")
 
                 if "封禁" in data:
                     break
@@ -346,6 +365,22 @@ class WavesApi:
             "roleId": roleId,
         }
         raw_data = await self._waves_request(REFRESH_URL, "POST", header, data=data)
+        return await _check_response(raw_data, token, roleId)
+
+    async def login_log(self, roleId: str, token: str):
+        header = await get_headers(ck=token, queryRoleId=roleId)
+        header.update(
+            {
+                "token": token,
+                "devCode": header.get("did", ""),
+                "version": KURO_VERSION,
+            }
+        )
+        header.pop("did", None)
+        header.pop("b-at", None)
+
+        data = {}
+        raw_data = await self._waves_request(LOGIN_LOG_URL, "POST", header, data=data)
         return await _check_response(raw_data, token, roleId)
 
     async def get_base_info(

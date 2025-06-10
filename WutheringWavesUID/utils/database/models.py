@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
-from sqlalchemy import delete, null
+from sqlalchemy import delete, null, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import and_, or_
 from sqlmodel import Field, col, select
@@ -116,6 +116,20 @@ class WavesUser(User, table=True):
     bbs_sign_switch: str = Field(default="off", title="自动社区签到")
     bat: str = Field(default="", title="bat")
     did: str = Field(default="", title="did")
+
+    @classmethod
+    @with_session
+    async def mark_cookie_invalid(
+        cls: Type[T_WavesUser], session: AsyncSession, uid: str, cookie: str, mark: str
+    ):
+        sql = (
+            update(cls)
+            .where(col(cls.uid) == uid)
+            .where(col(cls.cookie) == cookie)
+            .values(status=mark)
+        )
+        await session.execute(sql)
+        return True
 
     @classmethod
     @with_session

@@ -18,6 +18,7 @@ GACHA_LOG_URL = "https://gmserver-api.aki-game2.com/gacha/record/query"
 GACHA_NET_LOG_URL = "https://gmserver-api.aki-game2.net/gacha/record/query"
 
 REQUEST_TOKEN = f"{MAIN_URL}/aki/roleBox/requestToken"
+LOGIN_LOG_URL = f"{MAIN_URL}/user/login/log"
 LOGIN_URL = f"{MAIN_URL}/user/sdkLogin"
 LOGIN_H5_URL = f"{MAIN_URL}/user/sdkLoginForH5"
 KURO_ROLE_URL = f"{MAIN_URL}/gamer/role/default"
