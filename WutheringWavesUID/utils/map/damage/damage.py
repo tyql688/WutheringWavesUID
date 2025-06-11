@@ -12,6 +12,7 @@ from ...damage.utils import (
     CHAR_ATTR_SINKING,
     CHAR_ATTR_VOID,
     SONATA_CELESTIAL,
+    SONATA_CLAWPRINT,
     SONATA_EMPYREAN,
     SONATA_ETERNAL,
     SONATA_FREEZING,
@@ -20,16 +21,19 @@ from ...damage.utils import (
     SONATA_MIDNIGHT,
     SONATA_MOLTEN,
     SONATA_MOONLIT,
+    SONATA_PILGRIMAGE,
     SONATA_REJUVENATING,
     SONATA_SIERRA,
     SONATA_SINKING,
     SONATA_TIDEBREAKING,
     SONATA_VOID,
+    SONATA_WELKIN,
     Spectro_Frazzle_Role_Ids,
     cast_attack,
     cast_hit,
     cast_liberation,
     cast_skill,
+    liberation_damage,
     skill_damage,
 )
 
@@ -72,6 +76,8 @@ def phase_damage(
     isHealing: bool = False,
 ):
     phase_name = "合鸣效果"
+
+    # 这里的套装效果为自身触发。buff在别的地方触发。
 
     if not attr.ph_detail:
         return
@@ -200,7 +206,7 @@ def phase_damage(
                 attr.add_dmg_bonus(0.15, title, msg)
 
         # 无惧浪涛之勇
-        if check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_TIDEBREAKING):
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_TIDEBREAKING):
             # 角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%
             title = f"{phase_name}-{ph_detail.ph_name}"
             if attr.char_template == "temp_atk":
@@ -216,3 +222,41 @@ def phase_damage(
                     attr.add_effect(title, msg)
                 else:
                     attr.add_dmg_bonus(0.3, title, msg)
+
+        # 流云逝尽之空
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_WELKIN):
+            # 角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。
+            if attr.char_attr != CHAR_ATTR_SIERRA:
+                return
+            if attr.env_aero_erosion:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%"
+                attr.add_dmg_bonus(0.15, title, msg)
+
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "自身气动伤害额外提升15%"
+                attr.add_dmg_bonus(0.15, title, msg)
+
+        # 愿戴荣光之旅
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_PILGRIMAGE):
+            # 攻击命中存在【风蚀效应】的敌人时，自身暴击提升10%，气动伤害提升30%，持续10秒。
+            if attr.env_aero_erosion:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "攻击命中存在【风蚀效应】的敌人时，自身暴击提升10%"
+                attr.add_crit_rate(0.1, title, msg)
+                if attr.char_attr == CHAR_ATTR_SIERRA:
+                    msg = "气动伤害提升30%"
+                    attr.add_dmg_bonus(0.3, title, msg)
+
+        # 奔狼燎原之焰
+        elif check_if_ph_5(ph_detail.ph_name, ph_detail.ph_num, SONATA_CLAWPRINT):
+            # 施放共鸣解放时，队伍中角色热熔伤害提升15%，自身共鸣解放伤害提升20%，持续35秒。
+            if attr.char_attr == CHAR_ATTR_MOLTEN:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "施放共鸣解放时，队伍中角色热熔伤害提升15%"
+                attr.add_dmg_bonus(0.15, title, msg)
+
+            if attr.char_damage == liberation_damage:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "自身共鸣解放伤害提升20%"
+                attr.add_dmg_bonus(0.2, title, msg)
