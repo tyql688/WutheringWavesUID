@@ -213,3 +213,45 @@ async def get_local_all_role_info(uid: str) -> tuple[bool, dict]:
         logger.exception(f"[鸣潮] 数据解析失败 {path}:", e)
         path.unlink(missing_ok=True)
         return False, role_data
+
+
+
+async def change_weapon_resonLevel(waves_id: str, char: str, reson_level: int):
+    logger.info(f"[鸣潮] 准备修改{waves_id}{char}角色武器精炼为：{reson_level}")
+    if not waves_api.is_net(waves_id):
+        return "[鸣潮] 不支持修改国服用户角色武器数据!"
+    
+    bool_get, old_data = await get_local_all_role_detail(waves_id)
+    if not bool_get:
+        return f"[鸣潮] 用户{waves_id}数据不存在，请先使用【{PREFIX}分析】上传角色数据"
+
+    # 初始化
+    waves_data = []
+
+    if "所有" in char:
+        for char_id in old_data:
+            # 修改
+            old_data[char_id]["weaponData"]["resonLevel"] = reson_level
+    else:
+        char_name = alias_to_char_name(char)
+        if char == "漂泊者":
+            char_name = char # 匹配本地用，不接受alias的结果
+        char_id, roleName = await get_char_name_from_local(char_name, old_data)
+        if not char_id:
+            return f"[鸣潮] 角色{char_name}不存在，请先使用【{PREFIX}分析】上传角色数据"
+
+        # 检查角色是否存在
+        if char_id not in old_data:
+            return f"[鸣潮] {char_name}角色不存在！请检查命令是否正确！"
+
+        # 修改
+        old_data[char_id]["weaponData"]["resonLevel"] = reson_level
+
+    
+    waves_data = list(old_data.values())
+
+    # 覆盖更新
+    await save_card_info(waves_id, waves_data)
+    return f"[鸣潮] 修改用户{waves_id}{char}角色武器精炼为{reson_level}成功！"
+
+    

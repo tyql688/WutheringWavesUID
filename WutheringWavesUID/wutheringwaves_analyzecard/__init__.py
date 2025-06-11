@@ -3,7 +3,7 @@ from gsuid_core.sv import SV
 from gsuid_core.models import Event
 
 from .cardOCR import async_ocr
-from .changeEcho import change_echo
+from .changeEcho import change_echo, change_weapon_resonLevel
 import re
 import asyncio
 from async_timeout import timeout
@@ -11,6 +11,7 @@ from async_timeout import timeout
 
 waves_discord_bot_card_analyze = SV("waves分析discord_bot卡片")
 waves_change_sonata_and_first_echo = SV("waves修改首位声骸与套装")
+waves_change_weapon_reson_level = SV("waves修改武器精炼", priority=5, pm=1)
 
 
 @waves_discord_bot_card_analyze.on_command(
@@ -69,3 +70,30 @@ async def change_sonata_and_first_echo(bot: Bot, ev: Event):
     ev.regex_dict = match.groupdict()
 
     await change_echo(bot, ev)
+
+@waves_change_weapon_reson_level.on_regex(
+    r"^改(\d+)([\u4e00-\u9fa5]+)?武器(\d+)$",
+    block=False,
+)
+async def change_weapon_reson_level(bot: Bot, ev: Event):
+    """处理国际服本地识别结果的武器精炼相关"""
+    match = re.search(
+        r"^.*改(?P<waves_id>\d+)(?P<char>[\u4e00-\u9fa5]+)?武器(?P<reson_level>(\d+))$",
+        ev.raw_text,
+    )
+    if not match:
+        return
+    ev.regex_dict = match.groupdict()
+    waves_id = ev.regex_dict.get("waves_id")
+    char = ev.regex_dict.get("char")
+    reson_level = int(ev.regex_dict.get("reson_level"))
+
+    if waves_id and len(waves_id) != 9:
+        return await bot.send("[鸣潮] 输入用户uid有误! 参考命令：ww改123456789长离武器3")
+    if char is  None:
+        return await bot.send("[鸣潮] 未输入的角色名称有误! 参考命令：ww改uid(所有/长离)武器3")
+    if reson_level < 1 or reson_level > 5:
+        return await bot.send("[鸣潮] 输入的武器精炼等级有误!支持范围：[1,5] 参考命令：ww改uid长离武器3")
+
+    img = await change_weapon_resonLevel(waves_id, char, reson_level)
+    await bot.send(img)
