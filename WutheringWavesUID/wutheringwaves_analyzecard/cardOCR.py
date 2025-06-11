@@ -131,17 +131,22 @@ async def check_ocr_engine_accessible() -> int:
                     status_1 = cells[2].text.strip().upper()
                     status_2 = cells[3].text.strip().upper()
                     logger.info(f"[鸣潮] OcrEngine_1:{status_1}, OcrEngine_2:{status_2}")
-                    return 2 if status_2 == "UP" else 1
+                    if status_2 == "UP":
+                        return 2
+                    elif status_1 == "UP":
+                        return 1
+                    else:
+                        return 0
                     
             logger.info("[鸣潮] 未找到状态行")
             return 1
             
     except (aiohttp.ClientError, asyncio.TimeoutError) as e:
         logger.info(f"[鸣潮] 网络错误: {e}")
-        return 1
+        return -1
     except Exception as e:
         logger.error(f"[鸣潮] 解析异常: {e}")
-        return 1
+        return -1
 async def async_ocr(bot: Bot, ev: Event):
     """
     异步OCR识别函数
@@ -155,23 +160,26 @@ async def async_ocr(bot: Bot, ev: Event):
     # 检查示例链接是否可达
     engine_num = await check_ocr_engine_accessible()
     logger.info(f"[鸣潮]OCR.space服务engine：{engine_num}")
-    if not await check_ocr_link_accessible():
-        await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
-        return False
     # 检查key
     API_KEY = None
     for key in api_key_list:
-        if await check_ocr_link_accessible(key):
+        if key[0] != "K":
+            API_KEY = key
+            engine_num = 3 # 激活PRO计划
+            break
+        elif await check_ocr_link_accessible(key):
             API_KEY = key
             break
     if API_KEY is None:
-        await bot.send("[鸣潮] OCRspace API密钥不可用！请等待额度恢复或更换密钥")
-        return False
+        return await bot.send("[鸣潮] OCRspace API密钥不可用！请等待额度恢复或更换密钥")
+    if engine_num == 0:
+        return await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
+    elif engine_num == -1:
+        return await bot.send("[鸣潮] 服务器访问OCR服务失败，请检查服务器网络状态。")
 
     bool_i, image = await upload_discord_bot_card(ev)
     if not bool_i:
-        await bot.send("[鸣潮]获取dc卡片图失败！卡片分析已停止。")
-        return False
+        return await bot.send("[鸣潮]获取dc卡片图失败！卡片分析已停止。")
 
     # 获取dc卡片识别结果,使用API_KEY
     chain_num, cropped_images = await cut_card_to_ocr(image)
@@ -180,8 +188,7 @@ async def async_ocr(bot: Bot, ev: Event):
 
     if ocr_results[0]['error']:
         logger.info("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
-        await bot.send("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
-        return False
+        return await bot.send("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
 
     bool_d, final_result = await ocr_results_to_dict(chain_num, ocr_results)
     if not bool_d:
@@ -189,9 +196,8 @@ async def async_ocr(bot: Bot, ev: Event):
 
     name, char_id = await which_char(bot, ev, final_result["角色信息"]["角色名"])
     if char_id is None:
-        await bot.send(f"[鸣潮]识别结果为角色{name}不存在")
         logger.debug(f"[鸣潮][dc卡片识别] 角色{name}识别错误！")
-        return False
+        return await bot.send(f"[鸣潮]识别结果为角色{name}不存在")
     final_result["角色信息"]["角色名"] = name
     final_result["角色信息"]["角色ID"] = char_id
 
@@ -389,8 +395,14 @@ async def images_ocrspace(api_key, engine_num, cropped_images):
     使用 OCR.space 免费API识别碎块图片
     """
     API_KEY = api_key
-    ENGINE_NUM = engine_num
-    API_URL = 'https://api.ocr.space/parse/image'
+    FREE_URL = 'https://api.ocr.space/parse/image'
+    PRO_URL = 'https://apipro2.ocr.space/parse/image'
+    if engine_num == 3:
+        API_URL = PRO_URL
+        ENGINE_NUM = 2
+    else:
+        API_URL = FREE_URL
+        ENGINE_NUM = engine_num
 
     session = await get_global_session()  # 复用全局会话
     tasks = []

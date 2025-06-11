@@ -40,6 +40,8 @@ async def change_echo(bot: Bot, ev: Event):
     char = ev.regex_dict.get("char")
     sonata = ev.regex_dict.get("sonata")
     phantom = bool(ev.regex_dict.get("echo"))  # 改为布尔值判断
+    if not sonata and not phantom:
+        return await bot.send(f"[鸣潮] 请正确使用命令：{PREFIX}改{char}套装**(套装名) 或 {PREFIX}改{char}声骸", at_sender)
 
     char_name = alias_to_char_name(char)
     if char == "漂泊者":
@@ -57,7 +59,7 @@ async def change_echo(bot: Bot, ev: Event):
 
     bool_change, waves_data = await change_sonata_and_first_echo(bot, char_id, sonata, phantom, old_data)
     if not bool_change:
-        return await bot.send(f"[鸣潮] 修改角色{char_name_print}数据失败，请检查命令的正确性", at_sender)
+        return await bot.send(f"[鸣潮] 修改角色{char_name_print}数据失败，请检查命令参数的正确性", at_sender)
 
     # 覆盖更新
     await save_card_info(uid, waves_data)
