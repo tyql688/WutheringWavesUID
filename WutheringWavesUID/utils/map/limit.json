@@ -457,6 +457,32 @@
                     "cost": 1
                 }
             ]
+        },
+        {
+            "libId": 18,
+            "fetterDetailName": "愿戴荣光之旅",
+            "equipPhantomList": [
+                {
+                    "phantomId": 6000106,
+                    "cost": 4
+                },
+                {
+                    "phantomId": 6000113,
+                    "cost": 4
+                },
+                {
+                    "phantomId": 6000100,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 6000109,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 6000110,
+                    "cost": 1
+                }
+            ]
         }
     ],
     "charList":[
@@ -613,6 +639,13 @@
             "name": "维里奈",
             "weaponId": 21050024,
             "sonataLibId": 17
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1409,
+            "name": "卡提希娅",
+            "weaponId": 21020056,
+            "sonataLibId": 18
         }
     ]
  }

@@ -410,6 +410,7 @@ async def get_role_need(
     force_resource_id=None,
     is_online_user=True,
     is_limit_query=False,
+    change_list_regex: Optional[str] = None,
 ):
     if waves_id and not waves_api.is_net(waves_id):
         query_list = [char_id]
@@ -462,7 +463,7 @@ async def get_role_need(
                     None,
                     f"[鸣潮] 未找到【{char_name}】角色极限面板信息，请等待适配!\n",
                 )
-            elif is_online_user:
+            elif is_online_user and not change_list_regex:
                 return (
                     None,
                     f"[鸣潮] 未找到【{char_name}】角色信息, 请先使用[{PREFIX}刷新面板]进行刷新!\n",
@@ -686,6 +687,7 @@ async def draw_char_detail_img(
         force_resource_id,
         is_online_user,
         is_limit_query,
+        change_list_regex,
     )
     if isinstance(role_detail, str):
         return role_detail

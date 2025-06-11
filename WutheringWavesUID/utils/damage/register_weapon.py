@@ -134,6 +134,12 @@ class Weapon_21010034(WeaponAbstract):
             attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
+class Weapon_21010036(WeaponAbstract):
+    id = 21010036
+    type = 1
+    name = "焰痕"
+
+
 class Weapon_21010043(WeaponAbstract):
     id = 21010043
     type = 1
@@ -474,6 +480,25 @@ class Weapon_21020053(WeaponAbstract):
     id = 21020053
     type = 2
     name = "戍关迅刀·镇海"
+
+
+class Weapon_21020056(WeaponAbstract):
+    id = 21020056
+    type = 2
+    name = "不屈命定之冠"
+
+    # 施放变奏技能或普攻后15秒内，自身造成伤害无视目标8%防御，当目标的风蚀效应不少于1层时，对目标造成的伤害加深20%。
+    def cast_attack(self, attr: DamageAttribute, isGroup: bool = False):
+        if attr.env_aero_erosion:
+            dmg = f"{self.param(2)}"
+            title = self.get_title()
+            msg = f"当目标的风蚀效应不少于1层时，对目标造成的伤害加深{dmg}"
+            attr.add_dmg_deepen(calc_percent_expression(dmg), title, msg)
+
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放变奏技能或普攻后15秒内，自身造成伤害无视目标{dmg}防御"
+        attr.add_defense_reduction(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21020064(WeaponAbstract):
@@ -1366,6 +1391,7 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21010024.id, Weapon_21010024)
     WavesWeaponRegister.register_class(Weapon_21010026.id, Weapon_21010026)
     WavesWeaponRegister.register_class(Weapon_21010034.id, Weapon_21010034)
+    WavesWeaponRegister.register_class(Weapon_21010036.id, Weapon_21010036)
     WavesWeaponRegister.register_class(Weapon_21010043.id, Weapon_21010043)
     WavesWeaponRegister.register_class(Weapon_21010044.id, Weapon_21010044)
     WavesWeaponRegister.register_class(Weapon_21010053.id, Weapon_21010053)
@@ -1388,6 +1414,7 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21020044.id, Weapon_21020044)
     WavesWeaponRegister.register_class(Weapon_21020046.id, Weapon_21020046)
     WavesWeaponRegister.register_class(Weapon_21020053.id, Weapon_21020053)
+    WavesWeaponRegister.register_class(Weapon_21020056.id, Weapon_21020056)
     WavesWeaponRegister.register_class(Weapon_21020064.id, Weapon_21020064)
     WavesWeaponRegister.register_class(Weapon_21020074.id, Weapon_21020074)
     WavesWeaponRegister.register_class(Weapon_21020084.id, Weapon_21020084)

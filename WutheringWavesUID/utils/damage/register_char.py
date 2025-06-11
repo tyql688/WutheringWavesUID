@@ -8,6 +8,7 @@ from .utils import (
     CHAR_ATTR_CELESTIAL,
     CHAR_ATTR_FREEZING,
     CHAR_ATTR_MOLTEN,
+    CHAR_ATTR_SIERRA,
     CHAR_ATTR_SINKING,
     CHAR_ATTR_VOID,
     attack_damage,
@@ -306,6 +307,53 @@ class Char_1404(CharAbstract):
 class Char_1405(CharAbstract):
     id = 1405
     name = "鉴心"
+    starLevel = 5
+
+
+class Char_1406(CharAbstract):
+    id = 1406
+    name = "漂泊者·气动"
+    starLevel = 5
+
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+
+        if attr.char_attr == CHAR_ATTR_SIERRA:
+            #  血誓盟约
+            title = "风主-血誓盟约"
+            msg = "风主施放共鸣技能时，附近队伍中登场角色气动伤害加深10%"
+            attr.add_dmg_deepen(0.1, title, msg)
+
+            # 流云逝尽之空
+            # 角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%
+            title = "风主-流云逝尽之空"
+            msg = "队伍中的角色气动伤害提升15%"
+            attr.add_dmg_bonus(0.15, title, msg)
+
+
+class Char_1407(CharAbstract):
+    id = 1407
+    name = "夏空"
+    starLevel = 5
+
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        pass
+
+
+class Char_1408(Char_1406):
+    id = 1408
+    name = "漂泊者·气动"
     starLevel = 5
 
 
@@ -642,6 +690,9 @@ def register_char():
     WavesCharRegister.register_class(Char_1403.id, Char_1403)
     WavesCharRegister.register_class(Char_1404.id, Char_1404)
     WavesCharRegister.register_class(Char_1405.id, Char_1405)
+    WavesCharRegister.register_class(Char_1406.id, Char_1406)
+    WavesCharRegister.register_class(Char_1407.id, Char_1407)
+    WavesCharRegister.register_class(Char_1408.id, Char_1408)
     WavesCharRegister.register_class(Char_1501.id, Char_1501)
     WavesCharRegister.register_class(Char_1502.id, Char_1502)
     WavesCharRegister.register_class(Char_1503.id, Char_1503)
