@@ -103,3 +103,11 @@ def yinlin_buff(attr, chain, resonLevel, isGroup):
     if char_clz:
         s = char_clz()
         s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)
+
+
+def fengzhu_buff(attr, chain, resonLevel, isGroup):
+    # 风主buff
+    char_clz = WavesCharRegister.find_class(1406)
+    if char_clz:
+        s = char_clz()
+        s.do_buff(attr, chain=chain, resonLevel=resonLevel, isGroup=isGroup)

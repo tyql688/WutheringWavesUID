@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from msgspec import json as msgjson
 
@@ -28,7 +28,7 @@ read_sonata_json_files(MAP_PATH)
 class WavesSonataResult:
     def __init__(self):
         self.name: str = ""
-        self.set: int = 0
+        self.set: Any = {}
 
 
 def get_sonata_detail(sonata_name: Optional[str]) -> WavesSonataResult:
