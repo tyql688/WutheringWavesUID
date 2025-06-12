@@ -23,7 +23,7 @@ class RepeatConfig(BaseModel):
 
 
 class CountDown(BaseModel):
-    dateRange: List[str]
+    dateRange: Optional[List[str]] = None
 
 
 class ContentData(BaseModel):
