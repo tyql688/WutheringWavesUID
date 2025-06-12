@@ -535,7 +535,8 @@ async def ocr_results_to_dict(chain_num, ocr_results):
                         final_result["角色信息"]["角色名"] = cc.convert(name)
                 
                 # 等级提取
-                line_num = re.sub(r'[^0-9\s]', '', line_clean)
+                line_num = re.sub(r'[oOQ○◌θ]', "0", line_clean) # 处理0的错误识别
+                line_num = re.sub(r'[^0-9\s]', '', line_num)
                 level_match = patterns["level"].search(line_num)
                 if level_match and not final_result["角色信息"].get("等级"):
                     final_result["角色信息"]["等级"] = int(level_match.group(1))
@@ -553,7 +554,8 @@ async def ocr_results_to_dict(chain_num, ocr_results):
         # 武器名称（取第一行有效文本）
         for line in lines:
             # 文本预处理：删除非数字中英文的符号及多余空白
-            line_clean = re.sub(r'[^0-9\u4e00-\u9fa5\s]', '', line)  # 先删除非数字中英文的符号, 匹配“源能臂铠·测肆”
+            line_clean = re.sub(r'[oOQ○◌θ]', "0", line) # 处理0的错误识别
+            line_clean = re.sub(r'[^0-9\u4e00-\u9fa5\s]', '', line_clean)  # 先删除非数字中英文的符号, 匹配“源能臂铠·测肆”
             line_clean = re.sub(r'\s+', ' ', line_clean).strip()  # 再合并多余空白
             if patterns["name"].search(line_clean):
                 line_clean = re.sub(r'.*古洑流$', '千古洑流', line_clean)
@@ -573,7 +575,8 @@ async def ocr_results_to_dict(chain_num, ocr_results):
             
         text = ocr_results[idx]['text']
         # 强化文本清洗
-        text_clean = re.sub(r'[^0-9/]', ' ', text)  # 将非数字字符替换为空格
+        text_clean = re.sub(r'[oOQ○◌θ]', "0", text) # 处理0的错误识别
+        text_clean = re.sub(r'[^0-9/]', ' ', text_clean)  # 将非数字字符替换为空格
         match = patterns["skill_level"].search(text_clean)
         if match:
             level = int(match.group(1))
