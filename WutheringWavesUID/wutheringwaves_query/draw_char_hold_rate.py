@@ -198,8 +198,12 @@ async def new_draw_char_hold_rate(ev: Event, data, group_id: str = "") -> bytes:
         hole_progress_bg_draw.rounded_rectangle(
             (0, 0, real_length, 24), 15, fill=color + (170,)
         )
+        if hold_rate < 10:
+            xy = (real_length + 50, 12)
+        else:
+            xy = (real_length - 50, 12)
         hole_progress_bg_draw.text(
-            (real_length - 50, 12),
+            xy,
             hold_rate_text,
             "white",
             waves_font_20,
