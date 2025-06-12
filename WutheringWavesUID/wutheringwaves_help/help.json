@@ -430,6 +430,22 @@
         "need_admin": false
       },
       {
+        "name": "武器列表",
+        "desc": "武器列表",
+        "eg": "武器列表",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "合鸣/套装效果",
+        "desc": "合鸣/套装效果",
+        "eg": "套装列表",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "游戏公告列表",
         "desc": "游戏公告列表",
         "eg": "公告",
