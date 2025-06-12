@@ -105,6 +105,11 @@ def calc_damage_1(
         msg = "小卡普攻技能倍率提升50%"
         attr.add_skill_multi(0.5, title, msg)
 
+    elif chain_num >= 2 and ("空中" in skill_name):
+        title = f"{role_name}-二链"
+        msg = "小卡空中攻击倍率提升200%"
+        attr.add_skill_multi(2, title, msg)
+
     if chain_num >= 2:
         aeroErosionNum += 3
 
@@ -319,6 +324,9 @@ def calc_damage_11(
     # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
+        # title = f"{role_name}-一链【默认吃一半】"
+        # msg = "60点【决意】，暴击伤害提升25%*2"
+        # attr.add_crit_dmg(0.5, title, msg)
         pass
 
     if chain_num >= 2:
@@ -546,7 +554,7 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_12(attr, role),
     },
     {
-        "title": "风主/大卡r2",
+        "title": "风主01/大卡r2",
         "func": lambda attr, role: calc_damage_20(attr, role),
     },
 ]
