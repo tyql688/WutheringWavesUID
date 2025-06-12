@@ -2,7 +2,6 @@ import asyncio
 import random
 import string
 import time
-import uuid
 from functools import wraps
 from typing import Any, List
 
@@ -129,14 +128,26 @@ def get_version():
     return WutheringWavesUID_version
 
 
-@timed_async_cache(300)
+filter_msg = [
+    "角色查询失败，请重新选择角色",
+]
+
+
+# 发送主人信息
+@timed_async_cache(300, lambda x: x)
 async def send_master_info(msg: str):
+    # 过滤
+    for i in filter_msg:
+        if i in msg:
+            return
+
     subscribes = await gs_subscribe.get_subscribe("联系主人")
     if not subscribes:
         return
     if subscribes:
         for sub in subscribes:
             await sub.send(f"【联系主人】：{msg}")
+        return True
 
 
 def login_platform() -> str:
