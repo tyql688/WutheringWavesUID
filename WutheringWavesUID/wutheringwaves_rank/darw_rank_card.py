@@ -442,7 +442,7 @@ async def draw_rank_img(
         weapon_bg_temp_draw = ImageDraw.Draw(weapon_bg_temp)
         weapon_bg_temp_draw.text(
             (200, 30),
-            f"{weaponData.weapon.weaponName[:5]}",
+            f"{weaponData.weapon.weaponName}",
             SPECIAL_GOLD,
             waves_font_40,
             "lm",
