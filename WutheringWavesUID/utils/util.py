@@ -3,7 +3,7 @@ import random
 import string
 import time
 from functools import wraps
-from typing import Any, List
+from typing import Any, List, Optional
 
 import httpx
 from subscribe import gs_subscribe
