@@ -157,36 +157,44 @@ async def async_ocr(bot: Bot, ev: Event):
         await bot.send("[鸣潮] OCRspace API密钥未配置，请检查控制台。")
         return False
 
-    # 检查示例链接是否可达
+    # 检查可用引擎
     engine_num = await check_ocr_engine_accessible()
     logger.info(f"[鸣潮]OCR.space服务engine：{engine_num}")
-    # 检查key
+    # 初始化密钥和引擎
     API_KEY = None
-    for key in api_key_list:
-        if key[0] != "K":
-            API_KEY = key
-            engine_num = 3 # 激活PRO计划
-            break
-        elif await check_ocr_link_accessible(key):
-            API_KEY = key
-            break
-    if API_KEY is None:
-        return await bot.send("[鸣潮] OCRspace API密钥不可用！请等待额度恢复或更换密钥")
-    if engine_num == 0:
-        return await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
-    elif engine_num == -1:
-        return await bot.send("[鸣潮] 服务器访问OCR服务失败，请检查服务器网络状态。")
+    NEGINE_NUM = None
 
     bool_i, image = await upload_discord_bot_card(ev)
     if not bool_i:
         return await bot.send("[鸣潮]获取dc卡片图失败！卡片分析已停止。")
-
-    # 获取dc卡片识别结果,使用API_KEY
+    # 获取dc卡片与共鸣链
     chain_num, cropped_images = await cut_card_to_ocr(image)
-    ocr_results = await images_ocrspace(API_KEY, engine_num, cropped_images)
-    logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
 
-    if ocr_results[0]['error']:
+    # 遍历密钥
+    ocr_results =  None
+    for key in api_key_list:
+        if not key: 
+            continue
+
+        API_KEY = key
+        NEGINE_NUM = engine_num
+        if key[0] != "K":
+            NEGINE_NUM = 3 # 激活PRO计划
+        
+        ocr_results = await images_ocrspace(API_KEY, engine_num, cropped_images)
+        logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
+        if not ocr_results[0]['error']:
+            logger.info("[鸣潮]OCRspace 识别成功！")
+            break
+
+    if API_KEY is None:
+        return await bot.send("[鸣潮] OCRspace API密钥不可用！请等待额度恢复或更换密钥")
+    if NEGINE_NUM == 0:
+        return await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
+    elif NEGINE_NUM == -1:
+        return await bot.send("[鸣潮] 服务器访问OCR服务失败，请检查服务器网络状态。")
+
+    if ocr_results[0]['error'] or not ocr_results:
         logger.info("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
         return await bot.send("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
 
