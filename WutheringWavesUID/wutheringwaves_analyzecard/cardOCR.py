@@ -180,6 +180,11 @@ async def async_ocr(bot: Bot, ev: Event):
         NEGINE_NUM = engine_num
         if key[0] != "K":
             NEGINE_NUM = 3 # 激活PRO计划
+
+        if NEGINE_NUM == 0:
+            return await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
+        elif NEGINE_NUM == -1:
+            return await bot.send("[鸣潮] 服务器访问OCR服务失败，请检查服务器网络状态。")
         
         ocr_results = await images_ocrspace(API_KEY, engine_num, cropped_images)
         logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
@@ -189,11 +194,7 @@ async def async_ocr(bot: Bot, ev: Event):
 
     if API_KEY is None:
         return await bot.send("[鸣潮] OCRspace API密钥不可用！请等待额度恢复或更换密钥")
-    if NEGINE_NUM == 0:
-        return await bot.send("[鸣潮] OCR服务暂时不可用，请稍后再试。")
-    elif NEGINE_NUM == -1:
-        return await bot.send("[鸣潮] 服务器访问OCR服务失败，请检查服务器网络状态。")
-
+    
     if ocr_results[0]['error'] or not ocr_results:
         logger.info("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
         return await bot.send("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
