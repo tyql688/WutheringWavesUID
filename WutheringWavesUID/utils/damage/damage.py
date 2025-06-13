@@ -697,7 +697,7 @@ class DamageAttribute:
         :return: 期望伤害值
         """
         if self.crit_rate > 1:
-            return self.calculate_crit_damage()
+            return self.calculate_crit_damage(effect_value)
 
         if not effect_value:
             effect_value = self.effect_attack
