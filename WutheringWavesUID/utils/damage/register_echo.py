@@ -791,15 +791,15 @@ class Echo_6000113(EchoAbstract):
     id = 6000113
     name = "梦魇·凯尔匹"
 
-
-class Echo_6000114(EchoAbstract):
-    id = 6000114
-    name = "荣耀狮像"
-
     # 在首位装配该声骸技能时，自身冷凝伤害加成提升12.00%，气动伤害加成提升12.00%
     def do_equipment_first(self, role_id: int):
         """首位装备"""
         return {"冷凝伤害加成": "12%", "气动伤害加成": "12%"}
+
+
+class Echo_6000114(EchoAbstract):
+    id = 6000114
+    name = "荣耀狮像"
 
 
 def register_echo():
