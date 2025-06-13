@@ -33,6 +33,16 @@ def get_ck_and_devcode(text: str, split_str: str = ",") -> tuple[str, str]:
     return ck, devcode
 
 
+msg_notify = [
+    "[鸣潮] 该命令末尾需要跟正确的token和did!",
+    "例如【{PREFIX}添加token token,did】",
+    "",
+    "先找名字为did，没有再找devcode（不是distinct_id）",
+    "",
+    "当前did位数不正确（32位、36位、40位），请检查后重新添加",
+]
+
+
 @waves_add_ck.on_prefix(
     ("添加CK", "添加ck", "添加Token", "添加token", "添加TOKEN"), block=True
 )
@@ -46,14 +56,14 @@ async def send_waves_add_ck_msg(bot: Bot, ev: Event):
         if ck and did:
             break
 
-    if len(did) == 36 or len(did) == 40:
+    if len(did) == 32 or len(did) == 36 or len(did) == 40:
         pass
     else:
         did = ""
 
     if not ck or not did:
         return await bot.send(
-            f"[鸣潮] 该命令末尾需要跟正确的token和did! \n例如【{PREFIX}添加token token,did】\n",
+            "\n".join(msg_notify),
             at_sender,
         )
 

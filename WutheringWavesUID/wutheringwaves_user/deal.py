@@ -12,7 +12,7 @@ from ..utils.waves_api import waves_api
 
 
 async def add_cookie(ev: Event, ck: str, did: str) -> str:
-    succ, platform, kuroWavesUserInfos = await waves_api.get_kuro_role_list(ck)
+    succ, platform, kuroWavesUserInfos = await waves_api.get_kuro_role_list(ck, did)
     if not succ:
         if isinstance(kuroWavesUserInfos, str):
             return hint.error_reply(msg=kuroWavesUserInfos)
