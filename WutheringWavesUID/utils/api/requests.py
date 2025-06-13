@@ -395,7 +395,7 @@ class WavesApi:
             if succ:
                 header["b-at"] = b_at
             else:
-                return False, error_reply(WAVES_CODE_990)
+                return False, b_at or error_reply(WAVES_CODE_990)
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -416,7 +416,7 @@ class WavesApi:
             if succ:
                 header["b-at"] = b_at
             else:
-                return False, error_reply(WAVES_CODE_990)
+                return False, b_at or error_reply(WAVES_CODE_990)
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -453,7 +453,7 @@ class WavesApi:
             if succ:
                 header["b-at"] = b_at
             else:
-                return False, error_reply(WAVES_CODE_990)
+                return False, b_at or error_reply(WAVES_CODE_990)
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -478,7 +478,7 @@ class WavesApi:
             if succ:
                 header["b-at"] = b_at
             else:
-                return False, error_reply(WAVES_CODE_990)
+                return False, b_at or error_reply(WAVES_CODE_990)
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -506,7 +506,7 @@ class WavesApi:
             if succ:
                 header["b-at"] = b_at
             else:
-                return False, error_reply(WAVES_CODE_990)
+                return False, b_at or error_reply(WAVES_CODE_990)
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -531,7 +531,7 @@ class WavesApi:
             if succ:
                 header["b-at"] = b_at
             else:
-                return False, error_reply(WAVES_CODE_990)
+                return False, b_at or error_reply(WAVES_CODE_990)
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -568,7 +568,7 @@ class WavesApi:
             if succ:
                 header["b-at"] = b_at
             else:
-                return error_reply(WAVES_CODE_990)
+                return b_at or error_reply(WAVES_CODE_990)
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -589,7 +589,7 @@ class WavesApi:
             if succ:
                 header["b-at"] = b_at
             else:
-                return error_reply(WAVES_CODE_990)
+                return b_at or error_reply(WAVES_CODE_990)
         data = {
             "gameId": GAME_ID,
             "serverId": self.get_server_id(roleId, serverId),
@@ -622,12 +622,12 @@ class WavesApi:
         header.update(
             {
                 "token": token,
-                "Access-Control-Request-Header": "b-at,devcode,did,source,token",
+                # "Access-Control-Request-Header": "b-at,devcode,did,source,token",
                 "did": did,
             }
         )
         header["b-at"] = ""
-        # del header["X-Forwarded-For"]
+        # header.pop("X-Forwarded-For", None)
         data = {
             "serverId": self.get_server_id(roleId, serverId),
             "roleId": roleId,
@@ -653,6 +653,7 @@ class WavesApi:
                 self.bat_map[roleId] = access_token
                 return True, access_token
         else:
+            logger.warning(f"[{roleId}] 获取bat失败: {raw_data}")
             if isinstance(raw_data, dict):
                 return False, raw_data.get("msg", "") or ""
             else:
