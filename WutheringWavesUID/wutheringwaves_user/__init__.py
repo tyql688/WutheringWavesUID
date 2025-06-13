@@ -35,7 +35,7 @@ def get_ck_and_devcode(text: str, split_str: str = ",") -> tuple[str, str]:
 
 msg_notify = [
     "[鸣潮] 该命令末尾需要跟正确的token和did!",
-    "例如【{PREFIX}添加token token,did】",
+    f"例如【{PREFIX}添加token token,did】",
     "",
     "先找名字为did，没有再找devcode（不是distinct_id）",
     "",
