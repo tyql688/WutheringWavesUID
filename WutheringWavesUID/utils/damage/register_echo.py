@@ -757,14 +757,49 @@ class Echo_6000106(EchoAbstract):
         return res
 
 
-class Echo_6000145(Echo_6000045):
-    id = 6000145
-    name = "异相·哀声鸷"
+class Echo_6000107(EchoAbstract):
+    id = 6000107
+    name = "小翼龙·热熔"
 
 
-class Echo_6010052(EchoAbstract):
-    id = 6010052
-    name = "异相·无常凶鹭"
+class Echo_6000108(EchoAbstract):
+    id = 6000108
+    name = "小翼龙·衍射"
+
+
+class Echo_6000109(EchoAbstract):
+    id = 6000109
+    name = "小翼龙·湮灭"
+
+
+class Echo_6000110(EchoAbstract):
+    id = 6000110
+    name = "苦信者的作俑"
+
+
+class Echo_6000111(EchoAbstract):
+    id = 6000111
+    name = "传道者的遗形"
+
+
+class Echo_6000112(EchoAbstract):
+    id = 6000112
+    name = "角鳄"
+
+
+class Echo_6000113(EchoAbstract):
+    id = 6000113
+    name = "梦魇·凯尔匹"
+
+
+class Echo_6000114(EchoAbstract):
+    id = 6000114
+    name = "荣耀狮像"
+
+    # 在首位装配该声骸技能时，自身冷凝伤害加成提升12.00%，气动伤害加成提升12.00%
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"冷凝伤害加成": "12%", "气动伤害加成": "12%"}
 
 
 def register_echo():
@@ -878,5 +913,11 @@ def register_echo():
     WavesEchoRegister.register_class(Echo_6000104.id, Echo_6000104)
     WavesEchoRegister.register_class(Echo_6000105.id, Echo_6000105)
     WavesEchoRegister.register_class(Echo_6000106.id, Echo_6000106)
-    WavesEchoRegister.register_class(Echo_6000145.id, Echo_6000145)
-    WavesEchoRegister.register_class(Echo_6010052.id, Echo_6010052)
+    WavesEchoRegister.register_class(Echo_6000107.id, Echo_6000107)
+    WavesEchoRegister.register_class(Echo_6000108.id, Echo_6000108)
+    WavesEchoRegister.register_class(Echo_6000109.id, Echo_6000109)
+    WavesEchoRegister.register_class(Echo_6000110.id, Echo_6000110)
+    WavesEchoRegister.register_class(Echo_6000111.id, Echo_6000111)
+    WavesEchoRegister.register_class(Echo_6000112.id, Echo_6000112)
+    WavesEchoRegister.register_class(Echo_6000113.id, Echo_6000113)
+    WavesEchoRegister.register_class(Echo_6000114.id, Echo_6000114)
