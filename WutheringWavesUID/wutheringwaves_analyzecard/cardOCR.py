@@ -412,9 +412,11 @@ async def images_ocrspace(api_key, engine_num, cropped_images):
     else:
         API_URL = FREE_URL
         ENGINE_NUM = engine_num
+    logger.info(f"[鸣潮]使用 {API_URL} 识别图片")
 
     session = await get_global_session()  # 复用全局会话
     tasks = []
+    payloads = []  # 存储所有payload
     for img in cropped_images:
         # 将PIL.Image转换为base64
         try:
@@ -444,11 +446,18 @@ async def images_ocrspace(api_key, engine_num, cropped_images):
             'detectOrientation': True, 
             'scale': True              
         }
+        payloads.append(payload)
 
-        tasks.append(fetch_ocr_result(session, API_URL, payload))
+    # 添加0.1秒固定延迟的请求函数
+    async def delayed_fetch(payload):
+        await asyncio.sleep(0.5)  # 固定0.5秒延迟
+        return await fetch_ocr_result(session, API_URL, payload)
+    
+    # 创建所有任务
+    tasks = [delayed_fetch(payload) for payload in payloads]
 
-    # 限制并发数为1防止超过API限制
-    semaphore = asyncio.Semaphore(3)
+    # 限制并发数为2防止超过API限制
+    semaphore = asyncio.Semaphore(2)
     # 修改返回结果处理
     results = await asyncio.gather(*(process_with_semaphore(task, semaphore) for task in tasks))
         
@@ -466,7 +475,7 @@ async def fetch_ocr_result(session, url, payload):
             # 检查HTTP状态码
             if response.status != 200:
                 # 修改错误返回格式为字典（与其他成功结果结构一致）
-                return [{'error': f'HTTP Error {response.status}', 'text': None}]
+                return [{'error': f'HTTP Error {response}', 'text': None}]
                 
             data = await response.json()
             
