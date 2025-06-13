@@ -186,7 +186,7 @@ async def async_ocr(bot: Bot, ev: Event):
         elif NEGINE_NUM == -1:
             return await bot.send("[鸣潮] 服务器访问OCR服务失败，请检查服务器网络状态。")
         
-        ocr_results = await images_ocrspace(API_KEY, engine_num, cropped_images)
+        ocr_results = await images_ocrspace(API_KEY, NEGINE_NUM, cropped_images)
         logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
         if not ocr_results[0]['error']:
             logger.info("[鸣潮]OCRspace 识别成功！")
