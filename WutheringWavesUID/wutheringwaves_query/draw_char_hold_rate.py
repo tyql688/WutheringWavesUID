@@ -259,11 +259,14 @@ async def get_char_hold_rate_data() -> Dict:
     return {}
 
 
-async def get_group_char_hold_rate_data(group_id: str) -> Dict:
-    """获取群组角色持有率数据"""
+async def get_group_or_bot_char_hold_rate_data(group_id: str) -> Dict:
+    """获取群组或者bot所有的角色持有率数据"""
     res = {}
 
-    users = await WavesBind.get_group_all_uid(group_id)
+    if group_id == "bot":
+        users = await WavesBind.get_all_data()
+    else:
+        users = await WavesBind.get_group_all_uid(group_id)
     if not users:
         return res
 
@@ -367,7 +370,7 @@ async def get_group_char_hold_rate_data(group_id: str) -> Dict:
 async def get_char_hold_rate_img(ev: Event, group_id: str = "") -> Union[bytes, str]:
     """获取角色持有率图像"""
     if group_id:
-        data = await get_group_char_hold_rate_data(group_id)
+        data = await get_group_or_bot_char_hold_rate_data(group_id)
         if not data:
             return "群组持有率数据获取失败，请稍后再试"
     else:

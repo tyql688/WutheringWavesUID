@@ -23,6 +23,9 @@ sv_slash_appear_rate = SV("waves冥想出场率", priority=1)
         "群角色持有率",
         "群角色持有率列表",
         "群持有率",
+        "bot角色持有率",
+        "bot角色持有率列表",
+        "bot持有率",
     )
 )
 async def handle_char_hold_rate(bot: Bot, ev: Event):
@@ -30,6 +33,8 @@ async def handle_char_hold_rate(bot: Bot, ev: Event):
         if not ev.group_id:
             return await bot.send("请在群聊中使用")
         img = await get_char_hold_rate_img(ev, ev.group_id)
+    elif "bot" in ev.command:
+        img = await get_char_hold_rate_img(ev, "bot")
     else:
         img = await get_char_hold_rate_img(ev)
     buttons: List[Any] = [

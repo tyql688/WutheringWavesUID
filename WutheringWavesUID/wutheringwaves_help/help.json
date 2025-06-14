@@ -231,7 +231,7 @@
       {
         "name": "角色持有率",
         "desc": "角色持有率",
-        "eg": "(群)角色持有率(up/5/4)",
+        "eg": "(群/bot)持有率(up/5/4)",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -305,7 +305,7 @@
       {
         "name": "全服伤害排行",
         "desc": "全服伤害排行",
-        "eg": "长离总排行",
+        "eg": "长离总排行(5)",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -456,7 +456,7 @@
       {
         "name": "武器列表",
         "desc": "武器列表",
-        "eg": "武器列表",
+        "eg": "(佩枪)武器列表",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
