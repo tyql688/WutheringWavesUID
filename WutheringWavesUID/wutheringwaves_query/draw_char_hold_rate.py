@@ -55,7 +55,7 @@ async def new_draw_char_hold_rate(ev: Event, data, group_id: str = "") -> bytes:
         filter_type = "四"
     elif "5" in text or "五" in text:
         filter_type = "五"
-    elif "up" in text or "UP":
+    elif "up" in text or "UP" in text:
         filter_type = "UP"
     elif "all" in text or "ALL" in text or "全" in text:
         filter_type = ""
