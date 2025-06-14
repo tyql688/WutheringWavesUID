@@ -58,7 +58,7 @@
       {
         "name": "添加token",
         "desc": "绑定自己的库街区添加token",
-        "eg": "添加token,uid xx, yy",
+        "eg": "添加token tk,did",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
