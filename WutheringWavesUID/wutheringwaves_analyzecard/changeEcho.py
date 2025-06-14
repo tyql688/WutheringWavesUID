@@ -77,7 +77,7 @@ async def get_local_all_role_detail(uid: str) -> tuple[bool, dict]:
                 data = json.loads(await f.read())
                 role_data = {d["role"]["roleId"]: d for d in data}
         except Exception as e:
-            logger.exception(f"[鸣潮] 基础数据get failed {path}:", e)
+            logger.error(f"[鸣潮] 基础数据get failed {path}:", e)
             path.unlink(missing_ok=True)
     else:
         return False, role_data
@@ -87,8 +87,8 @@ async def get_local_all_role_detail(uid: str) -> tuple[bool, dict]:
 async def get_char_name_from_local(char_name: str, role_data: dict) -> tuple[int, str]:
     for char_id, role_info in role_data.items():
         roleName = role_info.get("role").get("roleName")
-        logger.info(f"[鸣潮] 角色{char_name}与{roleName}匹配")
         if char_name in roleName:
+            logger.info(f"[鸣潮] 角色{char_name}与{roleName}匹配")
             return int(char_id), roleName
     # 未找到匹配角色
     return None, None
@@ -152,7 +152,6 @@ async def change_sonata_and_first_echo(bot: Bot, char_id: int, sonata_a: str, ph
                 # 获取该 cost 层级的全部可选 ID
                 same_cost_ids = [echo_id for g in phantom_id_list_groups if g["cost"] == target_cost for echo_id in g["list"]]
                 
-                logger.info(f"[鸣潮]4444声骸id列表：{same_cost_ids}")
                 other_phantoms = [p for p in same_cost_ids if p != selected_id]
 
                 first_change_bool = True # 只修改第一顺位声骸
@@ -210,7 +209,7 @@ async def get_local_all_role_info(uid: str) -> tuple[bool, dict]:
             
         return True, role_data
     except Exception as e:
-        logger.exception(f"[鸣潮] 数据解析失败 {path}:", e)
+        logger.error(f"[鸣潮] 数据解析失败 {path}:", e)
         path.unlink(missing_ok=True)
         return False, role_data
 

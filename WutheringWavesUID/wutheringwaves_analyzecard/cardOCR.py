@@ -105,7 +105,7 @@ async def check_ocr_link_accessible(key="helloworld") -> bool:
             logger.debug(f"[鸣潮]OCR.space示例链接访问成功，状态码为 {response.status}\n内容：{data}")
             return response.status == 200
     except (aiohttp.ClientError, asyncio.TimeoutError):
-        logger.info("[鸣潮]OCR.space 访问示例链接失败，请检查网络或服务状态。")
+        logger.warning("[鸣潮]OCR.space 访问示例链接失败，请检查网络或服务状态。")
         return False
 
 async def check_ocr_engine_accessible() -> int:
@@ -138,14 +138,14 @@ async def check_ocr_engine_accessible() -> int:
                     else:
                         return 0
                     
-            logger.info("[鸣潮] 未找到状态行")
+            logger.warning("[鸣潮] 未找到状态行")
             return 1
             
     except (aiohttp.ClientError, asyncio.TimeoutError) as e:
-        logger.info(f"[鸣潮] 网络错误: {e}")
+        logger.warning(f"[鸣潮] 网络错误: {e}")
         return -1
     except Exception as e:
-        logger.error(f"[鸣潮] 解析异常: {e}")
+        logger.warning(f"[鸣潮] 解析异常: {e}")
         return -1
 async def async_ocr(bot: Bot, ev: Event):
     """
@@ -153,7 +153,7 @@ async def async_ocr(bot: Bot, ev: Event):
     """
     api_key_list = WutheringWavesConfig.get_config("OCRspaceApiKeyList").data  # 从控制台获取OCR.space的API密钥
     if api_key_list == []:
-        logger.info("[鸣潮] OCRspace API密钥为空！请检查控制台。")
+        logger.warning("[鸣潮] OCRspace API密钥为空！请检查控制台。")
         await bot.send("[鸣潮] OCRspace API密钥未配置，请检查控制台。")
         return False
 
@@ -189,14 +189,14 @@ async def async_ocr(bot: Bot, ev: Event):
         ocr_results = await images_ocrspace(API_KEY, NEGINE_NUM, cropped_images)
         logger.info(f"[鸣潮][OCRspace]dc卡片识别数据:\n{ocr_results}")
         if not ocr_results[0]['error']:
-            logger.info("[鸣潮]OCRspace 识别成功！")
+            logger.success("[鸣潮]OCRspace 识别成功！")
             break
 
     if API_KEY is None:
         return await bot.send("[鸣潮] OCRspace API密钥不可用！请等待额度恢复或更换密钥")
     
     if ocr_results[0]['error'] or not ocr_results:
-        logger.info("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
+        logger.warning("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
         return await bot.send("[鸣潮]OCRspace识别失败！请检查服务器网络是否正常。")
 
     bool_d, final_result = await ocr_results_to_dict(chain_num, ocr_results)
@@ -205,7 +205,7 @@ async def async_ocr(bot: Bot, ev: Event):
 
     name, char_id = await which_char(bot, ev, final_result["角色信息"]["角色名"])
     if char_id is None:
-        logger.debug(f"[鸣潮][dc卡片识别] 角色{name}识别错误！")
+        logger.warning(f"[鸣潮][dc卡片识别] 角色{name}识别错误！")
         return await bot.send(f"[鸣潮]识别结果为角色{name}不存在")
     final_result["角色信息"]["角色名"] = name
     final_result["角色信息"]["角色ID"] = char_id
@@ -370,7 +370,7 @@ def analyze_chain_num(image):
             chain_num += 1
             continue
         if chain_bool and not is_chain_color(color):
-            logger.debug("[鸣潮]卡片分析 共鸣链识别出现断裂错误")
+            logger.warning("[鸣潮]卡片分析 共鸣链识别出现断裂错误")
             return 0
         
     return chain_num
@@ -424,7 +424,7 @@ async def images_ocrspace(api_key, engine_num, cropped_images):
             img.save(buffered, format='PNG')
             img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
         except Exception as e:
-            logger.debug(f"图像转换错误: {e}")
+            logger.warning(f"图像转换错误: {e}")
             continue
                 
         # 构建请求参数
@@ -548,7 +548,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
                         name = name_match.group()
                         name = name.replace("吟槑", "吟霖")
                         if not re.match(r'^[\u4e00-\u9fa5]+$', name):
-                            logger.debug(f" [鸣潮][dc卡片识别] 识别出非中文角色名:{name}，退出识别！")
+                            logger.warning(f" [鸣潮][dc卡片识别] 识别出非中文角色名:{name}，退出识别！")
                             return False, final_result
                         final_result["角色信息"]["角色名"] = cc.convert(name)
                 
@@ -601,7 +601,7 @@ async def ocr_results_to_dict(chain_num, ocr_results):
             level = level if level > 0 else 1 # 限制最小等级为1
             final_result["技能等级"].append(min(level, 10))  # 限制最大等级为10
         else:
-            logger.error(f"[鸣潮][dc卡片识别]无法识别的技能等级：{text}")
+            logger.warning(f"[鸣潮][dc卡片识别]无法识别的技能等级：{text}")
             final_result["技能等级"].append(1)
 
     # 处理声骸装备（第8-12个结果）下标：7 8 9 10 11

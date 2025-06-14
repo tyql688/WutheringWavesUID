@@ -187,12 +187,12 @@ class PhantomValidator:
                     for _prop in props:
                         name_b = await exist_attribute_prop(_prop.get("attributeName"))
                         if not name_b:
-                            logger.info(f"[鸣潮][声骸检验]词条文本检查异常: {_prop.get('attributeName')}")
+                            logger.warning(f"[鸣潮][声骸检验]词条文本检查异常: {_prop.get('attributeName')}")
                             return False, None
 
             value_b, text = self._validate_phantom(phantom)
             if not value_b:
-                logger.info(f"[鸣潮][声骸检验]词条数值检查异常：{text}")
+                logger.warning(f"[鸣潮][声骸检验]词条数值检查异常：{text}")
                 return False, None
                 
         return True, self.equipPhantomList
@@ -272,6 +272,8 @@ class PhantomValidator:
 
         # 智能缩放检测
         scaled_value = self._detect_scale_error(value, allowed_values)
+        if scaled_value != value:
+            logger.warning(f"[鸣潮][声骸检查]副词条缩放：{value} -> {scaled_value}  {name}")
 
         # 寻找最近合法值
         closest = self._find_closest_sub_value(scaled_value, allowed_values)
@@ -289,8 +291,8 @@ class PhantomValidator:
                     scaled = num / 10.0   # 正常情况下scaled不被定义，走except
                     num = scaled
                 return f"{scaled:.2f}%"
-            except Exception as e:
-                logger.debug(f"[鸣潮][声骸检查]无法缩放值: {value}与阈值: {allowed_values}，错误信息: {e}")
+            except Exception:
+                logger.debug(f"[鸣潮][声骸检查]无法缩放值: {value}与阈值: {allowed_values}")
                 pass
         return value
 

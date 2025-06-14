@@ -55,7 +55,7 @@ async def get_first_echo_id_list(sonata_name):
         {"cost": 3, "list": SONATA_COST_3_ID.get(sonata_name, [])},
         {"cost": 1, "list": SONATA_COST_1_ID.get(sonata_name, [])},
     ]
-    logger.info(f"[鸣潮]获取到{sonata_name}的声骸id列表：{phantom_id_list}")
+    logger.debug(f"[鸣潮]获取到{sonata_name}的声骸id列表：{phantom_id_list}")
     return phantom_id_list
 
 async def echo_data_to_cost(char_id, mainProps_first, cost4_counter=0) -> tuple[int, int]:

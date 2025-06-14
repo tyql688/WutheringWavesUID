@@ -202,7 +202,7 @@ async def check_phantom_data(data) -> bool:
 
         return True, processed_data
     except Exception as e:
-        logger.info(f" [鸣潮][dc卡片识别] 角色声骸数据异常：{e}")
+        logger.warning(f" [鸣潮][dc卡片识别] 角色声骸数据异常：{e}")
         return False, data
 
 
