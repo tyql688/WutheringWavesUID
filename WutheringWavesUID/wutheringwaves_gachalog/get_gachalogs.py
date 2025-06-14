@@ -29,6 +29,8 @@ gacha_type_meta_data = {
     "新手调谐": "5",
     "新手自选唤取": "6",
     "新手自选唤取（感恩定向唤取）": "7",
+    "角色新旅唤取": "8",
+    "武器新旅唤取": "9",
 }
 
 gacha_type_meta_data_reverse = {v: k for k, v in gacha_type_meta_data.items()}
@@ -41,6 +43,8 @@ gachalogs_history_meta = {
     "新手调谐": [],
     "新手自选唤取": [],
     "新手自选唤取（感恩定向唤取）": [],
+    "角色新旅唤取": [],
+    "武器新旅唤取": [],
 }
 
 ERROR_MSG_INVALID_LINK = "当前抽卡链接已经失效，请重新导入抽卡链接"
@@ -198,6 +202,10 @@ async def save_gachalogs(
         gachalogs_history = gachalogs_history["data"]
     else:
         gachalogs_history = copy.deepcopy(gachalogs_history_meta)
+
+    temp = copy.deepcopy(gachalogs_history_meta)
+    temp.update(gachalogs_history)
+    gachalogs_history = temp
 
     is_need_backup = False
     for gacha_name, card_pool_type in gacha_type_meta_data.items():

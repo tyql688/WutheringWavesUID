@@ -494,6 +494,10 @@ def calc_damage_20(
 
 damage_detail = [
     {
+        "title": "小卡普攻3段",
+        "func": lambda attr, role: calc_damage_1(attr, role, skill_name="小卡普攻3段"),
+    },
+    {
         "title": "小卡普攻4段",
         "func": lambda attr, role: calc_damage_1(attr, role, skill_name="小卡普攻4段"),
     },
@@ -506,7 +510,7 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_1(attr, role, skill_name="小卡空中攻击"),
     },
     {
-        "title": "小卡空中攻击回收三剑",
+        "title": "3剑下落",
         "func": lambda attr, role: calc_damage_1(
             attr, role, skill_name="小卡空中回收3剑"
         ),
@@ -516,47 +520,13 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_2(attr, role),
     },
     {
-        "title": "大卡普攻3段",
-        "func": lambda attr, role: calc_damage_11(attr, role, skill_name="大卡普攻3段"),
-    },
-    {
-        "title": "大卡普攻4段",
-        "func": lambda attr, role: calc_damage_11(attr, role, skill_name="大卡普攻4段"),
-    },
-    {
-        "title": "大卡普攻5段",
-        "func": lambda attr, role: calc_damage_11(attr, role, skill_name="大卡普攻5段"),
-    },
-    {
-        "title": "大卡空中攻击1段",
-        "func": lambda attr, role: calc_damage_11(attr, role, skill_name="大卡空中1段"),
-    },
-    {
-        "title": "大卡空中攻击2段",
-        "func": lambda attr, role: calc_damage_11(attr, role, skill_name="大卡空中2段"),
-    },
-    {
-        "title": "大卡空中攻击3段",
-        "func": lambda attr, role: calc_damage_11(attr, role, skill_name="大卡空中3段"),
-    },
-    {
-        "title": "大卡重击",
-        "func": lambda attr, role: calc_damage_11(attr, role, skill_name="大卡重击"),
-    },
-    {
-        "title": "大卡强化重击",
-        "func": lambda attr, role: calc_damage_11(
-            attr, role, skill_name="大卡强化重击"
-        ),
-    },
-    {
-        "title": "大卡r2",
+        "title": "r2",
         "func": lambda attr, role: calc_damage_12(attr, role),
     },
     {
-        "title": "风主01/大卡r2",
+        "title": "风主01/r2",
         "func": lambda attr, role: calc_damage_20(attr, role),
     },
 ]
 
-rank = damage_detail[-1]
+rank = damage_detail[4]
