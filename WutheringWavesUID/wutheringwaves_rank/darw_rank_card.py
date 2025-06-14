@@ -53,6 +53,7 @@ from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.util import hide_uid
 from ..utils.waves_card_cache import get_card
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
+from ..wutheringwaves_analyzecard.user_info_utils import get_region_for_rank
 
 rank_length = 20  # 排行长度
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -72,6 +73,8 @@ class RankInfo(BaseModel):
     roleDetail: RoleDetailData  # 角色明细
     qid: str  # qq id
     uid: str  # uid
+    server: str  # 区服
+    server_color: tuple[int, int, int]  # 区服颜色
     level: int  # 角色等级
     chain: int  # 命座
     chainName: str  # 命座
@@ -128,12 +131,17 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
         for ph in ph_detail:
             if ph.get("ph_num") == 5:
                 sonata_name = ph.get("ph_name", "")
+                
+    # 区服
+    region_text, region_color = get_region_for_rank(uid)
 
     rankInfo = RankInfo(
         **{
             "roleDetail": role_detail,
             "qid": user_id,
             "uid": uid,
+            "server": region_text,
+            "server_color": region_color,
             "level": role_detail.role.level,
             "chain": role_detail.get_chain_num(),
             "chainName": role_detail.get_chain_name(),
@@ -395,16 +403,12 @@ async def draw_rank_img(
         bar_bg.alpha_composite(info_block, (190, 30))
 
         # 区服
-        from ..wutheringwaves_analyzecard.user_info_utils import get_region_for_rank
-        region_text, region_color = get_region_for_rank(rank.uid)
-        region_width = 50  # 固定宽度，确保所有区服标签宽度一致
-        region_block = Image.new("RGBA", (region_width, 20), color=(255, 255, 255, 0))
+        region_block = Image.new("RGBA", (50, 20), color=(255, 255, 255, 0))
         region_draw = ImageDraw.Draw(region_block)
-        region_bg = region_color + (int(0.9 * 255),)
-        region_draw.rounded_rectangle([0, 0, region_width, 20], radius=6, fill=region_bg)
-        text_width = region_draw.textlength(region_text, font=waves_font_16)
-        text_x = (region_width - text_width) / 2  # 文本居中显示
-        region_draw.text((text_x, 8), region_text, "white", waves_font_16, "lm")
+        region_draw.rounded_rectangle(
+            [0, 0, 50, 20], radius=6, fill=rank.server_color + (int(0.9 * 255),)
+        )
+        region_draw.text((25, 10), rank.server, "white", waves_font_16, "mm")
         bar_bg.alpha_composite(region_block, (100, 80))
 
         # 等级
@@ -564,7 +568,7 @@ async def draw_rank_img(
 
     # 备注
     rank_row_title = "入榜条件"
-    rank_row = f"1.本群内使用过命令 {PREFIX}卡片 {PREFIX}练度"
+    rank_row = f"1.本群内使用过命令 {PREFIX}练度"
     title_draw.text((20, 420), f"{rank_row_title}", SPECIAL_GOLD, waves_font_16, "lm")
     title_draw.text((90, 420), f"{rank_row}", GREY, waves_font_16, "lm")
     if tokenLimitFlag:

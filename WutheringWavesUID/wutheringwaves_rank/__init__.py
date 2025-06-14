@@ -9,6 +9,7 @@ from .draw_all_rank_card import draw_all_rank_card
 
 sv_waves_rank_list = SV("ww角色排行")
 sv_waves_rank_all_list = SV("ww角色总排行", priority=1)
+sv_waves_rank_bot_list = SV("ww角色bot排行", priority=1)
 
 
 @sv_waves_rank_list.on_regex("^[\u4e00-\u9fa5]+(?:排行|排名)$", block=True)
@@ -39,7 +40,7 @@ async def send_rank_card(bot: Bot, ev: Event):
     if isinstance(im, bytes):
         await bot.send(im)
 
-@sv_waves_rank_all_list.on_regex("^[\u4e00-\u9fa5]+(?:bot排行|bot排名)$", block=True)
+@sv_waves_rank_bot_list.on_regex("^[\u4e00-\u9fa5]+(?:bot排行|bot排名)$", block=True)
 async def send_bot_rank_card(bot: Bot, ev: Event):
     # 正则表达式
     match = re.search(
