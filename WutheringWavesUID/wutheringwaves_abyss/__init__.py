@@ -63,6 +63,7 @@ async def send_waves_abyss_info(bot: Bot, ev: Event):
         "查询全息",
         "查询全息战略",
         "全息",
+        "qx",
         "全息战略",
     ),
     block=True,

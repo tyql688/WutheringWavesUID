@@ -58,7 +58,7 @@
       {
         "name": "添加token",
         "desc": "绑定自己的库街区添加token",
-        "eg": "添加token xxxxxxy",
+        "eg": "添加token tk,did",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -90,7 +90,7 @@
       {
         "name": "体力",
         "desc": "获取自己的每日状态",
-        "eg": "mr",
+        "eg": "mr/每日",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
@@ -191,7 +191,7 @@
       {
         "name": "面板PK",
         "desc": "面板PK",
-        "eg": "椿面板pk@其他人",
+        "eg": "(uid)椿面板pk(@群友)",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
@@ -231,7 +231,7 @@
       {
         "name": "角色持有率",
         "desc": "角色持有率",
-        "eg": "(群/bot)持有率(up/5/4)",
+        "eg": "(群/bot)持有率(up/all)",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -244,7 +244,7 @@
       {
         "name": "深塔",
         "desc": "查询深塔",
-        "eg": "深塔",
+        "eg": "st/深塔",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
@@ -252,7 +252,7 @@
       {
         "name": "全息战略",
         "desc": "查询全息战略",
-        "eg": "全息",
+        "eg": "qx/全息",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
@@ -268,7 +268,7 @@
       {
         "name": "冥歌海墟",
         "desc": "查询冥歌海墟",
-        "eg": "冥歌海墟",
+        "eg": "mh/冥歌海墟",
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
@@ -305,7 +305,7 @@
       {
         "name": "全服伤害排行",
         "desc": "全服伤害排行",
-        "eg": "长离总排行(5)",
+        "eg": "长离总排行1",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -313,7 +313,7 @@
       {
         "name": "全服评分排行",
         "desc": "全服评分排行",
-        "eg": "长离评分总排行(5)",
+        "eg": "长离评分总排行1",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
@@ -456,7 +456,7 @@
       {
         "name": "武器列表",
         "desc": "武器列表",
-        "eg": "(佩枪)武器列表",
+        "eg": "(武器类型)武器(列表)",
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
