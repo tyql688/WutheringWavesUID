@@ -439,12 +439,12 @@ async def images_ocrspace(api_key, engine_num, cropped_images):
         payload = {
             'apikey': API_KEY,
             'language': 'cht',          
-            'isOverlayRequired': True, 
+            'isOverlayRequired': False, 
             'base64Image': f'data:image/png;base64,{img_base64}',
             'OCREngine': ENGINE_NUM,             
             'isTable': True,    
-            'detectOrientation': True, 
-            'scale': True              
+            'detectOrientation': False, 
+            'scale': False              
         }
         payloads.append(payload)
 
@@ -456,8 +456,8 @@ async def images_ocrspace(api_key, engine_num, cropped_images):
     # 创建所有任务
     tasks = [delayed_fetch(payload) for payload in payloads]
 
-    # 限制并发数为2防止超过API限制
-    semaphore = asyncio.Semaphore(2)
+    # 限制并发数为1防止超过API限制
+    semaphore = asyncio.Semaphore(1)
     # 修改返回结果处理
     results = await asyncio.gather(*(process_with_semaphore(task, semaphore) for task in tasks))
         
