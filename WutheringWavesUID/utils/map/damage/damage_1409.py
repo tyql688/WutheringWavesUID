@@ -39,6 +39,7 @@ def calc_damage_1(
         "小卡空中回收3剑",
     ] = "小卡普攻1段",
 ) -> tuple[str, str]:
+    attr.set_env_aero_erosion()
     # 设置角色伤害类型
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -79,7 +80,7 @@ def calc_damage_1(
     attr.add_skill_multi(skill_multi, title, msg)
 
     # 设置角色施放技能
-    damage_func = [cast_attack, cast_skill, cast_hit]
+    damage_func = [cast_attack, cast_skill, cast_hit, cast_liberation]
     phase_damage(attr, role, damage_func, isGroup)
 
     # 设置角色等级
@@ -103,12 +104,12 @@ def calc_damage_1(
     if chain_num >= 2 and ("普攻" in skill_name or "重击" in skill_name):
         title = f"{role_name}-二链"
         msg = "小卡普攻技能倍率提升50%"
-        attr.add_skill_multi(0.5, title, msg)
+        attr.add_skill_ratio(0.5, title, msg)
 
     elif chain_num >= 2 and ("空中" in skill_name):
         title = f"{role_name}-二链"
         msg = "小卡空中攻击倍率提升200%"
-        attr.add_skill_multi(2, title, msg)
+        attr.add_skill_ratio(2, title, msg)
 
     if chain_num >= 2:
         aeroErosionNum += 3
@@ -118,7 +119,7 @@ def calc_damage_1(
 
     if chain_num >= 4:
         title = f"{role_name}-四链"
-        msg = "角色为目标附加【异常反应】后，使队伍中所有角色全属性伤害加成提升20%"
+        msg = "附加【异常反应】，全属性伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 5:
@@ -132,13 +133,13 @@ def calc_damage_1(
     if role_breach and role_breach >= 3:
         # 默认吃满吧
         title = f"{role_name}-以风刻痕留蚀"
-        msg = "当目标拥有1到3层【风蚀效应】时，小卡对其造成的伤害提升30%；"
+        msg = "小卡对其造成的伤害提升30%；"
         attr.add_dmg_bonus(0.3, title, msg)
 
         aeroErosionNumTemp = min(aeroErosionNum - 3, 3)
         if aeroErosionNumTemp > 0:
             title = f"{role_name}-以风刻痕留蚀"
-            msg = f"当目标拥有3层以上【风蚀效应】时，【卡提希娅】对其造成的伤害额外提升10%*{aeroErosionNumTemp}"
+            msg = f"3层风蚀，对其造成的伤害额外提升10%*{aeroErosionNumTemp}"
             attr.add_dmg_bonus(0.1 * aeroErosionNumTemp, title, msg)
 
     # 声骸
@@ -158,6 +159,7 @@ def calc_damage_1(
 def calc_damage_2(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
 ) -> tuple[str, str]:
+    attr.set_env_aero_erosion()
     # 设置角色伤害类型
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -223,13 +225,13 @@ def calc_damage_2(
     if role_breach and role_breach >= 3:
         # 默认吃满吧
         title = f"{role_name}-以风刻痕留蚀"
-        msg = "当目标拥有1到3层【风蚀效应】时，小卡对其造成的伤害提升30%；"
+        msg = "小卡对其造成的伤害提升30%；"
         attr.add_dmg_bonus(0.3, title, msg)
 
         aeroErosionNumTemp = min(aeroErosionNum - 3, 3)
         if aeroErosionNumTemp > 0:
             title = f"{role_name}-以风刻痕留蚀"
-            msg = f"当目标拥有3层以上【风蚀效应】时，【卡提希娅】对其造成的伤害额外提升10%*{aeroErosionNumTemp}"
+            msg = f"3层风蚀，对其造成的伤害额外提升10%*{aeroErosionNumTemp}"
             attr.add_dmg_bonus(0.1 * aeroErosionNumTemp, title, msg)
 
     # 声骸
@@ -263,6 +265,7 @@ def calc_damage_11(
         "大卡空中3段",
     ] = "大卡普攻1段",
 ) -> tuple[str, str]:
+    attr.set_env_aero_erosion()
     # 设置角色伤害类型
     attr.set_char_damage(attack_damage)
     # 设置角色模板  "temp_atk", "temp_life", "temp_def"
@@ -337,7 +340,7 @@ def calc_damage_11(
 
     if chain_num >= 4:
         title = f"{role_name}-四链"
-        msg = "角色为目标附加【异常反应】后，使队伍中所有角色全属性伤害加成提升20%"
+        msg = "角色为目标附加【异常反应】，使队伍中所有角色全属性伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 5:
@@ -353,13 +356,13 @@ def calc_damage_11(
     if role_breach and role_breach >= 3:
         # 默认吃满吧
         title = f"{role_name}-以风刻痕留蚀"
-        msg = "当目标拥有1到3层【风蚀效应】时，大卡对其造成的伤害提升30%；"
+        msg = "大卡对其造成的伤害提升30%；"
         attr.add_dmg_bonus(0.3, title, msg)
 
         aeroErosionNumTemp = min(aeroErosionNum - 3, 3)
         if aeroErosionNumTemp > 0:
             title = f"{role_name}-以风刻痕留蚀"
-            msg = f"当目标拥有3层以上【风蚀效应】时，【芙露德莉斯】对其造成的伤害额外提升10%*{aeroErosionNumTemp}"
+            msg = f"3层风蚀，对其造成的伤害额外提升10%*{aeroErosionNumTemp}"
             attr.add_dmg_bonus(0.1 * aeroErosionNumTemp, title, msg)
 
     # 声骸
@@ -435,7 +438,7 @@ def calc_damage_12(
 
     if chain_num >= 4:
         title = f"{role_name}-四链"
-        msg = "角色为目标附加【异常反应】后，使队伍中所有角色全属性伤害加成提升20%"
+        msg = "角色为目标附加【异常反应】，使队伍中所有角色全属性伤害加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     if chain_num >= 5:
@@ -457,13 +460,13 @@ def calc_damage_12(
     if role_breach and role_breach >= 3:
         # 默认吃满吧
         title = f"{role_name}-以风刻痕留蚀"
-        msg = "当目标拥有1到3层【风蚀效应】时，大卡对其造成的伤害提升30%；"
+        msg = "大卡对其造成的伤害提升30%；"
         attr.add_dmg_bonus(0.3, title, msg)
 
         aeroErosionNumTemp = min(aeroErosionNum - 3, 3)
         if aeroErosionNumTemp > 0:
             title = f"{role_name}-以风刻痕留蚀"
-            msg = f"当目标拥有3层以上【风蚀效应】时，【芙露德莉斯】对其造成的伤害额外提升10%*{aeroErosionNumTemp}"
+            msg = f"3层风蚀，对其造成的伤害额外提升10%*{aeroErosionNumTemp}"
             attr.add_dmg_bonus(0.1 * aeroErosionNumTemp, title, msg)
 
     # 声骸
