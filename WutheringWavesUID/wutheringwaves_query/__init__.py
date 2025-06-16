@@ -8,8 +8,10 @@ from ..utils.button import WavesButton
 from .draw_char_hold_rate import get_char_hold_rate_img
 from .draw_slash_appear_rate import draw_slash_use_rate
 from .draw_tower_appear_rate import draw_tower_use_rate
+from .draw_char_chain_hold_rate import get_char_chain_hold_rate_img
 
 sv_char_hold_rate = SV("waves角色持有率")
+sv_char_chain_hold_rate = SV("waves角色共鸣链持有率")
 sv_tower_appear_rate = SV("waves深塔出场率", priority=1)
 sv_slash_appear_rate = SV("waves冥想出场率", priority=1)
 
@@ -45,6 +47,26 @@ async def handle_char_hold_rate(bot: Bot, ev: Event):
         WavesButton("群持有率", "群角色持有率"),
     ]
     await bot.send_option(img, buttons)
+
+
+# 角色持有率指令
+@sv_char_chain_hold_rate.on_command(
+    (
+        "角色共鸣链持有率", "共鸣链持有率", "链持有率", "链率",
+        "群角色共鸣链持有率", "群共鸣链持有率", "群链持有率", "群链率",
+        "bot角色共鸣链持有率", "bot共鸣链持有率", "bot链持有率", "bot链率",
+    )
+)
+async def handle_char_chain_hold_rate(bot: Bot, ev: Event):
+    if "群" in ev.command:
+        if not ev.group_id:
+            return await bot.send("请在群聊中使用")
+        img = await get_char_chain_hold_rate_img(ev, ev.group_id)
+    elif "bot" in ev.command:
+        img = await get_char_chain_hold_rate_img(ev, "bot")
+    else:
+        img = await get_char_chain_hold_rate_img(ev)
+    await bot.send(img)
 
 
 # 深塔出场率指令

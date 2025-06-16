@@ -229,6 +229,14 @@
         "need_admin": false
       },
       {
+        "name": "角色共鸣链持有率",
+        "desc": "角色共鸣链持有率",
+        "eg": "(群/bot)链率(up/all)",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "角色持有率",
         "desc": "角色持有率",
         "eg": "(群/bot)持有率(up/all)",
