@@ -96,7 +96,7 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
         
         # 计算每个共鸣链的持有数量或所占比例
         for chain_level, rate in chain_rates.items():
-            num = (hold_rate * rate / 100) if use_rate else int(player_count * rate / 100)
+            num = (hold_rate * rate / 100) if use_rate else round(player_count * rate / 100)
             if num > 0:  # 只添加有持有者的链
                 chain_data_list.append({
                     "char_id": char_id,
