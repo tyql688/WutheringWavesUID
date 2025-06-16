@@ -181,7 +181,9 @@ async def refresh_char(
     results = await asyncio.gather(*tasks)
 
     charId2chainNum: Dict[int, int] = {
-        r.roleId: r.chainUnlockNum for r in role_info.roleList
+        r.roleId: r.chainUnlockNum
+        for r in role_info.roleList
+        if isinstance(r.chainUnlockNum, int)
     }
     # 处理返回的数据
     for succ, role_detail_info in results:
