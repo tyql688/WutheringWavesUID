@@ -58,7 +58,7 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
     elif "all" in text or "ALL" in text or "全" in text:
         filter_type = ""
     else:
-        filter_type = "五" # 默认显示五星角色
+        filter_type = "五"  # 默认显示五星角色
 
     # 收集所有共鸣链数据
     chain_data_list = []
@@ -86,13 +86,17 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
             elif filter_type == "四":
                 if char_model.starLevel != 4:
                     continue
-        
-        player_count = char["player_count"]
+
+        use_rate = False
+        hold_rate = char["hold_rate"]
+        player_count = char.get("player_count", -1)
+        if player_count == -1:
+            use_rate = True
         chain_rates = char["chain_hold_rate"]
         
-        # 计算每个共鸣链的持有数量
+        # 计算每个共鸣链的持有数量或所占比例
         for chain_level, rate in chain_rates.items():
-            num = int(player_count * rate / 100)
+            num = (hold_rate * rate / 100) if use_rate else int(player_count * rate / 100)
             if num > 0:  # 只添加有持有者的链
                 chain_data_list.append({
                     "char_id": char_id,
@@ -158,9 +162,14 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
     title_mask_draw.text((300, 430), title_text, "white", waves_font_58, "lm")
     
     # count
+    title = (
+        f"样本数量: {data.get('total_player_count', 0)} 人 | 共 {total_items} 种共鸣链"
+        if group_id
+        else f"样本来源：国服近期活跃角色 | 共 {total_items} 种共鸣链"
+    )
     title_mask_draw.text(
         (300, 500),
-        f"样本数量: {data.get('total_player_count', 0)} 人 | 共 {total_items} 种共鸣链 | {columns}列布局",
+        title,
         "white",
         waves_font_36,
         "lm",
@@ -228,11 +237,11 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
         )
         
         # 持有数量
-        num_text = f"{num}人"
+        num_text = f"{num:.2f}%" if use_rate else f"{num}人"
         draw.text(
             (x + 110, y + 50),
             num_text,
-            "white",
+            "#AAAAAA",
             waves_font_24,
             "lm"
         )
@@ -242,7 +251,7 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
         draw.text(
             (x + 40, y + 90),
             num_text,
-            "white",
+            "#AAAAAA",
             waves_font_24,
             "lm"
         )

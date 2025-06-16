@@ -124,6 +124,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
         "attributeId": role.attributeId,
         "attributeName": role.attributeName,
         "breach": get_breach(result_dict["角色信息"]["等级"]),
+        "chainUnlockNum": chain_num,
         "isMainRole": False,  # 假设需要一个主角色标识（用户没有提供，可以设置默认值或动态获取）
         "level": result_dict["角色信息"]["等级"],
         "roleIconUrl": role.roleIconUrl,
