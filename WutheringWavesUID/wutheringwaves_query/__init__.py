@@ -8,6 +8,7 @@ from ..utils.button import WavesButton
 from .draw_char_hold_rate import get_char_hold_rate_img
 from .draw_slash_appear_rate import draw_slash_use_rate
 from .draw_tower_appear_rate import draw_tower_use_rate
+from ..wutheringwaves_config import WutheringWavesConfig
 from .draw_char_chain_hold_rate import get_char_chain_hold_rate_img
 
 sv_char_hold_rate = SV("waves角色持有率")
@@ -36,6 +37,9 @@ async def handle_char_hold_rate(bot: Bot, ev: Event):
             return await bot.send("请在群聊中使用")
         img = await get_char_hold_rate_img(ev, ev.group_id)
     elif "bot" in ev.command:
+        botData = WutheringWavesConfig.get_config("botData").data
+        if not botData:
+            return await bot.send("[鸣潮] 未开启bot排行")
         img = await get_char_hold_rate_img(ev, "bot")
     else:
         img = await get_char_hold_rate_img(ev)
@@ -63,6 +67,9 @@ async def handle_char_chain_hold_rate(bot: Bot, ev: Event):
             return await bot.send("请在群聊中使用")
         img = await get_char_chain_hold_rate_img(ev, ev.group_id)
     elif "bot" in ev.command:
+        botData = WutheringWavesConfig.get_config("botData").data
+        if not botData:
+            return await bot.send("[鸣潮] 未开启bot排行")
         img = await get_char_chain_hold_rate_img(ev, "bot")
     else:
         img = await get_char_chain_hold_rate_img(ev)

@@ -6,6 +6,7 @@ from gsuid_core.sv import SV
 from .darw_rank_card import draw_rank_img
 from .draw_bot_rank_card import draw_bot_rank_img
 from .draw_all_rank_card import draw_all_rank_card
+from ..wutheringwaves_config import WutheringWavesConfig
 
 sv_waves_rank_list = SV("ww角色排行")
 sv_waves_rank_all_list = SV("ww角色总排行", priority=1)
@@ -42,6 +43,9 @@ async def send_rank_card(bot: Bot, ev: Event):
 
 @sv_waves_rank_bot_list.on_regex("^[\u4e00-\u9fa5]+(?:bot排行|bot排名)$", block=True)
 async def send_bot_rank_card(bot: Bot, ev: Event):
+    botData = WutheringWavesConfig.get_config("botData").data
+    if not botData:
+        return await bot.send("[鸣潮] 未开启bot排行")
     # 正则表达式
     match = re.search(
         r"(?P<char>[\u4e00-\u9fa5]+)(?:bot排行|bot排名)",

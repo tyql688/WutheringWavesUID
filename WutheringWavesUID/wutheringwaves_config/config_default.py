@@ -128,6 +128,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "隐藏uid",
         False,
     ),
+    "botData": GsBoolConfig(
+        "bot排行查询开关",
+        "相关排行：伤害排行，评分排行，角色持有率排行，共鸣链持有率排行",
+        False,
+    ),
     "MaxBindNum": GsIntConfig(
         "绑定特征码限制数量（未登录）", "绑定特征码限制数量（未登录）", 2, 100
     ),
