@@ -154,7 +154,7 @@ async def refresh_char(
         async with semaphore:
             return await waves_api.get_role_detail_info(role_id, uid, ck)
 
-    semaphore = asyncio.Semaphore(value=len(role_info.roleList))
+    semaphore = asyncio.Semaphore(value=3)
     if is_self_ck:
         tasks = [
             limited_get_role_detail_info(str(r.roleId), uid, ck)
@@ -173,6 +173,9 @@ async def refresh_char(
             ]
     results = await asyncio.gather(*tasks)
 
+    charId2chainNum: Dict[int, int] = {
+        r.roleId: r.chainUnlockNum for r in role_info.roleList
+    }
     # 处理返回的数据
     for succ, role_detail_info in results:
         if (
@@ -191,6 +194,18 @@ async def refresh_char(
             del role_detail_info["weaponData"]["weapon"]["effectDescription"]
         except Exception as _:
             pass
+
+        # 修正共鸣链
+        try:
+            role_id = role_detail_info["role"]["roleId"]
+            for i in role_detail_info["chainList"]:
+                if i["order"] <= charId2chainNum[role_id]:
+                    i["unlocked"] = True
+                else:
+                    i["unlocked"] = False
+        except Exception as e:
+            logger.exception(f"{uid} 共鸣链修正失败", e)
+
         waves_datas.append(role_detail_info)
 
     await save_card_info(

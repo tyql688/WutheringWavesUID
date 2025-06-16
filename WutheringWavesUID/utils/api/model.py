@@ -71,6 +71,7 @@ class Role(BaseModel):
     weaponTypeId: int
     weaponTypeName: Optional[str]
     acronym: str
+    chainUnlockNum: int
     # mapRoleId: int | None
 
 
