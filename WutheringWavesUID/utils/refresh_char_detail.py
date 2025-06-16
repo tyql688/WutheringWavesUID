@@ -27,6 +27,7 @@ async def send_card(
     save_data: List,
     is_self_ck: bool = False,
     token: Optional[str] = "",
+    role_info: Optional[RoleList] = None,
 ):
     waves_char_rank: Optional[List[WavesCharRank]] = None
 
@@ -39,14 +40,19 @@ async def send_card(
         uid, save_data, user_id, waves_char_rank, is_self_ck, token
     )
 
-    if is_self_ck and token and waves_char_rank and WavesToken:
+    if is_self_ck and token and waves_char_rank and WavesToken and role_info:
+        if len(role_info.roleList) != len(save_data):
+            logger.warning(
+                f"角色数量不一致，role_info.roleNum:{len(role_info.roleList)} != waves_char_rank:{len(save_data)}"
+            )
+            return
         succ, account_info = await waves_api.get_base_info(uid, token=token)
         if not succ:
             return account_info
         account_info = AccountBaseInfo.model_validate(account_info)
         if account_info.roleNum != len(save_data):
             logger.warning(
-                f"角色数量不一致，roleNum:{account_info.roleNum} != waves_char_rank:{len(save_data)}"
+                f"角色数量不一致，role_info.roleNum:{account_info.roleNum} != waves_char_rank:{len(save_data)}"
             )
             return
         metadata = {
@@ -67,6 +73,7 @@ async def save_card_info(
     user_id: str = "",
     is_self_ck: bool = False,
     token: str = "",
+    role_info: Optional[RoleList] = None,
 ):
     if len(waves_data) == 0:
         return
@@ -109,7 +116,7 @@ async def save_card_info(
 
     save_data = list(old_data.values())
 
-    await send_card(uid, user_id, save_data, is_self_ck, token)
+    await send_card(uid, user_id, save_data, is_self_ck, token, role_info)
 
     try:
         async with aiofiles.open(path, "w", encoding="utf-8") as file:
@@ -215,6 +222,7 @@ async def refresh_char(
         user_id,
         is_self_ck=is_self_ck,
         token=ck,
+        role_info=role_info,
     )
 
     if not waves_datas:
