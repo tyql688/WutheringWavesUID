@@ -28,6 +28,7 @@ from ..utils.fonts.waves_fonts import (
     waves_font_18,
     waves_font_20,
     waves_font_24,
+    waves_font_28,
     waves_font_30,
     waves_font_34,
     waves_font_40,
@@ -149,18 +150,56 @@ async def draw_all_rank_card(
         page_num=page_num,
         rank_type=rank_type_num,
         waves_id=self_uid,
+        version=get_version(),
     )
 
     rankInfoList = await get_rank(item)
     if not rankInfoList:
         return "获取排行失败"
 
+    if rankInfoList.message and not rankInfoList.data:
+        return rankInfoList.message
+
+    if not rankInfoList.data:
+        return "获取排行失败"
+
     totalNum = len(rankInfoList.data.details)
     title_h = 500
     bar_star_h = 110
-    h = title_h + totalNum * bar_star_h + 80
+    text_bar_h = 130
+    h = title_h + totalNum * bar_star_h + text_bar_h + 80
     card_img = get_waves_bg(1300, h, "bg3")
-    card_img_draw = ImageDraw.Draw(card_img)
+    # card_img_draw = ImageDraw.Draw(card_img)
+
+    text_bar_img = Image.new("RGBA", (1300, text_bar_h), color=(0, 0, 0, 0))
+    text_bar_draw = ImageDraw.Draw(text_bar_img)
+    # 绘制深灰色背景
+    bar_bg_color = (36, 36, 41, 230)
+    text_bar_draw.rounded_rectangle(
+        [20, 20, 1280, text_bar_h - 15], radius=8, fill=bar_bg_color
+    )
+
+    # 绘制顶部的金色高亮线
+    accent_color = (203, 161, 95)
+    text_bar_draw.rectangle([20, 20, 1280, 26], fill=accent_color)
+
+    # 左侧标题
+    text_bar_draw.text((40, 60), "上榜条件", GREY, waves_font_28, "lm")
+    text_bar_draw.text((185, 50), "1. 声骸套装5件套", SPECIAL_GOLD, waves_font_20, "lm")
+    text_bar_draw.text(
+        (185, 85), "2. 登录用户&刷新面板", SPECIAL_GOLD, waves_font_20, "lm"
+    )
+
+    # 备注
+    if rank_type == "伤害":
+        temp_notes = (
+            "排行标准：以期望伤害（计算暴击率的伤害，不代表实际伤害) 为排序的排名"
+        )
+    else:
+        temp_notes = "排行标准：以声骸分数（声骸评分高，不代表实际伤害高) 为排序的排名"
+    text_bar_draw.text((1260, 100), temp_notes, SPECIAL_GOLD, waves_font_16, "rm")
+
+    card_img.alpha_composite(text_bar_img, (0, title_h))
 
     bar = Image.open(TEXT_PATH / "bar1.png")
     total_score = 0
@@ -213,23 +252,21 @@ async def draw_all_rank_card(
         # 评分
         if rank.phantom_score > 0.0:
             score_bg = Image.open(TEXT_PATH / f"score_{rank.phantom_score_bg}.png")
-            bar_bg.alpha_composite(score_bg, (550, 2))
+            bar_bg.alpha_composite(score_bg, (545, 2))
             bar_star_draw.text(
-                (716, 45),
-                f"{int(rank.phantom_score * 100) / 100:.1f}",
+                (707, 45),
+                f"{int(rank.phantom_score * 100) / 100:.2f}",
                 "white",
                 waves_font_34,
                 "mm",
             )
-            bar_star_draw.text((716, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
+            bar_star_draw.text((707, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
 
         # 合鸣效果
         if rank.sonata_name:
             effect_image = await get_attribute_effect(rank.sonata_name)
             effect_image = effect_image.resize((50, 50))
-            # sonata_color = WAVES_ECHO_MAP.get(rank.sonata_name, (0, 0, 0))
-            # effect_image = await change_color(effect_image, sonata_color)
-            bar_bg.alpha_composite(effect_image, (783, 15))
+            bar_bg.alpha_composite(effect_image, (790, 15))
             sonata_name = rank.sonata_name
         else:
             sonata_name = "合鸣效果"
@@ -237,7 +274,7 @@ async def draw_all_rank_card(
         sonata_font = waves_font_16
         if len(sonata_name) > 4:
             sonata_font = waves_font_14
-        bar_star_draw.text((808, 75), f"{sonata_name}", "white", sonata_font, "mm")
+        bar_star_draw.text((815, 75), f"{sonata_name}", "white", sonata_font, "mm")
 
         # 武器
         weapon_bg_temp = Image.new("RGBA", (600, 300))
@@ -276,26 +313,20 @@ async def draw_all_rank_card(
             (_x, _y), f"精{rank.weapon_reson_level}", "white", waves_font_24, "lm"
         )
 
-        # weapon_breach = get_breach(rank.weapon_reson_level, rank.weapon_level)
-        # for i in range(0, weapon_breach):
-        #     weapon_bg_temp.alpha_composite(
-        #         promote_icon.copy(), dest=(200 + 40 * i, 100)
-        #     )
-
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
-        bar_bg.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(830, 25))
+        bar_bg.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(850, 25))
 
         # 伤害
         bar_star_draw.text(
-            (1120, 45),
+            (1140, 45),
             f"{rank.expected_damage:,.0f}",
             SPECIAL_GOLD,
             waves_font_34,
             "mm",
         )
         bar_star_draw.text(
-            (1120, 75), f"{rank.expected_name}", "white", waves_font_16, "mm"
+            (1140, 75), f"{rank.expected_name}", "white", waves_font_16, "mm"
         )
 
         # 排名
@@ -338,9 +369,6 @@ async def draw_all_rank_card(
 
         # bot主人名字
         botName = rank.alias_name if rank.alias_name else ""
-        # bar_star_draw.text(
-        #     (350, 75), f"来自bot: {botName}", SPECIAL_GOLD, waves_font_20, "lm"
-        # )
         if botName:
             color = (54, 54, 54)
             if botName in bot_color_map:
@@ -360,7 +388,7 @@ async def draw_all_rank_card(
             bar_bg.alpha_composite(info_block, (350, 65))
 
         # 贴到背景
-        card_img.paste(bar_bg, (0, title_h + index * bar_star_h), bar_bg)
+        card_img.paste(bar_bg, (0, title_h + text_bar_h + index * bar_star_h), bar_bg)
 
         if index + 1 + (pages - 1) * page_num == rank_id:
             total_score += rank.phantom_score
@@ -400,15 +428,6 @@ async def draw_all_rank_card(
     info_block_draw.text((50, 15), f"v{get_version()}", "white", waves_font_24, "mm")
     _x = 540 + 31 * len(title_name)
     title.alpha_composite(info_block, (_x, 255))
-
-    # 备注
-    if rank_type == "伤害":
-        temp_notes = (
-            "排行标准：以期望伤害（计算暴击率的伤害，不代表实际伤害) 为排序的排名"
-        )
-    else:
-        temp_notes = "排行标准：以声骸分数（声骸评分高，不代表实际伤害高) 为排序的排名"
-    card_img_draw.text((700, 500), f"{temp_notes}", SPECIAL_GOLD, waves_font_16, "lm")
 
     img_temp = Image.new("RGBA", char_mask2.size)
     img_temp.alpha_composite(title, (-300, 0))
