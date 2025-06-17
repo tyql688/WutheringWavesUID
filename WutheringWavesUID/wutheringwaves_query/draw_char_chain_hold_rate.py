@@ -14,6 +14,7 @@ from ..utils.api.wwapi import GET_HOLD_RATE_URL
 from ..utils.ascension.char import get_char_model
 from ..utils.database.models import WavesBind
 from ..utils.fonts.waves_fonts import (
+    waves_font_20,
     waves_font_24,
     waves_font_36,
     waves_font_58,
@@ -96,19 +97,21 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
         
         # 计算每个共鸣链的持有数量或所占比例
         for chain_level, rate in chain_rates.items():
-            num = (hold_rate * rate / 100) if use_rate else round(player_count * rate / 100)
-            if num > 0:  # 只添加有持有者的链
+            all_rate = (hold_rate * rate / 100)
+            num = 0 if use_rate else round(player_count * rate / 100)
+            if all_rate > 0:  # 只添加有持有者的链
                 chain_data_list.append({
                     "char_id": char_id,
                     "char_model": char_model,
                     "chain_level": chain_level,
                     "num": num,
+                    "all_rate": all_rate,
                     "rate": rate
                 })
                 total_items += 1
     
     # 按持有数量降序排序
-    chain_data_list.sort(key=lambda x: x["num"], reverse=True)
+    chain_data_list.sort(key=lambda x: x["all_rate"], reverse=True)
 
     # 设置图像尺寸
     width = 1300
@@ -190,6 +193,7 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
         char_model = chain_data["char_model"]
         chain_level = chain_data["chain_level"]
         num = chain_data["num"]
+        all_rate = chain_data["all_rate"]
         rate = chain_data["rate"]
         
         # 计算位置 (行和列)
@@ -207,10 +211,10 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
         # 排名序号
         rank_text = f"{rank}."
         draw.text(
-            (x + 1, y + (item_height - 20) // 2),
+            (x + 1, y + 2),
             rank_text,
             "white",
-            waves_font_24,
+            waves_font_20,
             "lm"
         )
         
@@ -219,40 +223,47 @@ async def draw_char_chain_hold_rate(ev: Event, data, group_id: str = "") -> byte
         attribute_name = ATTRIBUTE_ID_MAP[attribute_text]
         role_attribute = await get_attribute(attribute_name, is_simple=True)
         role_attribute = role_attribute.resize((40, 40)).convert("RGBA")
-        img.alpha_composite(role_attribute, (x + 1, y + 2))
+        img.alpha_composite(role_attribute, (x + 2, y + 70))
 
         # 角色头像
         avatar = await draw_pic(char_id)
         avatar = avatar.resize((110, 110))
-        img.paste(avatar, (x + 40, y + 2), avatar)
+        img.paste(avatar, (x + 10, y + 10), avatar)
         
         # 链级
-        chain_text = f"{chain_level}链"
         draw.text(
-            (x + 110, y + 20),
-            chain_text,
+            (x + 42, y + 90),
+            f"{chain_level}链",
             CHAIN_COLOR_LIST[int(chain_level)],
             waves_font_24,
             "lm"
         )
         
         # 持有数量
-        num_text = f"{num:.2f}%" if use_rate else f"{num}人"
+        if not use_rate:
+            draw.text(
+                (x + 110, y + 30),
+                f"{num}人",
+                "white",
+                waves_font_20,
+                "lm"
+            )
+
+        # 持有占比
         draw.text(
-            (x + 110, y + 50),
-            num_text,
-            "#AAAAAA",
-            waves_font_24,
+            (x + 90, y + 60),
+            f"总榜{all_rate:.2f}%",
+            "white",
+            waves_font_20,
             "lm"
         )
 
         # 同角色该链持有数量占比
-        num_text = f"同角占比{rate:.1f}%"
         draw.text(
-            (x + 40, y + 90),
-            num_text,
-            "#AAAAAA",
-            waves_font_24,
+            (x + 90, y + 90),
+            f"同角{rate:.2f}%",
+            "white",
+            waves_font_20,
             "lm"
         )
         
