@@ -162,7 +162,7 @@ async def refresh_char(
         async with semaphore:
             return await waves_api.get_role_detail_info(role_id, uid, ck)
 
-    semaphore = asyncio.Semaphore(value=3)
+    semaphore = asyncio.Semaphore(value=len(role_info.roleList) // 2)
     if is_self_ck:
         tasks = [
             limited_get_role_detail_info(str(r.roleId), uid, ck)
@@ -182,7 +182,9 @@ async def refresh_char(
     results = await asyncio.gather(*tasks)
 
     charId2chainNum: Dict[int, int] = {
-        r.roleId: r.chainUnlockNum for r in role_info.roleList
+        r.roleId: r.chainUnlockNum
+        for r in role_info.roleList
+        if isinstance(r.chainUnlockNum, int)
     }
     # 处理返回的数据
     for succ, role_detail_info in results:

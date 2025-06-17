@@ -60,7 +60,7 @@ class RankInfoData(BaseModel):
 class RankInfoResponse(BaseModel):
     code: int
     message: str
-    data: RankInfoData
+    data: Optional[RankInfoData] = None
 
 
 class RankItem(BaseModel):
@@ -69,6 +69,7 @@ class RankItem(BaseModel):
     page_num: int
     rank_type: int
     waves_id: Optional[str] = ""
+    version: str
 
 
 class OneRankRequest(BaseModel):
