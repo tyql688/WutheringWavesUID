@@ -128,6 +128,7 @@ class DamageAttribute:
         skill_ratio_in_skill_description=0,
         dmg_bonus=0,
         dmg_deepen=0,
+        easy_damage=0,
         crit_rate=0,
         crit_dmg=0,
         character_level=0,
@@ -213,6 +214,8 @@ class DamageAttribute:
         self.dmg_bonus = dmg_bonus
         # 伤害加深百分比
         self.dmg_deepen = dmg_deepen
+        # 易伤百分比
+        self.easy_damage = easy_damage
         # 暴击率
         self.crit_rate = crit_rate
         # 暴击伤害
@@ -489,6 +492,12 @@ class DamageAttribute:
         self.add_effect(title, msg)
         return self
 
+    def add_easy_damage(self, easy_damage: float, title="", msg=""):
+        """增加易伤百分比"""
+        self.easy_damage += easy_damage
+        self.add_effect(title, msg)
+        return self
+
     def add_crit_rate(self, crit_rate: float, title="", msg=""):
         """设置暴击率"""
         self.crit_rate += crit_rate
@@ -685,6 +694,7 @@ class DamageAttribute:
             * (1 + self.skill_ratio_in_skill_description)
             * (1 + self.dmg_bonus)
             * (1 + self.dmg_deepen)
+            * (1 + self.easy_damage)
             * self.valid_enemy_resistance
             * self.defense_ratio
             * self.crit_dmg
@@ -709,6 +719,7 @@ class DamageAttribute:
             * (1 + self.skill_ratio_in_skill_description)
             * (1 + self.dmg_bonus)
             * (1 + self.dmg_deepen)
+            * (1 + self.easy_damage)
             * self.valid_enemy_resistance
             * self.defense_ratio
             * (self.crit_rate * (self.crit_dmg - 1) + 1)

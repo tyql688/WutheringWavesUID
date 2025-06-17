@@ -447,7 +447,7 @@ def calc_damage_12(
     if chain_num >= 6:
         title = f"{role_name}-六链"
         msg = "目标受到【芙露德莉斯】的伤害提升40%。"
-        attr.add_dmg_bonus(0.4, title, msg)
+        attr.add_easy_damage(0.4, title, msg)
 
     # 造成伤害时目标每拥有1层【风蚀效应】，对目标造成的伤害加深20%，至多5层，命中后会清空目标拥有的【风蚀效应】。
     aeroErosionNumTemp = min(aeroErosionNum, 5)
