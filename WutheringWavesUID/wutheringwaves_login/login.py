@@ -232,7 +232,12 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
             if isinstance(result, dict)
             else f"{game_title} 登录失败\n"
         )
-        return await bot.send(send_msg, at_sender=at_sender)
+        if send_msg == "系统繁忙，请稍后再试":
+            # 可能是没注册库街区。 -_-||
+            return await bot.send(msg_error, at_sender=at_sender)
+        else:
+            return await bot.send(send_msg, at_sender=at_sender)
+
     token = result.get("data", {}).get("token", "")
     waves_user = await add_cookie(ev, token, did)
     if waves_user and isinstance(waves_user, WavesUser):
