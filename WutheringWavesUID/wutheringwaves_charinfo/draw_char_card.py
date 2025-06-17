@@ -248,7 +248,6 @@ async def ph_card_draw(
                 phantom_icon = await get_phantom_img(
                     _phantom.phantomProp.phantomId, _phantom.phantomProp.iconUrl
                 )
-                # fetter_icon = await get_fetter_img(_phantom.fetterDetail.name, _phantom.fetterDetail.iconUrl)
                 fetter_icon = await get_attribute_effect(_phantom.fetterDetail.name)
                 fetter_icon = fetter_icon.resize((50, 50))
                 phantom_icon.alpha_composite(fetter_icon, dest=(205, 0))
@@ -286,8 +285,6 @@ async def ph_card_draw(
                 )
                 sh_temp.alpha_composite(ph_score_img, (223, 58))
 
-                # sh_temp_draw.text((142, 70), f'Lv.{_phantom.level}', 'white', waves_font_24, 'lm')
-                # sh_temp_draw.text((242, 70), f'{_score}分', 'white', waves_font_24, 'lm')
                 for index in range(0, _phantom.cost):
                     promote_icon = Image.open(TEXT_PATH / "promote_icon.png")
                     promote_icon = promote_icon.resize((30, 30))
@@ -628,7 +625,7 @@ async def draw_char_detail_img(
     jineng_len = 180
     dd_len = 0
     isDraw = False if damageId and damageDetail else True
-    echo_list = 1400 if isDraw else 140
+    echo_list = 1400 if isDraw else 170
     if damageDetail and isDraw:
         dd_len = 60 + (len(damageDetail) + 1) * 60
 
@@ -794,10 +791,6 @@ async def draw_char_detail_img(
             )
 
         dd_len += damage_calc_img.size[1]
-        # new_img = await get_card_bg(1200, img.size[1] + damage_calc_img.size[1], "bg3")
-        # new_img.paste(img, (0, 0), img)
-        # new_img.alpha_composite(damage_calc_img, (0, img.size[1]))
-        # img = new_img
 
     # 创建背景
     img = await get_card_bg(
@@ -811,7 +804,7 @@ async def draw_char_detail_img(
 
     if damage_calc_img:
         img.alpha_composite(
-            damage_calc_img, (0, img.size[1] - 50 - damage_calc_img.size[1])
+            damage_calc_img, (0, img.size[1] - 10 - damage_calc_img.size[1])
         )
 
     # 右侧属性
