@@ -424,21 +424,21 @@ async def draw_bot_rank_img(
         # 评分
         if rank.score > 0.0:
             score_bg = Image.open(TEXT_PATH / f"score_{rank.score_bg}.png")
-            bar_bg.alpha_composite(score_bg, (550, 2))
+            bar_bg.alpha_composite(score_bg, (545, 2))
             bar_star_draw.text(
-                (716, 45),
-                f"{int(rank.score * 100) / 100:.1f}",
+                (707, 45),
+                f"{int(rank.score * 100) / 100:.2f}",
                 "white",
                 waves_font_34,
                 "mm",
             )
-            bar_star_draw.text((716, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
+            bar_star_draw.text((707, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
 
         # 合鸣效果
         if rank.sonata_name:
             effect_image = await get_attribute_effect(rank.sonata_name)
             effect_image = effect_image.resize((50, 50))
-            bar_bg.alpha_composite(effect_image, (783, 15))
+            bar_bg.alpha_composite(effect_image, (790, 15))
             sonata_name = rank.sonata_name
         else:
             sonata_name = "合鸣效果"
@@ -446,7 +446,7 @@ async def draw_bot_rank_img(
         sonata_font = waves_font_16
         if len(sonata_name) > 4:
             sonata_font = waves_font_14
-        bar_star_draw.text((808, 75), f"{sonata_name}", "white", sonata_font, "mm")
+        bar_star_draw.text((815, 75), f"{sonata_name}", "white", sonata_font, "mm")
 
         # 武器
         weapon_bg_temp = Image.new("RGBA", (600, 300))
@@ -483,17 +483,17 @@ async def draw_bot_rank_img(
 
         weapon_bg_temp.alpha_composite(weapon_icon_bg, dest=(45, 0))
 
-        bar_bg.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(830, 25))
+        bar_bg.alpha_composite(weapon_bg_temp.resize((260, 130)), dest=(850, 25))
 
         # 伤害
         if damage_title == "无":
-            bar_star_draw.text((1120, 55), "等待更新(:", GREY, waves_font_34, "mm")
+            bar_star_draw.text((1140, 55), "等待更新(:", GREY, waves_font_34, "mm")
         else:
             bar_star_draw.text(
-                (1120, 45), f"{rank.expected_damage}", SPECIAL_GOLD, waves_font_34, "mm"
+                (1140, 45), f"{rank.expected_damage}", SPECIAL_GOLD, waves_font_34, "mm"
             )
             bar_star_draw.text(
-                (1120, 75), f"{damage_title}", "white", waves_font_16, "mm"
+                (1140, 75), f"{damage_title}", "white", waves_font_16, "mm"
             )
 
         # 排名
