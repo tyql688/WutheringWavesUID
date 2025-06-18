@@ -43,6 +43,7 @@ from ..utils.image import (
     get_attribute,
     get_attribute_effect,
     get_qq_avatar,
+    get_discord_avatar,
     get_role_pile_old,
     get_square_avatar,
     get_square_weapon,
@@ -598,22 +599,37 @@ async def get_avatar(
     qid: Optional[Union[int, str]],
     char_id: Union[int, str],
 ) -> Image.Image:
-    if ev.bot_id == "onebot":
-        if WutheringWavesConfig.get_config("QQPicCache").data:
-            pic = pic_cache.get(qid)
-            if not pic:
+    try:
+        if ev.bot_id == "onebot":
+            if WutheringWavesConfig.get_config("QQPicCache").data:
+                pic = pic_cache.get(qid)
+                if not pic:
+                    pic = await get_qq_avatar(qid, size=100)
+                    pic_cache.set(qid, pic)
+            else:
                 pic = await get_qq_avatar(qid, size=100)
                 pic_cache.set(qid, pic)
-        else:
-            pic = await get_qq_avatar(qid, size=100)
-            pic_cache.set(qid, pic)
-        pic_temp = crop_center_img(pic, 120, 120)
 
+        elif ev.bot_id == "discord":
+            if WutheringWavesConfig.get_config("QQPicCache").data:
+                pic = pic_cache.get(qid)
+                if not pic:
+                    pic = await get_discord_avatar(qid, size=100)
+                    pic_cache.set(qid, pic)
+            else:
+                pic = await get_discord_avatar(qid, size=100)
+                pic_cache.set(qid, pic)
+
+        # 统一处理 crop 和遮罩（onebot/discord 共用逻辑）
+        pic_temp = crop_center_img(pic, 120, 120)
         img = Image.new("RGBA", (180, 180))
         avatar_mask_temp = avatar_mask.copy()
         mask_pic_temp = avatar_mask_temp.resize((120, 120))
         img.paste(pic_temp, (0, -5), mask_pic_temp)
-    else:
+    
+    except Exception as e:
+        # 打印异常，进行降级处理
+        logger.warning(f"头像获取失败，使用默认头像: {e}")
         pic = await get_square_avatar(char_id)
 
         pic_temp = Image.new("RGBA", pic.size)

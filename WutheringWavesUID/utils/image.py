@@ -13,6 +13,7 @@ from PIL import (
     ImageOps,
 )
 
+from ..utils.database.models import UserAvatar
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.image_tools import crop_center_img
@@ -243,6 +244,22 @@ async def get_qq_avatar(
         avatar_url = f"http://q1.qlogo.cn/g?b=qq&nk={qid}&s={size}"
     elif avatar_url is None:
         avatar_url = f"https://q1.qlogo.cn/g?b=qq&nk=3399214199&s={size}"
+    char_pic = Image.open(BytesIO((await sget(avatar_url)).content)).convert("RGBA")
+    return char_pic
+
+async def get_discord_avatar(
+    qid: Optional[Union[int, str]] = None,
+    avatar_url: Optional[str] = None,
+    size: int = 640,
+) -> Image.Image:
+    if qid:
+        try:
+            avatar_hash = await UserAvatar.get_avatar_hash(qid, "discord")
+            avatar_url = f"https://cdn.discordapp.com/avatars/{qid}/{avatar_hash}.png?size={size}"
+        except ValueError:
+            logger.error("[鸣潮][discord]错误的qid！")
+    elif avatar_url:
+        avatar_url = avatar_url + f".png?size={size}" if not avatar_url.endswith(".png") else avatar_url
     char_pic = Image.open(BytesIO((await sget(avatar_url)).content)).convert("RGBA")
     return char_pic
 
