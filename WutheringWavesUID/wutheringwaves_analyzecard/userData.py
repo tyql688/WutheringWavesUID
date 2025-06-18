@@ -7,7 +7,6 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.logger import logger
 
-from ..wutheringwaves_charinfo.draw_char_card import generate_online_role_detail
 from ..utils.ascension.weapon import get_weapon_detail
 from ..utils.refresh_char_detail import save_card_info
 from ..utils.name_convert import (
@@ -57,7 +56,8 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
 
     # 存储用户昵称
     await save_user_info(uid, user_name)
-
+    
+    from ..wutheringwaves_charinfo.draw_char_card import generate_online_role_detail
     # char_id = "1506" # 菲比..utils\map\detail_json\char\1506.json
     result = await generate_online_role_detail(char_id)
     waves_data = []
@@ -188,7 +188,7 @@ async def save_card_dict_to_json(bot: Bot, ev: Event, result_dict: Dict):
     logger.info(f" [鸣潮][dc卡片识别] 数据识别完毕，用户{uid}的{char_name_print}面板数据已保存到本地！")
     return
 
-async def check_phantom_data(data) -> bool:
+async def check_phantom_data(data) -> tuple[bool, dict]:
     try:
         processed_data = copy.deepcopy(data)
         # 检查词条内容，修正词条数据

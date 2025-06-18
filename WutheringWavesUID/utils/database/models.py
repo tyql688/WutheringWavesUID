@@ -27,9 +27,9 @@ exec_list.extend(
 
 T_WavesBind = TypeVar("T_WavesBind", bound="WavesBind")
 T_WavesUser = TypeVar("T_WavesUser", bound="WavesUser")
-T_UserAvatar = TypeVar("T_UserAvatar", bound="UserAvatar")
+T_WavesUserAvatar = TypeVar("T_WavesUserAvatar", bound="WavesUserAvatar")
 
-class UserAvatar(User, table=True):
+class WavesUserAvatar(User, table=True):
     __table_args__: Dict[str, Any] = {"extend_existing": True}
     bot_id: str = Field(default="", title="平台ID")
     user_id: Optional[str] = Field(default="", title="用户ID")
@@ -37,7 +37,7 @@ class UserAvatar(User, table=True):
 
     @classmethod
     @with_session
-    async def upsert_avatar(cls: Type[T_UserAvatar], session: AsyncSession, user_id: str, bot_id: str, avatar_hash: str):
+    async def upsert_avatar(cls: Type[T_WavesUserAvatar], session: AsyncSession, user_id: str, bot_id: str, avatar_hash: str):
         sql = select(cls).where(cls.bot_id == bot_id, cls.user_id == user_id)
         result = await session.execute(sql)
         obj = result.scalars().all()
@@ -62,7 +62,7 @@ class UserAvatar(User, table=True):
 
     @classmethod
     @with_session
-    async def get_avatar_hash(cls: Type[T_UserAvatar], session: AsyncSession, user_id: str, bot_id: str) -> Optional[str]:
+    async def get_avatar_hash(cls: Type[T_WavesUserAvatar], session: AsyncSession, user_id: str, bot_id: str) -> Optional[str]:
         sql = select(cls.avatar_hash).where(cls.bot_id == bot_id, cls.user_id == user_id)
         result = await session.execute(sql)
         row = result.scalars().all()
@@ -369,4 +369,4 @@ class UserAvatar(GsAdminModel):
     page_schema = PageSchema(label="用户哈希管理", icon="fa fa-bullhorn")  # type: ignore
 
     # 配置管理模型
-    model = UserAvatar
+    model = WavesUserAvatar
