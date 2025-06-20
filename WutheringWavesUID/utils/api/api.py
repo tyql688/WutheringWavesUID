@@ -101,3 +101,12 @@ def get_local_proxy_url():
     if LocalProxyUrl:
         return LocalProxyUrl
     return None
+
+
+def get_need_proxy_func():
+    from ...wutheringwaves_config import WutheringWavesConfig
+
+    NeedProxyFunc = WutheringWavesConfig.get_config("NeedProxyFunc").data
+    if NeedProxyFunc:
+        return NeedProxyFunc
+    return []

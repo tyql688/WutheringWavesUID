@@ -161,7 +161,7 @@ async def refresh_char(
         async with semaphore:
             return await waves_api.get_role_detail_info(role_id, uid, ck)
 
-    semaphore = asyncio.Semaphore(value=len(role_info.roleList) // 2)
+    semaphore = asyncio.Semaphore(value=2)
     if is_self_ck:
         tasks = [
             limited_get_role_detail_info(str(r.roleId), uid, ck)

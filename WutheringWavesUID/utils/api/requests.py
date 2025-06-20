@@ -72,6 +72,7 @@ from .api import (
     WIKI_HOME_URL,
     WIKI_TREE_URL,
     get_local_proxy_url,
+    get_need_proxy_func,
 )
 
 
@@ -938,7 +939,11 @@ class WavesApi:
         if header:
             header.pop("roleId", None)
 
-        proxy_url = get_local_proxy_url()
+        proxy_func = get_need_proxy_func()
+        if inspect.stack()[1].function in proxy_func or "all" in proxy_func:
+            proxy_url = get_local_proxy_url()
+        else:
+            proxy_url = None
         for attempt in range(max_retries):
             try:
                 async with ClientSession(
