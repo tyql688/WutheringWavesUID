@@ -152,4 +152,10 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
             "get_role_detail_info",
         ],
     ),
+    "RefreshCardConcurrency": GsIntConfig(
+        "刷新角色面板并发数",
+        "刷新角色面板并发数",
+        10,
+        50,
+    ),
 }
