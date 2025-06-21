@@ -39,6 +39,7 @@ from ..utils.image import (
 )
 from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NAME_ALIAS, SPECIAL_CHAR_NAME
+from ..utils.util import async_func_lock
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
@@ -148,6 +149,7 @@ async def get_refresh_role_img(width: int, height: int):
     return result
 
 
+@async_func_lock(keys=["user_id", "uid"])
 async def draw_refresh_char_detail_img(
     bot: Bot,
     ev: Event,

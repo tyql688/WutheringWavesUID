@@ -1,14 +1,14 @@
 import asyncio
+import inspect
 import random
 import string
 import time
 from functools import wraps
-from typing import Any, List, Optional
+from typing import Any, Callable, Coroutine, Dict, List
 
 import httpx
-from subscribe import gs_subscribe
 
-from gsuid_core.logger import logger
+from gsuid_core.subscribe import gs_subscribe
 
 
 def timed_async_cache(expiration, condition=lambda x: True):
@@ -16,11 +16,14 @@ def timed_async_cache(expiration, condition=lambda x: True):
         cache = {}
         locks = {}
 
+        sig = inspect.signature(func)
+        params = list(sig.parameters.keys())
+        is_cls_method = params and params[0] in ["self", "cls"]
+
         @wraps(func)
         async def wrapper(*args):
             current_time = time.time()
-            # 如果是类方法，args[0]是实例，我们获取类名
-            if args and hasattr(args[0], "__class__"):
+            if is_cls_method and args and hasattr(args[0], "__class__"):
                 cache_key = f"{args[0].__class__.__name__}.{func.__name__}"
             else:
                 cache_key = func.__name__
@@ -54,6 +57,57 @@ def timed_async_cache(expiration, condition=lambda x: True):
     return decorator
 
 
+# 异步函数参数锁
+def async_func_lock(
+    _func: Callable[..., Coroutine[Any, Any, Any]] | None = None,
+    *,
+    keys: List[str] | None = None,
+):
+    """
+    异步函数参数锁
+    使用示例:
+    @async_func_lock(keys=["user_id"])
+    async def get_user_info(user_id: str, uid: str):
+        return await get_user_info(user_id, uid)
+    """
+
+    def decorator(func: Callable[..., Coroutine[Any, Any, Any]]):
+        locks: Dict[tuple, asyncio.Lock] = {}
+        sig = inspect.signature(func)
+        params = list(sig.parameters.keys())
+        is_cls_method = params and params[0] in ["self", "cls"]
+
+        @wraps(func)
+        async def wrapper(*args, **kwargs) -> Any:
+            if is_cls_method and args and hasattr(args[0], "__class__"):
+                # 对于类方法, 使用实例id来确保锁是实例级别的
+                cache_key_parts = [args[0].__class__.__name__, func.__name__]
+            else:
+                # 对于普通函数, 锁是函数级别的
+                cache_key_parts = [func.__name__]
+
+            if keys:
+                bound_args = sig.bind(*args, **kwargs)
+                bound_args.apply_defaults()
+                for key in keys:
+                    if key in bound_args.arguments:
+                        cache_key_parts.append(repr(bound_args.arguments[key]))
+
+            lock_key = tuple(cache_key_parts)
+            if lock_key not in locks:
+                locks[lock_key] = asyncio.Lock()
+
+            async with locks[lock_key]:
+                return await func(*args, **kwargs)
+
+        return wrapper
+
+    if _func is None:
+        return decorator
+    else:
+        return decorator(_func)
+
+
 # 使用示例
 @timed_async_cache(86400)
 async def get_public_ip(host="127.127.127.127"):
@@ -62,8 +116,7 @@ async def get_public_ip(host="127.127.127.127"):
             r = await client.get("https://event.kurobbs.com/event/ip", timeout=4)
             ip = r.text
             return ip
-    except Exception as e:
-        logger.error(f"获取kuro ip失败: {e}")
+    except:  # noqa:E722, B001
         pass
 
     # 尝试从 ipify 获取 IP 地址
@@ -81,7 +134,7 @@ async def get_public_ip(host="127.127.127.127"):
             r = await client.get("https://httpbin.org/ip", timeout=4)
             ip = r.json()["origin"]
             return ip
-    except Exception:
+    except:  # noqa:E722, B001
         pass
 
     return host
