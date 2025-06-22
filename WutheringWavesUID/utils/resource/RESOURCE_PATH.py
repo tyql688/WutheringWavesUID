@@ -104,3 +104,6 @@ waves_templates = Environment(
         ]
     )
 )
+
+# 设置captcha目录
+CAPTCHA_PATH = Path(__file__).parents[1].parent / "utils/api/captcha"

@@ -1,14 +1,14 @@
 import asyncio
 import inspect
-import json as j
+import json
 import random
 from typing import Any, Dict, List, Literal, Optional, Union
 
+import aiohttp
 from aiohttp import (
     ClientSession,
     ClientTimeout,
     ContentTypeError,
-    FormData,
     TCPConnector,
 )
 
@@ -74,6 +74,9 @@ from .api import (
     get_local_proxy_url,
     get_need_proxy_func,
 )
+from .captcha import get_solver
+from .captcha.base import CaptchaResult
+from .captcha.errors import CaptchaError
 
 
 async def _check_response(
@@ -225,6 +228,11 @@ class WavesApi:
 
     entry_detail_map = {}
     bat_map = {}
+
+    def __init__(self):
+        self.captcha_solver = get_solver()
+        if self.captcha_solver:
+            logger.success(f"使用过码器: {self.captcha_solver.get_name()}")
 
     def is_net(self, roleId):
         _temp = int(roleId)
@@ -651,7 +659,7 @@ class WavesApi:
             access_token = ""
             if isinstance(content_data, str):
                 try:
-                    json_data = j.loads(content_data)
+                    json_data = json.loads(content_data)
                     access_token = json_data.get("accessToken", "")
                 except Exception as e:
                     logger.error(f"[{roleId}] 获取token失败: {e}")
@@ -784,7 +792,7 @@ class WavesApi:
         data = {
             "serverId": self.get_server_id(roleId, serverId),
             "roleId": roleId,
-            "content": j.dumps(content),
+            "content": json.dumps(content),
         }
         raw_data = await self._waves_request(BATCH_ROLE_COST, "POST", header, data=data)
         return await _check_response(raw_data, token, roleId)
@@ -842,7 +850,7 @@ class WavesApi:
             "recordId": recordId,
         }
         url = GACHA_NET_LOG_URL if self.is_net(roleId) else GACHA_LOG_URL
-        return await self._waves_request(url, "POST", header, json=data)
+        return await self._waves_request(url, "POST", header, json_data=data)
 
     async def get_ann_list_by_type(
         self, eventType: str = "", pageSize: Optional[int] = None
@@ -929,8 +937,8 @@ class WavesApi:
         method: Literal["GET", "POST"] = "GET",
         header=None,
         params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        data: Optional[Union[FormData, Dict[str, Any]]] = None,
+        json_data: Optional[Dict[str, Any]] = None,
+        data: Optional[Dict[str, Any]] = None,
         max_retries: int = 3,
         retry_delay: float = 1.0,
     ) -> Union[Dict, int]:
@@ -944,43 +952,83 @@ class WavesApi:
             proxy_url = get_local_proxy_url()
         else:
             proxy_url = None
+
+        async def do_request(req_data, client_session):
+            async with client_session.request(
+                method,
+                url=url,
+                headers=header,
+                params=params,
+                json=json_data,
+                data=req_data,
+                proxy=proxy_url,
+                timeout=ClientTimeout(total=10),
+            ) as resp:
+                try:
+                    raw_data = await resp.json()
+                except ContentTypeError:
+                    _raw_data = await resp.text()
+                    raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
+
+                if (
+                    isinstance(raw_data, dict)
+                    and "data" in raw_data
+                    and isinstance(raw_data["data"], str)
+                ):
+                    try:
+                        raw_data["data"] = json.loads(raw_data["data"])
+                    except Exception:
+                        pass
+
+                logger.debug(
+                    f"url:[{url}] params:[{params}] headers:[{header}] data:[{req_data}] raw_data:{raw_data}"
+                )
+                return raw_data
+
+        async def solve_captcha():
+            if not self.captcha_solver:
+                return
+            for _ in range(max_retries):
+                try:
+                    return await self.captcha_solver.solve()
+                except CaptchaError as e:
+                    logger.error(f"url:[{url}] 验证码破解失败: {e}")
+
+            return {"code": WAVES_CODE_999, "data": "验证码破解失败"}
+
         for attempt in range(max_retries):
             try:
                 async with ClientSession(
                     connector=TCPConnector(verify_ssl=self.ssl_verify)
                 ) as client:
-                    async with client.request(
-                        method,
-                        url=url,
-                        headers=header,
-                        params=params,
-                        json=json,
-                        data=data,
-                        proxy=proxy_url,
-                        timeout=ClientTimeout(total=10),
-                    ) as resp:
-                        try:
-                            raw_data = await resp.json()
-                        except ContentTypeError:
-                            _raw_data = await resp.text()
-                            raw_data = {"code": WAVES_CODE_999, "data": _raw_data}
-                        if (
-                            isinstance(raw_data, dict)
-                            and "data" in raw_data
-                            and isinstance(raw_data["data"], str)
-                        ):
-                            try:
-                                des_data = j.loads(raw_data["data"])
-                                raw_data["data"] = des_data
-                            except Exception:
-                                pass
-                        logger.debug(
-                            f"url:[{url}] params:[{params}] headers:[{header}] data:[{data}] raw_data:{raw_data}"
-                        )
-                        return raw_data
-            except Exception as e:
-                logger.exception(f"url:[{url}] attempt {attempt + 1} failed", e)
+                    response = await do_request(data, client)
+
+                    res_data = response.get("data", {})
+                    if (
+                        self.captcha_solver
+                        and isinstance(res_data, dict)
+                        and res_data.get("geeTest") is True
+                    ):
+                        seccode_data = await solve_captcha()
+                        if isinstance(seccode_data, CaptchaResult):
+                            seccode_data = seccode_data.model_dump_json()
+
+                        if isinstance(seccode_data, dict):
+                            seccode_data = json.dumps(seccode_data)
+
+                        # 重试数据准备
+                        retry_data = data.copy() if data else {}
+                        retry_data["geeTestData"] = seccode_data
+                        return await do_request(retry_data, client)
+
+                    return response
+
+            except aiohttp.ClientError as e:
+                logger.warning(f"url:[{url}] 网络请求失败, 尝试次数 {attempt + 1}", e)
                 if attempt < max_retries - 1:
                     await asyncio.sleep(retry_delay)
+            except Exception as e:
+                logger.warning(f"url:[{url}] 发生未知错误, 尝试次数 {attempt + 1}", e)
+                return {"code": WAVES_CODE_999, "data": f"请求时发生未知错误: {e}"}
 
-        return {"code": WAVES_CODE_999, "data": "请求服务器失败"}
+        return {"code": WAVES_CODE_999, "data": "请求服务器失败，已达最大重试次数"}

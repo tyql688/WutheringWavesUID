@@ -158,4 +158,15 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         10,
         50,
     ),
+    "CaptchaProvider": GsStrConfig(
+        "验证码提供方（重启生效）",
+        "验证码提供方（重启生效）",
+        "",
+        options=["ttorc"],
+    ),
+    "CaptchaAppKey": GsStrConfig(
+        "验证码提供方appkey",
+        "验证码提供方appkey",
+        "",
+    ),
 }
