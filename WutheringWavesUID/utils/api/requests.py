@@ -245,7 +245,6 @@ class WavesApi:
 
             session = aiohttp.ClientSession(
                 connector=aiohttp.TCPConnector(ssl=self.ssl_verify),
-                proxy=proxy,
             )
 
             self._sessions[key] = session
