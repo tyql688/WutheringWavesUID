@@ -4,6 +4,14 @@ GAME_ID = 3
 SERVER_ID = "76402e5b20be2c39f095a152090afddc"
 SERVER_ID_NET = "919752ae5ea09c1ced910dd668a63ffb"
 
+NET_SERVER_ID_MAP = {
+    5: SERVER_ID_NET,
+    6: "6eb2a235b30d05efd77bedb5cf60999e",
+    7: SERVER_ID_NET,
+    8: SERVER_ID_NET,
+    9: SERVER_ID_NET,
+}
+
 
 def get_main_url():
     from ...wutheringwaves_config import WutheringWavesConfig

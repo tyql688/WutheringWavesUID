@@ -43,6 +43,7 @@ from .api import (
     LOGIN_URL,
     MONTH_LIST_URL,
     MR_REFRESH_URL,
+    NET_SERVER_ID_MAP,
     ONLINE_LIST_PHANTOM,
     ONLINE_LIST_ROLE,
     ONLINE_LIST_WEAPON,
@@ -258,9 +259,8 @@ class WavesApi:
         if serverId:
             return serverId
         if self.is_net(roleId):
-            return SERVER_ID_NET
-        else:
-            return SERVER_ID
+            return NET_SERVER_ID_MAP.get(int(roleId) // 100000000, SERVER_ID_NET)
+        return SERVER_ID
 
     async def get_ck_result(self, uid, user_id, bot_id) -> tuple[bool, Optional[str]]:
         ck = await self.get_self_waves_ck(uid, user_id, bot_id)
