@@ -10,7 +10,7 @@ from gsuid_core.utils.image.image_tools import crop_center_img
 from ..utils.api.model import AccountBaseInfo, RoleDetailData, WeaponData
 from ..utils.ascension.weapon import get_breach
 from ..utils.char_info_utils import get_all_roleid_detail_info_int
-from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_107
+from ..utils.error_reply import WAVES_CODE_102
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
 from ..utils.fonts.waves_fonts import (
     waves_font_16,
@@ -45,6 +45,7 @@ from ..utils.refresh_char_detail import refresh_char
 from ..utils.resource.constant import NORMAL_LIST
 from ..utils.resource.download_file import get_skill_img
 from ..utils.waves_api import waves_api
+from ..wutheringwaves_config import WutheringWavesConfig
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -57,24 +58,27 @@ async def get_all_roleid_detail_info(
     is_refresh: bool = False,
     is_peek: bool = False,
 ):
-    # 根据面板数据获取详细信息
-    if is_refresh or is_peek:
+    if not WutheringWavesConfig.get_config("RoleListQuery").data:
+        all_role_detail = await get_all_roleid_detail_info_int(uid)
+        if all_role_detail:
+            return all_role_detail
+    else:
+        # 根据面板数据获取详细信息
+        if is_refresh or is_peek:
+            await refresh_char(ev, uid, user_id, ck)
+        all_role_detail = await get_all_roleid_detail_info_int(uid)
+        if all_role_detail:
+            return all_role_detail
+
+        if is_refresh or is_peek:
+            # 已经刷新过，但是没有获取到数据
+            return None
+
+        # 尝试刷新
         await refresh_char(ev, uid, user_id, ck)
-    all_role_detail = await get_all_roleid_detail_info_int(uid)
-    if all_role_detail:
-        return all_role_detail
-
-    if is_refresh or is_peek:
-        # 已经刷新过，但是没有获取到数据
-        return None
-
-    # 尝试刷新
-    await refresh_char(ev, uid, user_id, ck)
-    all_role_detail = await get_all_roleid_detail_info_int(uid)
-    if all_role_detail:
-        return all_role_detail
-
-    return None
+        all_role_detail = await get_all_roleid_detail_info_int(uid)
+        if all_role_detail:
+            return all_role_detail
 
 
 async def draw_char_list_img(
@@ -109,7 +113,7 @@ async def draw_char_list_img(
         is_peek,
     )
     if not all_role_detail:
-        return error_reply(WAVES_CODE_107)
+        return error_reply(code=-111, msg="练度获取失败，请先刷新角色面板")
 
     waves_char_rank = await get_waves_char_rank(uid, all_role_detail)
     waves_char_rank.sort(

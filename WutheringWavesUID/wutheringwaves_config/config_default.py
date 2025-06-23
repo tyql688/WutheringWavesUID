@@ -114,6 +114,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "隐藏uid",
         False,
     ),
+    "RoleListQuery": GsBoolConfig(
+        "是否可以使用uid直接查询练度",
+        "是否可以使用uid直接查询练度",
+        True,
+    ),
     "MaxBindNum": GsIntConfig(
         "绑定特征码限制数量（未登录）", "绑定特征码限制数量（未登录）", 2, 100
     ),
