@@ -65,13 +65,13 @@ async def send_card_info(bot: Bot, ev: Event):
 
 
 @waves_new_get_one_char_info.on_regex(
-    r"^(刷新|更新)?[\u4e00-\u9fa5]+(面板|面包)$",
+    r"^(刷新|更新)[\u4e00-\u9fa5]+(面板|面包)$",
     block=True,
 )
 async def send_one_char_detail_msg(bot: Bot, ev: Event):
     logger.debug(f"[鸣潮] [角色面板] RAW_TEXT: {ev.raw_text}")
     match = re.search(
-        r"(?P<is_refresh>刷新|更新)?(?P<char>[\u4e00-\u9fa5]+)(?P<query_type>面板|面包)",
+        r"(?P<is_refresh>刷新|更新)(?P<char>[\u4e00-\u9fa5]+)(?P<query_type>面板|面包)",
         ev.raw_text,
     )
     logger.debug(f"[鸣潮] [角色面板] MATCH: {match}")
