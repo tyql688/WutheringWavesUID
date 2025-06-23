@@ -5,12 +5,7 @@ import random
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import aiohttp
-from aiohttp import (
-    ClientSession,
-    ClientTimeout,
-    ContentTypeError,
-    TCPConnector,
-)
+from aiohttp import ClientTimeout, ContentTypeError
 
 from gsuid_core.logger import logger
 
@@ -229,10 +224,31 @@ class WavesApi:
     entry_detail_map = {}
     bat_map = {}
 
+    _sessions: Dict[str, aiohttp.ClientSession] = {}
+    _session_lock = asyncio.Lock()
+
     def __init__(self):
         self.captcha_solver = get_solver()
         if self.captcha_solver:
             logger.success(f"使用过码器: {self.captcha_solver.get_name()}")
+
+    async def get_session(self, proxy: Optional[str] = None) -> aiohttp.ClientSession:
+        key = f"{proxy or 'no_proxy'}"
+
+        if key in self._sessions and not self._sessions[key].closed:
+            return self._sessions[key]
+
+        async with self._session_lock:
+            if key in self._sessions and not self._sessions[key].closed:
+                return self._sessions[key]
+
+            session = aiohttp.ClientSession(
+                connector=aiohttp.TCPConnector(ssl=self.ssl_verify),
+                proxy=proxy,
+            )
+
+            self._sessions[key] = session
+            return session
 
     def is_net(self, roleId):
         _temp = int(roleId)
@@ -998,30 +1014,32 @@ class WavesApi:
 
         for attempt in range(max_retries):
             try:
-                async with ClientSession(
-                    connector=TCPConnector(verify_ssl=self.ssl_verify)
-                ) as client:
-                    response = await do_request(data, client)
+                client = await self.get_session(proxy=proxy_url)
+                if not client:
+                    logger.warning(f"url:[{url}] 获取session失败")
+                    continue
 
-                    res_data = response.get("data", {})
-                    if (
-                        self.captcha_solver
-                        and isinstance(res_data, dict)
-                        and res_data.get("geeTest") is True
-                    ):
-                        seccode_data = await solve_captcha()
-                        if isinstance(seccode_data, CaptchaResult):
-                            seccode_data = seccode_data.model_dump_json()
+                response = await do_request(data, client)
 
-                        if isinstance(seccode_data, dict):
-                            seccode_data = json.dumps(seccode_data)
+                res_data = response.get("data", {})
+                if (
+                    self.captcha_solver
+                    and isinstance(res_data, dict)
+                    and res_data.get("geeTest") is True
+                ):
+                    seccode_data = await solve_captcha()
+                    if isinstance(seccode_data, CaptchaResult):
+                        seccode_data = seccode_data.model_dump_json()
 
-                        # 重试数据准备
-                        retry_data = data.copy() if data else {}
-                        retry_data["geeTestData"] = seccode_data
-                        return await do_request(retry_data, client)
+                    if isinstance(seccode_data, dict):
+                        seccode_data = json.dumps(seccode_data)
 
-                    return response
+                    # 重试数据准备
+                    retry_data = data.copy() if data else {}
+                    retry_data["geeTestData"] = seccode_data
+                    return await do_request(retry_data, client)
+
+                return response
 
             except aiohttp.ClientError as e:
                 logger.warning(f"url:[{url}] 网络请求失败, 尝试次数 {attempt + 1}", e)
