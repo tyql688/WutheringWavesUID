@@ -1,6 +1,6 @@
 import time
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
@@ -156,6 +156,7 @@ async def draw_refresh_char_detail_img(
     user_id: str,
     uid: str,
     buttons: List[WavesButton],
+    refresh_type: Union[str, List[str]] = "all",
 ):
     time_stamp = can_refresh_card(user_id, uid)
     if time_stamp > 0:
@@ -186,7 +187,13 @@ async def draw_refresh_char_detail_img(
         }
     else:
         waves_datas = await refresh_char(
-            ev, uid, user_id, ck, waves_map=waves_map, is_self_ck=self_ck
+            ev,
+            uid,
+            user_id,
+            ck,
+            waves_map=waves_map,
+            is_self_ck=self_ck,
+            refresh_type=refresh_type,
         )
         if isinstance(waves_datas, str):
             return waves_datas

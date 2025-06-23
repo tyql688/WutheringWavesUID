@@ -12,6 +12,8 @@ from ..utils.at_help import is_valid_at, ruser_id
 from ..utils.database.models import WavesBind
 from ..utils.error_reply import WAVES_CODE_103
 from ..utils.hint import error_reply
+from ..utils.name_convert import char_name_to_char_id
+from ..utils.resource.constant import SPECIAL_CHAR
 from .draw_char_card import draw_char_detail_img, draw_char_score_img
 from .upload_card import (
     compress_all_custom_card,
@@ -22,6 +24,7 @@ from .upload_card import (
 )
 
 waves_new_get_char_info = SV("waves新获取面板", priority=3)
+waves_new_get_one_char_info = SV("waves新获取单个角色面板", priority=3)
 waves_new_char_detail = SV("waves新角色面板", priority=4)
 waves_char_detail = SV("waves角色面板", priority=5)
 waves_upload_char = SV("waves上传面板图", priority=5, pm=1)
@@ -57,6 +60,48 @@ async def send_card_info(bot: Bot, ev: Event):
 
     buttons = []
     msg = await draw_refresh_char_detail_img(bot, ev, user_id, uid, buttons)
+    if isinstance(msg, str) or isinstance(msg, bytes):
+        return await bot.send_option(msg, buttons)
+
+
+@waves_new_get_one_char_info.on_regex(
+    r"^(刷新|更新)?[\u4e00-\u9fa5]+(面板|面包)$",
+    block=True,
+)
+async def send_one_char_detail_msg(bot: Bot, ev: Event):
+    logger.debug(f"[鸣潮] [角色面板] RAW_TEXT: {ev.raw_text}")
+    match = re.search(
+        r"(?P<is_refresh>刷新|更新)?(?P<char>[\u4e00-\u9fa5]+)(?P<query_type>面板|面包)",
+        ev.raw_text,
+    )
+    logger.debug(f"[鸣潮] [角色面板] MATCH: {match}")
+    if not match:
+        return
+    ev.regex_dict = match.groupdict()
+    char = ev.regex_dict.get("char")
+    if not char:
+        return
+    char_id = char_name_to_char_id(char)
+    if not char_id:
+        return (
+            f"[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
+        )
+    refresh_type = [char_id]
+    if char_id in SPECIAL_CHAR:
+        refresh_type = SPECIAL_CHAR.copy()[char_id]
+
+    user_id = ruser_id(ev)
+
+    uid = await WavesBind.get_uid_by_game(user_id, ev.bot_id)
+    if not uid:
+        return await bot.send(error_reply(WAVES_CODE_103))
+
+    from .draw_refresh_char_card import draw_refresh_char_detail_img
+
+    buttons = []
+    msg = await draw_refresh_char_detail_img(
+        bot, ev, user_id, uid, buttons, refresh_type
+    )
     if isinstance(msg, str) or isinstance(msg, bytes):
         return await bot.send_option(msg, buttons)
 

@@ -4,7 +4,7 @@ import random
 import string
 import time
 from functools import wraps
-from typing import Any, Callable, Coroutine, Dict, List
+from typing import Any, Callable, Coroutine, Dict, List, TypeVar, overload
 
 import httpx
 
@@ -57,12 +57,23 @@ def timed_async_cache(expiration, condition=lambda x: True):
     return decorator
 
 
+F = TypeVar("F", bound=Callable[..., Coroutine[Any, Any, Any]])
+
+
+@overload
+def async_func_lock(*, keys: List[str] | None = None) -> Callable[[F], F]: ...
+
+
+@overload
+def async_func_lock(_func: F, *, keys: List[str] | None = None) -> F: ...
+
+
 # 异步函数参数锁
 def async_func_lock(
-    _func: Callable[..., Coroutine[Any, Any, Any]] | None = None,
+    _func: F | None = None,
     *,
     keys: List[str] | None = None,
-):
+) -> Callable[[F], F] | F:
     """
     异步函数参数锁
     使用示例:
@@ -71,14 +82,14 @@ def async_func_lock(
         return await get_user_info(user_id, uid)
     """
 
-    def decorator(func: Callable[..., Coroutine[Any, Any, Any]]):
+    def decorator(func: F) -> F:
         locks: Dict[tuple, asyncio.Lock] = {}
         sig = inspect.signature(func)
         params = list(sig.parameters.keys())
         is_cls_method = params and params[0] in ["self", "cls"]
 
         @wraps(func)
-        async def wrapper(*args, **kwargs) -> Any:
+        async def wrapper(*args: Any, **kwargs: Any) -> Any:
             if is_cls_method and args and hasattr(args[0], "__class__"):
                 # 对于类方法, 使用实例id来确保锁是实例级别的
                 cache_key_parts = [args[0].__class__.__name__, func.__name__]
@@ -100,7 +111,7 @@ def async_func_lock(
             async with locks[lock_key]:
                 return await func(*args, **kwargs)
 
-        return wrapper
+        return wrapper  # type: ignore[return-value]
 
     if _func is None:
         return decorator

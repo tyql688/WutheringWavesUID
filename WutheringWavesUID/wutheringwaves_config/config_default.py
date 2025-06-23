@@ -80,12 +80,6 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "所有查询使用自己的ck",
         False,
     ),
-    "CardUseOptions2": GsStrConfig(
-        "排行面板数据启用规则（重启生效）",
-        "排行面板数据启用规则",
-        "不使用缓存",
-        options=["不使用缓存", "内存缓存"],
-    ),
     "QQPicCache": GsBoolConfig(
         "排行榜qq头像缓存开关",
         "排行榜qq头像缓存开关",

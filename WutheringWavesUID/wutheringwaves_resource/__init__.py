@@ -6,7 +6,6 @@ from gsuid_core.sv import SV
 from ..utils import hakush_api
 from ..utils.limit_user_card import load_limit_user_card
 from ..utils.resource.download_all_resource import download_all_resource
-from ..utils.waves_card_cache import load_all_card
 
 sv_download_config = SV("资源下载", pm=1)
 
@@ -39,10 +38,5 @@ async def startup():
         logger.info(
             f"[鸣潮][加载角色极限面板] 数量: {len(await load_limit_user_card())}"
         )
-    except Exception as e:
-        logger.exception(e)
-
-    try:
-        logger.info(f"[鸣潮][加载用户面板缓存] 数量: {await load_all_card()}")
     except Exception as e:
         logger.exception(e)

@@ -17,7 +17,6 @@ from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 from ..utils.util import get_version
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import WutheringWavesConfig
-from . import waves_card_cache
 from .resource.constant import SPECIAL_CHAR_INT_ALL
 
 
@@ -28,6 +27,7 @@ async def send_card(
     is_self_ck: bool = False,
     token: Optional[str] = "",
     role_info: Optional[RoleList] = None,
+    waves_data: Optional[List] = None,
 ):
     waves_char_rank: Optional[List[WavesCharRank]] = None
 
@@ -36,12 +36,17 @@ async def send_card(
     if WavesToken:
         waves_char_rank = await get_waves_char_rank(uid, save_data, True)
 
-    await waves_card_cache.save_card(
-        uid, save_data, user_id, waves_char_rank, is_self_ck, token
-    )
-
-    if is_self_ck and token and waves_char_rank and WavesToken and role_info:
-        if len(role_info.roleList) != len(save_data):
+    if (
+        is_self_ck
+        and token
+        and waves_char_rank
+        and WavesToken
+        and role_info
+        and waves_data
+        and user_id
+    ):
+        # 单角色上传排行
+        if len(waves_data) != 1 and len(role_info.roleList) != len(save_data):
             logger.warning(
                 f"角色数量不一致，role_info.roleNum:{len(role_info.roleList)} != waves_char_rank:{len(save_data)}"
             )
@@ -50,7 +55,7 @@ async def send_card(
         if not succ:
             return account_info
         account_info = AccountBaseInfo.model_validate(account_info)
-        if account_info.roleNum != len(save_data):
+        if len(waves_data) != 1 and account_info.roleNum != len(save_data):
             logger.warning(
                 f"角色数量不一致，role_info.roleNum:{account_info.roleNum} != waves_char_rank:{len(save_data)}"
             )
@@ -116,7 +121,7 @@ async def save_card_info(
 
     save_data = list(old_data.values())
 
-    await send_card(uid, user_id, save_data, is_self_ck, token, role_info)
+    await send_card(uid, user_id, save_data, is_self_ck, token, role_info, waves_data)
 
     try:
         async with aiofiles.open(path, "w", encoding="utf-8") as file:
@@ -136,6 +141,7 @@ async def refresh_char(
     ck: Optional[str] = None,  # type: ignore
     waves_map: Optional[Dict] = None,
     is_self_ck: bool = False,
+    refresh_type: Union[str, List[str]] = "all",
 ) -> Union[str, List]:
     waves_datas = []
     if not ck:
@@ -166,19 +172,25 @@ async def refresh_char(
     )
     if is_self_ck:
         tasks = [
-            limited_get_role_detail_info(str(r.roleId), uid, ck)
+            limited_get_role_detail_info(f"{r.roleId}", uid, ck)
             for r in role_info.roleList
+            if refresh_type == "all"
+            or (isinstance(refresh_type, list) and f"{r.roleId}" in refresh_type)
         ]
     else:
         if role_info.showRoleIdList:
             tasks = [
-                limited_get_role_detail_info(str(r), uid, ck)
+                limited_get_role_detail_info(f"{r}", uid, ck)
                 for r in role_info.showRoleIdList
+                if refresh_type == "all"
+                or (isinstance(refresh_type, list) and f"{r}" in refresh_type)
             ]
         else:
             tasks = [
-                limited_get_role_detail_info(str(r.roleId), uid, ck)
+                limited_get_role_detail_info(f"{r.roleId}", uid, ck)
                 for r in role_info.roleList
+                if refresh_type == "all"
+                or (isinstance(refresh_type, list) and f"{r.roleId}" in refresh_type)
             ]
     results = await asyncio.gather(*tasks)
 
@@ -230,6 +242,9 @@ async def refresh_char(
     )
 
     if not waves_datas:
-        return error_reply(WAVES_CODE_101)
+        if refresh_type == "all":
+            return error_reply(WAVES_CODE_101)
+        else:
+            return error_reply(code=-110, msg="库街区暂未查询到角色数据")
 
     return waves_datas
