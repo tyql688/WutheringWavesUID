@@ -105,7 +105,7 @@ async def draw_weapon_list(weapon_type: str):
     y_offset = 80
 
     # 添加组间分隔线
-    draw.line((40, y_offset, width - 80, y_offset), fill=SPECIAL_GOLD, width=1)
+    draw.line((40, y_offset, width - 40, y_offset), fill=SPECIAL_GOLD, width=1)
     # 绘制武器效果名（灰色）y_offset += 20
     
     # 按武器类型遍历所有分组
@@ -175,7 +175,7 @@ async def draw_weapon_list(weapon_type: str):
             y_offset += row_height
         
         # 添加组间分隔线
-        draw.line((40, y_offset, width - 80, y_offset), fill=SPECIAL_GOLD, width=1)
+        draw.line((40, y_offset, width - 40, y_offset), fill=SPECIAL_GOLD, width=1)
         y_offset += 20
     
     # 裁剪图片到实际高度
@@ -192,14 +192,12 @@ async def draw_sonata_list():
     sonata_groups = defaultdict(list)
     for data in sonata_id_data.values():
         name = data.get("name", "未知套装")
-        set2_desc = data.get("set", {}).get("2", {}).get("desc", "")
-        set5_desc = data.get("set", {}).get("5", {}).get("desc", "")
-         # 按名称字数分组
+        set_list = data.get("set", {})
+        # 按名称字数分组
         word_count = len(name)
         sonata_groups[word_count].append({
             "name": name,
-            "set2": set2_desc,
-            "set5": set5_desc
+            "set": set_list
         })
     
     # 按字数从小到大排序
@@ -215,13 +213,12 @@ async def draw_sonata_list():
 
     # 当前绘制位置
     y_offset = 80
-    # 列宽（用于文本换行计算）
-    col_width = 18
+    col_width = 18  # 列宽（用于文本换行计算）
+    des_height = 25  # 套装效果描述高度
 
     # 添加组间分隔线
     draw.line((40, y_offset, 860, y_offset), fill=SPECIAL_GOLD, width=1)
     y_offset += 20
-    
     
     # 按字数从小到大遍历所有分组
     for word_count, sonatas in sorted_groups:
@@ -230,74 +227,77 @@ async def draw_sonata_list():
         
         # 将组内套装分成两列展示
         for i in range(0, len(sonatas), 2):
-            current_y = y_offset # 记录当前行的起始Y位置
-            max_height = 0 # 记录当前行最大高度（用于移动到下一行）
+            current_y = y_offset  # 记录当前行的起始Y位置
+            max_height = 0  # 记录当前行最大高度（用于移动到下一行）
             
             # 第一列套装
             sonata1 = sonatas[i]
             name_height = 30
             
-            # 2件套效果（自动换行）
-            set2_text = f"{sonata1['set2']}"
-            wrapped_set2 = textwrap.wrap(set2_text, width=col_width)
-            set2_height = len(wrapped_set2) * 25
+            # 获取套装图标
+            fetter_icon1 = await get_attribute_effect(sonata1["name"])
+            fetter_icon1 = fetter_icon1.resize((50, 50))
+            img.paste(fetter_icon1, (40, current_y), fetter_icon1)
             
-            # 5件套效果（自动换行）
-            set5_text = f"{sonata1['set5']}"
-            wrapped_set5 = textwrap.wrap(set5_text, width=col_width)
-            set5_height = len(wrapped_set5) * 25
+            # 绘制套装名称
+            draw.text((100, current_y), sonata1["name"], font=waves_font_24, fill=SPECIAL_GOLD)
+            
+            # 绘制所有套装效果
+            current_height = current_y + name_height
+            for set_num, effect in sorted(sonata1["set"].items(), key=lambda x: int(x[0])):
+                # 绘制件数标签
+                draw.text((100, current_height), f"{set_num}件:", font=waves_font_16, fill="white")
+                
+                # 处理效果描述文本
+                desc = effect.get("desc", "")
+                wrapped_desc = textwrap.wrap(desc, width=col_width)
+                
+                # 绘制效果描述
+                for j, line in enumerate(wrapped_desc):
+                    draw.text((140, current_height + j * des_height), line, font=waves_font_16, fill="#AAAAAA")
+                
+                # 更新当前高度
+                current_height += len(wrapped_desc) * des_height + 5  # 加5像素作为间距
             
             # 计算当前套装总高度
-            sonata1_height = name_height + set2_height + set5_height + 20
-            
-            # 绘制套装
-            fetter_icon = await get_attribute_effect(sonata1["name"])
-            fetter_icon = fetter_icon.resize((50, 50))
-            img.paste(fetter_icon, (40, current_y), fetter_icon)
-
-            draw.text((100, current_y), sonata1["name"], font=waves_font_24, fill=SPECIAL_GOLD)
-            draw.text((100, current_y + name_height), "2件:", font=waves_font_16, fill="white")
-            for j, line in enumerate(wrapped_set2):
-                draw.text((140, current_y + name_height + j * 25), line, font=waves_font_16, fill="#AAAAAA")
-            draw.text((100, current_y + name_height + set2_height), "5件:", font=waves_font_16, fill="white")
-            for j, line in enumerate(wrapped_set5):
-                draw.text((140, current_y + name_height + set2_height + j * 25), line, font=waves_font_16, fill="#AAAAAA")
-            
-            # 更新最大高度
+            sonata1_height = current_height - current_y
             max_height = max(max_height, sonata1_height)
             
             # 第二列套装（如果有）
             if i + 1 < len(sonatas):
                 sonata2 = sonatas[i + 1]
                 
-                set2_text2 = f"{sonata2['set2']}"
-                wrapped_set2_2 = textwrap.wrap(set2_text2, width=col_width)
-                set2_height2 = len(wrapped_set2_2) * 25
-
-                set5_text2 = f"{sonata2['set5']}"
-                wrapped_set5_2 = textwrap.wrap(set5_text2, width=col_width)
-                set5_height2 = len(wrapped_set5_2) * 25
+                # 获取套装图标
+                fetter_icon2 = await get_attribute_effect(sonata2["name"])
+                fetter_icon2 = fetter_icon2.resize((50, 50))
+                img.paste(fetter_icon2, (460, current_y), fetter_icon2)
                 
-                sonata2_height = name_height + set2_height2 + set5_height2 + 20
-                
-                # 绘制套装
-                fetter_icon = await get_attribute_effect(sonata2["name"])
-                fetter_icon = fetter_icon.resize((50, 50))
-                img.paste(fetter_icon, (460, current_y), fetter_icon)
-
+                # 绘制套装名称
                 draw.text((520, current_y), sonata2["name"], font=waves_font_24, fill=SPECIAL_GOLD)
-                draw.text((520, current_y + name_height), "2件:", font=waves_font_16, fill="white")
-                for j, line in enumerate(wrapped_set2_2):
-                    draw.text((560, current_y + name_height + j * 25), line, font=waves_font_16, fill="#AAAAAA")
-                draw.text((520, current_y + name_height + set2_height2), "5件:", font=waves_font_16, fill="white")
-                for j, line in enumerate(wrapped_set5_2):
-                    draw.text((560, current_y + name_height + set2_height2 + j * 25), line, font=waves_font_16, fill="#AAAAAA")
                 
-                # 更新最大高度
+                # 绘制所有套装效果
+                current_height2 = current_y + name_height
+                for set_num, effect in sorted(sonata2["set"].items(), key=lambda x: int(x[0])):
+                    # 绘制件数标签
+                    draw.text((520, current_height2), f"{set_num}件:", font=waves_font_16, fill="white")
+                    
+                    # 处理效果描述文本
+                    desc = effect.get("desc", "")
+                    wrapped_desc = textwrap.wrap(desc, width=col_width)
+                    
+                    # 绘制效果描述
+                    for j, line in enumerate(wrapped_desc):
+                        draw.text((560, current_height2 + j * des_height), line, font=waves_font_16, fill="#AAAAAA")
+                    
+                    # 更新当前高度
+                    current_height2 += len(wrapped_desc) * des_height + 5  # 加5像素作为间距
+                
+                # 计算当前套装总高度
+                sonata2_height = current_height2 - current_y
                 max_height = max(max_height, sonata2_height)
             
             # 移动到下一行（使用当前行最大高度 + 间距）
-            y_offset += max_height + 10
+            y_offset += max_height + 20  # 增加行间距
         
         # 添加组间分隔线
         draw.line((40, y_offset, 860, y_offset), fill=SPECIAL_GOLD, width=1)
