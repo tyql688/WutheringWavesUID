@@ -483,6 +483,32 @@
                     "cost": 1
                 }
             ]
+        },
+        {
+            "libId": 19,
+            "fetterDetailName": "奔狼燎原之焰",
+            "equipPhantomList": [
+                {
+                    "phantomId": 6000114,
+                    "cost": 4
+                },
+                {
+                    "phantomId": 6000112,
+                    "cost": 3
+                },
+                {
+                    "phantomId": 6000111,
+                    "cost": 3
+                },
+                {
+                    "phantomId": 6000109,
+                    "cost": 1
+                },
+                {
+                    "phantomId": 6000110,
+                    "cost": 1
+                }
+            ]
         }
     ],
     "charList":[
@@ -646,6 +672,13 @@
             "name": "卡提希娅",
             "weaponId": 21020056,
             "sonataLibId": 18
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1207,
+            "name": "露帕",
+            "weaponId": 21010036,
+            "sonataLibId": 19
         }
     ]
  }

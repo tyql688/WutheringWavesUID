@@ -801,6 +801,11 @@ class Echo_6000114(EchoAbstract):
     id = 6000114
     name = "荣耀狮像"
 
+    # 在首位装配该声骸技能时，自身热熔伤害加成提升12.00%，共鸣解放伤害加成提升12.00%。
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"热熔伤害加成": "12%", "共鸣解放伤害加成": "12%"}
+
 
 def register_echo():
     WavesEchoRegister.register_class(Echo_390070051.id, Echo_390070051)

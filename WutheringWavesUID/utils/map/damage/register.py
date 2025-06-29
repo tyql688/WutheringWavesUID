@@ -13,6 +13,7 @@ def register_damage():
     from .damage_1204 import damage_detail as damage_1204
     from .damage_1205 import damage_detail as damage_1205
     from .damage_1206 import damage_detail as damage_1206
+    from .damage_1207 import damage_detail as damage_1207
     from .damage_1301 import damage_detail as damage_1301
     from .damage_1302 import damage_detail as damage_1302
     from .damage_1303 import damage_detail as damage_1303
@@ -61,6 +62,8 @@ def register_damage():
     DamageDetailRegister.register_class("1205", damage_1205)
     # 布兰特
     DamageDetailRegister.register_class("1206", damage_1206)
+    # 露帕
+    DamageDetailRegister.register_class("1207", damage_1207)
 
     # 卡卡罗
     DamageDetailRegister.register_class("1301", damage_1301)

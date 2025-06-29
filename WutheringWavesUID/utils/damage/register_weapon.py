@@ -4,6 +4,7 @@ from ..damage.abstract import WavesWeaponRegister, WeaponAbstract
 from .damage import DamageAttribute, calc_percent_expression
 from .utils import (
     CHAR_ATTR_CELESTIAL,
+    CHAR_ATTR_MOLTEN,
     CHAR_ATTR_SIERRA,
     Spectro_Frazzle_Role_Ids,
     attack_damage,
@@ -138,6 +139,37 @@ class Weapon_21010036(WeaponAbstract):
     id = 21010036
     type = 1
     name = "焰痕"
+
+    # 攻击提升12%。施放变奏技能或共鸣解放时，共鸣解放伤害提升24%，持续6秒；造成重击伤害时，该效果延长4秒，最多可延长1次。成功延长效果时，使队伍中的角色热熔伤害加成提升24%，持续30秒，同名效果之间不可叠加。
+
+    def cast_variation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放变奏技能"""
+        if attr.char_damage != liberation_damage:
+            return
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放变奏技能时，共鸣解放伤害提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
+
+    def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣解放"""
+        if attr.char_damage != liberation_damage:
+            return
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放共鸣解放时，共鸣解放伤害提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+        return True
+
+    def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放重击伤害"""
+        if attr.char_attr != CHAR_ATTR_MOLTEN:
+            return
+        dmg = f"{self.param(5)}"
+        title = self.get_title()
+        msg = f"施放重击伤害时，使队伍中的角色热熔伤害加成提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
 class Weapon_21010043(WeaponAbstract):

@@ -140,7 +140,7 @@ class DamageAttribute:
         char_attr=None,
         sync_strike=False,
         energy_regen=0,
-        char_damage="",
+        char_damage=None,
         enemy_level=90,
         teammate_char_ids: Optional[List[int]] = None,
         env_spectro=False,
@@ -179,7 +179,7 @@ class DamageAttribute:
             teammate_char_ids = []
         self.role: Optional[RoleDetailData] = role
         # 角色模版 ["temp_atk", "temp_life", "temp_def"]
-        self.char_template = char_template
+        self.char_template: Literal["temp_atk", "temp_life", "temp_def"] = char_template
         # 角色基础攻击力
         self.char_atk = char_atk
         # 角色基础生命值
@@ -233,7 +233,9 @@ class DamageAttribute:
         # 声骸技能id
         self.echo_id = echo_id
         # 角色属性 ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
-        self.char_attr = char_attr
+        self.char_attr: Optional[
+            Literal["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
+        ] = char_attr
         # 角色属性伤害  attack_damage,hit_damage,skill_damage,liberation_damage,heal_bonus
         self.char_damage = char_damage
         # 协同攻击
@@ -345,7 +347,9 @@ class DamageAttribute:
         self.char_template = char_template
         return self
 
-    def set_char_attr(self, char_attr: str):
+    def set_char_attr(
+        self, char_attr: Literal["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]
+    ):
         self.char_attr = char_attr
         return self
 
