@@ -179,4 +179,3 @@ def get_valid_color(name, value, calc_map: Union[Dict, None]):
             num_color = WAVES_MOLTEN
 
     return name_color, num_color
-    return name_color, num_color

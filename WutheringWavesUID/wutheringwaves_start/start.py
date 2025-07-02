@@ -11,6 +11,7 @@ async def all_start():
         from ..utils.damage.register_char import register_char
         from ..utils.damage.register_echo import register_echo
         from ..utils.damage.register_weapon import register_weapon
+        from ..utils.limit_user_card import load_limit_user_card
         from ..utils.map.damage.register import register_damage, register_rank
         from ..utils.queues import init_queues
 
@@ -23,6 +24,10 @@ async def all_start():
 
         # 初始化任务队列
         init_queues()
+
+        # 加载角色极限面板
+        card_list = await load_limit_user_card()
+        logger.info(f"[鸣潮][加载角色极限面板] 数量: {len(card_list)}")
 
         await startup()
     except Exception as e:

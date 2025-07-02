@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, Dict, List
 
 from gsuid_core.aps import scheduler
 from gsuid_core.bot import Bot
@@ -10,7 +10,6 @@ from gsuid_core.sv import SV
 
 from ..utils.button import WavesButton
 from ..utils.database.models import WavesBind, WavesUser
-from ..utils.message import send_diff_msg
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 from ..wutheringwaves_user.login_succ import login_success_msg
 from .deal import add_cookie, delete_cookie, get_cookie
@@ -229,3 +228,9 @@ async def send_waves_bind_uid_msg(bot: Bot, ev: Event):
             },
             at_sender=at_sender,
         )
+
+
+async def send_diff_msg(bot: Bot, code: Any, data: Dict, at_sender=False):
+    for retcode in data:
+        if code == retcode:
+            return await bot.send(data[retcode], at_sender)

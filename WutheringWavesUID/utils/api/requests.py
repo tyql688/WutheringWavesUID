@@ -19,7 +19,6 @@ from ..error_reply import (
 )
 from ..hint import error_reply
 from ..util import (
-    generate_random_ipv6_manual,
     generate_random_string,
     get_public_ip,
     login_platform,
@@ -131,7 +130,6 @@ async def get_common_header(platform: str = "ios"):
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
         "devCode": devCode,
-        "X-Forwarded-For": generate_random_ipv6_manual(),
         "version": KURO_VERSION,
     }
     return header
@@ -144,7 +142,6 @@ async def get_headers_h5():
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
         "devCode": devCode,
-        "X-Forwarded-For": generate_random_ipv6_manual(),
         "version": KURO_VERSION,
     }
     return header
@@ -157,7 +154,6 @@ async def get_headers_ios():
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
         "devCode": f"{ip}, Mozilla/5.0 (iPhone; CPU iPhone OS 18_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.5.0",
-        "X-Forwarded-For": generate_random_ipv6_manual(),
     }
     return header
 
@@ -186,10 +182,6 @@ async def get_headers(
                 did = waves_user.did
                 tokenRoleId = waves_user.uid
 
-                logger.debug(
-                    f"[get_headers.self.{inspect.stack()[1].function}] [queryRoleId:{queryRoleId} tokenRoleId:{tokenRoleId}] 获取成功: did: {did} bat: {bat}"
-                )
-
         # 2次校验
         if not tokenRoleId:
             waves_user = await WavesUser.select_data_by_cookie(cookie=ck)
@@ -198,10 +190,6 @@ async def get_headers(
                 bat = waves_user.bat
                 did = waves_user.did
                 tokenRoleId = waves_user.uid
-
-                logger.debug(
-                    f"[get_headers.other.{inspect.stack()[1].function}.2] [queryRoleId:{queryRoleId} tokenRoleId:{tokenRoleId}] 获取成功: did: {did} bat: {bat}"
-                )
 
     if platform == "ios":
         header = await get_headers_ios()
@@ -656,12 +644,10 @@ class WavesApi:
         header.update(
             {
                 "token": token,
-                # "Access-Control-Request-Header": "b-at,devcode,did,source,token",
                 "did": did,
             }
         )
         header["b-at"] = ""
-        # header.pop("X-Forwarded-For", None)
         data = {
             "serverId": self.get_server_id(roleId, serverId),
             "roleId": roleId,
