@@ -20,6 +20,41 @@ from ..wutheringwaves_config import WutheringWavesConfig
 from .resource.constant import SPECIAL_CHAR_INT_ALL
 
 
+def is_use_global_semaphore() -> bool:
+    return WutheringWavesConfig.get_config("UseGlobalSemaphore").data or False
+
+
+def get_refresh_card_concurrency() -> int:
+    return WutheringWavesConfig.get_config("RefreshCardConcurrency").data or 2
+
+
+class SemaphoreManager:
+    def __init__(self):
+        self._last_config: int = get_refresh_card_concurrency()
+        self._semaphore: asyncio.Semaphore = asyncio.Semaphore(value=self._last_config)
+        self._semaphore_lock = asyncio.Lock()
+
+    async def get_semaphore(self) -> asyncio.Semaphore:
+        current_config = get_refresh_card_concurrency()
+
+        if is_use_global_semaphore():
+            return await self._get_semaphore(current_config)  # 全局模式
+        else:
+            return asyncio.Semaphore(value=current_config)  # 独立模式
+
+    async def _get_semaphore(self, current_config: int) -> asyncio.Semaphore:
+        if self._last_config != current_config:
+            async with self._semaphore_lock:
+                if self._last_config != current_config:
+                    self._semaphore = asyncio.Semaphore(value=current_config)
+                    self._last_config = current_config
+
+        return self._semaphore
+
+
+semaphore_manager = SemaphoreManager()
+
+
 async def send_card(
     uid: str,
     user_id: str,
@@ -163,13 +198,12 @@ async def refresh_char(
         msg = f"鸣潮特征码[{uid}]获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据"
         return msg
 
+    semaphore = await semaphore_manager.get_semaphore()
+
     async def limited_get_role_detail_info(role_id, uid, ck):
         async with semaphore:
             return await waves_api.get_role_detail_info(role_id, uid, ck)
 
-    semaphore = asyncio.Semaphore(
-        value=WutheringWavesConfig.get_config("RefreshCardConcurrency").data or 2
-    )
     if is_self_ck:
         tasks = [
             limited_get_role_detail_info(f"{r.roleId}", uid, ck)

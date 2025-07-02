@@ -157,6 +157,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         10,
         50,
     ),
+    "UseGlobalSemaphore": GsBoolConfig(
+        "开启后刷新角色面板并发数为全局共享",
+        "开启后刷新角色面板并发数为全局共享",
+        False,
+    ),
     "CaptchaProvider": GsStrConfig(
         "验证码提供方（重启生效）",
         "验证码提供方（重启生效）",
