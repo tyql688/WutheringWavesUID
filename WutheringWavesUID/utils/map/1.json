@@ -8114,7 +8114,7 @@
           "level": 25,
           "mainProps": [
             {
-              "attributeName": "热熔伤害加成",
+              "attributeName": "攻击",
               "attributeValue": "30%",
               "iconUrl": ""
             },
