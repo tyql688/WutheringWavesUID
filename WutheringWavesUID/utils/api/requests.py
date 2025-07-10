@@ -1,77 +1,77 @@
-import asyncio
-import inspect
 import json
 import random
-from typing import Any, Dict, List, Literal, Optional, Union
+import asyncio
+import inspect
+from typing import Any, Dict, List, Union, Literal, Optional
 
 import aiohttp
+from gsuid_core.logger import logger
 from aiohttp import ClientTimeout, ContentTypeError
 
-from gsuid_core.logger import logger
-
-from ...wutheringwaves_config import WutheringWavesConfig
+from ..hint import error_reply
+from .captcha import get_solver
 from ..database.models import WavesUser
+from .captcha.base import CaptchaResult
+from .captcha.errors import CaptchaError
+from ...wutheringwaves_config import WutheringWavesConfig
 from ..error_reply import (
     WAVES_CODE_107,
     WAVES_CODE_990,
     WAVES_CODE_998,
     WAVES_CODE_999,
 )
-from ..hint import error_reply
 from ..util import (
-    generate_random_string,
     get_public_ip,
     login_platform,
     send_master_info,
     timed_async_cache,
+    generate_random_string,
 )
 from .api import (
-    ANN_CONTENT_URL,
-    ANN_LIST_URL,
-    BASE_DATA_URL,
-    BATCH_ROLE_COST,
-    CALABASH_DATA_URL,
-    CALCULATOR_REFRESH_DATA_URL,
-    CHALLENGE_DATA_URL,
-    EXPLORE_DATA_URL,
-    GACHA_LOG_URL,
-    GACHA_NET_LOG_URL,
     GAME_ID,
-    LOGIN_H5_URL,
-    LOGIN_LOG_URL,
     LOGIN_URL,
-    MONTH_LIST_URL,
-    MR_REFRESH_URL,
-    NET_SERVER_ID_MAP,
-    ONLINE_LIST_PHANTOM,
-    ONLINE_LIST_ROLE,
-    ONLINE_LIST_WEAPON,
-    PERIOD_LIST_URL,
-    QUERY_OWNED_ROLE,
-    REFRESH_URL,
-    REQUEST_TOKEN,
-    ROLE_CULTIVATE_STATUS,
-    ROLE_DATA_URL,
-    ROLE_DETAIL_URL,
-    ROLE_LIST_URL,
     SERVER_ID,
+    REFRESH_URL,
+    ANN_LIST_URL,
+    LOGIN_H5_URL,
+    BASE_DATA_URL,
+    GACHA_LOG_URL,
+    LOGIN_LOG_URL,
+    REQUEST_TOKEN,
+    ROLE_DATA_URL,
+    ROLE_LIST_URL,
     SERVER_ID_NET,
-    SLASH_DETAIL_URL,
-    SLASH_INDEX_URL,
-    TOWER_DETAIL_URL,
-    TOWER_INDEX_URL,
-    VERSION_LIST_URL,
     WEEK_LIST_URL,
-    WIKI_DETAIL_URL,
-    WIKI_ENTRY_DETAIL_URL,
     WIKI_HOME_URL,
     WIKI_TREE_URL,
+    MONTH_LIST_URL,
+    MR_REFRESH_URL,
+    ANN_CONTENT_URL,
+    BATCH_ROLE_COST,
+    PERIOD_LIST_URL,
+    ROLE_DETAIL_URL,
+    SLASH_INDEX_URL,
+    TOWER_INDEX_URL,
+    WIKI_DETAIL_URL,
+    EXPLORE_DATA_URL,
+    ONLINE_LIST_ROLE,
+    QUERY_OWNED_ROLE,
+    SLASH_DETAIL_URL,
+    TOWER_DETAIL_URL,
+    VERSION_LIST_URL,
+    CALABASH_DATA_URL,
+    GACHA_NET_LOG_URL,
+    MORE_ACTIVITY_URL,
+    NET_SERVER_ID_MAP,
+    CHALLENGE_DATA_URL,
+    ONLINE_LIST_WEAPON,
+    ONLINE_LIST_PHANTOM,
+    ROLE_CULTIVATE_STATUS,
+    WIKI_ENTRY_DETAIL_URL,
+    CALCULATOR_REFRESH_DATA_URL,
     get_local_proxy_url,
     get_need_proxy_func,
 )
-from .captcha import get_solver
-from .captcha.base import CaptchaResult
-from .captcha.errors import CaptchaError
 
 
 async def _check_response(
@@ -632,6 +632,27 @@ class WavesApi:
         }
         return await self._waves_request(SLASH_DETAIL_URL, "POST", header, data=data)
 
+    async def get_more_activity(
+        self, roleId: str, token: str, serverId: Optional[str] = None
+    ) -> Union[Dict, int, str]:
+        """浸梦海床+激斗！向着荣耀之丘"""
+        header = await get_headers(ck=token, queryRoleId=roleId)
+        header.update({"token": token})
+        if header.get("roleId", "") != roleId:
+            succ, b_at = await self.get_request_token(
+                roleId, token, header.get("did", "")
+            )
+            if succ:
+                header["b-at"] = b_at
+            else:
+                return b_at or error_reply(WAVES_CODE_990)
+        data = {
+            "gameId": GAME_ID,
+            "serverId": self.get_server_id(roleId, serverId),
+            "roleId": roleId,
+        }
+        return await self._waves_request(MORE_ACTIVITY_URL, "POST", header, data=data)
+
     async def get_request_token(
         self, roleId: str, token: str, did: str, serverId: Optional[str] = None
     ) -> tuple[bool, str]:
@@ -1034,4 +1055,5 @@ class WavesApi:
                 logger.warning(f"url:[{url}] 发生未知错误, 尝试次数 {attempt + 1}", e)
                 return {"code": WAVES_CODE_999, "data": f"请求时发生未知错误: {e}"}
 
+        return {"code": WAVES_CODE_999, "data": "请求服务器失败，已达最大重试次数"}
         return {"code": WAVES_CODE_999, "data": "请求服务器失败，已达最大重试次数"}

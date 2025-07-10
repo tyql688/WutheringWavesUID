@@ -1,7 +1,7 @@
-from typing import Dict, List, Literal, Optional, Union
+from typing import Dict, List, Union, Literal, Optional
 
 from msgspec import UNSET, Struct, UnsetType, field
-from pydantic import BaseModel, Field, RootModel, model_validator
+from pydantic import Field, BaseModel, RootModel, model_validator
 
 
 class GeneralGeetestData(Struct):
@@ -692,3 +692,45 @@ class PeriodDetail(BaseModel):
     totalStar: int
     coinList: List[PeriodNode] = Field(default_factory=list)
     starList: List[PeriodNode] = Field(default_factory=list)
+
+
+class PermanentRouge(BaseModel):
+    """浸梦海床"""
+
+    maxScore: int  # 最大分数
+    score: int  # 分数
+    sort: int  # 排序
+    title: str  # 标题
+
+
+class PhantomBattleBadgeItem(BaseModel):
+    """激斗！向着荣耀之丘"""
+
+    iconUrl: str  # 图标
+    name: str  # 名称
+    sort: int  # 排序
+    unlock: bool  # 是否解锁
+
+
+class PhantomBattle(BaseModel):
+    """激斗！向着荣耀之丘"""
+
+    badgeList: List[PhantomBattleBadgeItem] = Field(default_factory=list)  # 勋章列表
+    badgeNum: int  # 勋章数量
+    cardNum: int  # 卡片数量
+    exp: int  # 经验
+    expLimit: int  # 经验上限
+    level: int  # 等级
+    levelIcon: str  # 等级图标
+    levelName: str  # 等级名称
+    maxBadgeNum: int  # 最大勋章数量
+    maxCardNum: int  # 最大卡片数量
+    sort: int  # 排序
+    title: str  # 标题
+
+
+class MoreActivity(BaseModel):
+    """浸梦海床+激斗！向着荣耀之丘"""
+
+    permanentRouge: PermanentRouge  # 浸梦海床
+    phantomBattle: PhantomBattle  # 激斗！向着荣耀之丘

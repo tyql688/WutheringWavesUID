@@ -52,6 +52,7 @@ CALENDAR_PATH = OTHER_PATH / "calendar"
 SLASH_PATH = OTHER_PATH / "slash"
 CHALLENGE_PATH = OTHER_PATH / "challenge"
 ANN_CARD_PATH = OTHER_PATH / "ann_card"
+POKER_PATH = OTHER_PATH / "poker"
 
 
 # 别名

@@ -6,7 +6,6 @@ from PIL import Image, ImageDraw
 
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import crop_center_img
 from gsuid_core.utils.image.utils import sget
 
 from ..utils import hint
@@ -39,9 +38,9 @@ from ..utils.image import (
     YELLOW,
     add_footer,
     change_color,
-    get_event_avatar,
     get_waves_bg,
 )
+from ..utils.imagetool import draw_pic_with_ring
 from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -115,10 +114,8 @@ async def draw_explore_img(ev: Event, uid: str, user_id: str):
     img = get_waves_bg(2000, h, "bg3")
 
     # 头像部分
-    avatar = await draw_pic_with_ring(ev)
-    avatar_ring = Image.open(TEXT_PATH / "avatar_ring.png")
+    avatar, avatar_ring = await draw_pic_with_ring(ev)
     img.paste(avatar, (85, 70), avatar)
-    avatar_ring = avatar_ring.resize((180, 180))
     img.paste(avatar_ring, (95, 80), avatar_ring)
 
     # 基础信息 名字 特征码
@@ -252,16 +249,4 @@ async def draw_explore_img(ev: Event, uid: str, user_id: str):
 
     img = add_footer(img)
     img = await convert_img(img)
-    return img
-
-
-async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev)
-
-    mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
-    img = Image.new("RGBA", (180, 180))
-    mask = mask_pic.resize((160, 160))
-    resize_pic = crop_center_img(pic, 160, 160)
-    img.paste(resize_pic, (20, 20), mask)
-
     return img

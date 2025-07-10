@@ -5,7 +5,6 @@ from PIL import Image, ImageDraw
 
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import crop_center_img
 
 from ..utils.api.model import (
     AccountBaseInfo,
@@ -28,16 +27,12 @@ from ..utils.image import (
     add_footer,
     cropped_square_avatar,
     get_attribute,
-    get_event_avatar,
     get_square_avatar,
     get_square_weapon,
     get_waves_bg,
 )
-from ..utils.resource.constant import (
-    NORMAL_LIST,
-    SPECIAL_CHAR,
-    SPECIAL_CHAR_INT,
-)
+from ..utils.imagetool import draw_pic_with_ring
+from ..utils.resource.constant import NORMAL_LIST, SPECIAL_CHAR_INT
 from ..utils.waves_api import waves_api
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
@@ -224,10 +219,8 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
     card_img.paste(base_info_bg, (35, 170), base_info_bg)
 
     # 头像 头像环
-    avatar = await draw_pic_with_ring(ev)
-    avatar_ring = Image.open(TEXT_PATH / "avatar_ring.png")
+    avatar, avatar_ring = await draw_pic_with_ring(ev)
     card_img.paste(avatar, (45, 220), avatar)
-    avatar_ring = avatar_ring.resize((180, 180))
     card_img.paste(avatar_ring, (55, 230), avatar_ring)
 
     # 右侧装饰
@@ -263,15 +256,3 @@ async def draw_role_img(uid: str, ck: str, ev: Event):
     card_img = add_footer(card_img, 600, 20)
     card_img = await convert_img(card_img)
     return card_img
-
-
-async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev)
-
-    mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
-    img = Image.new("RGBA", (180, 180))
-    mask = mask_pic.resize((160, 160))
-    resize_pic = crop_center_img(pic, 160, 160)
-    img.paste(resize_pic, (20, 20), mask)
-
-    return img

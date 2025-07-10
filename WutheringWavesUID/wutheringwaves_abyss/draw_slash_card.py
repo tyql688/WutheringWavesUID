@@ -5,7 +5,6 @@ from PIL import Image, ImageDraw
 
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import crop_center_img
 
 from ..utils.api.model import (
     AccountBaseInfo,
@@ -31,11 +30,10 @@ from ..utils.image import (
     GREY,
     SPECIAL_GOLD,
     add_footer,
-    get_event_avatar,
-    get_square_avatar,
     get_waves_bg,
     pic_download_from_url,
 )
+from ..utils.imagetool import draw_pic, draw_pic_with_ring
 from ..utils.queues.const import QUEUE_SLASH_RECORD
 from ..utils.queues.queues import put_item
 from ..utils.resource.RESOURCE_PATH import SLASH_PATH
@@ -195,10 +193,8 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     card_img.paste(base_info_bg, (15, 20), base_info_bg)
 
     # 头像 头像环
-    avatar = await draw_pic_with_ring(ev)
-    avatar_ring = Image.open(TEXT_PATH / "avatar_ring.png")
+    avatar, avatar_ring = await draw_pic_with_ring(ev)
     card_img.paste(avatar, (25, 70), avatar)
-    avatar_ring = avatar_ring.resize((180, 180))
     card_img.paste(avatar_ring, (35, 80), avatar_ring)
 
     # 账号基本信息，由于可能会没有，放在一起
@@ -369,29 +365,6 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     card_img = add_footer(card_img, 600, 20)
     card_img = await convert_img(card_img)
     return card_img
-
-
-async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev)
-
-    mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
-    img = Image.new("RGBA", (180, 180))
-    mask = mask_pic.resize((160, 160))
-    resize_pic = crop_center_img(pic, 160, 160)
-    img.paste(resize_pic, (20, 20), mask)
-
-    return img
-
-
-async def draw_pic(roleId):
-    pic = await get_square_avatar(roleId)
-    mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
-    img = Image.new("RGBA", (180, 180))
-    mask = mask_pic.resize((140, 140))
-    resize_pic = crop_center_img(pic, 140, 140)
-    img.paste(resize_pic, (22, 18), mask)
-
-    return img
 
 
 async def upload_slash_record(

@@ -6,7 +6,6 @@ from pydantic import BaseModel
 
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
-from gsuid_core.utils.image.image_tools import crop_center_img
 
 from ..utils import hint
 from ..utils.api.model import (
@@ -34,11 +33,11 @@ from ..utils.image import (
     add_footer,
     get_attribute_effect,
     get_attribute_prop,
-    get_event_avatar,
     get_small_logo,
     get_square_avatar,
     get_waves_bg,
 )
+from ..utils.imagetool import draw_pic_with_ring
 from ..utils.resource.download_file import get_phantom_img
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
@@ -133,11 +132,8 @@ async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
     img = get_waves_bg(1600, 3230, "bg3")
 
     # 头像部分
-    avatar = await draw_pic_with_ring(ev)
-    avatar_ring = Image.open(TEXT_PATH / "avatar_ring.png")
-
+    avatar, avatar_ring = await draw_pic_with_ring(ev)
     img.paste(avatar, (45, 20), avatar)
-    avatar_ring = avatar_ring.resize((180, 180))
     img.paste(avatar_ring, (55, 30), avatar_ring)
 
     base_info_bg = Image.open(TEXT_PATH / "base_info_bg.png")
@@ -260,18 +256,6 @@ async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
 
     img = add_footer(img)
     img = await convert_img(img)
-    return img
-
-
-async def draw_pic_with_ring(ev: Event):
-    pic = await get_event_avatar(ev)
-
-    mask_pic = Image.open(TEXT_PATH / "avatar_mask.png")
-    img = Image.new("RGBA", (180, 180))
-    mask = mask_pic.resize((160, 160))
-    resize_pic = crop_center_img(pic, 160, 160)
-    img.paste(resize_pic, (20, 20), mask)
-
     return img
 
 

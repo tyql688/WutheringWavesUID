@@ -213,6 +213,14 @@
         "need_admin": false
       },
       {
+        "name": "打牌",
+        "desc": "打牌",
+        "eg": "poker",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
         "name": "卡池倒计时",
         "desc": "卡池倒计时",
         "eg": "未复刻角色/武器(5/4)",
