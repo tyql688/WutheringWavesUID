@@ -4,7 +4,6 @@ import math
 from pathlib import Path
 from typing import List, Optional
 
-from loguru import logger
 from msgspec import json as msgjson
 
 SCRIPT_PATH = Path(__file__).parents[0]
@@ -246,7 +245,7 @@ def read_calc_json_files(directory):
                 # score_max = [round(sub_max + i, @) for i in main_max]
                 score_max = [math.floor((sub_max + i) * 1000) / 1000 for i in main_max]
 
-                logger.info(
+                print(
                     f"{file.parents[0].name}/{file.name} - 技能分: {jineng} - "
                     f"副词条最大: {sub_max} - "
                     f"主词条最大: {main_max} - "
@@ -277,7 +276,7 @@ def read_calc_json_files(directory):
             if card_limit:
                 char_limit_cards.append(card_limit)
         except Exception as e:
-            logger.exception(f"Error decoding {file}", e)
+            print(f"Error decoding {file}", e)
 
     with open(ROLE_LIMIT_PATH, "w", encoding="utf-8") as f:
         json.dump(char_limit_cards, f, ensure_ascii=False, indent=2)
