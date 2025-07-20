@@ -255,7 +255,7 @@ async def parse_char_chain(data: Dict[int, Chain]):
     return final_img
 
 
-async def parse_char_skill(data: Dict[int, Dict[str, Skill]]):
+async def parse_char_skill(data: Dict[str, Dict[str, Skill]]):
     y_padding = 20  # 初始位移
     x_padding = 20  # 初始位移
     line_spacing = 10  # 行间距
@@ -272,12 +272,12 @@ async def parse_char_skill(data: Dict[int, Dict[str, Skill]]):
     detail_font = waves_font_origin(detail_color_size)
 
     keys = [
-        ("常态攻击", 1, [12, 13]),
-        ("共鸣技能", 2, [10, 14]),
-        ("共鸣回路", 7, [4, 5]),
-        ("共鸣解放", 3, [11, 15]),
-        ("变奏技能", 6, [9, 16]),
-        ("延奏技能", 8, []),
+        ("常态攻击", "1", ["12", "13"]),
+        ("共鸣技能", "2", ["10", "14"]),
+        ("共鸣回路", "7", ["4", "5"]),
+        ("共鸣解放", "3", ["11", "15"]),
+        ("变奏技能", "6", ["9", "16"]),
+        ("延奏技能", "8", []),
     ]
 
     images = []
@@ -378,7 +378,7 @@ async def parse_char_skill(data: Dict[int, Dict[str, Skill]]):
     return final_img
 
 
-async def parse_char_skill_rate(skillLevels: Optional[Dict[int, SkillLevel]]):
+async def parse_char_skill_rate(skillLevels: Optional[Dict[str, SkillLevel]]):
     if not skillLevels:
         return
     rows = []

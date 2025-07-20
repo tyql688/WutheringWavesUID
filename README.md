@@ -36,18 +36,6 @@
 
 - QQ群号：[76436110](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=hmB3ejtTx6cIDHegsLM91jd1Rn97eGAe&authKey=HqcnRdI0S98dUBcpHxwjWv72LYpUYE%2BSXVOEjiuBrAZbepCHPzP86szZFhxeiQkG&noverify=0&group_code=76436110)
 
-## 丨功能
-
-<details><summary>帮助 - 命令: ww帮助</summary><p>
-<a><img src="https://s2.loli.net/2024/12/22/DR9oWlcwpdkmt87.jpg"></a>
-</p></details>
-<details><summary>面板图 - 命令: ww椿面板</summary><p>
-<a><img src="https://s2.loli.net/2024/12/22/DreE28uzNCByTtW.jpg"></a>
-</p></details>
-<details><summary>ck获取方法</summary><p>
-https://github.com/tyql688/WutheringWavesUID/wiki
-</details>
-
 ## 丨其他
 
 + 本项目仅供学习使用，请勿用于商业用途

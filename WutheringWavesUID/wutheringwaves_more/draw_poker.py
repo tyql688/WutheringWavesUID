@@ -175,10 +175,10 @@ async def draw_poker_img(ev: Event, uid: str, user_id: str):
         waves_font_42,
         "mm",
     )
-    level_card_bg.paste(level_bg, (10, 10), level_bg)
+    level_card_bg.paste(level_bg, (30, 10), level_bg)
 
     # 右侧等级信息
-    level_text_x = 180
+    level_text_x = 210
     level_card_draw.text(
         (level_text_x, 75), phantomBattle.levelName, "white", waves_font_26, "lm"
     )
@@ -188,7 +188,7 @@ async def draw_poker_img(ev: Event, uid: str, user_id: str):
         level_card_draw,
         level_text_x,
         120,
-        700,
+        680,
         12,
         phantomBattle.exp,
         phantomBattle.expLimit,
@@ -218,10 +218,10 @@ async def draw_poker_img(ev: Event, uid: str, user_id: str):
     )
 
     card_bg = Image.open(TEXT_PATH / "card_bg.png")
-    card_card_bg.paste(card_bg, (10, 10), card_bg)
+    card_card_bg.paste(card_bg, (30, 10), card_bg)
 
     # 右侧卡片信息
-    card_text_x = 180
+    card_text_x = 210
     card_card_draw.text(
         (card_text_x, 75), "已收集卡片数量", "white", waves_font_26, "lm"
     )
@@ -231,7 +231,7 @@ async def draw_poker_img(ev: Event, uid: str, user_id: str):
         card_card_draw,
         card_text_x,
         120,
-        700,
+        680,
         12,
         phantomBattle.cardNum,
         phantomBattle.maxCardNum,

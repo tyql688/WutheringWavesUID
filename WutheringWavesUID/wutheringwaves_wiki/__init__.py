@@ -4,10 +4,10 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 
-from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
-from .draw_list import draw_weapon_list, draw_sonata_list
+from ..utils.name_convert import char_name_to_char_id
 from .draw_char import draw_char_wiki
 from .draw_echo import draw_wiki_echo
+from .draw_list import draw_sonata_list, draw_weapon_list
 from .draw_weapon import draw_wiki_weapon
 from .guide import get_guide
 
@@ -37,12 +37,6 @@ async def send_waves_wiki(bot: Bot, ev: Event):
             msg = f"[鸣潮] wiki【{char_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
             return await bot.send(msg, at_sender)
 
-        name = alias_to_char_name(char_name)
-        if name == "漂泊者·衍射":
-            name = "漂泊者-女-衍射"
-        elif name == "漂泊者·湮灭":
-            name = "漂泊者-女-湮灭"
-        await bot.logger.info(f"[鸣潮] 开始获取{name}wiki")
         query_role_type = (
             "天赋" if "技能" in wiki_type or "天赋" in wiki_type else "命座"
         )

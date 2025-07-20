@@ -530,15 +530,12 @@ async def draw_fixed_img(img, avatar, account_info, role_detail):
         roleName = "漂泊者"
 
     draw_text_with_shadow(
-        char_fg_image, f"{roleName}", 296, 867, waves_font_50, anchor="rm"
-    )
-    draw_text_with_shadow(
         char_fg_image,
-        f"Lv.{role_detail.role.level}",
-        300,
-        875,
-        waves_font_30,
-        anchor="lm",
+        f"{roleName} Lv.{role_detail.role.level}",
+        285,
+        867,
+        waves_font_50,
+        anchor="mm",
     )
 
     role_pile_image = Image.new("RGBA", (560, 1000))
@@ -1175,13 +1172,13 @@ async def draw_char_score_img(
                 sh_temp.alpha_composite(ph_level_img, (128, 58))
 
                 # 声骸分数背景
-                ph_score_img = Image.new("RGBA", (92, 30), (255, 255, 255, 0))
+                ph_score_img = Image.new("RGBA", (100, 30), (255, 255, 255, 0))
                 ph_score_img_draw = ImageDraw.Draw(ph_score_img)
                 ph_score_img_draw.rounded_rectangle(
-                    [0, 0, 92, 30], radius=8, fill=(186, 55, 42, int(0.8 * 255))
+                    [0, 0, 100, 30], radius=8, fill=(186, 55, 42, int(0.8 * 255))
                 )
                 ph_score_img_draw.text(
-                    (5, 13), f"{_score}分", "white", waves_font_24, "lm"
+                    (50, 13), f"{_score}分", "white", waves_font_24, "mm"
                 )
                 sh_temp.alpha_composite(ph_score_img, (228, 58))
 
@@ -1489,7 +1486,7 @@ async def generate_online_role_detail(char_id: str):
     for i in char_template_data["skillList"]:
         temp_skill = i["skill"]
         skill_type = temp_skill["type"]
-        skill_detail = char_model.skillTree[int(skill_map[skill_type])]["skill"]
+        skill_detail = char_model.skillTree[skill_map[skill_type]]["skill"]
 
         temp_skill["name"] = skill_detail.name
         temp_skill["description"] = skill_detail.desc.format(*skill_detail.param)

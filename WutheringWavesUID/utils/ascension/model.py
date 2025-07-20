@@ -33,7 +33,7 @@ class Skill(BaseModel):
     desc: str
     param: List[str]
     type: Optional[str] = None
-    level: Optional[Dict[int, SkillLevel]] = None
+    level: Optional[Dict[str, SkillLevel]] = None
 
     def get_desc_detail(self):
         return format_with_defaults(self.desc, self.param)
@@ -59,7 +59,7 @@ class CharacterModel(BaseModel):
     attributeId: int
     weaponTypeId: int
     stats: Dict[str, Dict[str, Stats]]
-    skillTree: Dict[int, Dict[str, Skill]]
+    skillTree: Dict[str, Dict[str, Skill]]
     chains: Dict[int, Chain]
     ascensions: Dict[str, List[AscensionMaterial]]
 
