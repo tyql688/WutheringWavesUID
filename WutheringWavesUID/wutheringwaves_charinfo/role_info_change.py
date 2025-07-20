@@ -633,7 +633,7 @@ async def change_role_detail(
                 index += 1
 
     if parserResult.sonata.sonataName:
-        sonata_result: WavesSonataResult | None = get_sonata_detail(
+        sonata_result: WavesSonataResult = get_sonata_detail(
             parserResult.sonata.sonataName
         )
         if (

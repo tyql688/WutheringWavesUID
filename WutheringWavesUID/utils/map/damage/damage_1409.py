@@ -397,7 +397,7 @@ def calc_damage_12(
     skillLevel = role.get_skill_level(skill_type)
     # 技能技能倍率
     skill_multi = skill_damage_calc(
-        char_result.skillTrees, SkillTreeMap[skill_type], "30", skillLevel
+        char_result.skillTrees, SkillTreeMap[skill_type], "31", skillLevel
     )
 
     title = "大卡共鸣解放"
