@@ -1,77 +1,78 @@
-import json
-import random
 import asyncio
 import inspect
-from typing import Any, Dict, List, Union, Literal, Optional
+import json
+import random
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import aiohttp
-from gsuid_core.logger import logger
 from aiohttp import ClientTimeout, ContentTypeError
 
-from ..hint import error_reply
-from .captcha import get_solver
-from ..database.models import WavesUser
-from .captcha.base import CaptchaResult
-from .captcha.errors import CaptchaError
+from gsuid_core.logger import logger
+
 from ...wutheringwaves_config import WutheringWavesConfig
+from ..database.models import WavesUser
 from ..error_reply import (
     WAVES_CODE_107,
     WAVES_CODE_990,
     WAVES_CODE_998,
     WAVES_CODE_999,
 )
+from ..hint import error_reply
 from ..util import (
+    generate_random_string,
     get_public_ip,
     login_platform,
     send_master_info,
     timed_async_cache,
-    generate_random_string,
 )
 from .api import (
-    GAME_ID,
-    LOGIN_URL,
-    SERVER_ID,
-    REFRESH_URL,
+    ANN_CONTENT_URL,
     ANN_LIST_URL,
-    LOGIN_H5_URL,
     BASE_DATA_URL,
+    BATCH_ROLE_COST,
+    CALABASH_DATA_URL,
+    CALCULATOR_REFRESH_DATA_URL,
+    CHALLENGE_DATA_URL,
+    EXPLORE_DATA_URL,
     GACHA_LOG_URL,
+    GACHA_NET_LOG_URL,
+    GAME_ID,
+    LOGIN_H5_URL,
     LOGIN_LOG_URL,
+    LOGIN_URL,
+    MONTH_LIST_URL,
+    MORE_ACTIVITY_URL,
+    MR_REFRESH_URL,
+    NET_SERVER_ID_MAP,
+    ONLINE_LIST_PHANTOM,
+    ONLINE_LIST_ROLE,
+    ONLINE_LIST_WEAPON,
+    PERIOD_LIST_URL,
+    QUERY_OWNED_ROLE,
+    REFRESH_URL,
     REQUEST_TOKEN,
+    ROLE_CULTIVATE_STATUS,
     ROLE_DATA_URL,
+    ROLE_DETAIL_URL,
     ROLE_LIST_URL,
+    SERVER_ID,
     SERVER_ID_NET,
+    SLASH_DETAIL_URL,
+    SLASH_INDEX_URL,
+    TOWER_DETAIL_URL,
+    TOWER_INDEX_URL,
+    VERSION_LIST_URL,
     WEEK_LIST_URL,
+    WIKI_DETAIL_URL,
+    WIKI_ENTRY_DETAIL_URL,
     WIKI_HOME_URL,
     WIKI_TREE_URL,
-    MONTH_LIST_URL,
-    MR_REFRESH_URL,
-    ANN_CONTENT_URL,
-    BATCH_ROLE_COST,
-    PERIOD_LIST_URL,
-    ROLE_DETAIL_URL,
-    SLASH_INDEX_URL,
-    TOWER_INDEX_URL,
-    WIKI_DETAIL_URL,
-    EXPLORE_DATA_URL,
-    ONLINE_LIST_ROLE,
-    QUERY_OWNED_ROLE,
-    SLASH_DETAIL_URL,
-    TOWER_DETAIL_URL,
-    VERSION_LIST_URL,
-    CALABASH_DATA_URL,
-    GACHA_NET_LOG_URL,
-    MORE_ACTIVITY_URL,
-    NET_SERVER_ID_MAP,
-    CHALLENGE_DATA_URL,
-    ONLINE_LIST_WEAPON,
-    ONLINE_LIST_PHANTOM,
-    ROLE_CULTIVATE_STATUS,
-    WIKI_ENTRY_DETAIL_URL,
-    CALCULATOR_REFRESH_DATA_URL,
     get_local_proxy_url,
     get_need_proxy_func,
 )
+from .captcha import get_solver
+from .captcha.base import CaptchaResult
+from .captcha.errors import CaptchaError
 
 
 async def _check_response(
@@ -654,10 +655,15 @@ class WavesApi:
         return await self._waves_request(MORE_ACTIVITY_URL, "POST", header, data=data)
 
     async def get_request_token(
-        self, roleId: str, token: str, did: str, serverId: Optional[str] = None
+        self,
+        roleId: str,
+        token: str,
+        did: str,
+        serverId: Optional[str] = None,
+        force_refresh: bool = False,
     ) -> tuple[bool, str]:
         """请求token"""
-        if roleId in self.bat_map:
+        if not force_refresh and roleId in self.bat_map:
             logger.debug(f"[{roleId}] 缓存读取bat成功: {self.bat_map[roleId]}")
             return True, self.bat_map[roleId]
 

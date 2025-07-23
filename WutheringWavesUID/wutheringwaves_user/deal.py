@@ -33,7 +33,11 @@ async def add_cookie(ev: Event, ck: str, did: str) -> str:
         )
 
         succ, bat = await waves_api.get_request_token(
-            data.roleId, ck, did, data.serverId
+            data.roleId,
+            ck,
+            did,
+            data.serverId,
+            force_refresh=True,
         )
         if not succ or not bat:
             return bat
