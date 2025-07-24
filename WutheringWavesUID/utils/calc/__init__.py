@@ -129,7 +129,7 @@ class WuWaCalc(object):
                     "ph_name": key,
                 }
             )
-            if num >= 2:
+            if num >= 2 and "2" in value["result"].set:
                 name = value["result"].set["2"]["effect"]
                 effect = value["result"].set["2"]["param"][0]
                 result["ph"] = value["result"].name
