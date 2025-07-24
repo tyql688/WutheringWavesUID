@@ -1,7 +1,6 @@
 from typing import List, Union
 
 from ...api.model import RoleDetailData, WeaponData
-from ...ascension.sonata import get_sonata_detail
 from ...damage.abstract import WavesEchoRegister, WavesWeaponRegister
 from ...damage.damage import DamageAttribute, check_char_id
 from ...damage.utils import (
@@ -90,7 +89,7 @@ def phase_damage(
             if cast_hit in damage_func or cast_attack in damage_func:
                 # 声骸五件套
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
+                msg = "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
                 attr.add_dmg_bonus(0.3, title, msg)
 
         # 熔山裂谷
@@ -99,7 +98,7 @@ def phase_damage(
                 return
             if cast_skill in damage_func:
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
+                msg = "使用共鸣技能时，热熔伤害提升30%，持续15秒"
                 attr.add_dmg_bonus(0.3, title, msg)
 
         # 彻空冥雷
@@ -121,7 +120,7 @@ def phase_damage(
                 return
             # 声骸五件套
             title = f"{phase_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
+            msg = "使用变奏技能登场时，气动伤害提升30%，持续15秒"
             attr.add_atk_percent(0.3, title, msg)
 
         # 浮星祛暗
@@ -131,7 +130,7 @@ def phase_damage(
             if attr.char_attr != CHAR_ATTR_CELESTIAL:
                 return
             title = f"{phase_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
+            msg = "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
             attr.add_dmg_bonus(0.3, title, msg)
 
         # 沉日劫明
@@ -140,7 +139,7 @@ def phase_damage(
                 return
             if cast_hit in damage_func or cast_attack in damage_func:
                 title = f"{phase_name}-{ph_detail.ph_name}"
-                msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
+                msg = "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
                 attr.add_dmg_bonus(0.3, title, msg)
 
         # 隐世回光
@@ -150,7 +149,7 @@ def phase_damage(
             if attr.char_template != "temp_atk":
                 return
             title = f"{phase_name}-{ph_detail.ph_name}"
-            msg = f"{get_sonata_detail(ph_detail.ph_name).set['5']['desc']}"
+            msg = "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
             attr.add_atk_percent(0.15, title, msg)
 
         # 轻云出月

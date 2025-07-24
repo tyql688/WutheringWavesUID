@@ -129,10 +129,13 @@ class WuWaCalc(object):
                     "ph_name": key,
                 }
             )
-            if num >= 2 and "2" in value["result"].set:
-                name = value["result"].set["2"]["effect"]
-                effect = value["result"].set["2"]["param"][0]
-                result["ph"] = value["result"].name
+            waves_sonata_result: WavesSonataResult = value["result"]
+            two_piece = waves_sonata_result.piece(2)
+            # 2件套效果，声骸数量大于等于2
+            if two_piece and num >= 2:
+                name = two_piece.effect
+                effect = two_piece.param[0]
+                result["ph"] = waves_sonata_result.name
                 if name not in result:
                     result[name] = effect
                     continue
