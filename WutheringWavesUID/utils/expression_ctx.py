@@ -98,6 +98,11 @@ async def get_waves_char_rank(uid, all_role_detail, need_expected_damage=False):
             for ph_detail in calc.phantom_pre.get("ph_detail", []):
                 if ph_detail.get("ph_name") and ph_detail.get("ph_num") == 5:
                     sonataName = ph_detail["ph_name"]
+                    break
+
+                if ph_detail.get("ph_name") and ph_detail.get("isFull"):
+                    sonataName = ph_detail["ph_name"]
+                    break
 
         wcr = WavesCharRank(
             **{
