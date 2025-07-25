@@ -11,6 +11,7 @@ from .utils import (
     heal_bonus,
     hit_damage,
     liberation_damage,
+    phantom_damage,
     skill_damage,
     temp_atk,
     temp_life,
@@ -1362,6 +1363,32 @@ class Weapon_21050064(WeaponAbstract):
         return True
 
 
+class Weapon_21050066(WeaponAbstract):
+    id = 21050066
+    type = 5
+    name = "幽冥的忘忧章"
+
+    # 造成声骸技能伤害后12秒内，共鸣技能伤害加成提升32%，声骸技能伤害加深32%，且造成伤害时无视目标8%防御。
+    def cast_phantom(self, attr: DamageAttribute, isGroup: bool = False):
+        """造成声骸技能伤害"""
+        # 无视目标8%防御
+        dmg = f"{self.param(4)}"
+        title = self.get_title()
+        msg = f"造成声骸技能伤害后，无视目标{dmg}%防御"
+        attr.add_defense_reduction(calc_percent_expression(dmg), title, msg)
+        if attr.char_damage == phantom_damage:
+            dmg = f"{self.param(3)}"
+            title = self.get_title()
+            msg = f"造成声骸技能伤害后，声骸技能伤害加深{dmg}"
+            attr.add_dmg_deepen(calc_percent_expression(dmg), title, msg)
+
+        if attr.char_damage == skill_damage:
+            dmg = f"{self.param(2)}"
+            title = self.get_title()
+            msg = f"造成声骸技能伤害后，共鸣技能伤害加成提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+
 class Weapon_21050074(WeaponAbstract):
     id = 21050074
     type = 5
@@ -1503,6 +1530,7 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21050053.id, Weapon_21050053)
     WavesWeaponRegister.register_class(Weapon_21050056.id, Weapon_21050056)
     WavesWeaponRegister.register_class(Weapon_21050064.id, Weapon_21050064)
+    WavesWeaponRegister.register_class(Weapon_21050066.id, Weapon_21050066)
     WavesWeaponRegister.register_class(Weapon_21050074.id, Weapon_21050074)
     WavesWeaponRegister.register_class(Weapon_21050084.id, Weapon_21050084)
     WavesWeaponRegister.register_class(Weapon_21050094.id, Weapon_21050094)

@@ -295,12 +295,8 @@ def calc_char_limit(char_limit, calc_file_dict):
     weapon_detail_path = WEAPON_DETAIL_PATH / f"{char_limit['weaponId']}.json"
     if not weapon_detail_path.exists():
         return
-    sonata_detail_path = SONATA_DETAIL_PATH / f"{sonata_lib['fetterDetailName']}.json"
-    if not sonata_detail_path.exists():
-        return
     char_detail = json.loads(char_detail_path.read_text(encoding="utf-8"))
     weapon_detail = json.loads(weapon_detail_path.read_text(encoding="utf-8"))
-    sonata_detail = json.loads(sonata_detail_path.read_text(encoding="utf-8"))
 
     char_template_data = copy.deepcopy(template_data)
 
@@ -354,71 +350,82 @@ def calc_char_limit(char_limit, calc_file_dict):
     temp_weapon["weaponType"] = weapon_detail["type"]
 
     # 声骸
-    temp_fetter_detail = {
-        "firstDescription": sonata_detail["set"]["2"]["desc"],
-        "groupId": 0,
-        "iconUrl": "",
-        "name": sonata_detail["name"],
-        "num": 5,
-        "secondDescription": sonata_detail["set"]["5"]["desc"],
-    }
 
     attribute = char_template_data["role"]["attributeName"]
-    for i, j in zip(
-        char_template_data["phantomData"]["equipPhantomList"],
-        sonata_lib["equipPhantomList"],
-    ):
-        cost = j["cost"]
-        i["fetterDetail"] = temp_fetter_detail
-        i["cost"] = cost
-        phantomProp = i["phantomProp"]
-        phantomProp["phantomId"] = j["phantomId"]
-        phantomProp["name"] = id2Name[str(j["phantomId"])]
-        phantomProp["cost"] = cost
 
-        custom_main_shuxing = j.get("mainPropName")
+    list_index = 0
 
-        mainProps = i["mainProps"]
-        for flag, main_props_name in enumerate(
-            calc_file_dict["max_main_props"][f"{cost}.1"]
-        ):
-            if cost == 4:
-                index = 2
-            elif cost == 3:
-                index = 1
-            else:
-                index = 0
-            if flag == 0 and custom_main_shuxing:
-                main_props_name = custom_main_shuxing
-            _phantom_value = phantom_main_value_map[main_props_name][index]
-            if main_props_name.startswith("属性"):
-                main_props_name = f"{attribute}伤害加成"
-            res = {
-                "attributeName": main_props_name.replace("%", ""),
-                "attributeValue": _phantom_value,
-                "iconUrl": "",
-            }
-            mainProps.append(res)
+    fetterList = sonata_lib["fetterList"]
+    for fetter in fetterList:
+        sonata_detail_path = SONATA_DETAIL_PATH / f"{fetter['fetterDetailName']}.json"
+        if not sonata_detail_path.exists():
+            continue
+        sonata_detail = json.loads(sonata_detail_path.read_text(encoding="utf-8"))
 
-        skill_weight = calc_file_dict["skill_weight"]
-        jineng_index = skill_weight.index(max(skill_weight))
-        jineng_name = [
-            "普攻伤害加成",
-            "重击伤害加成",
-            "共鸣技能伤害加成",
-            "共鸣解放伤害加成",
-        ][jineng_index]
+        temp_fetter_detail = {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": sonata_detail["name"],
+            "num": len(fetter["equipPhantomList"]),
+            "secondDescription": "",
+        }
 
-        subProps = i["subProps"]
-        for sub_props_name in calc_file_dict["max_sub_props"]:
-            _phantom_value = phantom_sub_value_map[sub_props_name][-1]
-            if sub_props_name.startswith("技能"):
-                sub_props_name = jineng_name
-            res = {
-                "attributeName": sub_props_name.replace("%", ""),
-                "attributeValue": _phantom_value,
-            }
-            subProps.append(res)
+        for j in fetter["equipPhantomList"]:
+            i = char_template_data["phantomData"]["equipPhantomList"][list_index]
+            cost = j["cost"]
+            i["fetterDetail"] = temp_fetter_detail
+            i["cost"] = cost
+            phantomProp = i["phantomProp"]
+            phantomProp["phantomId"] = j["phantomId"]
+            phantomProp["name"] = id2Name[str(j["phantomId"])]
+            phantomProp["cost"] = cost
+
+            custom_main_shuxing = j.get("mainPropName")
+
+            mainProps = i["mainProps"]
+            for flag, main_props_name in enumerate(
+                calc_file_dict["max_main_props"][f"{cost}.1"]
+            ):
+                if cost == 4:
+                    index = 2
+                elif cost == 3:
+                    index = 1
+                else:
+                    index = 0
+                if flag == 0 and custom_main_shuxing:
+                    main_props_name = custom_main_shuxing
+                _phantom_value = phantom_main_value_map[main_props_name][index]
+                if main_props_name.startswith("属性"):
+                    main_props_name = f"{attribute}伤害加成"
+                res = {
+                    "attributeName": main_props_name.replace("%", ""),
+                    "attributeValue": _phantom_value,
+                    "iconUrl": "",
+                }
+                mainProps.append(res)
+
+            skill_weight = calc_file_dict["skill_weight"]
+            jineng_index = skill_weight.index(max(skill_weight))
+            jineng_name = [
+                "普攻伤害加成",
+                "重击伤害加成",
+                "共鸣技能伤害加成",
+                "共鸣解放伤害加成",
+            ][jineng_index]
+
+            subProps = i["subProps"]
+            for sub_props_name in calc_file_dict["max_sub_props"]:
+                _phantom_value = phantom_sub_value_map[sub_props_name][-1]
+                if sub_props_name.startswith("技能"):
+                    sub_props_name = jineng_name
+                res = {
+                    "attributeName": sub_props_name.replace("%", ""),
+                    "attributeValue": _phantom_value,
+                }
+                subProps.append(res)
+
+            list_index += 1
 
     return char_template_data
 

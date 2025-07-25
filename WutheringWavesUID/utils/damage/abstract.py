@@ -82,6 +82,8 @@ class WeaponAbstract(object):
         if attr.env_aero_erosion:
             func_list.append("env_aero_erosion")
 
+        func_list.append("cast_phantom")
+
         for func_name in func_list:
             method = getattr(self, func_name, None)
             if callable(method):
@@ -116,6 +118,10 @@ class WeaponAbstract(object):
 
     def cast_liberation(self, attr: DamageAttribute, isGroup: bool = False):
         """施放共鸣解放"""
+        pass
+
+    def cast_phantom(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放声骸技能"""
         pass
 
     def cast_dodge_counter(self, attr: DamageAttribute, isGroup: bool = False):

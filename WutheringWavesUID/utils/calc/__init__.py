@@ -5,8 +5,12 @@ from gsuid_core.logger import logger
 
 from ...utils.api.model import Props, RoleDetailData
 from ...utils.api.model_other import EnemyDetailData
-from ...utils.damage.utils import SONATA_TIDEBREAKING
-from ...utils.map.damage.damage import check_if_ph_5
+from ...utils.damage.utils import (
+    SONATA_ANCIENT,
+    SONATA_TIDEBREAKING,
+    Ancient_Role_Ids,
+)
+from ...utils.map.damage.damage import check_if_ph_3, check_if_ph_5
 from ..ascension.char import WavesCharResult, get_char_detail
 from ..ascension.constant import percent_to_float, sum_numbers, sum_percentages
 from ..ascension.sonata import WavesSonataResult, get_sonata_detail
@@ -123,12 +127,6 @@ class WuWaCalc(object):
 
         for key, value in temp_result.items():
             num = len(value["phantomIds"])
-            result["ph_detail"].append(
-                {
-                    "ph_num": num,
-                    "ph_name": key,
-                }
-            )
             waves_sonata_result: WavesSonataResult = value["result"]
             two_piece = waves_sonata_result.piece(2)
             # 2件套效果，声骸数量大于等于2
@@ -142,6 +140,14 @@ class WuWaCalc(object):
                 old = float(result[name].replace("%", ""))
                 new = float(effect.replace("%", ""))
                 result[name] = f"{old + new:.1f}%"
+
+            result["ph_detail"].append(
+                {
+                    "ph_num": num,
+                    "ph_name": key,
+                    "isFull": num == waves_sonata_result.full_piece_effect(),
+                }
+            )
 
         return result
 
@@ -298,6 +304,17 @@ class WuWaCalc(object):
                         "30%",
                         card_sort_map["属性伤害加成"],
                     )
+                card_sort_map["ph_result"] = True
+
+            # 失序彼岸之梦
+            if role_id in Ancient_Role_Ids and check_if_ph_3(
+                ph_detail["ph_name"], ph_detail["ph_num"], SONATA_ANCIENT
+            ):
+                # 角色共鸣能量为0时，暴击率提升35%
+                card_sort_map["暴击"] = sum_percentages(
+                    "20%",
+                    card_sort_map["暴击"],
+                )
                 card_sort_map["ph_result"] = True
 
         base_atk = float(sum_numbers(_atk, _weapon_atk))

@@ -128,6 +128,11 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
         for ph in ph_detail:
             if ph.get("ph_num") == 5:
                 sonata_name = ph.get("ph_name", "")
+                break
+
+            if ph.get("isFull"):
+                sonata_name = ph.get("ph_name", "")
+                break
 
     rankInfo = RankInfo(
         **{

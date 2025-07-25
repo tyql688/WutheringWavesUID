@@ -51,12 +51,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -107,12 +107,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -163,12 +163,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -219,12 +219,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -275,12 +275,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -425,6 +425,429 @@
   {
     "chainList": [
       {
+        "description": "亡与死的乐章伤害倍率提升80%。\n永不消逝的梦呓伤害倍率提升80%。\n弗洛洛不处于指挥状态且不处于战斗状态4秒后，若【乐声】少于2枚，获得【乐声·彩乐】，直至【乐声】不少于2枚。",
+        "iconUrl": "",
+        "name": "钥匙，通往冥界的奥秘",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "谱曲终末伤害倍率提升75%，余响对谱曲终末的倍率增加效果提升75%。\n施放谱曲终末时可获得14层余响。",
+        "iconUrl": "",
+        "name": "绳索，重生更新的纽带",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "声骸技能伤害加深80%。\n施放谱曲终末期间，所有【乐声】将依次转化为【乐声·彩乐】。\n被强化攻击·彩乐·赫卡忒命中的目标，攻击降低20%，持续15秒。",
+        "iconUrl": "",
+        "name": "匕首，消弭妄想的力量",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "施放声骸技能时，队伍中的角色全属性伤害加成提升20%，持续30秒。",
+        "iconUrl": "",
+        "name": "火炬，新径启行的引导",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "进入指挥状态时，生成领域停滞周围的目标，领域持续4秒。结束指挥状态或切换至其他角色时，将提前清除停滞效果。\n处于指挥状态时，受到伤害降低30%。",
+        "iconUrl": "",
+        "name": "岔路，穿越生命的要地",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "强化攻击·赫卡忒伤害倍率提升24%。\n\n施放亡与死的乐章、永不消逝的梦呓期间，将召唤赫卡忒施放1次重世幻象·赫卡忒，造成弗洛洛攻击216.42%的湮灭伤害，命中目标时获得8层余响。本次伤害为声骸技能伤害。\n\n处于指挥状态时，若弗洛洛不为队伍中登场角色，目标受到赫卡忒和弗洛洛的伤害提升40%。\n处于指挥状态时，若弗洛洛为队伍中登场角色，湮灭伤害加成提升60%。",
+        "iconUrl": "",
+        "name": "深夜，走出安息与终结",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "失序彼岸之梦",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣技能伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "梦魇·赫卡忒",
+            "phantomId": 6000115,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "失序彼岸之梦",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣技能伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "梦魇·破霜猎手",
+            "phantomId": 6000118,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "失序彼岸之梦",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "湮灭伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣技能伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "梦魇·审判战士",
+            "phantomId": 6000117,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "幽夜隐匿之帷",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣技能伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "幽翎火",
+            "phantomId": 6000067,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "幽夜隐匿之帷",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣技能伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "雷鬃狼",
+            "phantomId": 6000062,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 6,
+      "attributeName": "湮灭",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1608,
+      "roleName": "弗洛洛",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 5,
+      "weaponTypeName": "音感仪",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n进行最多3段的连续攻击，造成湮灭伤害。\n施放普攻第3段时进入重世状态。\n\n重击\n消耗耐力攻击目标，造成湮灭伤害。\n施放该技能后在一定时间内短按普攻，将会施放普攻第2段。\n\n谱曲终末\n弗洛洛每25秒可激活谱曲。\n同时满足下述3种条件时，重击替换为谱曲终末。\n·拥有6枚【乐声】。\n·谱曲处于激活状态。\n·不处于【定音】状态。\n\n施放谱曲终末，消耗耐力，停滞并牵引附近目标，造成湮灭伤害，本次伤害为共鸣技能伤害。\n每层余响可使本次伤害倍率额外增加。\n施放此技能时，同时视为施放声骸技能。\n施放此技能时，谱曲进入冷却状态，随后获得【定音】状态。\n\n空中攻击\n消耗耐力进行空中下落攻击，造成湮灭伤害。\n\n闪避反击\n成功闪避后一定时间内短按普攻，将会攻击目标，造成湮灭伤害。\n施放该技能后在一定时间内短按普攻，将会施放普攻第3段。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "生与死的乐章",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成湮灭伤害。\n施放时进入重世状态。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "稍纵即逝的梦呓",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "往日深渊的圆舞曲\n弗洛洛共鸣能量上限为0，往日深渊的圆舞曲不消耗共鸣能量。\n处于【定音】状态时，解锁往日深渊的圆舞曲。\n施放后退出【定音】状态，进入指挥状态，持续24秒。\n\n指挥状态\n攻击提升120%。\n弗洛洛漂浮于空中，指挥赫卡忒进行战斗，赫卡忒将继承弗洛洛的属性。赫卡忒造成的伤害不会清除目标的迷梦状态。\n期间按获取顺序演奏【乐声】，每枚【乐声】演奏4秒。\n若弗洛洛为队伍中登场角色，可施放下列指令指挥赫卡忒发动攻击，此时赫卡忒受到攻击时弗洛洛会受到伤害。\n·指令·普攻：点击普攻，指挥赫卡忒施放普攻·赫卡忒。弗洛洛为队伍中登场角色且赫卡忒累计施放2次普攻后，下次普攻·赫卡忒将替换为强化攻击·赫卡忒。\n·指令·闪避：点击闪避，指挥赫卡忒闪避，成功闪避时将不受伤害。\n·指令·复位：点击跳跃，重置赫卡忒位置。\n·指令·谢幕：点击共鸣解放，结束指挥状态。\n若弗洛洛不为队伍中登场角色，赫卡忒不会受到伤害。赫卡忒将自动施放普攻·赫卡忒攻击目标。队伍中角色施放声骸技能时，赫卡忒将施放强化攻击·赫卡忒攻击目标。指挥状态期间，最多可触发10次该效果，同名声骸仅可触发1次该效果。\n若切换回弗洛洛，提前结束指挥状态。\n结束指挥状态时，清除所有【乐声】。\n\n普攻·赫卡忒\n进行最多2段的连续攻击，造成湮灭伤害，本次伤害为声骸技能伤害。\n\n强化攻击·弦乐·赫卡忒\n弗洛洛演奏【乐声·弦乐】时，赫卡忒施放的强化攻击·赫卡忒为强化攻击·弦乐·赫卡忒，停滞目标，造成湮灭伤害，本次伤害为声骸技能伤害。\n\n强化攻击·管乐·赫卡忒\n弗洛洛演奏【乐声·管乐】时，赫卡忒施放的强化攻击·赫卡忒为强化攻击·管乐·赫卡忒，牵引附近目标，造成湮灭伤害，本次伤害为声骸技能伤害。\n\n强化攻击·彩乐·赫卡忒\n弗洛洛演奏【乐声·彩乐】时，赫卡忒施放的强化攻击·赫卡忒为强化攻击·彩乐·赫卡忒，停滞并牵引附近目标，造成湮灭伤害，本次伤害为声骸技能伤害。\n\n谢幕\n可通过下述5种操作，施放谢幕，停滞目标，造成湮灭伤害。\n·弗洛洛为队伍中登场角色结束指挥状态。\n·处于指挥状态时，弗洛洛非变奏技能登场。\n·弗洛洛不为队伍中登场角色结束指挥状态后，弗洛洛下一次登场为非变奏技能登场。\n·处于指挥状态时，点击共鸣解放。\n·处于【定音】状态时，长按共鸣解放。\n处于【定音】状态，施放谢幕时，清除所有【乐声】并退出【定音】状态。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "往日深渊的圆舞曲",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "致命组歌\n攻击目标，造成湮灭伤害。\n施放该技能后在一定时间内短按普攻，将会施放普攻第3段。\n\n永生组歌\n进入指挥状态后，下次致命组歌替换为永生组歌，期间施放谢幕将取消本次替换。\n施放永生组歌，停滞目标，造成湮灭伤害，本次伤害为共鸣技能伤害。\n施放该技能后在一定时间内短按普攻，将会施放普攻第3段。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "致命组歌",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻·亡与死的乐章\n处于重世状态时，地面短按普攻施放亡与死的乐章，使命中的目标停滞，随后对目标造成湮灭伤害，本次伤害为共鸣技能伤害。\n施放时退出重世状态。\n\n共鸣技能·永不消逝的梦呓\n处于重世状态时，地面短按共鸣技能施放永不消逝的梦呓，造成湮灭伤害，本次伤害为共鸣技能伤害。\n施放时退出重世状态。\n\n余响获取规则\n余响上限为24层。\n弗洛洛不为队伍中登场角色，施放强化攻击·弦乐·赫卡忒、强化攻击·管乐·赫卡忒、强化攻击·彩乐·赫卡忒时，可获得1层余响。\n弗洛洛处于非战斗状态时，每30秒会清除全部余响层数。\n\n【乐声】获取规则\n【乐声】上限6枚，达上限时，再次获取【乐声】，所有【乐声】将左移1格，最左侧【乐声·弦乐】、【乐声·管乐】将被移除。\n普攻第3段、亡与死的乐章命中目标时，可获取1枚【乐声·弦乐】。\n共鸣技能稍纵即逝的梦呓、共鸣技能永不消逝的梦呓命中目标时，可获取1枚【乐声·管乐】。\n激活固有技能·变音符后，施放致命组歌、永生组歌、声骸技能时，下一枚获得的乐声会变为【乐声·彩乐】。\n处于【定音】状态时，无法获取【乐声】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "新世界狂想曲",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "下一位登场角色湮灭伤害加深20%，重击伤害加深25%，效果持续14秒，若切换至其他角色则该效果提前结束。\n弗洛洛处于指挥状态时施放此技能，此次指挥状态期间，弗洛洛切换至其他角色时，赫卡忒将额外施放2次强化攻击·赫卡忒。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "未完成的曲目",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "攻击提升24%。造成声骸技能伤害后12秒内，共鸣技能伤害加成提升64%，声骸技能伤害加深64%，且造成伤害时无视目标16%防御。",
+        "weaponIcon": "",
+        "weaponId": 21050066,
+        "weaponName": "幽冥的忘忧章",
+        "weaponStarLevel": 5,
+        "weaponType": 5
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
         "description": "施放共鸣技能时，回复1点【迷离】。共鸣技能翩跹、共鸣技能斑驳幻梦、共鸣回路感知汲取的伤害倍率提升50%。共鸣回路感知汲取免疫打断。",
         "iconUrl": "",
         "name": "在无尽展开的波涛里",
@@ -474,12 +897,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "幽夜隐匿之帷",
             "num": 5,
-            "secondDescription": "角色触发延奏技能离场时，额外对周围敌人造成480%的湮灭伤害，该伤害为延奏技能伤害，并使下一个登场角色湮灭属性伤害加成提升15%，持续15秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -530,12 +953,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "幽夜隐匿之帷",
             "num": 5,
-            "secondDescription": "角色触发延奏技能离场时，额外对周围敌人造成480%的湮灭伤害，该伤害为延奏技能伤害，并使下一个登场角色湮灭属性伤害加成提升15%，持续15秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -586,12 +1009,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "幽夜隐匿之帷",
             "num": 5,
-            "secondDescription": "角色触发延奏技能离场时，额外对周围敌人造成480%的湮灭伤害，该伤害为延奏技能伤害，并使下一个登场角色湮灭属性伤害加成提升15%，持续15秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -642,12 +1065,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "幽夜隐匿之帷",
             "num": 5,
-            "secondDescription": "角色触发延奏技能离场时，额外对周围敌人造成480%的湮灭伤害，该伤害为延奏技能伤害，并使下一个登场角色湮灭属性伤害加成提升15%，持续15秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -698,12 +1121,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "幽夜隐匿之帷",
             "num": 5,
-            "secondDescription": "角色触发延奏技能离场时，额外对周围敌人造成480%的湮灭伤害，该伤害为延奏技能伤害，并使下一个登场角色湮灭属性伤害加成提升15%，持续15秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -897,12 +1320,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -953,12 +1376,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1009,12 +1432,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1065,12 +1488,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1121,12 +1544,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1320,12 +1743,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1376,12 +1799,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1432,12 +1855,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1488,12 +1911,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1544,12 +1967,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1743,12 +2166,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1799,12 +2222,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1855,12 +2278,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1911,12 +2334,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -1967,12 +2390,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2166,12 +2589,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "无惧浪涛之勇",
             "num": 5,
-            "secondDescription": "角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2222,12 +2645,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "无惧浪涛之勇",
             "num": 5,
-            "secondDescription": "角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2278,12 +2701,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "无惧浪涛之勇",
             "num": 5,
-            "secondDescription": "角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2334,12 +2757,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "无惧浪涛之勇",
             "num": 5,
-            "secondDescription": "角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2390,12 +2813,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "无惧浪涛之勇",
             "num": 5,
-            "secondDescription": "角色攻击提升15%，共鸣效率达到250%后，当前角色全属性伤害提升30%。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2589,12 +3012,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "冷凝伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凝夜白霜",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2645,12 +3068,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "冷凝伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凝夜白霜",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2701,12 +3124,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "冷凝伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凝夜白霜",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2757,12 +3180,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "冷凝伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凝夜白霜",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -2813,12 +3236,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "冷凝伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凝夜白霜",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，冷凝伤害提升10%，该效果可叠加三层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3012,12 +3435,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3068,12 +3491,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3124,12 +3547,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3180,12 +3603,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3236,12 +3659,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3393,7 +3816,7 @@
         "unlocked": true
       },
       {
-        "description": "施放共鸣解放·听骑士从心祈愿后，使自身一定范围内的目标【风蚀效应】层数上限提升3层，自身下一次技能直接造成伤害后，对自身一定范围内的目标附加3层【风蚀效应】，并立刻结算1次目标身上的【风蚀效应】效果，此次结算不消耗【风蚀效应】层数。\n【卡提希娅】普攻、重击、闪避反击、变奏技能倍率提升50%，空中攻击倍率提升200%。\n施放空中攻击·卡提希娅后，每回收1种【剑之影】使共鸣技能·卡提希娅的冷却时间减少1秒。",
+        "description": "施放共鸣解放·听骑士从心祈愿后，使自身一定范围内的目标【风蚀效应】层数上限提升3层，自身技能下一次直接造成伤害后，对自身一定范围内的目标附加3层【风蚀效应】，并立刻结算1次目标身上的【风蚀效应】效果，此次结算不消耗【风蚀效应】层数。\n【卡提希娅】普攻、重击、闪避反击、变奏技能倍率提升50%，空中攻击倍率提升200%。\n施放空中攻击·卡提希娅后，每回收1种【剑之影】使共鸣技能·卡提希娅的冷却时间减少1秒。",
         "iconUrl": "",
         "name": "听风潮斩断利刃",
         "order": 2,
@@ -3435,12 +3858,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "愿戴荣光之旅",
             "num": 5,
-            "secondDescription": "攻击命中存在【风蚀效应】的敌人时，自身暴击提升10%，气动伤害提升30%，持续10秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3491,12 +3914,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "愿戴荣光之旅",
             "num": 5,
-            "secondDescription": "攻击命中存在【风蚀效应】的敌人时，自身暴击提升10%，气动伤害提升30%，持续10秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3547,12 +3970,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "愿戴荣光之旅",
             "num": 5,
-            "secondDescription": "攻击命中存在【风蚀效应】的敌人时，自身暴击提升10%，气动伤害提升30%，持续10秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3603,12 +4026,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "愿戴荣光之旅",
             "num": 5,
-            "secondDescription": "攻击命中存在【风蚀效应】的敌人时，自身暴击提升10%，气动伤害提升30%，持续10秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3659,12 +4082,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "愿戴荣光之旅",
             "num": 5,
-            "secondDescription": "攻击命中存在【风蚀效应】的敌人时，自身暴击提升10%，气动伤害提升30%，持续10秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3858,12 +4281,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "高天共奏之曲",
             "num": 5,
-            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3914,12 +4337,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "高天共奏之曲",
             "num": 5,
-            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -3970,12 +4393,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "高天共奏之曲",
             "num": 5,
-            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4026,12 +4449,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "高天共奏之曲",
             "num": 5,
-            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4082,12 +4505,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "共鸣效率提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "高天共奏之曲",
             "num": 5,
-            "secondDescription": "当前角色协同攻击造成的伤害提升80%；协同攻击命中敌人且暴击时，队伍中登场角色攻击力提升20%，持续4秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4281,12 +4704,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4337,12 +4760,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4393,12 +4816,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4449,12 +4872,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4505,12 +4928,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "熔山裂谷",
             "num": 5,
-            "secondDescription": "使用共鸣技能时，热熔伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4704,12 +5127,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "治疗效果提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "隐世回光",
             "num": 5,
-            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4752,12 +5175,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "治疗效果提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "隐世回光",
             "num": 5,
-            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4800,12 +5223,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "治疗效果提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "隐世回光",
             "num": 5,
-            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4848,12 +5271,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "治疗效果提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "隐世回光",
             "num": 5,
-            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -4896,12 +5319,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "治疗效果提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "隐世回光",
             "num": 5,
-            "secondDescription": "自身为友方提供治疗时，全队共鸣者攻击提升15%，持续30秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5087,12 +5510,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5143,12 +5566,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5199,12 +5622,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5255,12 +5678,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5311,12 +5734,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5510,12 +5933,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5566,12 +5989,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5622,12 +6045,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5678,12 +6101,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5734,12 +6157,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "流云逝尽之空",
             "num": 5,
-            "secondDescription": "角色为敌人添加【风蚀效应】时，队伍中角色气动伤害提升15%，自身气动伤害额外提升15%，持续20秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5933,12 +6356,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -5989,12 +6412,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6045,12 +6468,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6101,12 +6524,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6157,12 +6580,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6356,12 +6779,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "共鸣技能伤害提升12%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凌冽决断之心",
             "num": 5,
-            "secondDescription": "施放共鸣技能时，自身冷凝伤害提升22.5%，持续15秒；施放共鸣解放时，自身共鸣技能伤害提升18%，持续5秒，可叠加2层"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6412,12 +6835,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "共鸣技能伤害提升12%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凌冽决断之心",
             "num": 5,
-            "secondDescription": "施放共鸣技能时，自身冷凝伤害提升22.5%，持续15秒；施放共鸣解放时，自身共鸣技能伤害提升18%，持续5秒，可叠加2层"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6468,12 +6891,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "共鸣技能伤害提升12%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凌冽决断之心",
             "num": 5,
-            "secondDescription": "施放共鸣技能时，自身冷凝伤害提升22.5%，持续15秒；施放共鸣解放时，自身共鸣技能伤害提升18%，持续5秒，可叠加2层"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6524,12 +6947,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "共鸣技能伤害提升12%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凌冽决断之心",
             "num": 5,
-            "secondDescription": "施放共鸣技能时，自身冷凝伤害提升22.5%，持续15秒；施放共鸣解放时，自身共鸣技能伤害提升18%，持续5秒，可叠加2层"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6580,12 +7003,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "共鸣技能伤害提升12%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "凌冽决断之心",
             "num": 5,
-            "secondDescription": "施放共鸣技能时，自身冷凝伤害提升22.5%，持续15秒；施放共鸣解放时，自身共鸣技能伤害提升18%，持续5秒，可叠加2层"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6779,12 +7202,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6835,12 +7258,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6891,12 +7314,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -6947,12 +7370,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7003,12 +7426,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "浮星祛暗",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，衍射伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7202,12 +7625,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7258,12 +7681,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7314,12 +7737,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7370,12 +7793,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7426,12 +7849,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "湮灭伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "沉日劫明",
             "num": 5,
-            "secondDescription": "使用普攻或重击时，湮灭伤害提升7.5%，该效果可叠加四层，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7625,12 +8048,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7681,12 +8104,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7737,12 +8160,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7793,12 +8216,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -7849,12 +8272,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "衍射伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "此间永驻之光",
             "num": 5,
-            "secondDescription": "角色为敌人添加【光噪效应】时，自身暴击提升20%，持续15秒；攻击存在10层【光噪效应】的敌人时，自身衍射伤害加成提升15%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8048,12 +8471,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "奔狼燎原之焰",
             "num": 5,
-            "secondDescription": "施放共鸣解放时，队伍中角色热熔伤害提升15%，自身共鸣解放伤害提升20%，持续35秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8104,12 +8527,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "奔狼燎原之焰",
             "num": 5,
-            "secondDescription": "施放共鸣解放时，队伍中角色热熔伤害提升15%，自身共鸣解放伤害提升20%，持续35秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8160,12 +8583,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "奔狼燎原之焰",
             "num": 5,
-            "secondDescription": "施放共鸣解放时，队伍中角色热熔伤害提升15%，自身共鸣解放伤害提升20%，持续35秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8216,12 +8639,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "奔狼燎原之焰",
             "num": 5,
-            "secondDescription": "施放共鸣解放时，队伍中角色热熔伤害提升15%，自身共鸣解放伤害提升20%，持续35秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8272,12 +8695,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "热熔伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "奔狼燎原之焰",
             "num": 5,
-            "secondDescription": "施放共鸣解放时，队伍中角色热熔伤害提升15%，自身共鸣解放伤害提升20%，持续35秒。"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8471,12 +8894,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8527,12 +8950,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8583,12 +9006,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8639,12 +9062,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8695,12 +9118,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "导电伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "彻空冥雷",
             "num": 5,
-            "secondDescription": "使用重击或共鸣技能时，各获得一层导电伤害提升15%的效果，该效果可叠加两层，每层各持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8894,12 +9317,12 @@
         {
           "cost": 4,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "啸谷长风",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，气动伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -8950,12 +9373,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "啸谷长风",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，气动伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -9006,12 +9429,12 @@
         {
           "cost": 3,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "啸谷长风",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，气动伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -9062,12 +9485,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "啸谷长风",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，气动伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [
@@ -9118,12 +9541,12 @@
         {
           "cost": 1,
           "fetterDetail": {
-            "firstDescription": "气动伤害提升10%",
+            "firstDescription": "",
             "groupId": 0,
             "iconUrl": "",
             "name": "啸谷长风",
             "num": 5,
-            "secondDescription": "使用变奏技能登场时，气动伤害提升30%，持续15秒"
+            "secondDescription": ""
           },
           "level": 25,
           "mainProps": [

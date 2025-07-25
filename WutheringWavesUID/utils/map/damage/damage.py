@@ -10,6 +10,7 @@ from ...damage.utils import (
     CHAR_ATTR_SIERRA,
     CHAR_ATTR_SINKING,
     CHAR_ATTR_VOID,
+    SONATA_ANCIENT,
     SONATA_CELESTIAL,
     SONATA_CLAWPRINT,
     SONATA_EMPYREAN,
@@ -33,6 +34,7 @@ from ...damage.utils import (
     cast_liberation,
     cast_skill,
     liberation_damage,
+    phantom_damage,
     skill_damage,
 )
 
@@ -65,6 +67,10 @@ def echo_damage(attr: DamageAttribute, isGroup: bool):
 
 def check_if_ph_5(ph_name: str, ph_num: int, check_name: str):
     return ph_name == check_name and ph_num == 5
+
+
+def check_if_ph_3(ph_name: str, ph_num: int, check_name: str):
+    return ph_name == check_name and ph_num == 3
 
 
 def phase_damage(
@@ -259,3 +265,20 @@ def phase_damage(
                 title = f"{phase_name}-{ph_detail.ph_name}"
                 msg = "自身共鸣解放伤害提升20%"
                 attr.add_dmg_bonus(0.2, title, msg)
+        # 失序彼岸之梦
+        elif check_if_ph_3(ph_detail.ph_name, ph_detail.ph_num, SONATA_ANCIENT):
+            # 角色共鸣能量为0时，自身暴击率提升20%，声骸技能伤害加成提升35%
+            title = f"{phase_name}-{ph_detail.ph_name}"
+            if attr.char_template == "temp_atk":
+                msg = "角色共鸣能量为0时，自身暴击率提升20%"
+                if attr.ph_result:
+                    attr.add_effect(title, msg)
+                else:
+                    attr.add_crit_rate(0.2, title, msg)
+
+            if attr.char_damage == phantom_damage:
+                msg = "角色共鸣能量为0时，声骸技能伤害加成提升35%"
+                if attr.ph_result:
+                    attr.add_effect(title, msg)
+                else:
+                    attr.add_dmg_bonus(0.35, title, msg)

@@ -19,6 +19,7 @@ SONATA_TIDEBREAKING = "无惧浪涛之勇"
 SONATA_WELKIN = "流云逝尽之空"
 SONATA_PILGRIMAGE = "愿戴荣光之旅"
 SONATA_CLAWPRINT = "奔狼燎原之焰"
+SONATA_ANCIENT = "失序彼岸之梦"
 
 CHAR_ATTR_FREEZING = "冷凝"
 CHAR_ATTR_CELESTIAL = "衍射"
@@ -35,6 +36,8 @@ hit_damage = "hit_damage"
 skill_damage = "skill_damage"
 # 共鸣解放伤害加成
 liberation_damage = "liberation_damage"
+# 声骸技能伤害加成
+phantom_damage = "phantom_damage"
 # 治疗效果加成
 heal_bonus = "heal_bonus"
 # 护盾量加成
@@ -46,10 +49,12 @@ cast_damage = "cast_damage"
 cast_attack = "cast_attack"
 # 造成重击伤害
 cast_hit = "cast_hit"
-# 造成技能伤害
+# 造成共鸣技能伤害
 cast_skill = "cast_skill"
-# 释放解放伤害
+# 造成共鸣解放伤害
 cast_liberation = "cast_liberation"
+# 造成声骸技能伤害
+cast_phantom = "cast_phantom"
 # 施放闪避反击
 cast_dodge_counter = "cast_dodge_counter"
 # 施放变奏技能
@@ -79,6 +84,9 @@ SkillTreeMap = {
 
 # 光噪效应
 Spectro_Frazzle_Role_Ids = [1501, 1502, 1506, 1507]
+
+# 失序彼岸之梦 套装
+Ancient_Role_Ids = [1608]
 
 # 异常
 AbnormalType = Literal[

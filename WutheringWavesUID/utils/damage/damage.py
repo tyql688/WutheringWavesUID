@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Any, Dict, List, Literal, Optional, Union
 
 from ...utils.api.model import RoleDetailData
@@ -55,32 +56,15 @@ class PhantomDetail:
         return res
 
 
+@dataclass
 class DamageBonusPhantom:
-    def __init__(
-        self,
-        attack_damage=0,
-        hit_damage=0,
-        skill_damage=0,
-        liberation_damage=0,
-        heal_bonus=0,
-        shuxing_bonus=0,
-    ):
-        """
-        初始化 DamageBonusPhantom 类的实例。
-
-        :param attack_damage: 普攻伤害加成
-        :param hit_damage: 重击伤害加成
-        :param skill_damage: 共鸣技能伤害加成
-        :param liberation_damage: 共鸣解放伤害加成
-        :param heal_bonus: 治疗效果加成
-        :param shuxing_bonus: 属性伤害加成
-        """
-        self.attack_damage = attack_damage
-        self.hit_damage = hit_damage
-        self.skill_damage = skill_damage
-        self.liberation_damage = liberation_damage
-        self.heal_bonus = heal_bonus
-        self.shuxing_bonus = shuxing_bonus
+    attack_damage: float = 0  # 普攻伤害加成
+    hit_damage: float = 0  # 重击伤害加成
+    skill_damage: float = 0  # 共鸣技能伤害加成
+    liberation_damage: float = 0  # 共鸣解放伤害加成
+    phantom_damage: float = 0  # 声骸伤害加成
+    heal_bonus: float = 0  # 治疗效果加成
+    shuxing_bonus: float = 0  # 属性伤害加成
 
     def __str__(self):
         return (
@@ -89,6 +73,7 @@ class DamageBonusPhantom:
             f"    hit_damage={self.hit_damage}, \n"
             f"    skill_damage={self.skill_damage}, \n"
             f"    liberation_damage={self.liberation_damage}, \n"
+            f"    phantom_damage={self.phantom_damage}, \n"
             f"    heal_bonus={self.heal_bonus}\n"
             f"    shuxing_bonus={self.shuxing_bonus}\n"
             f")"
@@ -101,6 +86,7 @@ class DamageBonusPhantom:
         res.hit_damage = d.get("hit_damage", 0)
         res.skill_damage = d.get("skill_damage", 0)
         res.liberation_damage = d.get("liberation_damage", 0)
+        res.phantom_damage = d.get("phantom_damage", 0)
         res.heal_bonus = d.get("heal_bonus", 0)
         res.shuxing_bonus = d.get("shuxing_bonus", 0)
         return res
@@ -613,8 +599,9 @@ class DamageAttribute:
         if not self.dmg_bonus_phantom:
             return self
         if needPhantom:
-            value = getattr(self.dmg_bonus_phantom, self.char_damage)
-            self.add_dmg_bonus(value)
+            if self.char_damage:
+                value = getattr(self.dmg_bonus_phantom, self.char_damage)
+                self.add_dmg_bonus(value)
         if needShuxing:
             value = self.dmg_bonus_phantom.shuxing_bonus
             self.add_dmg_bonus(value)

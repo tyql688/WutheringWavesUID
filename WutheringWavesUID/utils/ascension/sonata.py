@@ -40,6 +40,10 @@ class WavesSonataResult(BaseModel):
         """获取件套效果"""
         return self.set.get(str(piece_count), None)
 
+    def full_piece_effect(self) -> int:
+        """获取套装最大件数"""
+        return max(int(key) for key in self.set.keys())
+
 
 def get_sonata_detail(sonata_name: Optional[str]) -> WavesSonataResult:
     result = WavesSonataResult()
