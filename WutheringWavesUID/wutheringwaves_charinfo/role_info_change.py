@@ -91,7 +91,7 @@ class ReplaceSonata:
     PREFIX_RE: list[str] = ["合鸣", "套装"]
 
     def __init__(self):
-        self.sonataName: list[str] | None = None  # 套装名字
+        self.sonataName: list[str] = []  # 套装名字
 
 
 class PhantomInfo:
@@ -222,7 +222,7 @@ def parse_sonatas(content: str) -> list[Any] | None:
         type1 = []
         for text_part, num in match:
             clean_text = text_part.strip()
-            amount = int(num) if num else 5 # 没有数字，默认使用五件套
+            amount = int(num) if num else 5  # 没有数字，默认使用五件套
             if clean_text:
                 type1.append((clean_text, amount))
         return type1
@@ -462,17 +462,20 @@ class ChangeParser:
 
     def parse_sonata(self, cont: str) -> list[str]:
         matched_list = []
-        parsed_data  = parse_sonatas(cont)
-        if parsed_data :
+        parsed_data = parse_sonatas(cont)
+        if parsed_data:
             sonata_names = []
             compressed_commands = []
             for alias, amount in parsed_data:
-                formal_name  = alias_to_sonata_name(alias)
+                formal_name = alias_to_sonata_name(alias)
                 if isinstance(formal_name, str):
                     sonata_names.extend([formal_name] * amount)
                     compressed_commands.append(formal_name + str(amount))
-            self.rr.sonata.sonataName = sonata_names
-            matched_list.append(f"换{self.rr.sonata.PREFIX_RE[0]} {' '.join(compressed_commands)}")
+
+            self.rr.sonata.sonataName.extend(sonata_names)
+            matched_list.append(
+                f"换{self.rr.sonata.PREFIX_RE[0]} {' '.join(compressed_commands)}"
+            )
         return matched_list
 
     def parse_phantom(self, cont: str) -> list[str]:
@@ -646,29 +649,28 @@ async def change_role_detail(
     if parserResult.sonata.sonataName:
         sonata_results = []
         for sonataName in parserResult.sonata.sonataName:
-            sonata_result: WavesSonataResult = get_sonata_detail(
-                sonataName
-            )
+            sonata_result: WavesSonataResult = get_sonata_detail(sonataName)
             sonata_results.append(sonata_result)
         if (
             sonata_results
             and role_detail.phantomData
             and role_detail.phantomData.equipPhantomList
         ):
-            if len(sonata_results) == len(role_detail.phantomData.equipPhantomList):
-                for index, ep in enumerate(role_detail.phantomData.equipPhantomList):
-                    if not ep:
-                        continue
-                    ep.fetterDetail.name = sonata_results[index].name
-                    if index == 0 and ep.phantomProp.phantomId not in SONATA_FIRST_ID.get(
+            for index, ep in enumerate(role_detail.phantomData.equipPhantomList):
+                if not ep:
+                    continue
+                if index >= len(sonata_results):
+                    break
+                ep.fetterDetail.name = sonata_results[index].name
+                if index == 0 and ep.phantomProp.phantomId not in SONATA_FIRST_ID.get(
+                    sonata_results[index].name, []
+                ):
+                    ep.phantomProp.phantomId = SONATA_FIRST_ID.get(
                         sonata_results[index].name, []
-                    ):
-                        ep.phantomProp.phantomId = SONATA_FIRST_ID.get(
-                            sonata_results[index].name, []
-                        )[0]
-                        ep.phantomProp.name = easy_id_to_name(
-                            str(ep.phantomProp.phantomId), ep.phantomProp.name
-                        )
+                    )[0]
+                    ep.phantomProp.name = easy_id_to_name(
+                        str(ep.phantomProp.phantomId), ep.phantomProp.name
+                    )
 
     # 敌人
     if parserResult.enemy.enemyResistance:
