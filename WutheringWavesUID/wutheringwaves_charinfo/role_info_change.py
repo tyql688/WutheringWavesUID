@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from gsuid_core.logger import logger
 
@@ -91,7 +91,7 @@ class ReplaceSonata:
     PREFIX_RE: list[str] = ["合鸣", "套装"]
 
     def __init__(self):
-        self.sonataName: str | None = None  # 套装名字
+        self.sonataName: list[str] | None = None  # 套装名字
 
 
 class PhantomInfo:
@@ -214,12 +214,17 @@ def parse_skills(content: str) -> list[int] | None:
     return skills[:5]
 
 
-def parse_sonatas(content: str) -> str | None:
-    pattern = r"([^\d]+)"
-    match = re.search(pattern, content)
+def parse_sonatas(content: str) -> list[Any] | None:
+    pattern = r"([^\d]+)(\d*)"
+    match = re.findall(pattern, content)
 
     if match:
-        type1 = match.group(1).strip()
+        type1 = []
+        for text_part, num in match:
+            clean_text = text_part.strip()
+            amount = int(num) if num else 5 # 没有数字，默认使用五件套
+            if clean_text:
+                type1.append((clean_text, amount))
         return type1
 
     return None
@@ -457,11 +462,17 @@ class ChangeParser:
 
     def parse_sonata(self, cont: str) -> list[str]:
         matched_list = []
-        sonata_name = parse_sonatas(cont)
-        sonata_name = alias_to_sonata_name(sonata_name)
-        if sonata_name:
-            self.rr.sonata.sonataName = sonata_name
-            matched_list.append(f"换{self.rr.sonata.PREFIX_RE[0]} {sonata_name}")
+        parsed_data  = parse_sonatas(cont)
+        if parsed_data :
+            sonata_names = []
+            compressed_commands = []
+            for alias, amount in parsed_data:
+                formal_name  = alias_to_sonata_name(alias)
+                if isinstance(formal_name, str):
+                    sonata_names.extend([formal_name] * amount)
+                    compressed_commands.append(formal_name + str(amount))
+            self.rr.sonata.sonataName = sonata_names
+            matched_list.append(f"换{self.rr.sonata.PREFIX_RE[0]} {' '.join(compressed_commands)}")
         return matched_list
 
     def parse_phantom(self, cont: str) -> list[str]:
@@ -633,27 +644,31 @@ async def change_role_detail(
                 index += 1
 
     if parserResult.sonata.sonataName:
-        sonata_result: WavesSonataResult = get_sonata_detail(
-            parserResult.sonata.sonataName
-        )
+        sonata_results = []
+        for sonataName in parserResult.sonata.sonataName:
+            sonata_result: WavesSonataResult = get_sonata_detail(
+                sonataName
+            )
+            sonata_results.append(sonata_result)
         if (
-            sonata_result
+            sonata_results
             and role_detail.phantomData
             and role_detail.phantomData.equipPhantomList
         ):
-            for index, ep in enumerate(role_detail.phantomData.equipPhantomList):
-                if not ep:
-                    continue
-                ep.fetterDetail.name = sonata_result.name
-                if index == 0 and ep.phantomProp.phantomId not in SONATA_FIRST_ID.get(
-                    sonata_result.name, []
-                ):
-                    ep.phantomProp.phantomId = SONATA_FIRST_ID.get(
-                        sonata_result.name, []
-                    )[0]
-                    ep.phantomProp.name = easy_id_to_name(
-                        str(ep.phantomProp.phantomId), ep.phantomProp.name
-                    )
+            if len(sonata_results) == len(role_detail.phantomData.equipPhantomList):
+                for index, ep in enumerate(role_detail.phantomData.equipPhantomList):
+                    if not ep:
+                        continue
+                    ep.fetterDetail.name = sonata_results[index].name
+                    if index == 0 and ep.phantomProp.phantomId not in SONATA_FIRST_ID.get(
+                        sonata_results[index].name, []
+                    ):
+                        ep.phantomProp.phantomId = SONATA_FIRST_ID.get(
+                            sonata_results[index].name, []
+                        )[0]
+                        ep.phantomProp.name = easy_id_to_name(
+                            str(ep.phantomProp.phantomId), ep.phantomProp.name
+                        )
 
     # 敌人
     if parserResult.enemy.enemyResistance:
