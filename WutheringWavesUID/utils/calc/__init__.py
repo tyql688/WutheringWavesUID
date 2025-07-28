@@ -131,15 +131,15 @@ class WuWaCalc(object):
             two_piece = waves_sonata_result.piece(2)
             # 2件套效果，声骸数量大于等于2
             if two_piece and num >= 2:
-                name = two_piece.effect
+                name: str | Any = two_piece.effect
                 effect = two_piece.param[0]
                 result["ph"] = waves_sonata_result.name
                 if name not in result:
                     result[name] = effect
-                    continue
-                old = float(result[name].replace("%", ""))
-                new = float(effect.replace("%", ""))
-                result[name] = f"{old + new:.1f}%"
+                else:
+                    old = float(result[name].replace("%", ""))
+                    new = float(effect.replace("%", ""))
+                    result[name] = f"{old + new:.1f}%"
 
             result["ph_detail"].append(
                 {
