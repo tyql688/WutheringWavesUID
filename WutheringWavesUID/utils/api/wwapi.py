@@ -15,6 +15,7 @@ GET_POOL_LIST = f"{MAIN_URL}/api/waves/pool/list"
 GET_TOWER_APPEAR_RATE = f"{MAIN_URL}/api/waves/abyss/appear_rate"
 UPLOAD_SLASH_RECORD_URL = f"{MAIN_URL}/top/waves/slash/upload"
 GET_SLASH_APPEAR_RATE = f"{MAIN_URL}/api/waves/slash/appear_rate"
+GET_SLASH_RANK_URL = f"{MAIN_URL}/top/waves/slash/rank"
 
 ABYSS_TYPE = Literal["l4", "m2", "r4", "a"]
 
@@ -160,3 +161,53 @@ class SlashDetailRequest(BaseModel):
     halfList: List[SlashDetail]
     rank: str
     score: int
+
+
+# ------------------------------------------------------------
+# 冥海排行
+#
+# ------------------------------------------------------------
+
+
+class SlashRankItem(BaseModel):
+    page: int
+    page_num: int
+    waves_id: str
+    version: str
+
+
+class SlashCharDetail(BaseModel):
+    char_id: int  # 角色id
+    level: int  # 角色等级
+    chain: int  # 角色链
+
+
+class SlashHalfList(BaseModel):
+    buff_icon: str  # buff图标
+    buff_name: str  # buff名称
+    buff_quality: int  # buff品质
+    char_detail: List[SlashCharDetail]  # 角色详细数据
+    score: int  # 每层分数
+
+
+class SlashRank(BaseModel):
+    half_list: List[SlashHalfList]
+    score: int  # 冥海总分数
+    rank: int  # 总排名
+    user_id: str  # 用户id
+    waves_id: str  # 鸣潮id
+    kuro_name: str  # 库洛用户名
+    alias_name: str  # 主人别名
+
+
+class SlashRankData(BaseModel):
+    page: int  # 页码
+    page_num: int  # 每页数量
+    start_date: str  # 开始日期
+    rank_list: List[SlashRank]  # 排行数据
+
+
+class SlashRankRes(BaseModel):
+    code: int
+    message: str
+    data: Optional[SlashRankData] = None
