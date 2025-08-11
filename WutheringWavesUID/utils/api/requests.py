@@ -413,7 +413,7 @@ class WavesApi:
         header.update({"token": token})
         if header.get("roleId", "") != roleId:
             succ, b_at = await self.get_request_token(
-                roleId, token, header.get("did", "")
+                header.get("roleId", ""), token, header.get("did", "")
             )
             if succ:
                 header["b-at"] = b_at
@@ -434,7 +434,7 @@ class WavesApi:
         header.update({"token": token})
         if header.get("roleId", "") != roleId:
             succ, b_at = await self.get_request_token(
-                roleId, token, header.get("did", "")
+                header.get("roleId", ""), token, header.get("did", "")
             )
             if succ:
                 header["b-at"] = b_at
@@ -471,7 +471,7 @@ class WavesApi:
         header.update({"token": token})
         if header.get("roleId", "") != roleId:
             succ, b_at = await self.get_request_token(
-                roleId, token, header.get("did", "")
+                header.get("roleId", ""), token, header.get("did", "")
             )
             if succ:
                 header["b-at"] = b_at
@@ -496,7 +496,7 @@ class WavesApi:
         header.update({"token": token})
         if header.get("roleId", "") != roleId:
             succ, b_at = await self.get_request_token(
-                roleId, token, header.get("did", "")
+                header.get("roleId", ""), token, header.get("did", "")
             )
             if succ:
                 header["b-at"] = b_at
@@ -524,7 +524,7 @@ class WavesApi:
         header.update({"token": token})
         if header.get("roleId", "") != roleId:
             succ, b_at = await self.get_request_token(
-                roleId, token, header.get("did", "")
+                header.get("roleId", ""), token, header.get("did", "")
             )
             if succ:
                 header["b-at"] = b_at
@@ -549,7 +549,7 @@ class WavesApi:
         header.update({"token": token})
         if header.get("roleId", "") != roleId:
             succ, b_at = await self.get_request_token(
-                roleId, token, header.get("did", "")
+                header.get("roleId", ""), token, header.get("did", "")
             )
             if succ:
                 header["b-at"] = b_at
@@ -586,7 +586,7 @@ class WavesApi:
         header.update({"token": token})
         if header.get("roleId", "") != roleId:
             succ, b_at = await self.get_request_token(
-                roleId, token, header.get("did", "")
+                header.get("roleId", ""), token, header.get("did", "")
             )
             if succ:
                 header["b-at"] = b_at
@@ -607,7 +607,7 @@ class WavesApi:
         header.update({"token": token})
         if header.get("roleId", "") != roleId:
             succ, b_at = await self.get_request_token(
-                roleId, token, header.get("did", "")
+                header.get("roleId", ""), token, header.get("did", "")
             )
             if succ:
                 header["b-at"] = b_at
@@ -641,7 +641,7 @@ class WavesApi:
         header.update({"token": token})
         if header.get("roleId", "") != roleId:
             succ, b_at = await self.get_request_token(
-                roleId, token, header.get("did", "")
+                header.get("roleId", ""), token, header.get("did", "")
             )
             if succ:
                 header["b-at"] = b_at
