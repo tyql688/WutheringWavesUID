@@ -118,7 +118,7 @@ async def get_new_gachalog(
         res = await waves_api.get_gacha_log(card_pool_type, record_id, uid)
         if not res.success or not res.data:
             # 抽卡记录获取失败
-            if res.get("code") == -1:  # type: ignore
+            if res.code == -1:  # type: ignore
                 return ERROR_MSG_INVALID_LINK, None, None  # type: ignore
             else:
                 continue

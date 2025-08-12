@@ -77,6 +77,7 @@ class RespCode(IntEnum):
 SEND_MASTER_INFO_CODES = (RespCode.DANGER_ENV.value,)
 # 不发送主人信息
 NOT_SEND_MASTER_INFO_CODES = (
+    RespCode.ERROR.value,
     RespCode.OK_ZERO.value,
     RespCode.OK_HTTP.value,
     RespCode.TOKEN_INVALID.value,
