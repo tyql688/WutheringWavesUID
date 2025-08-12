@@ -55,6 +55,7 @@ class ThrowMsg(str):
     BAT_TOKEN_INVALID = "数据令牌已失效"
     DANGER_ENV = "当前环境存在风险无法进行操作，请切换网络环境后重试"
     SERVER_ERROR = "请求服务器失败，已达最大重试次数"
+    SYSTEM_BUSY = "系统繁忙，请稍后再试"
 
 
 class RespCode(IntEnum):
@@ -66,6 +67,7 @@ class RespCode(IntEnum):
     SERVER_ERROR = 500
 
     # 以下是kuro给的
+    CAPTCHA_EXPIRED = 132  #  {'code': 132, 'msg': '验证码已经过期，请重新获取'}
     TOKEN_INVALID = 220  # {'code': 220, 'msg': '登录已过期，请重新登录'} token失效
     BAT_TOKEN_INVALID = 10903  # {'code': 10903, 'msg': '数据令牌已失效', 'data': None, 'success': False} bat失效
     DANGER_ENV = 270  # {'code': 270, 'msg': '当前环境存在风险无法进行操作，请切换网络环境后重试'} ip无了
@@ -79,6 +81,7 @@ NOT_SEND_MASTER_INFO_CODES = (
     RespCode.OK_HTTP.value,
     RespCode.TOKEN_INVALID.value,
     RespCode.BAT_TOKEN_INVALID.value,
+    RespCode.CAPTCHA_EXPIRED.value,
 )
 
 
@@ -149,7 +152,7 @@ class KuroApiResp(BaseModel, Generic[T]):
     def throw_msg(self) -> str:
         if isinstance(self.msg, str):
             return self.msg
-        return ThrowMsg.SERVER_ERROR
+        return ThrowMsg.SYSTEM_BUSY
 
 
 if __name__ == "__main__":

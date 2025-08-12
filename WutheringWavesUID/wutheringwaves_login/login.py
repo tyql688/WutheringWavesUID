@@ -222,23 +222,17 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
 
     did = str(uuid.uuid4()).upper()
     result = await waves_api.login(phone_number, code, did)
-    if (
-        not isinstance(result, dict)
-        or result.get("code") != 200
-        or result.get("data") is None
-    ):
-        send_msg = (
-            result.get("msg", "")
-            if isinstance(result, dict)
-            else f"{game_title} 登录失败\n"
-        )
-        if send_msg == "系统繁忙，请稍后再试":
-            # 可能是没注册库街区。 -_-||
-            return await bot.send(msg_error, at_sender=at_sender)
-        else:
-            return await bot.send(send_msg, at_sender=at_sender)
+    if not result.success:
+        return await bot.send(result.throw_msg(), at_sender=at_sender)
 
-    token = result.get("data", {}).get("token", "")
+    if result.msg == "系统繁忙，请稍后再试":
+        # 可能是没注册库街区。 -_-||
+        return await bot.send(msg_error, at_sender=at_sender)
+
+    if not result.data or not isinstance(result.data, dict):
+        return await bot.send(message=result.throw_msg(), at_sender=at_sender)
+
+    token = result.data.get("token", "")
     waves_user = await add_cookie(ev, token, did)
     if waves_user and isinstance(waves_user, WavesUser):
         return await login_success_msg(bot, ev, waves_user)
