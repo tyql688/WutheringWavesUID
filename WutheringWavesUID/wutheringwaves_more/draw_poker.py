@@ -85,23 +85,17 @@ async def draw_poker_img(ev: Event, uid: str, user_id: str):
         return error_reply(WAVES_CODE_102)
 
     moreActivity = await waves_api.get_more_activity(uid, ck)
-    if isinstance(moreActivity, str):
-        return moreActivity
+    if not moreActivity.success:
+        return moreActivity.throw_msg()
 
-    if not isinstance(moreActivity, dict):
-        return POKER_ERROR
-
-    if moreActivity.get("code") != 200 or not moreActivity.get("data"):
-        return POKER_ERROR
-
-    temp: MoreActivity = MoreActivity.model_validate(moreActivity["data"])
+    temp: MoreActivity = MoreActivity.model_validate(moreActivity.data)
     phantomBattle = temp.phantomBattle
 
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info  # type: ignore
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success:
+        return account_info.throw_msg()
+    account_info = AccountBaseInfo.model_validate(account_info.data)
 
     # 计算徽章行数来调整总高度
     total_badges = len(phantomBattle.badgeList)

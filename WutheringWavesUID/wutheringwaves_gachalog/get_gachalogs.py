@@ -116,18 +116,14 @@ async def get_new_gachalog(
     new_count = {}
     for gacha_name, card_pool_type in gacha_type_meta_data.items():
         res = await waves_api.get_gacha_log(card_pool_type, record_id, uid)
-        if (
-            not isinstance(res, dict)
-            or res.get("code") != 0
-            or res.get("data", None) is None
-        ):
+        if not res.success or not res.data:
             # 抽卡记录获取失败
             if res.get("code") == -1:  # type: ignore
                 return ERROR_MSG_INVALID_LINK, None, None  # type: ignore
             else:
                 continue
 
-        gacha_log = [GachaLog(**log) for log in res["data"]]
+        gacha_log = [GachaLog.model_validate(log) for log in res.data]  # type: ignore
         for log in gacha_log:
             if log.cardPoolType != card_pool_type:
                 log.cardPoolType = card_pool_type

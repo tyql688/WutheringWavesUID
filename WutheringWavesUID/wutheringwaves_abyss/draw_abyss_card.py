@@ -15,7 +15,7 @@ from ..utils.api.model import (
 )
 from ..utils.api.wwapi import ABYSS_TYPE_MAP, AbyssDetail, AbyssItem
 from ..utils.char_info_utils import get_all_roleid_detail_info
-from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
+from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import (
     waves_font_18,
     waves_font_25,
@@ -54,24 +54,18 @@ async def get_abyss_data(uid: str, ck: str, is_self_ck: bool):
     else:
         abyss_data = await waves_api.get_abyss_index(uid, ck)
 
-    if isinstance(abyss_data, str):
-        return abyss_data
+    if not abyss_data.success:
+        return abyss_data.throw_msg()
 
-    if not isinstance(abyss_data, dict):
+    abyss_data = abyss_data.data
+    if not abyss_data or (
+        isinstance(abyss_data, dict) and not abyss_data.get("isUnlock", False)
+    ):
+        if not is_self_ck:
+            return ABYSS_ERROR_MESSAGE_LOGIN
         return ABYSS_ERROR_MESSAGE_NO_DATA
-
-    if abyss_data.get("code") == 200:
-        if not abyss_data.get("data") or not abyss_data["data"].get("isUnlock", False):
-            if not is_self_ck:
-                return ABYSS_ERROR_MESSAGE_LOGIN
-            return ABYSS_ERROR_MESSAGE_NO_DATA
-        else:
-            return AbyssChallenge.model_validate(abyss_data["data"])
     else:
-        msg = error_reply(WAVES_CODE_999)
-        if abyss_data.get("msg"):
-            msg = abyss_data["msg"]
-        return error_reply(msg=msg)
+        return AbyssChallenge.model_validate(abyss_data)
 
 
 async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]:
@@ -95,16 +89,17 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
         difficultyName = "实验区"
 
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info  # type: ignore
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success:
+        return account_info.throw_msg()
+    account_info = AccountBaseInfo.model_validate(account_info.data)
 
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(uid, ck)
-    if not succ:
-        return role_info  # type: ignore
-    role_info = RoleList.model_validate(role_info)
+    role_info = await waves_api.get_role_info(uid, ck)
+    if not role_info.success:
+        return role_info.throw_msg()
+
+    role_info = RoleList.model_validate(role_info.data)
 
     # 深渊
     abyss_data = await get_abyss_data(uid, ck, is_self_ck)

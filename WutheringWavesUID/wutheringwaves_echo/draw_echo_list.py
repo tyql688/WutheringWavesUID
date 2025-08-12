@@ -61,8 +61,10 @@ async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
         # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success:
+        return account_info.throw_msg()
+    account_info = AccountBaseInfo.model_validate(account_info.data)
 
     all_role_detail: Optional[Dict[str, RoleDetailData]] = (
         await get_all_role_detail_info(uid)

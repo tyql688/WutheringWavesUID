@@ -3,24 +3,25 @@ from typing import List, Optional, Union
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 
-from ..utils import hint
 from ..utils.api.api import GAME_ID
 from ..utils.api.model import KuroWavesUserInfo
+from ..utils.api.request_util import PLATFORM_SOURCE
 from ..utils.database.models import WavesBind, WavesUser
-from ..utils.error_reply import ERROR_CODE, WAVES_CODE_101, WAVES_CODE_103
+from ..utils.error_reply import ERROR_CODE, WAVES_CODE_103
 from ..utils.waves_api import waves_api
 
 
 async def add_cookie(ev: Event, ck: str, did: str) -> str:
-    succ, platform, kuroWavesUserInfos = await waves_api.get_kuro_role_list(ck, did)
-    if not succ:
-        if isinstance(kuroWavesUserInfos, str):
-            return hint.error_reply(msg=kuroWavesUserInfos)
-        else:
-            return hint.error_reply(code=WAVES_CODE_101)
+    platform = PLATFORM_SOURCE
+    kuroWavesUserInfos = await waves_api.get_kuro_role_list(ck, did)
+    if (
+        not kuroWavesUserInfos.success
+        or not kuroWavesUserInfos.data
+        or not isinstance(kuroWavesUserInfos.data, list)
+    ):
+        return kuroWavesUserInfos.throw_msg()
 
-    if not isinstance(kuroWavesUserInfos, list):
-        return hint.error_reply(code=WAVES_CODE_101)
+    kuroWavesUserInfos = kuroWavesUserInfos.data
 
     role_list = []
     for kuroWavesUserInfo in kuroWavesUserInfos:
@@ -37,7 +38,6 @@ async def add_cookie(ev: Event, ck: str, did: str) -> str:
             ck,
             did,
             data.serverId,
-            force_refresh=True,
         )
         if not succ or not bat:
             return bat

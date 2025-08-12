@@ -13,6 +13,7 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.image.image_tools import crop_center_img
 
 from ..utils.api.model import AccountBaseInfo, DailyData
+from ..utils.api.request_util import KuroApiResp
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.error_reply import ERROR_CODE, WAVES_CODE_102, WAVES_CODE_103
 from ..utils.fonts.waves_fonts import (
@@ -67,16 +68,14 @@ async def process_uid(uid, ev):
     )
 
     (daily_info_res, account_info_res) = results
-    if not isinstance(daily_info_res, (list, tuple)) or not isinstance(
-        account_info_res, (list, tuple)
-    ):
+    if not isinstance(daily_info_res, KuroApiResp) or not daily_info_res.success:
         return None
 
-    if not daily_info_res[0] or not account_info_res[0]:
+    if not isinstance(account_info_res, KuroApiResp) or not account_info_res.success:
         return None
 
-    daily_info = DailyData.model_validate(daily_info_res[1])
-    account_info = AccountBaseInfo.model_validate(account_info_res[1])
+    daily_info = DailyData.model_validate(daily_info_res.data)
+    account_info = AccountBaseInfo.model_validate(account_info_res.data)
 
     return {
         "daily_info": daily_info,
@@ -164,13 +163,15 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
             )
             if ck:
                 for char_id in SPECIAL_CHAR[char_id]:
-                    succ, role_detail_info = await waves_api.get_role_detail_info(
+                    role_detail_info = await waves_api.get_role_detail_info(
                         char_id, daily_info.roleId, ck
                     )
+                    if not role_detail_info.success:
+                        continue
+                    role_detail_info = role_detail_info.data
                     if (
-                        not succ
+                        not isinstance(role_detail_info, Dict)
                         or "role" not in role_detail_info
-                        or not isinstance(role_detail_info, dict)
                         or role_detail_info["role"] is None
                         or "level" not in role_detail_info
                         or role_detail_info["level"] is None

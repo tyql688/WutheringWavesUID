@@ -46,11 +46,11 @@ async def draw_challenge_img(ev: Event, uid: str, user_id: str) -> Union[bytes, 
         return error_reply(WAVES_CODE_102)
 
     # 全息数据
-    succ, challenge_data = await waves_api.get_challenge_data(uid, ck)
-    if not succ or not challenge_data:
-        return challenge_data if isinstance(challenge_data, str) else ERROR_MSG
+    challenge_data = await waves_api.get_challenge_data(uid, ck)
+    if not challenge_data.success:
+        return challenge_data.throw_msg()
 
-    challenge_data = ChallengeArea.model_validate(challenge_data)
+    challenge_data = ChallengeArea.model_validate(challenge_data.data)
     if not challenge_data.isUnlock:
         return ERROR_UNLOCK
 
@@ -58,14 +58,18 @@ async def draw_challenge_img(ev: Event, uid: str, user_id: str) -> Union[bytes, 
         return ERROR_OPEN
 
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success:
+        return account_info.throw_msg()
+    account_info = AccountBaseInfo.model_validate(account_info.data)
 
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(uid, ck)
-    if not succ:
-        return role_info if isinstance(role_info, str) else ERROR_MSG
-    role_info = RoleList.model_validate(role_info)
+    role_info = await waves_api.get_role_info(uid, ck)
+    if not role_info.success:
+        return role_info.throw_msg()
+
+    role_info = RoleList.model_validate(role_info.data)
+
     num = len(challenge_data.challengeInfo)
     a = num // 2 + (0 if num % 2 == 0 else 1)
     h = 300 + a * 260 + 50

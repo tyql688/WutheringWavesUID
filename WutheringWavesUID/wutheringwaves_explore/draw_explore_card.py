@@ -84,15 +84,15 @@ async def draw_explore_img(ev: Event, uid: str, user_id: str):
     if not ck:
         return hint.error_reply(WAVES_CODE_102)
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success:
+        return account_info.throw_msg()
+    account_info = AccountBaseInfo.model_validate(account_info.data)
 
-    succ, explore_data = await waves_api.get_explore_data(uid, ck)
-    if not succ:
-        return explore_data
-    explore_data = ExploreList.model_validate(explore_data)
+    explore_data = await waves_api.get_explore_data(uid, ck)
+    if not explore_data.success:
+        return explore_data.throw_msg()
+    explore_data = ExploreList.model_validate(explore_data.data)
     if not is_self_ck and not explore_data.open:
         return hint.error_reply(msg="探索数据未开启")
 

@@ -8,7 +8,7 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 
 from ..utils.api.model import AccountBaseInfo, RoleList
-from ..utils.error_reply import WAVES_CODE_101, WAVES_CODE_102, WAVES_CODE_999
+from ..utils.error_reply import WAVES_CODE_101, WAVES_CODE_102
 from ..utils.expression_ctx import WavesCharRank, get_waves_char_rank
 from ..utils.hint import error_reply
 from ..utils.queues.const import QUEUE_SCORE_RANK
@@ -86,10 +86,10 @@ async def send_card(
                 f"角色数量不一致，role_info.roleNum:{len(role_info.roleList)} != waves_char_rank:{len(save_data)}"
             )
             return
-        succ, account_info = await waves_api.get_base_info(uid, token=token)
-        if not succ:
-            return account_info
-        account_info = AccountBaseInfo.model_validate(account_info)
+        account_info = await waves_api.get_base_info(uid, token=token)
+        if not account_info.success:
+            return account_info.throw_msg()
+        account_info = AccountBaseInfo.model_validate(account_info.data)
         if len(waves_data) != 1 and account_info.roleNum != len(save_data):
             logger.warning(
                 f"角色数量不一致，role_info.roleNum:{account_info.roleNum} != waves_char_rank:{len(save_data)}"
@@ -184,15 +184,12 @@ async def refresh_char(
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(uid, ck)
-    if not succ:
-        if isinstance(role_info, str):
-            return role_info
-        else:
-            return error_reply(WAVES_CODE_999)
+    role_info = await waves_api.get_role_info(uid, ck)
+    if not role_info.success:
+        return role_info.throw_msg()
 
     try:
-        role_info = RoleList.model_validate(role_info)
+        role_info = RoleList.model_validate(role_info.data)
     except Exception as e:
         logger.exception(f"{uid} 角色信息解析失败", e)
         msg = f"鸣潮特征码[{uid}]获取数据失败\n1.是否注册过库街区\n2.库街区能否查询当前鸣潮特征码数据"
@@ -234,10 +231,13 @@ async def refresh_char(
         if isinstance(r.chainUnlockNum, int)
     }
     # 处理返回的数据
-    for succ, role_detail_info in results:
+    for role_detail_info in results:
+        if not role_detail_info.success:
+            continue
+
+        role_detail_info = role_detail_info.data
         if (
-            not succ
-            or not isinstance(role_detail_info, dict)
+            not isinstance(role_detail_info, dict)
             or "role" not in role_detail_info
             or role_detail_info["role"] is None
             or "level" not in role_detail_info

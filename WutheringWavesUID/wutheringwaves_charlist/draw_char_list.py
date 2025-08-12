@@ -99,10 +99,10 @@ async def draw_char_list_img(
         is_self_ck = False
 
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info  # type: ignore
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success:
+        return account_info.throw_msg()
+    account_info = AccountBaseInfo.model_validate(account_info.data)
 
     all_role_detail = await get_all_roleid_detail_info(
         ev,

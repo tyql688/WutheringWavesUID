@@ -15,7 +15,7 @@ from ..utils.api.model import (
 from ..utils.api.wwapi import SlashDetailRequest
 from ..utils.ascension.char import get_char_model
 from ..utils.char_info_utils import get_all_roleid_detail_info
-from ..utils.error_reply import WAVES_CODE_102, WAVES_CODE_999
+from ..utils.error_reply import WAVES_CODE_102
 from ..utils.fonts.waves_fonts import (
     waves_font_18,
     waves_font_25,
@@ -85,24 +85,18 @@ async def get_slash_data(
     else:
         slash_data = await waves_api.get_slash_index(uid, ck)
 
-    if isinstance(slash_data, str):
-        return slash_data
+    if not slash_data.success:
+        return slash_data.throw_msg()
 
-    if not isinstance(slash_data, dict):
-        return SLASH_ERROR
-
-    if slash_data.get("code") == 200:
-        if not slash_data.get("data") or not slash_data["data"].get("isUnlock", False):
-            if not is_self_ck:
-                return SLASH_ERROR_MESSAGE_NO_UNLOCK
-            return SLASH_ERROR_MESSAGE_NO_DATA
-        else:
-            return SlashDetail.model_validate(slash_data["data"])
+    slash_data = slash_data.data
+    if not slash_data or (
+        isinstance(slash_data, dict) and not slash_data.get("isUnlock", False)
+    ):
+        if not is_self_ck:
+            return SLASH_ERROR_MESSAGE_NO_UNLOCK
+        return SLASH_ERROR_MESSAGE_NO_DATA
     else:
-        msg = error_reply(WAVES_CODE_999)
-        if slash_data.get("msg"):
-            msg = slash_data["msg"]
-        return error_reply(msg=msg)
+        return SlashDetail.model_validate(slash_data)
 
 
 async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]:
@@ -155,16 +149,17 @@ async def draw_slash_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
         return SLASH_ERROR_MESSAGE_NO_DATA
 
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info  # type: ignore
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success:
+        return account_info.throw_msg()
+    account_info = AccountBaseInfo.model_validate(account_info.data)
 
     # 共鸣者信息
-    succ, role_info = await waves_api.get_role_info(uid, ck)
-    if not succ:
-        return role_info  # type: ignore
-    role_info = RoleList.model_validate(role_info)
+    role_info = await waves_api.get_role_info(uid, ck)
+    if not role_info.success:
+        return role_info.throw_msg()
+
+    role_info = RoleList.model_validate(role_info.data)
 
     # 绘制图片
     footer_h = 50

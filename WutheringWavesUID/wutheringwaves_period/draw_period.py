@@ -50,11 +50,11 @@ async def process_uid(
     if not ck:
         return None
 
-    succ, period_list = await waves_api.get_period_list(uid, ck)
-    if not succ or not period_list:
+    period_list = await waves_api.get_period_list(uid, ck)
+    if not period_list.success or not period_list.data:
         return None
 
-    period_list = PeriodList.model_validate(period_list)
+    period_list = PeriodList.model_validate(period_list.data)
 
     period_type = "month"
     period_node: Optional[Period] = None

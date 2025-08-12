@@ -414,12 +414,14 @@ async def get_role_need(
             query_list = SPECIAL_CHAR.copy()[char_id]
 
         for char_id in query_list:
-            succ, role_detail_info = await waves_api.get_role_detail_info(
+            role_detail_info = await waves_api.get_role_detail_info(
                 char_id, waves_id, ck
             )
+            if not role_detail_info.success:
+                continue
+            role_detail_info = role_detail_info.data
             if (
-                not succ
-                or not isinstance(role_detail_info, Dict)
+                not isinstance(role_detail_info, Dict)
                 or "role" not in role_detail_info
                 or role_detail_info["role"] is None
                 or "level" not in role_detail_info
@@ -645,9 +647,9 @@ async def draw_char_detail_img(
         if not ck:
             return hint.error_reply(WAVES_CODE_102)
 
-        succ, online_list = await waves_api.get_online_list_role(ck)
-        if succ and online_list:
-            online_list_role_model = OnlineRoleList.model_validate(online_list)
+        online_list = await waves_api.get_online_list_role(ck)
+        if online_list.success and online_list.data:
+            online_list_role_model = OnlineRoleList.model_validate(online_list.data)
             online_role_map = {str(i.roleId): i for i in online_list_role_model}
             if char_id in online_role_map:
                 is_online_user = True
@@ -657,10 +659,10 @@ async def draw_char_detail_img(
         uid = waves_id
 
     if not is_limit_query:
-        succ, account_info = await waves_api.get_base_info(uid, ck)
-        if not succ:
-            return account_info
-        account_info = AccountBaseInfo.model_validate(account_info)
+        account_info = await waves_api.get_base_info(uid, ck)
+        if not account_info.success:
+            return account_info.throw_msg()
+        account_info = AccountBaseInfo.model_validate(account_info.data)
         force_resource_id = None
     else:
         account_info = AccountBaseInfo.model_validate(
@@ -1088,10 +1090,10 @@ async def draw_char_score_img(
     # 账户数据
     if waves_id:
         uid = waves_id
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success:
+        return account_info.throw_msg()
+    account_info = AccountBaseInfo.model_validate(account_info.data)
     # 获取数据
     avatar, role_detail = await get_role_need(ev, char_id, ck, uid, char_name, waves_id)
     if isinstance(role_detail, str):

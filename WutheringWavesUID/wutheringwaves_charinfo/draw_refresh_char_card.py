@@ -165,10 +165,10 @@ async def draw_refresh_char_detail_img(
     if not ck:
         return error_reply(WAVES_CODE_102)
     # 账户数据
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ:
-        return account_info
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success:
+        return account_info.throw_msg()
+    account_info = AccountBaseInfo.model_validate(account_info.data)
     # 更新group id
     await WavesBind.insert_waves_uid(
         user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9

@@ -45,12 +45,12 @@ async def get_remote_role_detail_info(
 
     if not role_detail_info:
         for char_id in find_char_id:
-            succ, role_detail_info = await waves_api.get_role_detail_info(
-                char_id, waves_id, ck
-            )
+            temp = await waves_api.get_role_detail_info(char_id, waves_id, ck)
+            if not temp.success:
+                continue
+            role_detail_info = temp.data
             if (
-                not succ
-                or not isinstance(role_detail_info, Dict)
+                not isinstance(role_detail_info, Dict)
                 or "role" not in role_detail_info
                 or role_detail_info["role"] is None
                 or "level" not in role_detail_info

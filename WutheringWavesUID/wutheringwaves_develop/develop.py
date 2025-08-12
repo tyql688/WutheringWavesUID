@@ -147,27 +147,27 @@ async def calc_develop_cost(ev: Event, develop_list: List[str], is_flush=False):
     if len(alias_char_ids) > 2:
         return "暂不支持查询两个以上角色养成"
 
-    succ, _ = await waves_api.calculator_refresh_data(uid, token)
-    if not succ:
+    refresh_data = await waves_api.calculator_refresh_data(uid, token)
+    if not refresh_data.success:
         return "养成刷新失败"
 
     # 获取所有角色
-    succ, online_list_role = await waves_api.get_online_list_role(token)
-    if not succ or isinstance(online_list_role, str):
-        return online_list_role
-    online_list_role_model = OnlineRoleList.model_validate(online_list_role)
+    online_list_role = await waves_api.get_online_list_role(token)
+    if not online_list_role.success or isinstance(online_list_role.data, str):
+        return online_list_role.throw_msg()
+    online_list_role_model = OnlineRoleList.model_validate(online_list_role.data)
     online_role_map = {str(i.roleId): i for i in online_list_role_model}
     # 获取所有武器
-    succ, online_list_weapon = await waves_api.get_online_list_weapon(token)
-    if not succ or isinstance(online_list_weapon, str):
-        return online_list_weapon
-    online_list_weapon_model = OnlineWeaponList.model_validate(online_list_weapon)
+    online_list_weapon = await waves_api.get_online_list_weapon(token)
+    if not online_list_weapon.success or isinstance(online_list_weapon.data, str):
+        return online_list_weapon.throw_msg()
+    online_list_weapon_model = OnlineWeaponList.model_validate(online_list_weapon.data)
     online_weapon_map = {str(i.weaponId): i for i in online_list_weapon_model}
     # 获取拥有的角色
-    succ, owned_role = await waves_api.get_owned_role(uid, token)
-    if not succ or isinstance(owned_role, str):
-        return owned_role
-    owned_char_ids_model = OwnedRoleList.model_validate(owned_role)
+    owned_role = await waves_api.get_owned_role(uid, token)
+    if not owned_role.success or isinstance(owned_role.data, str):
+        return owned_role.throw_msg()
+    owned_char_ids_model = OwnedRoleList.model_validate(owned_role.data)
     owned_char_ids = [str(i) for i in owned_char_ids_model]
 
     owneds = []
@@ -188,12 +188,12 @@ async def calc_develop_cost(ev: Event, develop_list: List[str], is_flush=False):
 
     develop_data_map = {}
     if owneds:
-        success, develop_data = await waves_api.get_develop_role_cultivate_status(
+        develop_data = await waves_api.get_develop_role_cultivate_status(
             uid, token, owneds
         )
-        if not success:
-            return develop_data
-        develop_data = RoleCultivateStatusList.model_validate(develop_data)
+        if not develop_data.success:
+            return develop_data.throw_msg()
+        develop_data = RoleCultivateStatusList.model_validate(develop_data.data)
         develop_data_map = {i.roleId: i for i in develop_data}
 
     if is_flush:
@@ -248,12 +248,12 @@ async def calc_develop_cost(ev: Event, develop_list: List[str], is_flush=False):
     if not content_list:
         return "未找到养成角色"
 
-    succ, develop_cost = await waves_api.get_batch_role_cost(uid, token, content_list)
-    if not succ:
-        return develop_cost
+    develop_cost = await waves_api.get_batch_role_cost(uid, token, content_list)
+    if not develop_cost.success:
+        return develop_cost.throw_msg()
     content_map = {f"{i['roleId']}": i for i in content_list}
 
-    batch_role_cost_res = BatchRoleCostResponse.model_validate(develop_cost)
+    batch_role_cost_res = BatchRoleCostResponse.model_validate(develop_cost.data)
 
     all_card = []
     # batch_preview: RoleCostDetail = batch_role_cost_res.preview
