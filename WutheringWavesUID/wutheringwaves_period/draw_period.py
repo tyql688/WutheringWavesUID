@@ -82,17 +82,17 @@ async def process_uid(
     if not period_node:
         return MSG_NO_PERIOD.format(uid, period_param)
 
-    succ, period_detail = await waves_api.get_period_detail(
+    period_detail = await waves_api.get_period_detail(
         period_type, period_node.index, uid, ck
     )
-    if not succ or not period_detail:
+    if not period_detail.success or not period_detail.data:
         return None
-    period_detail = PeriodDetail.model_validate(period_detail)
+    period_detail = PeriodDetail.model_validate(period_detail.data)
 
-    succ, account_info = await waves_api.get_base_info(uid, ck)
-    if not succ or not account_info:
+    account_info = await waves_api.get_base_info(uid, ck)
+    if not account_info.success or not account_info.data:
         return None
-    account_info = AccountBaseInfo.model_validate(account_info)
+    account_info = AccountBaseInfo.model_validate(account_info.data)
 
     return {
         "period_node": period_node,
@@ -220,13 +220,14 @@ async def _draw_period_img(ev: Event, valid: Dict):
         )
         for item in period_detail.starList
     }
+    pie_data_num_map = {item.type: item.num for item in period_detail.starList}
 
     # 获取合成后的饼图
     pie_placeholder = create_pie_chart_with_placeholder(pie_data)
     home_bg.paste(pie_placeholder, (380, 320), pie_placeholder)
 
     # 在左侧绘制图例
-    draw_legend_on_home_bg(home_bg, pie_data, 50, 345)
+    draw_legend_on_home_bg(home_bg, pie_data_num_map, 50, 345)
 
     img.paste(home_bg, (30, 235), home_bg)
     img = add_footer(img, 600, 25)
@@ -268,11 +269,14 @@ async def draw_pic_with_ring(ev: Event):
 
 
 def draw_legend_on_home_bg(
-    home_bg: Image.Image, pie_data: Dict[str, float], x: int, y: int
+    home_bg: Image.Image,
+    pie_data_num_map: Dict[str, int],
+    x: int,
+    y: int,
 ):
     draw = ImageDraw.Draw(home_bg)
 
-    for i, (label, value) in enumerate(pie_data.items()):
+    for i, (label, value) in enumerate(pie_data_num_map.items()):
         current_y = y + i * 45
 
         # 绘制颜色圆点
@@ -280,7 +284,8 @@ def draw_legend_on_home_bg(
         draw.ellipse([x + 5, current_y + 5, x + 20, current_y + 20], fill=color)
 
         # 绘制标签
-        percentage = f"{value:.1f}%"
+        # percentage = f"{value:.1f}%"
+        percentage = f"{value}"
         draw.text((x + 30, current_y + 2), label, fill=(80, 80, 80), font=waves_font_24)
         draw.text((x + 170, current_y + 2), percentage, fill=color, font=waves_font_24)
 
