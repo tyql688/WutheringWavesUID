@@ -667,7 +667,7 @@ class WavesApi:
         if not force_refresh and roleId in self.bat_map:
             if self.bat_map[roleId][1] + 24 * 60 * 60 > time.time():
                 logger.debug(f"[{roleId}] 缓存读取bat成功: {self.bat_map[roleId]}")
-                return True, self.bat_map[roleId]
+                return True, self.bat_map[roleId][0]
 
         header = await get_headers(ck=token, queryRoleId=roleId)
         header.update(
