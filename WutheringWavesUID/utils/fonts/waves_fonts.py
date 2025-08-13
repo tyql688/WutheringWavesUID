@@ -4,6 +4,7 @@ from PIL import ImageFont
 
 FONT_ORIGIN_PATH = Path(__file__).parent / "waves_fonts.ttf"
 FONT2_ORIGIN_PATH = Path(__file__).parent / "arial-unicode-ms-bold.ttf"
+EMOJI_ORIGIN_PATH = Path(__file__).parent / "NotoColorEmoji.ttf"
 
 
 def waves_font_origin(size: int) -> ImageFont.FreeTypeFont:
@@ -12,6 +13,10 @@ def waves_font_origin(size: int) -> ImageFont.FreeTypeFont:
 
 def ww_font_origin(size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(FONT2_ORIGIN_PATH), size=size)
+
+
+def emoji_font_origin(size: int) -> ImageFont.FreeTypeFont:
+    return ImageFont.truetype(str(EMOJI_ORIGIN_PATH), size=size)
 
 
 waves_font_10 = waves_font_origin(10)
@@ -68,3 +73,5 @@ ww_font_60 = ww_font_origin(60)
 ww_font_62 = ww_font_origin(62)
 ww_font_70 = ww_font_origin(70)
 ww_font_84 = ww_font_origin(84)
+
+emoji_font = emoji_font_origin(109)
