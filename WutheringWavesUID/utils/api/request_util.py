@@ -68,6 +68,7 @@ class RespCode(IntEnum):
 
     # 以下是kuro给的
     SERVER_EXTERNAL_ERROR = 102  # {'code': 102, 'msg': '服务器外部错误'} # 接口错误了
+    CAPTCHA_ERROR = 130  # {'code': 130, 'msg': '验证码错误，请重新输入'}
     CAPTCHA_EXPIRED = 132  #  {'code': 132, 'msg': '验证码已经过期，请重新获取'}
     ROLE_QUERY_FAILED = 1000  # {'code': 1000, 'msg': '角色查询失败', 'data': None, 'success': False} 未知
     TOKEN_INVALID = 220  # {'code': 220, 'msg': '登录已过期，请重新登录'} token失效
@@ -84,6 +85,7 @@ NOT_SEND_MASTER_INFO_CODES = (
     RespCode.OK_HTTP.value,
     RespCode.TOKEN_INVALID.value,
     RespCode.BAT_TOKEN_INVALID.value,
+    RespCode.CAPTCHA_ERROR.value,
     RespCode.CAPTCHA_EXPIRED.value,
     RespCode.ROLE_QUERY_FAILED.value,
 )
