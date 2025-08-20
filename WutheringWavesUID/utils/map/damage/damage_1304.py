@@ -204,7 +204,7 @@ def calc_damage_5(
     # 守岸人buff
     shouanren_buff(attr, 6, 5, isGroup)
 
-    # 折枝buff
+    # 灯灯buff
     dengdeng_buff(attr, 6, 1, isGroup)
 
     return calc_damage_1(attr, role, isGroup)

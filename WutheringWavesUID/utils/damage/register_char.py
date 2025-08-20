@@ -223,6 +223,55 @@ class Char_1206(CharAbstract):
             attr.add_dmg_deepen(0.25, title, msg)
 
 
+class Char_1207(CharAbstract):
+    id = 1207
+    name = "露帕"
+    starLevel = 5
+
+    def _do_buff(
+        self,
+        attr: DamageAttribute,
+        chain: int = 0,
+        resonLevel: int = 1,
+        isGroup: bool = True,
+    ):
+        """获得buff"""
+        title = "露帕-奔狼燎原之焰"
+        msg = "队伍中的角色热熔伤害提升15%"
+        attr.add_dmg_bonus(0.15, title, msg)
+
+        if attr.char_attr == CHAR_ATTR_MOLTEN:
+            title = "露帕-延奏技能"
+            msg = "下一位登场角色热熔伤害加深20%"
+            attr.add_dmg_deepen(0.2, title, msg)
+
+        if attack_damage == attr.char_damage:
+            title = "露帕-延奏技能"
+            msg = "下一位登场角色普攻伤害加深25%"
+            attr.add_dmg_deepen(0.25, title, msg)
+        
+        if chain >= 2:
+            title = "露帕-二链"
+            msg = "施放共鸣解放时，队伍中的角色热熔伤害提升(20+20)%"
+            attr.add_dmg_bonus(0.4, title, msg)
+        
+        if chain >= 3:
+            title = "露帕-三链"
+            msg = "攻击时无视15%热熔抗性"
+            attr.add_enemy_resistance(-0.15, title, msg)
+
+            if attr.char_template == temp_atk:
+                msg = "攻击提升(6*3)%(变奏强化2次)"
+                attr.add_atk_percent(0.18, title, msg)
+
+        # 焰痕
+        weapon_clz = WavesWeaponRegister.find_class(21010036)
+        if weapon_clz:
+            w = weapon_clz(21010036, 90, 6, resonLevel)
+            method = getattr(w, "cast_hit", None)
+            if callable(method):
+                method(attr, isGroup)
+
 class Char_1301(CharAbstract):
     id = 1301
     name = "卡卡罗"
@@ -681,6 +730,7 @@ def register_char():
     WavesCharRegister.register_class(Char_1204.id, Char_1204)
     WavesCharRegister.register_class(Char_1205.id, Char_1205)
     WavesCharRegister.register_class(Char_1206.id, Char_1206)
+    WavesCharRegister.register_class(Char_1207.id, Char_1207)
     WavesCharRegister.register_class(Char_1301.id, Char_1301)
     WavesCharRegister.register_class(Char_1302.id, Char_1302)
     WavesCharRegister.register_class(Char_1303.id, Char_1303)

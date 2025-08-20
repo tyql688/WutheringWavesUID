@@ -12,7 +12,7 @@ from ...damage.utils import (
     liberation_damage,
     skill_damage_calc,
 )
-from .buff import sanhua_buff, shouanren_buff
+from .buff import sanhua_buff, shouanren_buff, lupa_buff
 from .damage import echo_damage, phase_damage, weapon_damage
 
 
@@ -188,6 +188,44 @@ def calc_damage_10(
     return calc_damage_1(attr, role, isGroup)
 
 
+def calc_damage_11(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_char_damage(attack_damage)
+    attr.set_char_template("temp_atk")
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 露帕buff
+    lupa_buff(attr, 0, 1, isGroup)
+
+    # 露帕解放火队人数buff
+    title = "露帕-追猎-共鸣解放"
+    msg = "热熔提升10%"
+    attr.add_dmg_bonus(0.1, title, msg)
+
+    return calc_damage_1(attr, role, isGroup)
+    
+
+def calc_damage_12(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_char_damage(attack_damage)
+    attr.set_char_template("temp_atk")
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 露帕buff
+    lupa_buff(attr, 6, 5, isGroup)
+
+    # 露帕解放火队人数buff
+    title = "露帕-追猎-共鸣解放"
+    msg = "热熔提升(10+10)%"
+    attr.add_dmg_bonus(0.2, title, msg)
+
+    return calc_damage_1(attr, role, isGroup)
+
+
 damage_detail = [
     {
         "title": "火焰归亡曲尾刀",
@@ -204,6 +242,14 @@ damage_detail = [
     {
         "title": "0+1守/6散/火焰归亡曲伤害",
         "func": lambda attr, role: calc_damage_10(attr, role),
+    },
+    {
+        "title": "0+1守/0+1露/火焰归亡曲伤害",
+        "func": lambda attr, role: calc_damage_11(attr, role),
+    },
+    {
+        "title": "0+1守/6+5露/火焰归亡曲伤害",
+        "func": lambda attr, role: calc_damage_12(attr, role),
     },
 ]
 

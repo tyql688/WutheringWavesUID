@@ -16,7 +16,7 @@ from ...damage.utils import (
     skill_damage,
     skill_damage_calc,
 )
-from .buff import bulante_buff, shouanren_buff
+from .buff import bulante_buff, shouanren_buff, lupa_buff
 from .damage import echo_damage, phase_damage, weapon_damage
 
 
@@ -279,6 +279,86 @@ def calc_damage_13(
     return calc_damage_0(attr, role, isGroup)
 
 
+def calc_damage_14(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_char_damage(skill_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 露帕buff
+    lupa_buff(attr, 0, 1, isGroup)
+
+    # 露帕解放火队人数buff
+    title = "露帕-追猎-共鸣解放"
+    msg = "热熔提升10%"
+    attr.add_dmg_bonus(0.1, title, msg)
+
+    return calc_damage_0(attr, role, isGroup)
+
+
+def calc_damage_15(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 露帕buff
+    lupa_buff(attr, 6, 5, isGroup)
+
+    # 露帕解放火队人数buff
+    title = "露帕-追猎-共鸣解放"
+    msg = "热熔提升(10+10)%"
+    attr.add_dmg_bonus(0.2, title, msg)
+
+    return calc_damage_0(attr, role, isGroup)
+
+
+def calc_damage_16(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 露帕buff
+    lupa_buff(attr, 0, 1, isGroup)
+
+    # 露帕解放火队人数buff
+    title = "露帕-追猎-共鸣解放"
+    msg = "热熔提升10%"
+    attr.add_dmg_bonus(0.1, title, msg)
+
+    return calc_damage_1(attr, role, isGroup)
+
+
+def calc_damage_17(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = True
+) -> tuple[str, str]:
+    attr.set_char_damage(liberation_damage)
+    attr.set_char_template("temp_atk")
+
+    # 守岸人buff
+    shouanren_buff(attr, 0, 1, isGroup)
+
+    # 露帕buff
+    lupa_buff(attr, 6, 5, isGroup)
+
+    # 露帕解放火队人数buff
+    title = "露帕-追猎-共鸣解放"
+    msg = "热熔提升(10+10)%"
+    attr.add_dmg_bonus(0.2, title, msg)
+
+    return calc_damage_1(attr, role, isGroup)
+
+
 damage_detail = [
     {
         "title": "焚身以火",
@@ -296,17 +376,33 @@ damage_detail = [
         "title": "0+1守/0船/焚身以火",
         "func": lambda attr, role: calc_damage_12(attr, role),
     },
+    # {
+    #     "title": "6+5守/0船/焚身以火",
+    #     "func": lambda attr, role: calc_damage_13(attr, role),
+    # },
     {
-        "title": "6+5守/0船/焚身以火",
-        "func": lambda attr, role: calc_damage_13(attr, role),
+        "title": "0+1守/0+1露/焚身以火",
+        "func": lambda attr, role: calc_damage_14(attr, role),
+    },
+    {
+        "title": "0+1守/6+5露/焚身以火",
+        "func": lambda attr, role: calc_damage_15(attr, role),
     },
     {
         "title": "0+1守/0船/离火照丹心",
         "func": lambda attr, role: calc_damage_10(attr, role),
     },
+    # {
+    #     "title": "6+5守/0船/离火照丹心",
+    #     "func": lambda attr, role: calc_damage_11(attr, role),
+    # },
     {
-        "title": "6+5守/0船/离火照丹心",
-        "func": lambda attr, role: calc_damage_11(attr, role),
+        "title": "0+1守/0+1露/离火照丹心",
+        "func": lambda attr, role: calc_damage_16(attr, role),
+    },
+    {
+        "title": "0+1守/6+5露/离火照丹心",
+        "func": lambda attr, role: calc_damage_17(attr, role),
     },
 ]
 
