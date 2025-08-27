@@ -187,7 +187,7 @@ async def draw_calendar_img(ev: Event, uid: str):
         if cont.countDown:
             dateRange = cont.countDown.dateRange
 
-        if dateRange:
+        if dateRange and len(dateRange) == 2 and dateRange[0] and dateRange[1]:
             start_time = datetime.strptime(dateRange[0], "%Y-%m-%d %H:%M")
             end_time = datetime.strptime(dateRange[1], "%Y-%m-%d %H:%M")
 
@@ -305,6 +305,7 @@ async def draw_calendar_gacha(side_module, gacha_type):
             else:
                 name = special_images.name
 
+            name = name.replace("-前瞻", "")
             if not name:
                 return None
 
