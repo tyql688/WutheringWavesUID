@@ -120,10 +120,13 @@ async def get_new_gachalog(
             # 抽卡记录获取失败
             if res.code == -1:  # type: ignore
                 return ERROR_MSG_INVALID_LINK, None, None  # type: ignore
-            else:
-                continue
 
-        gacha_log = [GachaLog.model_validate(log) for log in res.data]  # type: ignore
+        if res.data and isinstance(res.data, list):
+            temp = res.data
+        else:
+            temp = []
+
+        gacha_log = [GachaLog.model_validate(log) for log in temp]  # type: ignore
         for log in gacha_log:
             if log.cardPoolType != card_pool_type:
                 log.cardPoolType = card_pool_type
