@@ -842,6 +842,61 @@ class Echo_6000119(EchoAbstract):
     name = "梦魇·振铎乐师"
 
 
+class Echo_6000120(EchoAbstract):
+    id = 6000120
+    name = "蚀脊龙"
+
+
+class Echo_6000121(EchoAbstract):
+    id = 6000121
+    name = "伪作的神王"
+
+    # 在首位装配该声骸技能时，自身导电伤害加成提升12.00%，重击伤害加成提升12.00%
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"导电伤害加成": "12%", "重击伤害加成": "12%"}
+
+
+class Echo_6000160(EchoAbstract):
+    id = 6000160
+    name = "海之女"
+
+    # 在首位装配该声骸技能时，自身气动伤害加成提升12.00%，共鸣解放伤害加成提升12.00%。
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"气动伤害加成": "12%", "共鸣解放伤害加成": "12%"}
+
+
+class Echo_6000161(EchoAbstract):
+    id = 6000161
+    name = "梦魇·紫羽鹭"
+
+
+class Echo_6000162(EchoAbstract):
+    id = 6000162
+    name = "梦魇·青羽鹭"
+
+
+class Echo_6000163(EchoAbstract):
+    id = 6000163
+    name = "梦魇·惊蛰猎手"
+
+
+class Echo_6000164(EchoAbstract):
+    id = 6000164
+    name = "梦魇·巡徊猎手"
+
+
+class Echo_6000165(EchoAbstract):
+    id = 6000165
+    name = "梦魇·咕咕河豚"
+
+
+class Echo_6000166(EchoAbstract):
+    id = 6000166
+    name = "梦魇·啾啾河豚"
+
+
 def register_echo():
     WavesEchoRegister.register_class(Echo_390070051.id, Echo_390070051)
     WavesEchoRegister.register_class(Echo_390070052.id, Echo_390070052)
@@ -966,3 +1021,12 @@ def register_echo():
     WavesEchoRegister.register_class(Echo_6000117.id, Echo_6000117)
     WavesEchoRegister.register_class(Echo_6000118.id, Echo_6000118)
     WavesEchoRegister.register_class(Echo_6000119.id, Echo_6000119)
+    WavesEchoRegister.register_class(Echo_6000120.id, Echo_6000120)
+    WavesEchoRegister.register_class(Echo_6000121.id, Echo_6000121)
+    WavesEchoRegister.register_class(Echo_6000160.id, Echo_6000160)
+    WavesEchoRegister.register_class(Echo_6000161.id, Echo_6000161)
+    WavesEchoRegister.register_class(Echo_6000162.id, Echo_6000162)
+    WavesEchoRegister.register_class(Echo_6000163.id, Echo_6000163)
+    WavesEchoRegister.register_class(Echo_6000164.id, Echo_6000164)
+    WavesEchoRegister.register_class(Echo_6000165.id, Echo_6000165)
+    WavesEchoRegister.register_class(Echo_6000166.id, Echo_6000166)

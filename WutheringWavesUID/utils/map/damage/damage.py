@@ -13,6 +13,7 @@ from ...damage.utils import (
     SONATA_ANCIENT,
     SONATA_CELESTIAL,
     SONATA_CLAWPRINT,
+    SONATA_CROWN_OF_VALOR,
     SONATA_EMPYREAN,
     SONATA_ETERNAL,
     SONATA_FREEZING,
@@ -282,3 +283,14 @@ def phase_damage(
                     attr.add_effect(title, msg)
                 else:
                     attr.add_dmg_bonus(0.35, title, msg)
+
+        # 荣斗铸锋之冠
+        elif check_if_ph_3(ph_detail.ph_name, ph_detail.ph_num, SONATA_CROWN_OF_VALOR):
+            # 角色获得护盾时，自身攻击提升6%，暴击伤害提升4%，该效果可叠加5层，持续4秒，每0.5秒可触发一次。
+            if not attr.trigger_shield:
+                return
+            title = f"{phase_name}-{ph_detail.ph_name}"
+            msg = "角色获得护盾时，自身攻击提升6%*5"
+            attr.add_atk_percent(0.06 * 5, title, msg)
+            msg = "角色获得护盾时，自身暴击伤害提升4%*5"
+            attr.add_crit_dmg(0.04 * 5, title, msg)

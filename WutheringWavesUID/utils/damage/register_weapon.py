@@ -203,6 +203,30 @@ class Weapon_21010044(WeaponAbstract):
         attr.add_def_percent(calc_percent_expression(dmg), title, msg)
 
 
+class Weapon_21010046(WeaponAbstract):
+    id = 21010046
+    type = 1
+    name = "驭冕铸雷之权"
+
+    def cast_skill(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放共鸣技能"""
+        if attr.char_damage != hit_damage:
+            return
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"施放共鸣技能时，重击伤害提升{dmg}"
+        attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+    def trigger_shield(self, attr: DamageAttribute, isGroup: bool = False):
+        """触发护盾"""
+        if attr.char_damage != hit_damage:
+            return
+        dmg = f"{self.param(3)}*{self.param(4)}"
+        title = self.get_title()
+        msg = f"自身获得护盾时，重击伤害无视目标{dmg}防御"
+        attr.add_defense_reduction(calc_percent_expression(dmg), title, msg)
+
+
 class Weapon_21010053(WeaponAbstract):
     id = 21010053
     type = 1
@@ -983,6 +1007,12 @@ class Weapon_21040044(WeaponAbstract):
         attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
 
 
+class Weapon_21040046(WeaponAbstract):
+    id = 21040046
+    type = 4
+    name = "万物持存的注释"
+
+
 class Weapon_21040053(WeaponAbstract):
     id = 21040053
     type = 4
@@ -1453,6 +1483,7 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21010036.id, Weapon_21010036)
     WavesWeaponRegister.register_class(Weapon_21010043.id, Weapon_21010043)
     WavesWeaponRegister.register_class(Weapon_21010044.id, Weapon_21010044)
+    WavesWeaponRegister.register_class(Weapon_21010046.id, Weapon_21010046)
     WavesWeaponRegister.register_class(Weapon_21010053.id, Weapon_21010053)
     WavesWeaponRegister.register_class(Weapon_21010063.id, Weapon_21010063)
     WavesWeaponRegister.register_class(Weapon_21010064.id, Weapon_21010064)
@@ -1507,6 +1538,7 @@ def register_weapon():
     WavesWeaponRegister.register_class(Weapon_21040036.id, Weapon_21040036)
     WavesWeaponRegister.register_class(Weapon_21040043.id, Weapon_21040043)
     WavesWeaponRegister.register_class(Weapon_21040044.id, Weapon_21040044)
+    WavesWeaponRegister.register_class(Weapon_21040046.id, Weapon_21040046)
     WavesWeaponRegister.register_class(Weapon_21040053.id, Weapon_21040053)
     WavesWeaponRegister.register_class(Weapon_21040064.id, Weapon_21040064)
     WavesWeaponRegister.register_class(Weapon_21040074.id, Weapon_21040074)

@@ -1694,6 +1694,429 @@
   {
     "chainList": [
       {
+        "description": "·【以众愿为冕】每层使暴击伤害额外提升15%。\n·【以众愿为冕】上限提高至2层。\n·奥古斯塔施放变奏技能·灼金的巡行时，也可以获得1层【以众愿为冕】。\n·共鸣技能·不败恒阳·迅击、共鸣技能·不败恒阳·跃空、共鸣技能·不败恒阳·落袭免疫打断。",
+        "iconUrl": "",
+        "name": "于焦壤中蒙垢",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "·【以众愿为冕】获得额外效果：每层使暴击提升20%。\n·奥古斯塔暴击高于100%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升100%暴击伤害。",
+        "iconUrl": "",
+        "name": "于血戮中涤尘",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "以下技能的伤害倍率提升25%：\n·重击·烁雷·后撤、闪避反击·烁雷·后撤、重击·烁雷·旋切、重击·烁雷·升拳。\n·共鸣技能·不败恒阳·落袭。\n·共鸣解放·赫日威临·烈阳、共鸣解放·赫日威临·不朽者之肃。",
+        "iconUrl": "",
+        "name": "于朽腐中砺骨",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "施放变奏技能·灼金的巡行时，队伍中的角色的攻击提升20%，持续30秒。",
+        "iconUrl": "",
+        "name": "于荣辉中孤行",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "固有技能·荣誉的加护获得护盾量提升50%。",
+        "iconUrl": "",
+        "name": "于怒潮中卓立",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "·【以众愿为冕】的上限提升至4层。\n·奥古斯塔暴击高于150%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升50%暴击伤害。\n·奥古斯塔施放重击·烁雷·旋切、重击·烁雷·升拳时，可以获得2层【以众愿为冕】，每1秒仅可通过于耀光中刻名的效果获得2层【以众愿为冕】。\n·施放重击·烁雷·旋切、重击·烁雷·升拳过程中，会在原地额外引发【怒霆】，造成两次奥古斯塔攻击100%的导电伤害，此次伤害为重击伤害。",
+        "iconUrl": "",
+        "name": "于耀光中刻名",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "荣斗铸锋之冠",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "伪作的神王",
+            "phantomId": 6000121,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "荣斗铸锋之冠",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "导电伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "飓力熊",
+            "phantomId": 6000097,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "荣斗铸锋之冠",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "导电伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "梦魇·紫羽鹭",
+            "phantomId": 6000161,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "彻空冥雷",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "巡徊猎手",
+            "phantomId": 390070071,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "彻空冥雷",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "湮灭棱镜",
+            "phantomId": 390077017,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 3,
+      "attributeName": "导电",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1306,
+      "roleName": "奥古斯塔",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 1,
+      "weaponTypeName": "长刃",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n进行最多4段的连续攻击，造成导电伤害。\n\n重击·鸣铁\n消耗耐力攻击目标，造成导电伤害。施放后短时间内短按普攻，可以施放普攻第2段。\n\n空中攻击\n消耗耐力进行空中下落攻击，造成导电伤害。\n\n闪避反击\n成功闪避后一定时间内短按普攻，将会攻击目标，造成导电伤害。\n\n空中闪避反击\n空中成功闪避后一定时间内短按普攻，消耗耐力进行空中下落攻击，造成导电伤害。\n\n重击·烁雷·后撤\n【战势】满时，重击·鸣铁替换为重击·烁雷·后撤，造成导电伤害，施放时消耗全部的【战势】。\n·技能施放时，一定时间后松开普攻，或者再次短按普攻，可以施放重击·烁雷·旋切。\n·技能被打断后一定时间内若没有离开地面，亦可施放重击·烁雷·旋切。\n\n重击·烁雷·旋切\n奥古斯塔舞剑旋转，造成导电伤害。\n\n重击·烁雷·升拳\n【战势】满时，短按跳跃可以施放重击·烁雷·升拳，造成导电伤害，施放时消耗全部的【战势】。\n当施放共鸣技能·斩锋时，若【战势】满，短按共鸣技能或跳跃可以施放重击·烁雷·升拳，造成导电伤害，施放时消耗全部的【战势】。\n当施放重击·鸣铁或闪避反击·重击·鸣铁时，若【战势】满，一定时间后松开普攻，或者再次短按普攻或跳跃可以施放重击·烁雷·升拳，造成导电伤害，施放时消耗全部的【战势】。\n\n闪避反击·重击·鸣铁\n【战势】满时，闪避反击替换为闪避反击·重击·鸣铁，造成导电伤害，此次伤害为重击伤害。\n\n闪避反击·烁雷·后撤\n【权炳】满时，地面闪避成功后短按普攻，闪避反击与闪避反击·重击·鸣铁替换为闪避反击·烁雷·后撤，施放时造成导电伤害，此次伤害为重击伤害。\n·技能施放时，一定时间后松开普攻，或者再次短按普攻，可以施放重击·烁雷·旋切。\n·技能被打断后一定时间内若没有离开地面，亦可施放重击·烁雷·旋切。\n\n【战势】获取规则\n【战势】上限为100点。\n·普攻、重击·鸣铁、空中攻击、空中闪避反击、共鸣技能·斩锋、闪避反击、闪避反击·重击·鸣铁造成伤害时可以获得【战势】。\n·施放变奏技能·灼金的巡行时，回满【战势】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "逐狩",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "奥古斯塔挥刀跳劈，造成导电伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "斩锋",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "共鸣解放·誓锋不殒\n短按共鸣解放松开时可施放该技能，奥古斯塔发动横扫斩击，造成导电伤害，此次伤害为重击伤害。\n\n共鸣解放·赫日威临\n当存在2层【威慑】时，长按共鸣解放可施放共鸣解放·赫日威临。共鸣解放·赫日威临施放时不消耗共鸣能量，而是消耗2层【威慑】。\n·施放共鸣解放·赫日威临时，展开王之界域，并且进入7秒的俯首之刻，俯首之刻持续期间时间暂时停止，不能切换角色，仅能施放赫日威临·烈阳、赫日威临·不朽者之肃、闪避，处于空中状态时可以施放空中攻击。\n·俯首之刻期间，短按普攻或长按普攻可施放赫日威临·烈阳。可在水面行走且不消耗耐力。\n·若进行场景、玩法、或功能交互时，将强制结束俯首之刻，且不会自动施放赫日威临·不朽者之肃。\n\n赫日威临·烈阳\n造成导电伤害，此伤害为重击伤害。施放9次赫日威临·烈阳后，短按普攻或共鸣解放可施放赫日威临·不朽者之肃。\n\n赫日威临·不朽者之肃\n造成导电伤害，此次伤害为重击伤害。施放赫日威临·不朽者之肃时解除俯首之刻，技能结束时消耗全部的【以众愿为冕】，且队伍中除奥古斯塔外的其他角色离场。\n·俯首之刻结束时自动施放赫日威临·不朽者之肃。\n·俯首之刻持续期间可长按共鸣解放，提前施放赫日威临·不朽者之肃。\n\n王之界域\n·王之界域持续30秒。\n·王之界域存在时：队伍中角色施放变奏技能时，获得基于奥古斯塔最大生命5%+650的护盾，不可叠加，持续10秒。该护盾在切换至其他角色时不会继承。\n\n【威慑】获取方式\n【威慑】上限为2层。\n·施放共鸣技能·不败恒阳·落袭时，奥古斯塔获得1层【威慑】。\n·队友处于奥古斯塔延奏技能·不屈的战歌的效果期间，施放延奏技能时，奥古斯塔获得1层【威慑】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "至日的征伐",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "造成导电伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "灼金的巡行",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "共鸣技能·不败恒阳·迅击\n【权炳】满时，奥古斯塔的共鸣技能·斩锋替换为共鸣技能·不败恒阳·迅击，造成导电伤害。\n·技能施放时，短按普攻或共鸣技能，可以施放共鸣技能·不败恒阳·跃空。\n·短时间内被打断则可重新施放共鸣技能·不败恒阳·迅击。\n·一定时间后被打断则可施放共鸣技能·不败恒阳·跃空。\n·可在空中施放。\n\n共鸣技能·不败恒阳·跃空\n造成导电伤害。\n·技能施放时，短按普攻或共鸣技能，可以施放共鸣技能·不败恒阳·落袭。\n·短时间内被打断则可重新施放共鸣技能·不败恒阳·跃空。\n·一定时间后被打断则可施放共鸣技能·不败恒阳·落袭。\n·仅可在空中施放。\n\n共鸣技能·不败恒阳·落袭\n施放时消耗全部的【权炳】，造成导电伤害，此次伤害为重击伤害。\n·施放时，获得1层【威慑】。\n·仅可在空中施放。\n\n闪避反击·不败恒阳·迅击\n【权炳】满时，地面闪避成功后短按共鸣技能，或者空中闪避成功后短按普攻或共鸣技能，可施放闪避反击·不败恒阳·迅击，施放时造成导电伤害，此次伤害为共鸣技能伤害。\n·技能施放时，短按普攻或共鸣技能，可以施放共鸣技能·不败恒阳·跃空。\n·一定时间后被打断则可施放共鸣技能·不败恒阳·跃空。\n\n【权炳】获取规则\n【权炳】上限为100点。\n·常态攻击造成伤害时，可以获得【权炳】。\n·施放变奏技能·灼金的巡行时回复20%【权炳】。\n·施放共鸣技能·斩锋时回复10%【权炳】。\n·施放共鸣解放·誓锋不殒时回复40%【权炳】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "曜阳如我",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "下一位登场角色获得如下效果，持续14秒，若切换至其他角色则如下效果提前结束：\n·全伤害加深15%。\n·施放延奏技能时，让队伍中的奥古斯塔获得1层【威慑】与1层【以众愿为冕】。\n\n【以众愿为冕】\n每层使导电伤害加成提升15%，上限为1层。共鸣解放·赫日威临·不朽者之肃结束时，清除自身全部的【以众愿为冕】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "不屈的战歌",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "攻击提升24%。施放变奏技能或共鸣技能时，重击伤害提升40%，持续15秒；自身获得护盾时，重击伤害无视目标12%防御，每0.5秒可生效1次，可叠加5层，持续7秒。",
+        "weaponIcon": "",
+        "weaponId": 21010046,
+        "weaponName": "驭冕铸雷之权",
+        "weaponStarLevel": 5,
+        "weaponType": 1
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
         "description": "施放集中压制或破袭反击时，衍射伤害加成提升50%，持续14秒。\n重斩·终夜免疫打断。",
         "iconUrl": "",
         "name": "当清晨闹钟响起时",

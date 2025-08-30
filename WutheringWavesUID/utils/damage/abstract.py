@@ -82,6 +82,9 @@ class WeaponAbstract(object):
         if attr.env_aero_erosion:
             func_list.append("env_aero_erosion")
 
+        if attr.trigger_shield:
+            func_list.append("trigger_shield")
+
         func_list.append("cast_phantom")
 
         for func_name in func_list:
@@ -142,6 +145,10 @@ class WeaponAbstract(object):
 
     def env_aero_erosion(self, attr: DamageAttribute, isGroup: bool = False):
         """风蚀效应"""
+        pass
+
+    def trigger_shield(self, attr: DamageAttribute, isGroup: bool = False):
+        """触发护盾"""
         pass
 
     def cast_healing(self, attr: DamageAttribute, isGroup: bool = False):
