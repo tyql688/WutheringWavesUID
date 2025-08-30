@@ -263,6 +263,21 @@ async def refresh_char(
         except Exception as e:
             logger.exception(f"{uid} 共鸣链修正失败", e)
 
+        # 修正合鸣效果
+        try:
+            if (
+                role_detail_info["phantomData"]
+                and role_detail_info["phantomData"]["equipPhantomList"]
+            ):
+                for i in role_detail_info["phantomData"]["equipPhantomList"]:
+                    if not isinstance(i, dict):
+                        continue
+                    sonata_name = i.get("fetterDetail", {}).get("name", "")
+                    if sonata_name == "雷曜日冕之冠":
+                        i["fetterDetail"]["name"] = "荣斗铸锋之冠"  # type: ignore
+        except Exception as e:
+            logger.exception(f"{uid} 合鸣效果修正失败", e)
+
         waves_datas.append(role_detail_info)
 
     await save_card_info(

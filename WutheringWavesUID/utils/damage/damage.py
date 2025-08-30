@@ -242,6 +242,8 @@ class DamageAttribute:
         self.env_aero_erosion = False
         # 风蚀效应伤害加深
         self.env_aero_erosion_deepen = False
+        # 触发护盾
+        self.trigger_shield = False
         # 声骸结果
         self.ph_result = False
         # 联觉等级
@@ -290,6 +292,7 @@ class DamageAttribute:
             f"  角色属性={self.char_attr}, \n"
             f"  角色属性伤害={self.char_damage}, \n"
             f"  协同攻击={self.sync_strike}, \n"
+            f"  触发护盾={self.trigger_shield}, \n"
             f"  共鸣效率={self.energy_regen}, \n"
             f"  声骸={ph_details_str}, \n"
             f"  效果={effect_str}, \n"
@@ -579,6 +582,11 @@ class DamageAttribute:
     def set_env_aero_erosion_deepen(self):
         """风蚀效应伤害加深"""
         self.env_aero_erosion_deepen = True
+        return self
+
+    def set_trigger_shield(self):
+        """触发护盾"""
+        self.trigger_shield = True
         return self
 
     def set_char_damage(self, char_damage):

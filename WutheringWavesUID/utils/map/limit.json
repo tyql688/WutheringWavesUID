@@ -622,6 +622,41 @@
                     ]
                 }
             ]
+        },
+        {
+            "libId": 21,
+            "fetterList": [
+                {
+                    "fetterDetailName": "荣斗铸锋之冠",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 6000121,
+                            "cost": 4
+                        },
+                        {
+                            "phantomId": 6000097,
+                            "cost": 3
+                        },
+                        {
+                            "phantomId": 6000161,
+                            "cost": 3
+                        }
+                    ]
+                },
+                {
+                    "fetterDetailName": "彻空冥雷",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 390070071,
+                            "cost": 1
+                        },
+                        {
+                            "phantomId": 390077017,
+                            "cost": 1
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "charList": [
@@ -799,6 +834,13 @@
             "name": "弗洛洛",
             "weaponId": 21050066,
             "sonataLibId": 20
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1306,
+            "name": "奥古斯塔",
+            "weaponId": 21010046,
+            "sonataLibId": 21
         }
     ]
 }
