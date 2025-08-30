@@ -112,7 +112,7 @@ def get_max_score(cost, calc_map):
 
 def calc_phantom_score(
     char_name: str, prop_list: List[Props], cost: int, calc_map: Union[Dict, None]
-) -> tuple[int, str]:
+) -> tuple[float, str]:
     if not calc_map:
         return 0, "c"
 
@@ -135,7 +135,7 @@ def calc_phantom_score(
     return final_score, score_level
 
 
-def get_total_score_bg(char_name: str, score: int, calc_map: Union[Dict, None]):
+def get_total_score_bg(char_name: str, score: float, calc_map: Union[Dict, None]):
     if not calc_map:
         return "c"
 

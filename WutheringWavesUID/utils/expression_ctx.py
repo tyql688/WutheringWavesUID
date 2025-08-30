@@ -104,6 +104,7 @@ async def get_waves_char_rank(uid, all_role_detail, need_expected_damage=False):
                     sonataName = ph_detail["ph_name"]
                     break
 
+        phantom_score = round(phantom_score, 2)
         wcr = WavesCharRank(
             **{
                 "roleId": role_detail.role.roleId,

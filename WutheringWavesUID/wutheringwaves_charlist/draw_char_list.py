@@ -21,7 +21,6 @@ from ..utils.fonts.waves_fonts import (
     waves_font_25,
     waves_font_26,
     waves_font_30,
-    waves_font_34,
     waves_font_38,
     waves_font_40,
     waves_font_42,
@@ -205,10 +204,10 @@ async def draw_char_list_img(
             score_bg = Image.open(TEXT_PATH / f"score_{_rank.score_bg}.png")
             bar_star.alpha_composite(score_bg, (200, 2))
             bar_star_draw.text(
-                (348, 45),
-                f"{int(_rank.score * 100) / 100:.1f}",
+                (348, 42),
+                f"{int(_rank.score * 100) / 100:.2f}",
                 "white",
-                waves_font_34,
+                waves_font_30,
                 "mm",
             )
             bar_star_draw.text((348, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")

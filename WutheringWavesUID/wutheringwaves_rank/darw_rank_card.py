@@ -108,6 +108,7 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
     if phantom_score == 0:
         return
 
+    phantom_score = round(phantom_score, 2)
     phantom_bg = get_total_score_bg(
         role_detail.role.roleName, phantom_score, calc.calc_temp
     )
@@ -413,10 +414,10 @@ async def draw_rank_img(
             score_bg = Image.open(TEXT_PATH / f"score_{rank.score_bg}.png")
             bar_bg.alpha_composite(score_bg, (320, 2))
             bar_star_draw.text(
-                (466, 45),
-                f"{int(rank.score * 100) / 100:.1f}",
+                (466, 42),
+                f"{int(rank.score * 100) / 100:.2f}",
                 "white",
-                waves_font_34,
+                waves_font_30,
                 "mm",
             )
             bar_star_draw.text((466, 75), "声骸分数", SPECIAL_GOLD, waves_font_16, "mm")
