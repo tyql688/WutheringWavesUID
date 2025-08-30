@@ -3,19 +3,99 @@
 from typing import Tuple
 
 from ...api.model import RoleDetailData
+from .damage import echo_damage, phase_damage, weapon_damage
 from ...ascension.char import WavesCharResult, get_char_detail2
 from ...damage.damage import DamageAttribute, calc_percent_expression
 from ...damage.utils import (
-    SkillTreeMap,
     SkillType,
-    cast_attack,
+    SkillTreeMap,
     cast_hit,
-    cast_liberation,
     cast_skill,
     hit_damage,
+    cast_attack,
+    cast_liberation,
     skill_damage_calc,
 )
-from .damage import echo_damage, phase_damage, weapon_damage
+
+
+def chain_damage(
+    attr: DamageAttribute,
+    role: RoleDetailData,
+    isGroup: bool = False,
+):
+    role_name = role.role.roleName
+    # 设置共鸣链
+    chain_num = role.get_chain_num()
+    if chain_num >= 6:
+        # 4层以众愿为冕 - 15爆伤，15导电，20暴击
+        title = f"{role_name}-六链-以众愿为冕"
+        msg = "暴击伤害15%*4+导电伤害加成提升15%*4+暴击率20%*4"
+        attr.add_crit_dmg(0.15 * 4)
+        attr.add_dmg_bonus(0.15 * 4)
+        attr.add_crit_rate(0.2 * 4)
+        attr.add_effect(title, msg)
+
+        # 暴击高于100%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升100%暴击伤害
+        crit_rate = attr.crit_rate
+        if crit_rate > 1:
+            crit_rate = crit_rate - 1
+            crit_rate_bonus = min(max(crit_rate / 0.01, 0), 50)
+            add_crit_dmg = crit_rate_bonus * 2 * 0.01
+            title = f"{role_name}-二链"
+            msg = f"爆伤提升{add_crit_dmg*100:.2f}%"
+            attr.add_crit_dmg(add_crit_dmg, title, msg)
+
+        # 暴击高于150%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升50%暴击伤害
+        crit_rate = attr.crit_rate
+        if crit_rate > 1.5:
+            crit_rate = crit_rate - 1.5
+            crit_rate_bonus = min(max(crit_rate / 0.01, 0), 25)
+            add_crit_dmg = crit_rate_bonus * 2 * 0.01
+            title = f"{role_name}-六链"
+            msg = f"爆伤提升{add_crit_dmg*100:.2f}%"
+            attr.add_crit_dmg(add_crit_dmg, title, msg)
+
+    elif chain_num >= 2:
+        # 2层以众愿为冕 - 15爆伤，15导电，20暴击
+        title = f"{role_name}-二链-以众愿为冕"
+        msg = "暴击伤害15%*2+导电伤害加成提升15%*2+暴击率20%*2"
+        attr.add_crit_dmg(0.15 * 2)
+        attr.add_dmg_bonus(0.15 * 2)
+        attr.add_crit_rate(0.2 * 2)
+        attr.add_effect(title, msg)
+
+        # 暴击高于100%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升100%暴击伤害
+        crit_rate = attr.crit_rate
+        if crit_rate > 1:
+            crit_rate = crit_rate - 1
+            crit_rate_bonus = min(max(crit_rate / 0.01, 0), 50)
+            add_crit_dmg = crit_rate_bonus * 2 * 0.01
+            title = f"{role_name}-二链"
+            msg = f"爆伤提升{add_crit_dmg*100:.2f}%"
+            attr.add_crit_dmg(add_crit_dmg, title, msg)
+
+    elif chain_num >= 1:
+        # 固有技能·炽盛决意会补充至上限，单人第一波能吃到。？
+        title = f"{role_name}-一链-以众愿为冕"
+        msg = "暴击伤害15%*2+导电伤害加成提升15%*2"
+        attr.add_crit_dmg(0.15 * 2)
+        attr.add_dmg_bonus(0.15 * 2)
+        attr.add_effect(title, msg)
+    else:
+        title = "延奏技能-以众愿为冕"
+        msg = "导电伤害加成提升15%"
+        attr.add_dmg_bonus(0.15)
+        attr.add_effect(title, msg)
+
+    if chain_num >= 3:
+        title = f"{role_name}-三链"
+        msg = "伤害倍率提升25%"
+        attr.add_skill_ratio(0.25, title, msg)
+
+    if chain_num >= 4 and isGroup:
+        title = f"{role_name}-四链"
+        msg = "队伍中的角色的攻击提升20%"
+        attr.add_atk_percent(0.2, title, msg)
 
 
 def calc_damage_1(
@@ -73,67 +153,7 @@ def calc_damage_1(
     attr.set_phantom_dmg_bonus()
 
     # 设置共鸣链
-    chain_num = role.get_chain_num()
-    if chain_num >= 6:
-        # 4层以众愿为冕 - 15爆伤，15导电，20暴击
-        title = f"{role_name}-六链"
-        msg = "以众愿为冕=暴击伤害15%*4+导电伤害加成提升15%*4+暴击率20%*4"
-        attr.add_crit_dmg(0.15 * 4)
-        attr.add_dmg_bonus(0.15 * 4)
-        attr.add_crit_rate(0.2 * 4)
-        attr.add_effect(title, msg)
-
-        # 暴击高于150%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升50%暴击伤害
-        crit_rate = attr.crit_rate
-        if crit_rate > 1.5:
-            crit_rate = crit_rate - 1.5
-            crit_rate_bonus = min(max(crit_rate / 0.01, 0), 25)
-            add_crit_dmg = crit_rate_bonus * 2
-            title = f"{role_name}-六链"
-            msg = f"爆伤提升{add_crit_dmg}%"
-            attr.add_crit_dmg(add_crit_dmg)
-
-    elif chain_num >= 2:
-        # 2层以众愿为冕 - 15爆伤，15导电，20暴击
-        title = f"{role_name}-二链"
-        msg = "以众愿为冕=暴击伤害15%*2+导电伤害加成提升15%*2+暴击率20%*2"
-        attr.add_crit_dmg(0.15 * 2)
-        attr.add_dmg_bonus(0.15 * 2)
-        attr.add_crit_rate(0.2 * 2)
-        attr.add_effect(title, msg)
-
-        # 暴击高于100%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升100%暴击伤害
-        crit_rate = attr.crit_rate
-        if crit_rate > 1:
-            crit_rate = crit_rate - 1
-            crit_rate_bonus = min(max(crit_rate / 0.01, 0), 50)
-            add_crit_dmg = crit_rate_bonus * 2
-            title = f"{role_name}-二链"
-            msg = f"爆伤提升{add_crit_dmg}%"
-            attr.add_crit_dmg(add_crit_dmg)
-
-    elif chain_num >= 1:
-        # 固有技能·炽盛决意会补充至上限，单人第一波能吃到。？
-        title = f"{role_name}-一链"
-        msg = "以众愿为冕=暴击伤害15%*2+导电伤害加成提升15%*2"
-        attr.add_crit_dmg(0.15 * 2)
-        attr.add_dmg_bonus(0.15 * 2)
-        attr.add_effect(title, msg)
-    else:
-        title = "延奏技能-以众愿为冕"
-        msg = "导电伤害加成提升15%"
-        attr.add_dmg_bonus(0.15)
-        attr.add_effect(title, msg)
-
-    if chain_num >= 3:
-        title = f"{role_name}-三链"
-        msg = "伤害倍率提升25%"
-        attr.add_skill_ratio(0.25, title, msg)
-
-    if chain_num >= 4 and isGroup:
-        title = f"{role_name}-四链"
-        msg = "队伍中的角色的攻击提升20%"
-        attr.add_atk_percent(0.2, title, msg)
+    chain_damage(attr, role, isGroup)
 
     # 声骸
     echo_damage(attr, isGroup)
@@ -198,67 +218,7 @@ def calc_damage_2(
     attr.set_phantom_dmg_bonus()
 
     # 设置共鸣链
-    chain_num = role.get_chain_num()
-    if chain_num >= 6:
-        # 4层以众愿为冕 - 15爆伤，15导电，20暴击
-        title = f"{role_name}-六链"
-        msg = "以众愿为冕=暴击伤害15%*4+导电伤害加成提升15%*4+暴击率20%*4"
-        attr.add_crit_dmg(0.15 * 4)
-        attr.add_dmg_bonus(0.15 * 4)
-        attr.add_crit_rate(0.2 * 4)
-        attr.add_effect(title, msg)
-
-        # 暴击高于150%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升50%暴击伤害
-        crit_rate = attr.crit_rate
-        if crit_rate > 1.5:
-            crit_rate = crit_rate - 1.5
-            crit_rate_bonus = min(max(crit_rate / 0.01, 0), 25)
-            add_crit_dmg = crit_rate_bonus * 2
-            title = f"{role_name}-六链"
-            msg = f"爆伤提升{add_crit_dmg}%"
-            attr.add_crit_dmg(add_crit_dmg)
-
-    elif chain_num >= 2:
-        # 2层以众愿为冕 - 15爆伤，15导电，20暴击
-        title = f"{role_name}-二链"
-        msg = "以众愿为冕=暴击伤害15%*2+导电伤害加成提升15%*2+暴击率20%*2"
-        attr.add_crit_dmg(0.15 * 2)
-        attr.add_dmg_bonus(0.15 * 2)
-        attr.add_crit_rate(0.2 * 2)
-        attr.add_effect(title, msg)
-
-        # 暴击高于100%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升100%暴击伤害
-        crit_rate = attr.crit_rate
-        if crit_rate > 1:
-            crit_rate = crit_rate - 1
-            crit_rate_bonus = min(max(crit_rate / 0.01, 0), 50)
-            add_crit_dmg = crit_rate_bonus * 2
-            title = f"{role_name}-二链"
-            msg = f"爆伤提升{add_crit_dmg}%"
-            attr.add_crit_dmg(add_crit_dmg)
-
-    elif chain_num >= 1:
-        # 固有技能·炽盛决意会补充至上限，单人第一波能吃到。？
-        title = f"{role_name}-一链"
-        msg = "以众愿为冕=暴击伤害15%*2+导电伤害加成提升15%*2"
-        attr.add_crit_dmg(0.15 * 2)
-        attr.add_dmg_bonus(0.15 * 2)
-        attr.add_effect(title, msg)
-    else:
-        title = "延奏技能-以众愿为冕"
-        msg = "导电伤害加成提升15%"
-        attr.add_dmg_bonus(0.15)
-        attr.add_effect(title, msg)
-
-    if chain_num >= 3:
-        title = f"{role_name}-三链"
-        msg = "伤害倍率提升25%"
-        attr.add_skill_ratio(0.25, title, msg)
-
-    if chain_num >= 4 and isGroup:
-        title = f"{role_name}-四链"
-        msg = "队伍中的角色的攻击提升20%"
-        attr.add_atk_percent(0.2, title, msg)
+    chain_damage(attr, role, isGroup)
 
     # 声骸
     echo_damage(attr, isGroup)
@@ -331,67 +291,7 @@ def calc_damage_3(
     attr.set_phantom_dmg_bonus()
 
     # 设置共鸣链
-    chain_num = role.get_chain_num()
-    if chain_num >= 6:
-        # 4层以众愿为冕 - 15爆伤，15导电，20暴击
-        title = f"{role_name}-六链"
-        msg = "以众愿为冕=暴击伤害15%*4+导电伤害加成提升15%*4+暴击率20%*4"
-        attr.add_crit_dmg(0.15 * 4)
-        attr.add_dmg_bonus(0.15 * 4)
-        attr.add_crit_rate(0.2 * 4)
-        attr.add_effect(title, msg)
-
-        # 暴击高于150%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升50%暴击伤害
-        crit_rate = attr.crit_rate
-        if crit_rate > 1.5:
-            crit_rate = crit_rate - 1.5
-            crit_rate_bonus = min(max(crit_rate / 0.01, 0), 25)
-            add_crit_dmg = crit_rate_bonus * 2
-            title = f"{role_name}-六链"
-            msg = f"爆伤提升{add_crit_dmg}%"
-            attr.add_crit_dmg(add_crit_dmg)
-
-    elif chain_num >= 2:
-        # 2层以众愿为冕 - 15爆伤，15导电，20暴击
-        title = f"{role_name}-二链"
-        msg = "以众愿为冕=暴击伤害15%*2+导电伤害加成提升15%*2+暴击率20%*2"
-        attr.add_crit_dmg(0.15 * 2)
-        attr.add_dmg_bonus(0.15 * 2)
-        attr.add_crit_rate(0.2 * 2)
-        attr.add_effect(title, msg)
-
-        # 暴击高于100%时，每多出1%暴击，奥古斯塔暴击伤害提升2%，最高可提升100%暴击伤害
-        crit_rate = attr.crit_rate
-        if crit_rate > 1:
-            crit_rate = crit_rate - 1
-            crit_rate_bonus = min(max(crit_rate / 0.01, 0), 50)
-            add_crit_dmg = crit_rate_bonus * 2
-            title = f"{role_name}-二链"
-            msg = f"爆伤提升{add_crit_dmg}%"
-            attr.add_crit_dmg(add_crit_dmg)
-
-    elif chain_num >= 1:
-        # 固有技能·炽盛决意会补充至上限，单人第一波能吃到。？
-        title = f"{role_name}-一链"
-        msg = "以众愿为冕=暴击伤害15%*2+导电伤害加成提升15%*2"
-        attr.add_crit_dmg(0.15 * 2)
-        attr.add_dmg_bonus(0.15 * 2)
-        attr.add_effect(title, msg)
-    else:
-        title = "延奏技能-以众愿为冕"
-        msg = "导电伤害加成提升15%"
-        attr.add_dmg_bonus(0.15)
-        attr.add_effect(title, msg)
-
-    if chain_num >= 3:
-        title = f"{role_name}-三链"
-        msg = "伤害倍率提升25%"
-        attr.add_skill_ratio(0.25, title, msg)
-
-    if chain_num >= 4 and isGroup:
-        title = f"{role_name}-四链"
-        msg = "队伍中的角色的攻击提升20%"
-        attr.add_atk_percent(0.2, title, msg)
+    chain_damage(attr, role, isGroup)
 
     # 声骸
     echo_damage(attr, isGroup)
