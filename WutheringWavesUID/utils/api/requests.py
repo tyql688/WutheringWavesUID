@@ -570,7 +570,9 @@ class WavesApi:
     ):
         """角色培养状态"""
         header = await get_base_header()
-        used_headers = await self.get_used_headers(cookie=token, uid=roleId)
+        used_headers = await self.get_used_headers(
+            cookie=token, uid=roleId, needToken=True
+        )
         header.update(used_headers)
         data = {
             "serverId": self.get_server_id(roleId, serverId),
