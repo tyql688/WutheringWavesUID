@@ -130,12 +130,16 @@ class WavesApi:
         )
         return waves_user
 
-    async def get_used_headers(self, cookie: str, uid: str) -> Dict[str, Any]:
+    async def get_used_headers(
+        self, cookie: str, uid: str, needToken=False
+    ) -> Dict[str, Any]:
         headers = {
-            "token": cookie,
+            # "token": cookie,
             "did": "",
             "b-at": "",
         }
+        if needToken:
+            headers["token"] = cookie
         waves_user: Optional[WavesUser] = await WavesUser.select_data_by_cookie_and_uid(
             cookie=cookie,
             uid=uid,
@@ -235,7 +239,9 @@ class WavesApi:
     ):
         """每日"""
         header = await get_base_header()
-        used_headers = await self.get_used_headers(cookie=token, uid=roleId)
+        used_headers = await self.get_used_headers(
+            cookie=token, uid=roleId, needToken=True
+        )
         header.update(used_headers)
         data = {
             "type": "1",
@@ -491,7 +497,9 @@ class WavesApi:
         serverId: Optional[str] = None,
     ):
         header = await get_base_header()
-        used_headers = await self.get_used_headers(cookie=token, uid=roleId)
+        used_headers = await self.get_used_headers(
+            cookie=token, uid=roleId, needToken=True
+        )
         header.update(used_headers)
 
         data = {
@@ -543,7 +551,9 @@ class WavesApi:
     ):
         """已拥有角色"""
         header = await get_base_header()
-        used_headers = await self.get_used_headers(cookie=token, uid=roleId)
+        used_headers = await self.get_used_headers(
+            cookie=token, uid=roleId, needToken=True
+        )
         header.update(used_headers)
         data = {
             "serverId": self.get_server_id(roleId, serverId),
@@ -580,7 +590,9 @@ class WavesApi:
     ):
         """角色培养成本"""
         header = await get_base_header()
-        used_headers = await self.get_used_headers(cookie=token, uid=roleId)
+        used_headers = await self.get_used_headers(
+            cookie=token, uid=roleId, needToken=True
+        )
         header.update(used_headers)
         data = {
             "serverId": self.get_server_id(roleId, serverId),
@@ -596,7 +608,9 @@ class WavesApi:
     ):
         """资源简报列表"""
         header = await get_base_header()
-        used_headers = await self.get_used_headers(cookie=token, uid=roleId)
+        used_headers = await self.get_used_headers(
+            cookie=token, uid=roleId, needToken=True
+        )
         header.update(used_headers)
         return await self._waves_request(PERIOD_LIST_URL, "GET", header)
 
@@ -610,7 +624,9 @@ class WavesApi:
     ):
         """资源简报详情"""
         header = await get_base_header()
-        used_headers = await self.get_used_headers(cookie=token, uid=roleId)
+        used_headers = await self.get_used_headers(
+            cookie=token, uid=roleId, needToken=True
+        )
         header.update(used_headers)
         data = {
             "serverId": self.get_server_id(roleId, serverId),
