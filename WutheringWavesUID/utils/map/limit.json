@@ -657,6 +657,41 @@
                     ]
                 }
             ]
+        },
+        {
+            "libId": 22,
+            "fetterList": [
+                {
+                    "fetterDetailName": "荣斗铸锋之冠",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 6000160,
+                            "cost": 4
+                        },
+                        {
+                            "phantomId": 6000097,
+                            "cost": 3
+                        },
+                        {
+                            "phantomId": 6000161,
+                            "cost": 3
+                        }
+                    ]
+                },
+                {
+                    "fetterDetailName": "啸谷长风",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 390070071,
+                            "cost": 1
+                        },
+                        {
+                            "phantomId": 390070075,
+                            "cost": 1
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "charList": [
@@ -841,6 +876,13 @@
             "name": "奥古斯塔",
             "weaponId": 21010046,
             "sonataLibId": 21
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1410,
+            "name": "尤诺",
+            "weaponId": 21040046,
+            "sonataLibId": 22
         }
     ]
 }

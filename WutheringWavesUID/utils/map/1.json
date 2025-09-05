@@ -3809,6 +3809,429 @@
   {
     "chainList": [
       {
+        "description": "尤诺处于月相流转状态时，攻击提升40%。\n尤诺处于满月领域中时，自身每秒额外回复1点共鸣能量。\n共鸣技能·越限的弦引和重击·至臻的完满免疫打断。",
+        "iconUrl": "",
+        "name": "圆与缺，皆替金枝镀色",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "队伍中的角色的苍白死光的祝颂叠加至10层时，其额外获得40%全伤害加深。",
+        "iconUrl": "",
+        "name": "昼或夜，且以它为永恒",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "尤诺处于月相流转状态时，月弓·普攻、共鸣技能·越限的弦引、月弓·闪避反击造成的伤害加深65%。\n施放月弓·普攻或月弓·闪避反击后一定时间内，施放共鸣技能·越限的弦引将不会重置月弓·普攻的连段。",
+        "iconUrl": "",
+        "name": "我痛饮他者的遗忘",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "施放重击·至臻的完满时，队伍中的角色获得一个基于尤诺攻击160%的护盾，持续时间30秒，切换至其他角色不会继承该护盾。",
+        "iconUrl": "",
+        "name": "任雨季栖息于眼眸",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣解放伤害加成提升20%。",
+        "iconUrl": "",
+        "name": "万千次虚掷的注视",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "重击·至臻的完满伤害倍率增加1600%。\n尤诺施放重击·至臻的完满时，会再次进入月相流转·新月状态，获得100点【灵性】并重置共鸣技能·越限的弦引的全部冷却。",
+        "iconUrl": "",
+        "name": "我所在，即为不变的独一",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "荣斗铸锋之冠",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "海之女",
+            "phantomId": 6000160,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "荣斗铸锋之冠",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "气动伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "飓力熊",
+            "phantomId": 6000097,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "荣斗铸锋之冠",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "气动伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "梦魇·紫羽鹭",
+            "phantomId": 6000161,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "啸谷长风",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "巡徊猎手",
+            "phantomId": 390070071,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "啸谷长风",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "共鸣解放伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "碎獠猪",
+            "phantomId": 390070075,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 4,
+      "attributeName": "气动",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1410,
+      "roleName": "尤诺",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 4,
+      "weaponTypeName": "臂铠",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "月环·普攻\n使用月环进行最多3段的连续攻击，造成气动伤害。\n\n空中攻击\n消耗耐力进行空中下落攻击，造成气动伤害。\n\n月环·闪避反击\n成功闪避后一定时间内短按普攻，将会使用月环攻击目标，造成气动伤害。施放该技能后一定时间内短按普攻，将会施放月环·普攻第三段。\n\n月弓·普攻\n尤诺可施放重击·流变·月环，进入月相流转·新月状态，在此状态下尤诺将使用月弓进行攻击。\n使用月弓进行最多3段的连续攻击，造成气动伤害，此次伤害为共鸣解放伤害。\n可在空中施放。\n\n月弓·闪避反击\n月相流转·新月状态下，成功闪避后一定时间内短按普攻，将会使用月弓攻击目标，造成气动伤害，此次伤害为共鸣解放伤害。\n月相流转·新月状态下，施放该技能后一定时间内短按普攻，将会施放月弓·普攻第三段。\n可在空中施放。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "祭者独步",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "原初的律动\n尤诺向前突进，造成气动伤害。\n\n告终的喧响\n尤诺不处于月相流转状态时，施放月环·普攻第3段、变奏技能或原初的律动时，共鸣技能替换为告终的喧响，持续5秒。\n施放告终的喧响时，造成多段气动伤害，并进入月相流转状态。\n\n未终的喧响\n尤诺处于月相流转·弦月状态时，共鸣技能替换为未终的喧响。\n施放未终的喧响时，造成多段气动伤害。\n告终的喧响与未终的喧响共用同一个冷却时间。\n\n越限的弦引\n尤诺处于月相流转·新月状态时，共鸣技能替换为越限的弦引，初始拥有2次可施放次数。\n施放越限的弦引时，尤诺进行一次位移，并造成气动伤害，此次伤害为共鸣解放伤害。\n-技能位移期间可通过移动输入延长位移距离。当尤诺处于受击或被击飞状态中，施放越限的弦引将脱离受击状态或被击飞状态。\n可在空中施放。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "先觉赋格",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "造成气动伤害，并进入月相流转状态。\n可在空中施放。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "溺失月海",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "造成气动伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "照我以显",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "月相流转\n尤诺可以通过施放共鸣技能·告终的喧响或共鸣解放进入月相流转状态。\n月相流转分为弦月和新月两种状态，初始默认进入弦月状态，尤诺可以通过施放重击·流变进行两种状态间的切换。\n处于月相流转状态下：尤诺的跳跃替换为重击·流变；尤诺在空中时无法进行耐力回复；\n移动时，尤诺会进入漫溯巡游状态，以特殊表现进行移动，在空中时会持续消耗耐力。\n当触发特定场景交互、探索工具或长按跳跃键时，将退出月相流转状态。\n\n月相流转·弦月\n尤诺使用月环攻击，命中目标时可恢复【灵性】。\n尤诺可施放重击·流变·月弓，造成气动伤害，此次伤害为共鸣解放伤害，进入月相流转·新月状态。\n重击·流变·月弓可在空中施放。\n\n月相流转·新月\n尤诺使用月弓攻击，施放月弓·普攻、共鸣技能·越限的弦引、月弓·闪避反击时可消耗【灵性】，提升该次技能的伤害倍率，回复额外的协奏能量，并为附近队伍中的角色回复生命值。\n尤诺可施放重击·流变·月环，造成气动伤害，此次伤害为共鸣解放伤害，进入月相流转·弦月状态。\n重击·流变·月环可在空中施放。\n\n重击·至臻的完满\n尤诺协奏能量充满时，重击替换为至臻的完满。\n施放至臻的完满时，尤诺结束自身的月相流转状态，为附近队伍中的角色回复生命值；\n对周围目标造成气动伤害，此次伤害为共鸣解放伤害；\n以自身为中心展开满月领域，该效果25秒最多可触发一次。\n可在空中施放。\n\n满月领域\n处于领域中的角色，周期性获得治疗和耐力回复。\n处于领域中的登场角色获得护盾时，可获得一层苍白死光的祝颂，该效果每0.5秒可触发一次。\n\n苍白死光的祝颂\n角色全伤害加深4%，持续10秒，可叠加10层，重复添加时刷新持续时间。若切换至其他角色则该效果提前结束。\n\n灵性\n灵性上限100点。\n尤诺施放变奏技能时，可获得40点【灵性】。\n尤诺施放共鸣解放时，可获得60点【灵性】。\n尤诺施放告终的喧响或未终的喧响时，可获得25点【灵性】。\n尤诺处于月相流转状态时，月环·普攻、月环·闪避反击、空中攻击命中目标时，可获得【灵性】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "于盈亏间涨落",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标造成100%的气动伤害，下一个登场角色重击伤害加深50%，持续14秒，若切换至其他角色则该效果提前结束。\n-在施放重击·至臻的完满的过程中施放延奏技能时，不会中断重击·至臻的完满的施放，且延奏技能效果仍然生效。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "晦渡为明",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "攻击提升24%。 施放变奏技能或共鸣解放时，共鸣解放伤害提升40%，持续15秒。 自身获得护盾时：共鸣解放伤害无视目标12.0%防御，每0.5秒可生效1次，可叠加5层，持续7秒；施放变奏技能时，无视目标防御的效果视为满层，持续3秒。",
+        "weaponIcon": "",
+        "weaponId": 21040046,
+        "weaponName": "万物持存的注释",
+        "weaponStarLevel": 5,
+        "weaponType": 4
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
         "description": "共鸣技能伤害加成提升30%。",
         "iconUrl": "",
         "name": "弦外知机",

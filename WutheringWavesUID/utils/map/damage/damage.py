@@ -18,6 +18,7 @@ from ...damage.utils import (
     SONATA_ETERNAL,
     SONATA_FREEZING,
     SONATA_FROSTY,
+    SONATA_HARMONY,
     SONATA_LINGERING,
     SONATA_MIDNIGHT,
     SONATA_MOLTEN,
@@ -34,6 +35,7 @@ from ...damage.utils import (
     cast_hit,
     cast_liberation,
     cast_skill,
+    hit_damage,
     liberation_damage,
     phantom_damage,
     skill_damage,
@@ -294,3 +296,16 @@ def phase_damage(
             attr.add_atk_percent(0.06 * 5, title, msg)
             msg = "角色获得护盾时，自身暴击伤害提升4%*5"
             attr.add_crit_dmg(0.04 * 5, title, msg)
+
+        # 息界同调之律
+        elif check_if_ph_3(ph_detail.ph_name, ph_detail.ph_num, SONATA_HARMONY):
+            # 角色施放声骸技能时，自身重击伤害加成提升30%，持续4秒；队伍中角色声骸技能伤害加成提升4%，该效果可叠加4层，持续30秒。
+            # ？
+            if attr.char_damage == hit_damage:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "角色施放声骸技能时，自身重击伤害加成提升30%"
+                attr.add_dmg_bonus(0.3, title, msg)
+            if attr.char_damage == phantom_damage:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "队伍中角色声骸技能伤害加成提升4%*4"
+                attr.add_dmg_bonus(0.04 * 4, title, msg)
