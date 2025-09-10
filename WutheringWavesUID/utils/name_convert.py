@@ -180,8 +180,15 @@ def alias_to_sonata_name(sonata_name: str | None) -> str | None:
 
 
 def alias_to_echo_name(echo_name: str) -> str:
-    for i in echo_alias_data:
-        if (echo_name in i) or (echo_name in echo_alias_data[i]):
+    for i, j in echo_alias_data.items():
+        if echo_name == i:
+            return i
+        if echo_name in j:
+            return i
+        for k in j:
+            if k and echo_name in k:
+                return i
+        if echo_name in i:
             return i
     return echo_name
 
