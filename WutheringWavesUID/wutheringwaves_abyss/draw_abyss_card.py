@@ -31,6 +31,7 @@ from ..utils.image import GOLD, GREY, add_footer, get_waves_bg
 from ..utils.imagetool import draw_pic, draw_pic_with_ring
 from ..utils.queues.const import QUEUE_ABYSS_RECORD
 from ..utils.queues.queues import put_item
+from ..utils.util import get_version
 from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 
@@ -122,10 +123,28 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     if not abyss_check:
         return ABYSS_ERROR_MESSAGE_NO_DEEP
 
-    if is_self_ck:
-        h = 2200
-    else:
-        h = 1300
+    needAbyss = None
+    for _abyss in abyss_data.difficultyList:
+        if _abyss.difficultyName != difficultyName:
+            continue
+        needAbyss = _abyss
+        break
+    if not needAbyss:
+        return ABYSS_ERROR_MESSAGE_NO_DEEP
+
+    frameHigh = (
+        sum(
+            [
+                len(i.floorList) * 141 + 90 + 50
+                for i in needAbyss.towerAreaList
+                if i.floorList
+            ]
+        )
+        + 100
+        + 50
+    )
+
+    h = frameHigh + 220
     card_img = get_waves_bg(950, h, "bg4")
 
     # 基础信息 名字 特征码
@@ -164,11 +183,9 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
 
     # frame
     frame = Image.open(TEXT_PATH / "frame.png")
-    frame = frame.resize(
-        (frame.size[0], h - 50 if is_self_ck else h - 100), box=(0, 0, frame.size[0], h)
-    )
+    frame = frame.resize((frame.size[0], frameHigh))
 
-    yset = 0
+    yset = 100  # 起始
     for _abyss in abyss_data.difficultyList:
         if _abyss.difficultyName != difficultyName:
             continue
@@ -190,9 +207,9 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                     waves_font_32,
                     "mm",
                 )
-            frame.paste(tower_name_bg, (-20, 300 + yset), tower_name_bg)
+            frame.paste(tower_name_bg, (-20, yset), tower_name_bg)
 
-            yset += 150
+            yset += 90  # tower_name_bg high
             if not tower.floorList:
                 tower.floorList = [
                     AbyssFloor(
@@ -276,8 +293,9 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
                         )
 
                 abyss_bg.paste(abyss_bg_temp, (0, 0), abyss_bg_temp)
-                frame.paste(abyss_bg, (80, 240 + yset), abyss_bg)
+                frame.paste(abyss_bg, (80, yset), abyss_bg)
                 yset += 141
+            yset += 50
         break
     else:
         if not is_self_ck:
@@ -287,7 +305,7 @@ async def draw_abyss_img(ev: Event, uid: str, user_id: str) -> Union[bytes, str]
     # 上传深渊记录
     await upload_abyss_record(is_self_ck, uid, difficultyName, abyss_data)
 
-    card_img.paste(frame, (0, 0), frame)
+    card_img.paste(frame, (0, 210), frame)
 
     card_img = add_footer(card_img, 600, 20)
     card_img = await convert_img(card_img)
@@ -342,6 +360,7 @@ async def upload_abyss_record(
         {
             "waves_id": waves_id,
             "abyss_record": abyss_record,
+            "version": get_version(),
         }
     )
     # logger.info(f"上传深渊记录: {abyss_item.model_dump()}")

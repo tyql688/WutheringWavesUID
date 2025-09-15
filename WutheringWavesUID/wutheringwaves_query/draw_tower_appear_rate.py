@@ -53,7 +53,7 @@ async def draw_tower_use_rate(ev: Event):
     elif "右" in text or "回音" in text:
         filter_type = "r4"
     elif "中" in text or "深境" in text:
-        filter_type = "m2"
+        filter_type = "m4"
 
     title_h = 500
     bar_star_h = 180

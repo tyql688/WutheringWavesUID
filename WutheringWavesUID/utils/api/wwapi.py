@@ -17,7 +17,7 @@ UPLOAD_SLASH_RECORD_URL = f"{MAIN_URL}/top/waves/slash/upload"
 GET_SLASH_APPEAR_RATE = f"{MAIN_URL}/api/waves/slash/appear_rate"
 GET_SLASH_RANK_URL = f"{MAIN_URL}/top/waves/slash/rank"
 
-ABYSS_TYPE = Literal["l4", "m2", "r4", "a"]
+ABYSS_TYPE = Literal["l4", "m4", "r4", "a"]
 
 ABYSS_TYPE_MAP = {
     "残响之塔": "l",
@@ -27,7 +27,7 @@ ABYSS_TYPE_MAP = {
 
 ABYSS_TYPE_MAP_REVERSE = {
     "l4": "残响之塔 - 4层",
-    "m2": "深境之塔 - 2层",
+    "m4": "深境之塔 - 4层",
     "r4": "回音之塔 - 4层",
 }
 
@@ -99,6 +99,7 @@ class AbyssDetail(BaseModel):
 class AbyssItem(BaseModel):
     waves_id: str
     abyss_record: List[AbyssDetail]
+    version: str
 
 
 class AbyssRecordRequest(BaseModel):
