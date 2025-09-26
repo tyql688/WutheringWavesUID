@@ -110,6 +110,15 @@ async def draw_card_help():
         ]
     )
 
+    yun = "\n".join(
+        [
+            "云游戏获取方式",
+            "1.复制以下链接到浏览器打开",
+            "https://ga.camellya.xyz",
+            "2.登录后,依次点击`刷新记录`,`复制记录`按钮",
+        ]
+    )
+
     text = "\n".join(
         [
             "如何导入抽卡记录",
@@ -119,7 +128,7 @@ async def draw_card_help():
             "抽卡链接具有有效期，请在有效期内尽快导入",
         ]
     )
-    msg = [android, ios, pc, text]
+    msg = [android, ios, pc, yun, text]
     return msg
 
 
