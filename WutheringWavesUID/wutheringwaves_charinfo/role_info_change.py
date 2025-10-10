@@ -7,6 +7,7 @@ from ..utils.api.model import EquipPhantomData, RoleDetailData
 from ..utils.api.model_other import EnemyDetailData
 from ..utils.ascension.sonata import WavesSonataResult, get_sonata_detail
 from ..utils.ascension.weapon import WavesWeaponResult, get_weapon_detail
+from ..utils.char_info_utils import get_all_role_detail_info_list
 from ..utils.name_convert import (
     alias_to_sonata_name,
     alias_to_weapon_name,
@@ -16,7 +17,6 @@ from ..utils.name_convert import (
 )
 from ..utils.resource.constant import SONATA_FIRST_ID, SPECIAL_CHAR
 from ..utils.waves_api import waves_api
-from ..utils.waves_card_cache import get_card
 
 phantom_main_value = [
     {"name": "攻击", "values": ["18%", "30%", "33%"]},
@@ -36,7 +36,7 @@ async def get_remote_role_detail_info(
 ) -> Optional[RoleDetailData]:
     role_detail_info = None
 
-    gen_temp = await get_card(waves_id)  # type: ignore
+    gen_temp = await get_all_role_detail_info_list(waves_id)  # type: ignore
     if gen_temp:
         role_detail_info = next(
             (role for role in gen_temp if str(role.role.roleId) in find_char_id),
@@ -752,4 +752,5 @@ async def change_role_phantom(
                 totalCost += eq.cost
 
             if totalCost - oldCost + newCost <= 12:
+                temp[int(parserToPosition) - 1] = new  # type: ignore
                 temp[int(parserToPosition) - 1] = new  # type: ignore

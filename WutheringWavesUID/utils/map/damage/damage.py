@@ -16,6 +16,7 @@ from ...damage.utils import (
     SONATA_CROWN_OF_VALOR,
     SONATA_EMPYREAN,
     SONATA_ETERNAL,
+    SONATA_FIREWALL,
     SONATA_FREEZING,
     SONATA_FROSTY,
     SONATA_HARMONY,
@@ -309,3 +310,20 @@ def phase_damage(
                 title = f"{phase_name}-{ph_detail.ph_name}"
                 msg = "队伍中角色声骸技能伤害加成提升4%*4"
                 attr.add_dmg_bonus(0.04 * 4, title, msg)
+
+        # 焚羽猎魔之影
+        elif check_if_ph_3(ph_detail.ph_name, ph_detail.ph_num, SONATA_FIREWALL):
+            # 角色造成声骸技能伤害时，重击伤害的暴击提升20%，持续6秒；造成重击伤害时，声骸技能伤害的暴击提升20%，持续6秒。同时拥有两种效果时，自身热熔伤害提升16%。
+            if attr.char_damage == hit_damage:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "角色施放声骸技能时，自身重击伤害加成提升20%"
+                attr.add_dmg_bonus(0.2, title, msg)
+            if attr.char_damage == phantom_damage:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "造成重击伤害时，声骸技能伤害的暴击提升20%"
+                attr.add_dmg_bonus(0.2, title, msg)
+
+            if attr.role and attr.role.role.roleId == 1208:
+                title = f"{phase_name}-{ph_detail.ph_name}"
+                msg = "自身热熔伤害提升16%"
+                attr.add_dmg_bonus(0.16, title, msg)

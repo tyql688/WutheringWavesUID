@@ -10533,5 +10533,428 @@
         "weaponType": 1
       }
     }
+  },
+  {
+    "chainList": [
+      {
+        "description": "嘉贝莉娜施放共鸣技能·恶翼扬升时，每点【余火】额外为普攻·炽天猎杀、重击·炼羽裁决、空中攻击·火狱暴雨、共鸣技能·掠袭、闪避反击·罪业当涤提升2%暴击伤害，至多提升80%暴击伤害，退出恶魔位格时移除。\n恶魔位格期间，普攻·炽天猎杀第5段、重击·炼羽裁决第3段、空中攻击·火狱暴雨免疫打断。",
+        "iconUrl": "",
+        "name": "不熄抵牾抗争之心",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "内燃烧提供的攻击加成提升350%。",
+        "iconUrl": "",
+        "name": "行过烈狱与幽暗冥途",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣解放的伤害倍率提升130%。",
+        "iconUrl": "",
+        "name": "再燃血狩死猎之誓",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "队伍中的角色施放声骸技能时，使队伍中所有角色全属性伤害加成提升20%，持续20秒。",
+        "iconUrl": "",
+        "name": "承负无薪孤惧苦火",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣技能·迫近，共鸣技能·恶翼扬升，共鸣技能·掠袭的伤害倍率提升150%。",
+        "iconUrl": "",
+        "name": "纵使光明远去，厄难焚身",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "恶魔位格升级为永恒位格，永恒位格保留恶魔位格全部原有效果。\n永恒位格期间普攻·炽天猎杀、重击·炼羽裁决、空中攻击·火狱暴雨、闪避反击·罪业当涤的伤害倍率提升60%。\n\n嘉贝莉娜施放共鸣技能·恶翼扬升时，每点【余火】额外为普攻·炽天猎杀、重击·炼羽裁决、空中攻击·火狱暴雨、共鸣技能·掠袭、闪避反击·罪业当涤提升0.875%热熔伤害加深，至多提升35%热熔伤害加深，退出永恒位格时移除。",
+        "iconUrl": "",
+        "name": "我仍炽耀不移，自有永有",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "焚羽猎魔之影",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "热熔伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "蚀脊龙",
+            "phantomId": 6000120,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "焚羽猎魔之影",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "共鸣回响·鸣式·利维亚坦",
+            "phantomId": 6000167,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "焚羽猎魔之影",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "热熔伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "蚀脊龙",
+            "phantomId": 6000120,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "熔山裂谷",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "热熔棱镜",
+            "phantomId": 390077012,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "熔山裂谷",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "绿熔蜥（稚形）",
+            "phantomId": 390070078,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 2,
+      "attributeName": "热熔",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1208,
+      "roleName": "嘉贝莉娜",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 3,
+      "weaponTypeName": "佩枪",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n进行最多4段的连续攻击，造成热熔伤害，普攻第1段、普攻第2段、普攻第3段伤害为重击伤害，普攻第4段伤害为声骸技能伤害。\n施放普攻第4段后一定时间内短按普攻，可施放普攻第2段。\n\n重击·燧发杀戮\n消耗耐力攻击目标，进行最多3段的连续攻击，造成热熔伤害，第3段伤害为声骸技能伤害。\n施放重击·燧发杀戮第1段后一定时间内短按普攻，可施放普攻第2段。施放重击·燧发杀戮第2、3段后一定时间内短按普攻，可施放普攻第3段。\n\n空中攻击·枪弹暴雨\n处于空中时，短按普攻消耗耐力进行空中下落攻击，造成热熔伤害，此次伤害为重击伤害。\n处于空中时，按住普攻可持续消耗耐力对正下方目标进行扫射，造成热熔伤害，此次伤害为重击伤害，技能被打断后若没有回到地面，无法再次施放。扫射期间松开普攻将施放空中下落攻击。\n空中下落攻击后，短按普攻可施放普攻第3段。\n\n闪避反击·血债将偿\n成功闪避后一定时间内短按普攻，将会攻击目标，造成热熔伤害，此次伤害为重击伤害。\n施放该技能后在一定时间内短按普攻，可施放普攻第4段。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "猎魔扳机",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "共鸣技能·迫近\n向前冲刺并跃起，命中目标后向后跳跃，造成热熔伤害，此次伤害为重击伤害。\n\n共鸣技能·恶翼扬升\n【罪火】达到100点时，共鸣技能替换为共鸣技能·恶翼扬升。\n用羽翼斩击敌人，造成热熔伤害，此次伤害视为重击伤害。施放时：\n·嘉贝莉娜进入恶魔位格。\n·【罪火】转化为等值的【净炼火】。\n·可衔接普攻·炽天猎杀第2段。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "边缘翼动",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成热熔伤害，此次伤害为声骸技能伤害，并使恶魔位格期间，普攻·炽天猎杀、重击·炼羽裁决、空中攻击·火狱暴雨、闪避反击·罪业当涤的伤害倍率提升85%，持续14秒。\n施放共鸣解放后，短按普攻，可施放普攻第2段，恶魔位格期间替换为施放普攻·炽天猎杀第2段。\n可在低空中施放。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "炼净",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成热熔伤害。\n施放该技能后长按普攻，可施放重击·燧发杀戮第2段，恶魔位格期间替换为施放重击·炼羽裁决第2段。\n施放该技能后短按普攻，可施放普攻第2段，恶魔位格期间替换为施放普攻·炽天猎杀第2段。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "永火上膛",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "阈限状态\n嘉贝莉娜初始处于阈限状态。阈限状态下嘉贝莉娜可积攒【余火】与【罪火】。\n\n恶魔位格\n恶魔位格期间，嘉贝莉娜的普攻、重击·燧发杀戮、空中攻击·枪弹暴雨、闪避反击·血债将偿、共鸣技能·迫近替换为普攻·炽天猎杀、重击·炼羽裁决、空中攻击·火狱暴雨、闪避反击·罪业当涤、共鸣技能·掠袭，替换后的技能命中目标时消耗【净炼火】。\n恶魔位格期间，每点【余火】会使目标受到嘉贝莉娜的普攻·炽天猎杀、重击·炼羽裁决、空中攻击·火狱暴雨、共鸣技能·掠袭、闪避反击·罪业当涤伤害提升1.5%，至多提升至60%，退出恶魔位格时移除。\n消耗完【净炼火】时，或处于恶魔位格50秒后，将退出恶魔位格。\n\n普攻·炽天猎杀\n进行最多5段的连续攻击，造成热熔伤害，命中目标时消耗【净炼火】，第1、2、3段伤害为重击伤害，第4、5段伤害为声骸技能伤害。\n施放普攻·炽天猎杀第5段后，短按普攻可施放普攻·炽天猎杀第3段。\n\n重击·炼羽裁决\n消耗耐力攻击目标，进行最多3段的连续攻击，造成热熔伤害，命中目标时消耗【净炼火】，第3段伤害为声骸技能伤害。\n施放重击·炼羽裁决第1段后，短按普攻可施放普攻·炽天猎杀第2段。\n施放重击·炼羽裁决第2、3段后，短按普攻可施放普攻·炽天猎杀第3段。\n\n空中攻击·火狱暴雨\n处于空中时，短按普攻消耗耐力进行空中攻击，造成热熔伤害，此次伤害为重击伤害，命中目标时消耗【净炼火】。\n处于空中时，按住普攻可持续消耗耐力对目标进行扫射，造成热熔伤害，此次伤害为重击伤害，命中目标时持续消耗【净炼火】，技能被打断后若没有回到地面，无法再次施放。扫射期间松开普攻将施放空中下落攻击。\n空中下落攻击后，短按普攻可施放普攻·炽天猎杀第3段。\n\n闪避反击·罪业当涤\n成功闪避后一定时间内短按普攻，将会攻击目标，造成热熔伤害，此次伤害为重击伤害。\n施放该技能后在一定时间内短按普攻，可施放普攻·炽天猎杀第4段。\n\n共鸣技能·掠袭\n向前冲刺并跃起，命中目标后向后跳跃，造成热熔伤害，此次伤害为重击伤害，命中目标时消耗【净炼火】。共鸣技能·掠袭和共鸣技能·迫近共享冷却时间。\n\n地狱穿行\n嘉贝莉娜施放自身技能期间，且在地面时，短按闪避可施放地狱穿行，造成固定热熔伤害，此次伤害为普攻伤害，不受伤害加成影响，地狱穿行可以触发成功闪避效果。地狱穿行不可连续施放。\n施放该技能后，一定时间内将不会重置连段。\n\n内燃烧\n施放变奏技能、地狱穿行、普攻·炽天猎杀第4段、共鸣技能·迫近、共鸣技能·恶翼扬升、共鸣技能·掠袭时，嘉贝莉娜的攻击提升20%，抗打断能力提升，持续4秒。\n\n余火获取规则\n【余火】上限40点。\n阈限状态期间，附近队伍中所有角色施放声骸技能时，嘉贝莉娜回复8点【余火】，同名声骸只可触发1次，嘉贝莉娜退出恶魔位格时重置。\n退出恶魔位格时，清除所有【余火】。\n\n罪火获取规则\n【罪火】上限100点。\n阈限状态期间，普攻，重击·燧发杀戮，空中攻击·枪弹暴雨，共鸣技能·迫近，变奏技能·永火上膛命中目标时，回复【罪火】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "超阈限",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成嘉贝莉娜79.5%*3+556.5%攻击的热熔伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "驱猎逐烬",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "攻击提升24%。造成声骸技能伤害时，重击伤害加深48%，持续6秒；造成重击伤害时，声骸技能伤害加深48%，持续6秒；单次攻击最多享受48%伤害加深。同时拥有两种效果时，造成伤害时无视目标16%防御。",
+        "weaponIcon": "",
+        "weaponId": 21030036,
+        "weaponName": "光影双生",
+        "weaponStarLevel": 5,
+        "weaponType": 3
+      }
+    }
   }
 ]

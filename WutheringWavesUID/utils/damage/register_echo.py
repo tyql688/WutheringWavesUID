@@ -846,6 +846,11 @@ class Echo_6000120(EchoAbstract):
     id = 6000120
     name = "蚀脊龙"
 
+    # 在首位装配该声骸技能时，自身热熔伤害加成提升12.00%，声骸技能伤害加成提升20.00%。
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"热熔伤害加成": "12%", "声骸技能伤害加成": "20%"}
+
 
 class Echo_6000121(EchoAbstract):
     id = 6000121
@@ -897,136 +902,33 @@ class Echo_6000166(EchoAbstract):
     name = "梦魇·啾啾河豚"
 
 
+class Echo_6000167(EchoAbstract):
+    id = 6000167
+    name = "共鸣回响·鸣式·利维亚坦"
+
+    # 在首位装配该声骸技能时，自身湮灭伤害加成提升12.00%，共鸣解放伤害加成提升12.00%。
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"湮灭伤害加成": "12%", "共鸣解放伤害加成": "12%"}
+
+
+class Echo_6000168(EchoAbstract):
+    id = 6000168
+    name = "梦魇·绿熔蜥"
+
+
+class Echo_6000169(EchoAbstract):
+    id = 6000169
+    name = "梦魇·绿熔蜥（稚形）"
+
+
+class Echo_6000170(EchoAbstract):
+    id = 6000170
+    name = "梦魇·刺玫菇（稚形）"
+
+
 def register_echo():
-    WavesEchoRegister.register_class(Echo_390070051.id, Echo_390070051)
-    WavesEchoRegister.register_class(Echo_390070052.id, Echo_390070052)
-    WavesEchoRegister.register_class(Echo_390070053.id, Echo_390070053)
-    WavesEchoRegister.register_class(Echo_390070064.id, Echo_390070064)
-    WavesEchoRegister.register_class(Echo_390070065.id, Echo_390070065)
-    WavesEchoRegister.register_class(Echo_390070066.id, Echo_390070066)
-    WavesEchoRegister.register_class(Echo_390070067.id, Echo_390070067)
-    WavesEchoRegister.register_class(Echo_390070068.id, Echo_390070068)
-    WavesEchoRegister.register_class(Echo_390070069.id, Echo_390070069)
-    WavesEchoRegister.register_class(Echo_390070070.id, Echo_390070070)
-    WavesEchoRegister.register_class(Echo_390070071.id, Echo_390070071)
-    WavesEchoRegister.register_class(Echo_390070074.id, Echo_390070074)
-    WavesEchoRegister.register_class(Echo_390070075.id, Echo_390070075)
-    WavesEchoRegister.register_class(Echo_390070076.id, Echo_390070076)
-    WavesEchoRegister.register_class(Echo_390070077.id, Echo_390070077)
-    WavesEchoRegister.register_class(Echo_390070078.id, Echo_390070078)
-    WavesEchoRegister.register_class(Echo_390070079.id, Echo_390070079)
-    WavesEchoRegister.register_class(Echo_390070100.id, Echo_390070100)
-    WavesEchoRegister.register_class(Echo_390070105.id, Echo_390070105)
-    WavesEchoRegister.register_class(Echo_390077004.id, Echo_390077004)
-    WavesEchoRegister.register_class(Echo_390077005.id, Echo_390077005)
-    WavesEchoRegister.register_class(Echo_390077012.id, Echo_390077012)
-    WavesEchoRegister.register_class(Echo_390077013.id, Echo_390077013)
-    WavesEchoRegister.register_class(Echo_390077016.id, Echo_390077016)
-    WavesEchoRegister.register_class(Echo_390077017.id, Echo_390077017)
-    WavesEchoRegister.register_class(Echo_390077021.id, Echo_390077021)
-    WavesEchoRegister.register_class(Echo_390077022.id, Echo_390077022)
-    WavesEchoRegister.register_class(Echo_390077023.id, Echo_390077023)
-    WavesEchoRegister.register_class(Echo_390077024.id, Echo_390077024)
-    WavesEchoRegister.register_class(Echo_390077025.id, Echo_390077025)
-    WavesEchoRegister.register_class(Echo_390077028.id, Echo_390077028)
-    WavesEchoRegister.register_class(Echo_390077029.id, Echo_390077029)
-    WavesEchoRegister.register_class(Echo_390077033.id, Echo_390077033)
-    WavesEchoRegister.register_class(Echo_390077038.id, Echo_390077038)
-    WavesEchoRegister.register_class(Echo_390080003.id, Echo_390080003)
-    WavesEchoRegister.register_class(Echo_390080005.id, Echo_390080005)
-    WavesEchoRegister.register_class(Echo_390080007.id, Echo_390080007)
-    WavesEchoRegister.register_class(Echo_390180010.id, Echo_390180010)
-    WavesEchoRegister.register_class(Echo_391070105.id, Echo_391070105)
-    WavesEchoRegister.register_class(Echo_391077024.id, Echo_391077024)
-    WavesEchoRegister.register_class(Echo_391080003.id, Echo_391080003)
-    WavesEchoRegister.register_class(Echo_6000038.id, Echo_6000038)
-    WavesEchoRegister.register_class(Echo_6000039.id, Echo_6000039)
-    WavesEchoRegister.register_class(Echo_6000040.id, Echo_6000040)
-    WavesEchoRegister.register_class(Echo_6000041.id, Echo_6000041)
-    WavesEchoRegister.register_class(Echo_6000042.id, Echo_6000042)
-    WavesEchoRegister.register_class(Echo_6000043.id, Echo_6000043)
-    WavesEchoRegister.register_class(Echo_6000044.id, Echo_6000044)
-    WavesEchoRegister.register_class(Echo_6000045.id, Echo_6000045)
-    WavesEchoRegister.register_class(Echo_6000046.id, Echo_6000046)
-    WavesEchoRegister.register_class(Echo_6000047.id, Echo_6000047)
-    WavesEchoRegister.register_class(Echo_6000048.id, Echo_6000048)
-    WavesEchoRegister.register_class(Echo_6000049.id, Echo_6000049)
-    WavesEchoRegister.register_class(Echo_6000050.id, Echo_6000050)
-    WavesEchoRegister.register_class(Echo_6000051.id, Echo_6000051)
-    WavesEchoRegister.register_class(Echo_6000052.id, Echo_6000052)
-    WavesEchoRegister.register_class(Echo_6000053.id, Echo_6000053)
-    WavesEchoRegister.register_class(Echo_6000054.id, Echo_6000054)
-    WavesEchoRegister.register_class(Echo_6000055.id, Echo_6000055)
-    WavesEchoRegister.register_class(Echo_6000056.id, Echo_6000056)
-    WavesEchoRegister.register_class(Echo_6000057.id, Echo_6000057)
-    WavesEchoRegister.register_class(Echo_6000058.id, Echo_6000058)
-    WavesEchoRegister.register_class(Echo_6000059.id, Echo_6000059)
-    WavesEchoRegister.register_class(Echo_6000060.id, Echo_6000060)
-    WavesEchoRegister.register_class(Echo_6000061.id, Echo_6000061)
-    WavesEchoRegister.register_class(Echo_6000062.id, Echo_6000062)
-    WavesEchoRegister.register_class(Echo_6000063.id, Echo_6000063)
-    WavesEchoRegister.register_class(Echo_6000064.id, Echo_6000064)
-    WavesEchoRegister.register_class(Echo_6000065.id, Echo_6000065)
-    WavesEchoRegister.register_class(Echo_6000066.id, Echo_6000066)
-    WavesEchoRegister.register_class(Echo_6000067.id, Echo_6000067)
-    WavesEchoRegister.register_class(Echo_6000068.id, Echo_6000068)
-    WavesEchoRegister.register_class(Echo_6000069.id, Echo_6000069)
-    WavesEchoRegister.register_class(Echo_6000070.id, Echo_6000070)
-    WavesEchoRegister.register_class(Echo_6000071.id, Echo_6000071)
-    WavesEchoRegister.register_class(Echo_6000072.id, Echo_6000072)
-    WavesEchoRegister.register_class(Echo_6000073.id, Echo_6000073)
-    WavesEchoRegister.register_class(Echo_6000074.id, Echo_6000074)
-    WavesEchoRegister.register_class(Echo_6000075.id, Echo_6000075)
-    WavesEchoRegister.register_class(Echo_6000076.id, Echo_6000076)
-    WavesEchoRegister.register_class(Echo_6000077.id, Echo_6000077)
-    WavesEchoRegister.register_class(Echo_6000078.id, Echo_6000078)
-    WavesEchoRegister.register_class(Echo_6000079.id, Echo_6000079)
-    WavesEchoRegister.register_class(Echo_6000080.id, Echo_6000080)
-    WavesEchoRegister.register_class(Echo_6000081.id, Echo_6000081)
-    WavesEchoRegister.register_class(Echo_6000082.id, Echo_6000082)
-    WavesEchoRegister.register_class(Echo_6000083.id, Echo_6000083)
-    WavesEchoRegister.register_class(Echo_6000084.id, Echo_6000084)
-    WavesEchoRegister.register_class(Echo_6000085.id, Echo_6000085)
-    WavesEchoRegister.register_class(Echo_6000086.id, Echo_6000086)
-    WavesEchoRegister.register_class(Echo_6000087.id, Echo_6000087)
-    WavesEchoRegister.register_class(Echo_6000088.id, Echo_6000088)
-    WavesEchoRegister.register_class(Echo_6000089.id, Echo_6000089)
-    WavesEchoRegister.register_class(Echo_6000090.id, Echo_6000090)
-    WavesEchoRegister.register_class(Echo_6000091.id, Echo_6000091)
-    WavesEchoRegister.register_class(Echo_6000092.id, Echo_6000092)
-    WavesEchoRegister.register_class(Echo_6000093.id, Echo_6000093)
-    WavesEchoRegister.register_class(Echo_6000094.id, Echo_6000094)
-    WavesEchoRegister.register_class(Echo_6000095.id, Echo_6000095)
-    WavesEchoRegister.register_class(Echo_6000096.id, Echo_6000096)
-    WavesEchoRegister.register_class(Echo_6000097.id, Echo_6000097)
-    WavesEchoRegister.register_class(Echo_6000098.id, Echo_6000098)
-    WavesEchoRegister.register_class(Echo_6000099.id, Echo_6000099)
-    WavesEchoRegister.register_class(Echo_6000100.id, Echo_6000100)
-    WavesEchoRegister.register_class(Echo_6000101.id, Echo_6000101)
-    WavesEchoRegister.register_class(Echo_6000102.id, Echo_6000102)
-    WavesEchoRegister.register_class(Echo_6000103.id, Echo_6000103)
-    WavesEchoRegister.register_class(Echo_6000104.id, Echo_6000104)
-    WavesEchoRegister.register_class(Echo_6000105.id, Echo_6000105)
-    WavesEchoRegister.register_class(Echo_6000106.id, Echo_6000106)
-    WavesEchoRegister.register_class(Echo_6000107.id, Echo_6000107)
-    WavesEchoRegister.register_class(Echo_6000108.id, Echo_6000108)
-    WavesEchoRegister.register_class(Echo_6000109.id, Echo_6000109)
-    WavesEchoRegister.register_class(Echo_6000110.id, Echo_6000110)
-    WavesEchoRegister.register_class(Echo_6000111.id, Echo_6000111)
-    WavesEchoRegister.register_class(Echo_6000112.id, Echo_6000112)
-    WavesEchoRegister.register_class(Echo_6000113.id, Echo_6000113)
-    WavesEchoRegister.register_class(Echo_6000114.id, Echo_6000114)
-    WavesEchoRegister.register_class(Echo_6000115.id, Echo_6000115)
-    WavesEchoRegister.register_class(Echo_6000116.id, Echo_6000116)
-    WavesEchoRegister.register_class(Echo_6000117.id, Echo_6000117)
-    WavesEchoRegister.register_class(Echo_6000118.id, Echo_6000118)
-    WavesEchoRegister.register_class(Echo_6000119.id, Echo_6000119)
-    WavesEchoRegister.register_class(Echo_6000120.id, Echo_6000120)
-    WavesEchoRegister.register_class(Echo_6000121.id, Echo_6000121)
-    WavesEchoRegister.register_class(Echo_6000160.id, Echo_6000160)
-    WavesEchoRegister.register_class(Echo_6000161.id, Echo_6000161)
-    WavesEchoRegister.register_class(Echo_6000162.id, Echo_6000162)
-    WavesEchoRegister.register_class(Echo_6000163.id, Echo_6000163)
-    WavesEchoRegister.register_class(Echo_6000164.id, Echo_6000164)
-    WavesEchoRegister.register_class(Echo_6000165.id, Echo_6000165)
-    WavesEchoRegister.register_class(Echo_6000166.id, Echo_6000166)
+    # 自动注册所有以 Echo_ 开头的类
+    for name, obj in globals().items():
+        if name.startswith("Echo_") and hasattr(obj, "id"):
+            WavesEchoRegister.register_class(obj.id, obj)

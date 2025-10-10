@@ -396,6 +396,14 @@ class WuWaCalc(object):
             card_sort_map["共鸣解放伤害加成"]
         )
 
+        card_sort_map["声骸技能伤害加成"] = sum_percentages(
+            result.get("声骸技能伤害加成", "0%"),
+            card_sort_map.get("声骸技能伤害加成", "0%"),
+        )
+        card_sort_map["phantom_damage"] = percent_to_float(
+            card_sort_map["声骸技能伤害加成"]
+        )
+
         card_sort_map["治疗效果加成"] = sum_percentages(
             result.get("治疗效果加成", "0%"), card_sort_map.get("治疗效果加成", "0%")
         )

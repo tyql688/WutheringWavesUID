@@ -792,6 +792,49 @@ class Weapon_21030043(WeaponAbstract):
     name = "远行者佩枪·洞察"
 
 
+class Weapon_21030036(WeaponAbstract):
+    id = 21030036
+    type = 3
+    name = "光影双生"
+
+    # 攻击提升12%。造成声骸技能伤害时，重击伤害加深24%，持续6秒；造成重击伤害时，声骸技能伤害加深24%，持续6秒；单次攻击最多享受24%伤害加深。同时拥有两种效果时，造成伤害时无视目标8%防御。
+    def cast_phantom(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放声骸技能"""
+        if attr.char_damage != hit_damage:
+            return False
+        dmg = f"{self.param(1)}"
+        title = self.get_title()
+        msg = f"造成声骸技能伤害时，重击伤害加深{dmg}"
+        attr.add_dmg_deepen(calc_percent_expression(dmg), title, msg)
+
+        # 嘉贝莉娜
+        if attr.role and attr.role.role.roleId == 1208:
+            dmg = f"{self.param(6)}"
+            title = self.get_title()
+            msg = f"无视目标{dmg}防御"
+            attr.add_defense_reduction(calc_percent_expression(dmg), title, msg)
+
+        return True
+
+    def cast_hit(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放重击"""
+        if attr.char_damage != phantom_damage:
+            return False
+        dmg = f"{self.param(3)}"
+        title = self.get_title()
+        msg = f"造成重击伤害时，声骸技能伤害加深{dmg}"
+        attr.add_dmg_deepen(calc_percent_expression(dmg), title, msg)
+
+        # 嘉贝莉娜
+        if attr.role and attr.role.role.roleId == 1208:
+            dmg = f"{self.param(6)}"
+            title = self.get_title()
+            msg = f"无视目标{dmg}防御"
+            attr.add_defense_reduction(calc_percent_expression(dmg), title, msg)
+
+        return True
+
+
 class Weapon_21030044(WeaponAbstract):
     id = 21030044
     type = 3
@@ -1641,103 +1684,7 @@ class Weapon_21050104(WeaponAbstract):
 
 
 def register_weapon():
-    WavesWeaponRegister.register_class(Weapon_21010011.id, Weapon_21010011)
-    WavesWeaponRegister.register_class(Weapon_21010012.id, Weapon_21010012)
-    WavesWeaponRegister.register_class(Weapon_21010013.id, Weapon_21010013)
-    WavesWeaponRegister.register_class(Weapon_21010015.id, Weapon_21010015)
-    WavesWeaponRegister.register_class(Weapon_21010016.id, Weapon_21010016)
-    WavesWeaponRegister.register_class(Weapon_21010023.id, Weapon_21010023)
-    WavesWeaponRegister.register_class(Weapon_21010024.id, Weapon_21010024)
-    WavesWeaponRegister.register_class(Weapon_21010026.id, Weapon_21010026)
-    WavesWeaponRegister.register_class(Weapon_21010034.id, Weapon_21010034)
-    WavesWeaponRegister.register_class(Weapon_21010036.id, Weapon_21010036)
-    WavesWeaponRegister.register_class(Weapon_21010043.id, Weapon_21010043)
-    WavesWeaponRegister.register_class(Weapon_21010044.id, Weapon_21010044)
-    WavesWeaponRegister.register_class(Weapon_21010046.id, Weapon_21010046)
-    WavesWeaponRegister.register_class(Weapon_21010053.id, Weapon_21010053)
-    WavesWeaponRegister.register_class(Weapon_21010063.id, Weapon_21010063)
-    WavesWeaponRegister.register_class(Weapon_21010064.id, Weapon_21010064)
-    WavesWeaponRegister.register_class(Weapon_21010074.id, Weapon_21010074)
-    WavesWeaponRegister.register_class(Weapon_21010084.id, Weapon_21010084)
-    WavesWeaponRegister.register_class(Weapon_21010094.id, Weapon_21010094)
-    WavesWeaponRegister.register_class(Weapon_21010104.id, Weapon_21010104)
-    WavesWeaponRegister.register_class(Weapon_21020011.id, Weapon_21020011)
-    WavesWeaponRegister.register_class(Weapon_21020012.id, Weapon_21020012)
-    WavesWeaponRegister.register_class(Weapon_21020013.id, Weapon_21020013)
-    WavesWeaponRegister.register_class(Weapon_21020015.id, Weapon_21020015)
-    WavesWeaponRegister.register_class(Weapon_21020016.id, Weapon_21020016)
-    WavesWeaponRegister.register_class(Weapon_21020017.id, Weapon_21020017)
-    WavesWeaponRegister.register_class(Weapon_21020023.id, Weapon_21020023)
-    WavesWeaponRegister.register_class(Weapon_21020024.id, Weapon_21020024)
-    WavesWeaponRegister.register_class(Weapon_21020026.id, Weapon_21020026)
-    WavesWeaponRegister.register_class(Weapon_21020034.id, Weapon_21020034)
-    WavesWeaponRegister.register_class(Weapon_21020036.id, Weapon_21020036)
-    WavesWeaponRegister.register_class(Weapon_21020043.id, Weapon_21020043)
-    WavesWeaponRegister.register_class(Weapon_21020044.id, Weapon_21020044)
-    WavesWeaponRegister.register_class(Weapon_21020046.id, Weapon_21020046)
-    WavesWeaponRegister.register_class(Weapon_21020053.id, Weapon_21020053)
-    WavesWeaponRegister.register_class(Weapon_21020056.id, Weapon_21020056)
-    WavesWeaponRegister.register_class(Weapon_21020064.id, Weapon_21020064)
-    WavesWeaponRegister.register_class(Weapon_21020074.id, Weapon_21020074)
-    WavesWeaponRegister.register_class(Weapon_21020084.id, Weapon_21020084)
-    WavesWeaponRegister.register_class(Weapon_21020094.id, Weapon_21020094)
-    WavesWeaponRegister.register_class(Weapon_21020104.id, Weapon_21020104)
-    WavesWeaponRegister.register_class(Weapon_21030011.id, Weapon_21030011)
-    WavesWeaponRegister.register_class(Weapon_21030012.id, Weapon_21030012)
-    WavesWeaponRegister.register_class(Weapon_21030013.id, Weapon_21030013)
-    WavesWeaponRegister.register_class(Weapon_21030015.id, Weapon_21030015)
-    WavesWeaponRegister.register_class(Weapon_21030016.id, Weapon_21030016)
-    WavesWeaponRegister.register_class(Weapon_21030023.id, Weapon_21030023)
-    WavesWeaponRegister.register_class(Weapon_21030024.id, Weapon_21030024)
-    WavesWeaponRegister.register_class(Weapon_21030026.id, Weapon_21030026)
-    WavesWeaponRegister.register_class(Weapon_21030034.id, Weapon_21030034)
-    WavesWeaponRegister.register_class(Weapon_21030043.id, Weapon_21030043)
-    WavesWeaponRegister.register_class(Weapon_21030044.id, Weapon_21030044)
-    WavesWeaponRegister.register_class(Weapon_21030053.id, Weapon_21030053)
-    WavesWeaponRegister.register_class(Weapon_21030064.id, Weapon_21030064)
-    WavesWeaponRegister.register_class(Weapon_21030074.id, Weapon_21030074)
-    WavesWeaponRegister.register_class(Weapon_21030084.id, Weapon_21030084)
-    WavesWeaponRegister.register_class(Weapon_21030094.id, Weapon_21030094)
-    WavesWeaponRegister.register_class(Weapon_21030104.id, Weapon_21030104)
-    WavesWeaponRegister.register_class(Weapon_21040011.id, Weapon_21040011)
-    WavesWeaponRegister.register_class(Weapon_21040012.id, Weapon_21040012)
-    WavesWeaponRegister.register_class(Weapon_21040013.id, Weapon_21040013)
-    WavesWeaponRegister.register_class(Weapon_21040015.id, Weapon_21040015)
-    WavesWeaponRegister.register_class(Weapon_21040016.id, Weapon_21040016)
-    WavesWeaponRegister.register_class(Weapon_21040023.id, Weapon_21040023)
-    WavesWeaponRegister.register_class(Weapon_21040024.id, Weapon_21040024)
-    WavesWeaponRegister.register_class(Weapon_21040026.id, Weapon_21040026)
-    WavesWeaponRegister.register_class(Weapon_21040034.id, Weapon_21040034)
-    WavesWeaponRegister.register_class(Weapon_21040036.id, Weapon_21040036)
-    WavesWeaponRegister.register_class(Weapon_21040043.id, Weapon_21040043)
-    WavesWeaponRegister.register_class(Weapon_21040044.id, Weapon_21040044)
-    WavesWeaponRegister.register_class(Weapon_21040046.id, Weapon_21040046)
-    WavesWeaponRegister.register_class(Weapon_21040053.id, Weapon_21040053)
-    WavesWeaponRegister.register_class(Weapon_21040064.id, Weapon_21040064)
-    WavesWeaponRegister.register_class(Weapon_21040074.id, Weapon_21040074)
-    WavesWeaponRegister.register_class(Weapon_21040084.id, Weapon_21040084)
-    WavesWeaponRegister.register_class(Weapon_21040094.id, Weapon_21040094)
-    WavesWeaponRegister.register_class(Weapon_21040104.id, Weapon_21040104)
-    WavesWeaponRegister.register_class(Weapon_21050011.id, Weapon_21050011)
-    WavesWeaponRegister.register_class(Weapon_21050012.id, Weapon_21050012)
-    WavesWeaponRegister.register_class(Weapon_21050013.id, Weapon_21050013)
-    WavesWeaponRegister.register_class(Weapon_21050015.id, Weapon_21050015)
-    WavesWeaponRegister.register_class(Weapon_21050016.id, Weapon_21050016)
-    WavesWeaponRegister.register_class(Weapon_21050017.id, Weapon_21050017)
-    WavesWeaponRegister.register_class(Weapon_21050023.id, Weapon_21050023)
-    WavesWeaponRegister.register_class(Weapon_21050024.id, Weapon_21050024)
-    WavesWeaponRegister.register_class(Weapon_21050026.id, Weapon_21050026)
-    WavesWeaponRegister.register_class(Weapon_21050027.id, Weapon_21050027)
-    WavesWeaponRegister.register_class(Weapon_21050034.id, Weapon_21050034)
-    WavesWeaponRegister.register_class(Weapon_21050036.id, Weapon_21050036)
-    WavesWeaponRegister.register_class(Weapon_21050043.id, Weapon_21050043)
-    WavesWeaponRegister.register_class(Weapon_21050044.id, Weapon_21050044)
-    WavesWeaponRegister.register_class(Weapon_21050046.id, Weapon_21050046)
-    WavesWeaponRegister.register_class(Weapon_21050053.id, Weapon_21050053)
-    WavesWeaponRegister.register_class(Weapon_21050056.id, Weapon_21050056)
-    WavesWeaponRegister.register_class(Weapon_21050064.id, Weapon_21050064)
-    WavesWeaponRegister.register_class(Weapon_21050066.id, Weapon_21050066)
-    WavesWeaponRegister.register_class(Weapon_21050074.id, Weapon_21050074)
-    WavesWeaponRegister.register_class(Weapon_21050084.id, Weapon_21050084)
-    WavesWeaponRegister.register_class(Weapon_21050094.id, Weapon_21050094)
-    WavesWeaponRegister.register_class(Weapon_21050104.id, Weapon_21050104)
+    # 自动注册所有以 Weapon_ 开头的类
+    for name, obj in globals().items():
+        if name.startswith("Weapon_") and hasattr(obj, "id"):
+            WavesWeaponRegister.register_class(obj.id, obj)

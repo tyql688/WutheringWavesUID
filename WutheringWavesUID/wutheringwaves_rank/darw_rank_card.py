@@ -20,6 +20,7 @@ from ..utils.calculate import (
     get_calc_map,
     get_total_score_bg,
 )
+from ..utils.char_info_utils import get_all_role_detail_info_list
 from ..utils.damage.abstract import DamageRankRegister
 from ..utils.database.models import WavesBind, WavesUser
 from ..utils.fonts.waves_fonts import (
@@ -51,7 +52,6 @@ from ..utils.image import (
 from ..utils.name_convert import alias_to_char_name, char_name_to_char_id
 from ..utils.resource.constant import SPECIAL_CHAR, SPECIAL_CHAR_NAME
 from ..utils.util import hide_uid
-from ..utils.waves_card_cache import get_card
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 
 rank_length = 20  # 排行长度
@@ -156,7 +156,7 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
 async def find_role_detail(
     uid: str, char_id: Union[int, str, List[str], List[int]]
 ) -> Optional[RoleDetailData]:
-    role_details = await get_card(uid)
+    role_details = await get_all_role_detail_info_list(uid)
     if role_details is None:
         return None
 

@@ -692,6 +692,44 @@
                     ]
                 }
             ]
+        },
+        {
+            "libId": 23,
+            "fetterList": [
+                {
+                    "fetterDetailName": "焚羽猎魔之影",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 6000120,
+                            "mainPropName": "属性伤害加成",
+                            "cost": 3
+                        },
+                        {
+                            "phantomId": 6000167,
+                            "mainPropName": "暴击伤害",
+                            "cost": 4
+                        },
+                        {
+                            "phantomId": 6000120,
+                            "mainPropName": "属性伤害加成",
+                            "cost": 3
+                        }
+                    ]
+                },
+                {
+                    "fetterDetailName": "熔山裂谷",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 390077012,
+                            "cost": 1
+                        },
+                        {
+                            "phantomId": 390070078,
+                            "cost": 1
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "charList": [
@@ -883,6 +921,13 @@
             "name": "尤诺",
             "weaponId": 21040046,
             "sonataLibId": 22
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1208,
+            "name": "嘉贝莉娜",
+            "weaponId": 21030036,
+            "sonataLibId": 23
         }
     ]
 }

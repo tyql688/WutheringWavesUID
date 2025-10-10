@@ -12,6 +12,7 @@ from gsuid_core.utils.image.convert import convert_img
 
 from ..utils.api.wwapi import GET_HOLD_RATE_URL
 from ..utils.ascension.char import get_char_model
+from ..utils.char_info_utils import get_all_role_detail_info_list
 from ..utils.database.models import WavesBind
 from ..utils.fonts.waves_fonts import (
     waves_font_20,
@@ -36,7 +37,6 @@ from ..utils.resource.constant import (
     SPECIAL_CHAR_NAME,
 )
 from ..utils.util import timed_async_cache
-from ..utils.waves_card_cache import get_card
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 bar1 = Image.open(TEXT_PATH / "bar1.png")
@@ -284,7 +284,7 @@ async def get_group_char_hold_rate_data(group_id: str) -> Dict:
         if uid in uid_fiter:
             return None
 
-        role_details = await get_card(uid)
+        role_details = await get_all_role_detail_info_list(uid)
         if role_details is None:
             return None
 
