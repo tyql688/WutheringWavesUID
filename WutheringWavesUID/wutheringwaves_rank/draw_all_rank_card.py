@@ -212,7 +212,7 @@ async def draw_all_rank_card(
     pic_temp = pic_temp.resize((160, 160))
 
     tasks = [
-        get_avatar(rank.user_id, rank.char_id) for rank in rankInfoList.data.details
+        get_avatar(ev, rank.user_id, rank.char_id) for rank in rankInfoList.data.details
     ]
     results = await asyncio.gather(*tasks)
 
@@ -481,38 +481,43 @@ def get_breach(breach: Union[int, None], level: int):
 
 
 async def get_avatar(
+    ev: Event,
     qid: Optional[str],
     char_id: Union[int, str],
 ) -> Image.Image:
-    # 检查qid 为纯数字
-    if qid and qid.isdigit():
-        if WutheringWavesConfig.get_config("QQPicCache").data:
-            pic = pic_cache.get(qid)
-            if not pic:
-                pic = await get_qq_avatar(qid, size=100)
-                pic_cache.set(qid, pic)
+    """
+    优先从 ev.sender['avatar'] 下载平台头像，按排行规范贴 120×120 小头像于 (0,-5)；
+    失败则回退角色头像 160×160 + 大遮罩偏移(-20,-45)，贴于 (0,0)。
+    """
+    import io
+    import urllib.request
+    # 平台头像
+    try:
+        url = None
+        sender = getattr(ev, "sender", None)
+        if isinstance(sender, dict):
+            url = sender.get("avatar")
         else:
-            pic = await get_qq_avatar(qid, size=100)
-            pic_cache.set(qid, pic)
-        pic_temp = crop_center_img(pic, 120, 120)
-
-        img = Image.new("RGBA", (180, 180))
-        avatar_mask_temp = avatar_mask.copy()
-        mask_pic_temp = avatar_mask_temp.resize((120, 120))
-        img.paste(pic_temp, (0, -5), mask_pic_temp)
-    else:
+            url = getattr(sender, "avatar", None)
+        if isinstance(url, str) and (url.startswith("http://") or url.startswith("https://")):
+            with urllib.request.urlopen(url, timeout=8) as resp:
+                data = resp.read()
+            raw = Image.open(io.BytesIO(data)).convert("RGBA")
+            base = Image.new("RGBA", (180, 180))
+            avatar_sq = crop_center_img(raw, 120, 120)
+            small_mask = avatar_mask.resize((120, 120))
+            base.paste(avatar_sq, (0, -5), small_mask)
+            return base
+        raise RuntimeError("no valid avatar url")
+    except Exception:
+        # 角色头像兜底：160×160 + 大遮罩
         pic = await get_square_avatar(char_id)
-
-        pic_temp = Image.new("RGBA", pic.size)
-        pic_temp.paste(pic.resize((160, 160)), (10, 10))
-        pic_temp = pic_temp.resize((160, 160))
-
-        avatar_mask_temp = avatar_mask.copy()
-        mask_pic_temp = Image.new("RGBA", avatar_mask_temp.size)
-        mask_pic_temp.paste(avatar_mask_temp, (-20, -45), avatar_mask_temp)
+        base = Image.new("RGBA", (180, 180))
+        mask = avatar_mask.copy()
+        pic_temp = Image.new("RGBA", (160, 160))
+        pic_temp.paste(pic.resize((160, 160)), (0, 0))
+        mask_pic_temp = Image.new("RGBA", mask.size)
+        mask_pic_temp.paste(mask, (-20, -45), mask)
         mask_pic_temp = mask_pic_temp.resize((160, 160))
-
-        img = Image.new("RGBA", (180, 180))
-        img.paste(pic_temp, (0, 0), mask_pic_temp)
-
-    return img
+        base.paste(pic_temp, (0, 0), mask_pic_temp)
+        return base
