@@ -7,10 +7,11 @@ from msgspec import json as msgjson
 from gsuid_core.logger import logger
 
 from ..utils.api.model import Props
+from ..utils.ascension.char import get_char_model
 from .expression_evaluator import find_first_matching_expression
 from .image import SPECIAL_GOLD, WAVES_MOLTEN, WAVES_SIERRA, WAVES_VOID
 from .map.calc_score_script import phantom_sub_value_map as ph_sub_map
-from .resource.constant import ID_FULL_CHAR_NAME
+from .resource.constant import ATTRIBUTE_NAME_SET, ID_FULL_CHAR_NAME
 
 MAP_PATH = Path(__file__).parent / "map/character"
 
@@ -44,7 +45,7 @@ def get_calc_map(ctx: Dict, char_name: str, char_id: Union[int, str]):
         return msgjson.decode(f.read())
 
 
-def calc_phantom_entry(index, prop, cost: int, calc_map):
+def calc_phantom_entry(index, prop, cost: int, calc_map, char_attr: str):
     skill_weight = calc_map.get("skill_weight", [])
     if not skill_weight:
         skill_weight = [0, 0, 0, 0]
@@ -85,7 +86,9 @@ def calc_phantom_entry(index, prop, cost: int, calc_map):
         score += pros_temp.get("技能伤害加成", 0) * skill_weight[2] * value
     elif prop.attributeName == "共鸣解放伤害加成":
         score += pros_temp.get("技能伤害加成", 0) * skill_weight[3] * value
-    elif prop.attributeName[0:2] in ["冷凝", "衍射", "导电", "热熔", "气动", "湮灭"]:
+    elif prop.attributeName[0:2] in ATTRIBUTE_NAME_SET and (
+        char_attr == prop.attributeName[0:2] or char_attr == ""
+    ):
         score += pros_temp.get("属性伤害加成", 0) * value
     else:
         score += pros_temp.get(prop.attributeName, 0) * value
@@ -111,14 +114,22 @@ def get_max_score(cost, calc_map):
 
 
 def calc_phantom_score(
-    char_name: str, prop_list: List[Props], cost: int, calc_map: Union[Dict, None]
+    char_id: Union[str, int],
+    prop_list: List[Props],
+    cost: int,
+    calc_map: Union[Dict, None],
 ) -> tuple[float, str]:
     if not calc_map:
         return 0, "c"
 
+    char_model = get_char_model(char_id)
+    char_attr = ""
+    if char_model:
+        char_attr = char_model.get_attribute_name()
+
     score = 0
     for index, prop in enumerate(prop_list):
-        _score, _ = calc_phantom_entry(index, prop, cost, calc_map)
+        _score, _ = calc_phantom_entry(index, prop, cost, calc_map, char_attr)
         score += _score
 
     max_score, props_grade = get_max_score(cost, calc_map)

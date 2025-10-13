@@ -76,7 +76,7 @@ async def get_waves_char_rank(uid, all_role_detail, need_expected_damage=False):
                 if _phantom and _phantom.phantomProp:
                     props = _phantom.get_props()
                     _score, _bg = calc_phantom_score(
-                        role_detail.role.roleName, props, _phantom.cost, calc.calc_temp
+                        role_detail.role.roleId, props, _phantom.cost, calc.calc_temp
                     )
                     phantom_score += _score
 

@@ -101,7 +101,7 @@ async def get_one_rank_info(user_id, uid, role_detail, rankDetail):
         if _phantom and _phantom.phantomProp:
             props = _phantom.get_props()
             _score, _bg = calc_phantom_score(
-                role_detail.role.roleName, props, _phantom.cost, calc.calc_temp
+                role_detail.role.roleId, props, _phantom.cost, calc.calc_temp
             )
             phantom_score += _score
 

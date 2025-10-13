@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from pydantic import BaseModel, Field
 
+from ...utils.resource.constant import ATTRIBUTE_ID_MAP
 from ...utils.util import format_with_defaults
 
 
@@ -71,6 +72,9 @@ class CharacterModel(BaseModel):
 
     def get_max_level_stat(self) -> Stats:
         return self.stats["6"]["90"]
+
+    def get_attribute_name(self) -> str:
+        return ATTRIBUTE_ID_MAP[self.attributeId]
 
 
 class WeaponModel(BaseModel):

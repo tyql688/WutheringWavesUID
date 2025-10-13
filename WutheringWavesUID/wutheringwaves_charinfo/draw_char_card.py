@@ -237,7 +237,7 @@ async def ph_card_draw(
             if _phantom and _phantom.phantomProp:
                 props = _phantom.get_props()
                 _score, _bg = calc_phantom_score(
-                    char_name, props, _phantom.cost, calc.calc_temp
+                    role_detail.role.roleId, props, _phantom.cost, calc.calc_temp
                 )
 
                 phantom_score += _score
@@ -1137,7 +1137,7 @@ async def draw_char_score_img(
             if _phantom and _phantom.phantomProp:
                 props = _phantom.get_props()
                 _score, _bg = calc_phantom_score(
-                    char_name, props, _phantom.cost, calc.calc_temp
+                    char_id, props, _phantom.cost, calc.calc_temp
                 )
 
                 phantom_score += _score
@@ -1218,7 +1218,11 @@ async def draw_char_score_img(
                     )
 
                     score, final_score = calc_phantom_entry(
-                        index, _prop, _phantom.cost, calc.calc_temp
+                        index,
+                        _prop,
+                        _phantom.cost,
+                        calc.calc_temp,
+                        role_detail.role.attributeName or "",
                     )
                     score_color = WAVES_MOONLIT
                     if final_score > 0:

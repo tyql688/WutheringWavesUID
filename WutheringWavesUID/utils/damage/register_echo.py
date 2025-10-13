@@ -520,6 +520,11 @@ class Echo_6000076(EchoAbstract):
     id = 6000076
     name = "毒冠贵族"
 
+    # 首位装备该声骸技能时，自身冷凝伤害加成提升12.00%
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"冷凝伤害加成": "12%"}
+
 
 class Echo_6000077(EchoAbstract):
     id = 6000077
@@ -785,6 +790,11 @@ class Echo_6000111(EchoAbstract):
 class Echo_6000112(EchoAbstract):
     id = 6000112
     name = "角鳄"
+
+    # 首位装配该声骸技能时，自身气动伤害加成提升12.00%，共鸣解放伤害加成提升12.00%
+    def do_equipment_first(self, role_id: int):
+        """首位装备"""
+        return {"气动伤害加成": "12%", "共鸣解放伤害加成": "12%"}
 
 
 class Echo_6000113(EchoAbstract):

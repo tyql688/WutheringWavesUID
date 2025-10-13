@@ -97,7 +97,7 @@ async def get_draw_list(ev: Event, uid: str, user_id: str) -> Union[str, bytes]:
             _phantom: EquipPhantom
             props = _phantom.get_props()
             _score, _bg = calc_phantom_score(
-                char_name, props, _phantom.cost, calc.calc_temp
+                role_detail.role.roleId, props, _phantom.cost, calc.calc_temp
             )
             name_colors = []
             num_colors = []
