@@ -135,6 +135,7 @@ async def draw_challenge_img(ev: Event, uid: str, user_id: str) -> Union[bytes, 
         boss_icon = await pic_download_from_url(
             CHALLENGE_PATH, _challenge[0].bossIconUrl
         )
+        boss_icon = boss_icon.resize((242, 156))
         img_temp.alpha_composite(boss_icon, (20, 20))
         for _temp in reversed(_challenge):
             boss_difficulty = _temp.difficulty
