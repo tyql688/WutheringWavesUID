@@ -87,6 +87,8 @@ class WeaponAbstract(object):
 
         func_list.append("cast_phantom")
 
+        func_list = [x for i, x in enumerate(func_list) if func_list.index(x) == i]
+
         for func_name in func_list:
             method = getattr(self, func_name, None)
             if callable(method):

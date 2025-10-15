@@ -604,6 +604,22 @@ class Weapon_21020064(WeaponAbstract):
             attr.add_atk_percent(calc_percent_expression(dmg), title, msg)
 
 
+class Weapon_21020066(WeaponAbstract):
+    id = 21020066
+    type = 2
+    name = "裁竹"
+
+    # 施放变奏技能或普攻后10秒内，施放声骸技能时，获得1层【解竹】，重击伤害加成提升30%，同名声骸只可触发一次，最多可叠加2层，持续12秒，叠加至2层后施放声骸技能不刷新持续时间。该效果10秒内最多生效1次，若切换至其他角色则该效果提前结束。
+    # 施放变奏技能时，队伍中的角色声骸技能伤害加成提升20%，持续30秒，同名效果之间不可叠加。
+    def cast_phantom(self, attr: DamageAttribute, isGroup: bool = False):
+        """施放声骸技能"""
+        if attr.char_damage == hit_damage:
+            dmg = f"{self.param(2)}%*2"
+            title = self.get_title()
+            msg = f"施放声骸技能时，重击伤害加成提升{dmg}"
+            attr.add_dmg_bonus(calc_percent_expression(dmg), title, msg)
+
+
 class Weapon_21020074(WeaponAbstract):
     id = 21020074
     type = 2

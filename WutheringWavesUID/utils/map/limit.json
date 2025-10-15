@@ -730,6 +730,44 @@
                     ]
                 }
             ]
+        },
+        {
+            "libId": 24,
+            "fetterList": [
+                {
+                    "fetterDetailName": "息界同调之律",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 6000116,
+                            "mainPropName": "暴击伤害",
+                            "cost": 4
+                        },
+                        {
+                            "phantomId": 6000162,
+                            "mainPropName": "属性伤害加成",
+                            "cost": 3
+                        },
+                        {
+                            "phantomId": 6000096,
+                            "mainPropName": "属性伤害加成",
+                            "cost": 3
+                        }
+                    ]
+                },
+                {
+                    "fetterDetailName": "啸谷长风",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 390070064,
+                            "cost": 1
+                        },
+                        {
+                            "phantomId": 390070079,
+                            "cost": 1
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "charList": [
@@ -928,6 +966,13 @@
             "name": "嘉贝莉娜",
             "weaponId": 21030036,
             "sonataLibId": 23
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1411,
+            "name": "仇远",
+            "weaponId": 21020066,
+            "sonataLibId": 24
         }
     ]
 }

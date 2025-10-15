@@ -10114,6 +10114,429 @@
   {
     "chainList": [
       {
+        "description": "答剑·弦歌不缀、答剑·割股之心、答剑·忠烈死节免疫打断。\n仇远暴击提升20%。",
+        "iconUrl": "",
+        "name": "如剑不动，相由心生",
+        "order": 1,
+        "unlocked": true
+      },
+      {
+        "description": "【竹照】获得时增加额外效果：附近队伍中的角色声骸技能伤害加深30%。",
+        "iconUrl": "",
+        "name": "剑啊，谓我弃绝弦歌不辍",
+        "order": 2,
+        "unlocked": true
+      },
+      {
+        "description": "共鸣解放万钧一断伤害倍率增加500%。\n协奏能量充满且不处于【淋漓醉墨】状态下时，仇远的共鸣技能替换为共鸣技能荷蓑出林，每20秒可施放1次。\n施放荷蓑出林时，提前结束且从容效果，消耗60点协奏能量并回复【挑灯问剑】400点，对目标造成仇远自身500%攻击的气动伤害，此次伤害视为声骸技能伤害，下一次常态攻击普攻替换为答剑·质黑相青第三段。\n施放荷蓑出林后，下次仇远进入【淋漓醉墨】状态时无法获得且从容效果，答剑·弦歌不缀、答剑·割股之心、答剑·忠烈死节伤害倍率增加600%，答剑·忠烈死节命中时额外获得协奏能量30点。\n施放荷蓑出林后，非联机状态下下次延奏技能替换为延奏技能新筠坠箨，造成仇远自身500%攻击的气动伤害，此次伤害视为声骸技能伤害。",
+        "iconUrl": "",
+        "name": "剑啊，谓我弃绝割股之心",
+        "order": 3,
+        "unlocked": true
+      },
+      {
+        "description": "仇远攻击提升20%。",
+        "iconUrl": "",
+        "name": "剑啊，谓我弃绝忠烈死节",
+        "order": 4,
+        "unlocked": true
+      },
+      {
+        "description": "仇远无视目标15%的防御。",
+        "iconUrl": "",
+        "name": "剑啊，如今我弹铗而歌",
+        "order": 5,
+        "unlocked": true
+      },
+      {
+        "description": "施放重击答剑·忠烈死节时，停滞周围的敌人，持续5秒，该效果联机状态下不会生效。切换至其他角色或目标受到伤害时提前清除停滞效果。\n退出【淋漓醉墨】状态且为队伍中登场角色时，对范围内敌人造成自身600%攻击的气动伤害，该伤害视为声骸技能伤害。\n施放共鸣技能荷蓑出林时，仇远暴击伤害增加100%，持续6秒。切换至其他角色时，效果提前结束。",
+        "iconUrl": "",
+        "name": "如是我闻、我见、我言",
+        "order": 6,
+        "unlocked": true
+      }
+    ],
+    "level": 90,
+    "phantomData": {
+      "cost": 12,
+      "equipPhantomList": [
+        {
+          "cost": 4,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "息界同调之律",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "44%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "150",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 4,
+            "iconUrl": "",
+            "name": "共鸣回响·芬莱克",
+            "phantomId": 6000116,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "息界同调之律",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "气动伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "梦魇·青羽鹭",
+            "phantomId": 6000162,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 3,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "息界同调之律",
+            "num": 3,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "气动伤害加成",
+              "attributeValue": "30%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "100",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 3,
+            "iconUrl": "",
+            "name": "重塑雕像的拳砾",
+            "phantomId": 6000096,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "啸谷长风",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "鸣泣战士",
+            "phantomId": 390070064,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        },
+        {
+          "cost": 1,
+          "fetterDetail": {
+            "firstDescription": "",
+            "groupId": 0,
+            "iconUrl": "",
+            "name": "啸谷长风",
+            "num": 2,
+            "secondDescription": ""
+          },
+          "level": 25,
+          "mainProps": [
+            {
+              "attributeName": "攻击",
+              "attributeValue": "18%",
+              "iconUrl": ""
+            },
+            {
+              "attributeName": "生命",
+              "attributeValue": "2280",
+              "iconUrl": ""
+            }
+          ],
+          "subProps": [
+            {
+              "attributeName": "暴击",
+              "attributeValue": "10.5%"
+            },
+            {
+              "attributeName": "暴击伤害",
+              "attributeValue": "21.0%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "11.6%"
+            },
+            {
+              "attributeName": "攻击",
+              "attributeValue": "60"
+            },
+            {
+              "attributeName": "重击伤害加成",
+              "attributeValue": "11.6%"
+            }
+          ],
+          "phantomProp": {
+            "cost": 1,
+            "iconUrl": "",
+            "name": "刺玫菇（稚形）",
+            "phantomId": 390070079,
+            "phantomPropId": 0,
+            "quality": 5,
+            "skillDescription": ""
+          },
+          "quality": 5
+        }
+      ]
+    },
+    "role": {
+      "acronym": "",
+      "attributeId": 4,
+      "attributeName": "气动",
+      "breach": 6,
+      "isMainRole": false,
+      "level": 90,
+      "roleIconUrl": "",
+      "roleId": 1411,
+      "roleName": "仇远",
+      "rolePicUrl": "",
+      "starLevel": 5,
+      "weaponTypeId": 2,
+      "weaponTypeName": "迅刀",
+      "iconUrl": ""
+    },
+    "skillList": [
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻\n进行最多三段的连续攻击，造成气动伤害。\n\n重击\n消耗耐力攻击目标，造成气动伤害。施放后一定时间内，短按普攻将施放普攻答剑·质黑相青第四段。\n\n空中攻击\n消耗耐力进行空中下落攻击，造成气动伤害。\n\n闪避反击\n成功闪避后，短按普攻将会攻击目标，造成气动伤害，此次伤害视为重击伤害。\n施放普攻和重击后一定时间内，若受到敌方目标攻击，免疫此次伤害并施放闪避反击，攻击目标并造成气动伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "质黑相青",
+          "type": "常态攻击"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "短按共鸣技能，仇远向前突进一段距离，造成气动伤害，此次伤害视为声骸技能伤害。即将受到敌方目标攻击时，施放共鸣技能，免疫此次伤害并停滞周围敌人，此次共鸣技能免疫打断。\n切换至其他角色时提前清除停滞效果。\n\n不辞远\n长按共鸣技能，仇远向前突进一段距离，对目标造成气动伤害，此次伤害视为声骸技能伤害。\n按住共鸣技能时，若周围没有目标，仇远会升入空中向前奔袭并持续消耗耐力，奔袭可持续一段时间。在空中时，耐力耗尽或松开共鸣技能将提前结束奔袭，奔袭结束时若周围有目标，会对目标造成气动伤害，此次伤害视为声骸技能伤害。此技能可在空中施放。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "穿林打叶",
+          "type": "共鸣技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "对范围内的目标造成气动伤害，此次伤害视为声骸技能伤害。\n仇远暴击高于50%时，每多出1%暴击，施放该技能时，附近队伍中的登场角色提升2%暴击伤害，持续30秒。最高可提升30%暴击伤害。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "万钧一断",
+          "type": "共鸣解放"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成气动伤害，此次伤害视为重击伤害。\n施放该技能后一定时间内短按普攻，将施放普攻答剑·质黑相青第三段。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "攻其必救",
+          "type": "变奏技能"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "普攻·答剑·质黑相青\n【挑灯问剑】达到200点时，普攻替换为普攻答剑·质黑相青，进行最多四段的连续攻击，造成气动伤害，此次伤害视为重击伤害。\n\n竹照\n【挑灯问剑】达到400点时，获得【竹照】效果，附近队伍中的登场角色声骸技能伤害加成提升30%，持续30秒。\n\n淋漓醉墨\n【挑灯问剑】满时，仇远进入【淋漓醉墨】状态，重击替换为重击答剑·割股之心，持续8秒。\n【淋漓醉墨】状态下，长按普攻可消耗【挑灯问剑】依次施放重击答剑·弦歌不缀、答剑·割股之心、答剑·忠烈死节，造成气动伤害，此伤害视为重击伤害。\n·施放答剑·弦歌不缀、答剑·割股之心、答剑·忠烈死节时，视为施放声骸技能。\n·【挑灯问剑】耗尽时，仇远提前退出【淋漓醉墨】状态。\n\n【挑灯问剑】获取规则\n【挑灯问剑】上限为600点。\n·施放普攻第三段时，获得【挑灯问剑】100点。\n·施放普攻答剑·质黑相青每段可获得【挑灯问剑】100点。\n·施放闪避反击时，获得【挑灯问剑】100点。\n·施放变奏技能时，获得【挑灯问剑】400点。\n·【淋漓醉墨】状态期间，无法获得【挑灯问剑】。\n·【淋漓醉墨】状态结束时，清空【挑灯问剑】。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "裁竹为锋",
+          "type": "共鸣回路"
+        }
+      },
+      {
+        "level": 10,
+        "skill": {
+          "description": "攻击目标，造成仇远自身100%攻击的气动伤害，此次伤害视为声骸技能伤害。\n下一个登场角色声骸技能伤害加深50%，持续14秒，若切换至其他角色则该效果提前结束。",
+          "iconUrl": "",
+          "id": 0,
+          "name": "出其不趋",
+          "type": "延奏技能"
+        }
+      }
+    ],
+    "weaponData": {
+      "breach": 6,
+      "level": 90,
+      "resonLevel": 5,
+      "weapon": {
+        "weaponEffectName": "攻击提升24%。施放变奏技能或普攻后10秒内，施放声骸技能时，获得1层【解竹】，重击伤害加成提升60%，同名声骸只可触发一次，最多可叠加2层，持续12秒，叠加至2层后施放声骸技能不刷新持续时间。该效果10秒内最多生效1次，若切换至其他角色则该效果提前结束。\n施放变奏技能时，队伍中的角色声骸技能伤害加成提升40%，持续30秒，同名效果之间不可叠加。",
+        "weaponIcon": "",
+        "weaponId": 21020066,
+        "weaponName": "裁竹",
+        "weaponStarLevel": 5,
+        "weaponType": 2
+      }
+    }
+  },
+  {
+    "chainList": [
+      {
         "description": "共鸣技能枪扫风定可使用次数增加1次。\n施放共鸣技能枪扫风定时，消耗的【破阵值】减少15点。",
         "iconUrl": "",
         "name": "济世",
