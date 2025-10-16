@@ -113,8 +113,6 @@ async def draw_total_rank(bot: Bot, ev: Event, pages: int) -> Union[str, bytes]:
     if not rankInfoList.data:
         return "获取练度总排行失败"
 
-    logger.info(f"获取练度总排行成功: {rankInfoList.data}")
-
     # 设置图像尺寸
     width = 1300
     text_bar_height = 130
