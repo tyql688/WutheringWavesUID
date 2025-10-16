@@ -160,12 +160,23 @@ def calc_damage_2(
     # 设置声骸属性
     attr.set_phantom_dmg_bonus()
 
+    # 竹照
+    # 获得【竹照】效果，附近队伍中的登场角色声骸技能伤害加成提升30%，持续30秒。
+    title = "竹照"
+    msg = "声骸技能伤害加成提升30%"
+    attr.add_dmg_bonus(0.3, title, msg)
+
     # 设置共鸣链
     chain_num = role.get_chain_num()
     if chain_num >= 1:
         title = f"{role_name}-一链"
         msg = "暴击提升20%"
         attr.add_crit_rate(0.2, title, msg)
+
+    if chain_num >= 2:
+        title = f"{role_name}-二链"
+        msg = "【竹照】：附近队伍中的角色声骸技能伤害加深30%。"
+        attr.add_dmg_deepen(0.3, title, msg)
 
     if chain_num >= 3:
         title = f"{role_name}-三链"
