@@ -7,6 +7,7 @@ MAIN_URL = "https://top.camellya.xyz"
 
 UPLOAD_URL = f"{MAIN_URL}/top/waves/upload"
 GET_RANK_URL = f"{MAIN_URL}/top/waves/rank"
+GET_TOTAL_RANK_URL = f"{MAIN_URL}/top/waves/total/rank"
 ONE_RANK_URL = f"{MAIN_URL}/top/waves/one"
 UPLOAD_ABYSS_RECORD_URL = f"{MAIN_URL}/top/waves/abyss/upload"
 GET_ABYSS_RECORD_URL = f"{MAIN_URL}/top/waves/abyss/record"
@@ -71,6 +72,48 @@ class RankItem(BaseModel):
     rank_type: int
     waves_id: Optional[str] = ""
     version: str
+
+
+# ------------------------------------------------------------
+# 总排行
+
+
+class TotalRankRequest(BaseModel):
+    page: int = Field(..., description="页码")
+    page_num: int = Field(..., description="每页数量")
+    version: str = Field(..., description="版本号")
+    waves_id: str = Field(..., description="鸣潮id")
+
+
+class CharScoreDetail(BaseModel):
+    char_id: int
+    phantom_score: float
+
+
+class TotalRankDetail(BaseModel):
+    rank: int
+    user_id: str
+    username: str
+    alias_name: str
+    kuro_name: str
+    waves_id: str
+    total_score: float
+    char_score_details: List[CharScoreDetail]
+
+
+class TotalRankInfoData(BaseModel):
+    score_details: List[TotalRankDetail]
+    page: int
+    page_num: int
+
+
+class TotalRankResponse(BaseModel):
+    code: int
+    message: str
+    data: Optional[TotalRankInfoData] = None
+
+
+# ------------------------------------------------------------
 
 
 class OneRankRequest(BaseModel):

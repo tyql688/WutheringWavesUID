@@ -3,11 +3,14 @@ import re
 from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
+
 from .darw_rank_card import draw_rank_img
 from .draw_all_rank_card import draw_all_rank_card
+from .draw_total_rank_card import draw_total_rank
 
 sv_waves_rank_list = SV("ww角色排行")
 sv_waves_rank_all_list = SV("ww角色总排行", priority=1)
+sv_waves_rank_total_list = SV("ww练度总排行", priority=0)
 
 
 @sv_waves_rank_list.on_regex("^[\u4e00-\u9fa5]+(?:排行|排名)$", block=True)
@@ -79,3 +82,11 @@ async def send_all_rank_card(bot: Bot, ev: Event):
         await bot.send(im, at_sender)
     if isinstance(im, bytes):
         await bot.send(im)
+
+
+@sv_waves_rank_total_list.on_command(("练度总排行", "练度总排名"), block=True)
+async def send_total_rank_card(bot: Bot, ev: Event):
+
+    pages = 1
+    im = await draw_total_rank(bot, ev, pages)
+    await bot.send(im)

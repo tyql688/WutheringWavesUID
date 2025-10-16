@@ -102,6 +102,7 @@ async def send_card(
             "version": get_version(),
             "char_info": [r.to_rank_dict() for r in waves_char_rank],
             "role_num": account_info.roleNum,
+            "single_refresh": 1 if len(waves_data) == 1 else 0,
         }
         await put_item(QUEUE_SCORE_RANK, metadata)
 

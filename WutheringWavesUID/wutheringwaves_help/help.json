@@ -317,6 +317,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "练度总排行",
+        "desc": "练度总排行",
+        "eg": "练度总排行",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
