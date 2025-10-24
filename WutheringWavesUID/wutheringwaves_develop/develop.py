@@ -397,7 +397,7 @@ async def calc_role_need_card(
     )
 
     # 武器
-    if content.get("weaponId", None):
+    if content.get("weaponId", None) and role_cost_detail.weaponId:
         online_weapon = online_weapon_map[f"{role_cost_detail.weaponId}"]
         weapon_id = content["weaponId"]
         square_weapon = await get_square_weapon(weapon_id)
