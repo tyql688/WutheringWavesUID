@@ -885,6 +885,13 @@
         },
         {
             "calcFile": "calc.json",
+            "charId": 1606,
+            "name": "洛可可",
+            "weaponId": 21040026,
+            "sonataLibId": 6
+        },
+        {
+            "calcFile": "calc.json",
             "charId": 1607,
             "name": "坎特蕾拉",
             "weaponId": 21050056,
