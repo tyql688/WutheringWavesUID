@@ -122,9 +122,24 @@ with open(MAP_PATH / "id2name.json", "r", encoding="UTF-8") as f:
 def alias_to_char_name(char_name: str) -> str:
     for i in char_alias_data:
         if (char_name in i) or (char_name in char_alias_data[i]):
-            logger.debug(f"别名转换: {char_name} -> {i}")
             return i
     return char_name
+
+
+def alias_to_char_name_optional(char_name: Optional[str]) -> Optional[str]:
+    if not char_name:
+        return None
+    for i in char_alias_data:
+        if (char_name in i) or (char_name in char_alias_data[i]):
+            return i
+    return None
+
+
+def alias_to_char_name_list(char_name: str) -> List[str]:
+    for i in char_alias_data:
+        if (char_name in i) or (char_name in char_alias_data[i]):
+            return char_alias_data[i]
+    return []
 
 
 def char_id_to_char_name(char_id: str) -> Optional[str]:
