@@ -10,7 +10,6 @@ from gsuid_core.utils.image.image_tools import (
     draw_text_by_line,
     easy_alpha_composite,
     easy_paste,
-    get_pic,
 )
 
 from ..utils.fonts.waves_fonts import (
@@ -218,9 +217,8 @@ async def ann_batch_card(post_content: List, drow_height: float) -> bytes:
         elif (
             temp["contentType"] == 2
             and "url" in temp
-            and temp["url"].endswith(("jpg", "png", "jpeg"))
+            and temp["url"].endswith(("jpg", "png", "jpeg", "webp"))
         ):
-            # img = await get_pic(temp["url"], (temp["imgWidth"], temp["imgHeight"]))
             img = await pic_download_from_url(ANN_CARD_PATH, temp["url"])
             img_x = 0
             if img.width > im.width:
@@ -298,11 +296,11 @@ async def ann_detail_card(
         elif (
             content_type == 2
             and "url" in temp
-            and temp["url"].endswith(("jpg", "png", "jpeg"))
+            and temp["url"].endswith(("jpg", "png", "jpeg", "webp"))
         ):
             # 图片
             _size = (temp["imgWidth"], temp["imgHeight"])
-            img = await get_pic(temp["url"], _size)
+            img = await pic_download_from_url(ANN_CARD_PATH, temp["url"])
             img_height = img.size[1]
             if img.width > 1080:
                 ratio = 1080 / img.width
@@ -343,7 +341,7 @@ def get_duanluo(text: str):
     draw = ImageDraw.Draw(txt)
     # 所有文字的段落
     duanluo = ""
-    max_width = 1080
+    max_width = 1050
     # 宽度总和
     sum_width = 0
     # 几行
