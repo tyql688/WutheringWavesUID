@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Dict, List
 
 from PIL import Image, ImageDraw
-from utils.image.convert import convert_img
 
 from gsuid_core.models import Event
+from gsuid_core.utils.image.convert import convert_img
 
 from ..utils.api.model import (
     BatchRoleCostResponse,

@@ -6,11 +6,11 @@ from typing import Optional, Union
 
 import httpx
 from PIL import Image, ImageDraw
-from utils.image.convert import convert_img
 
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
+from gsuid_core.utils.image.convert import convert_img
 
 from ..utils.api.wwapi import (
     GET_RANK_URL,
