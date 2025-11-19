@@ -768,6 +768,44 @@
                     ]
                 }
             ]
+        },
+        {
+            "libId": 25,
+            "fetterList": [
+                {
+                    "fetterDetailName": "命理崩毁之弦",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 6000167,
+                            "mainPropName": "暴击伤害",
+                            "cost": 4
+                        },
+                        {
+                            "phantomId": 6000077,
+                            "mainPropName": "属性伤害加成",
+                            "cost": 3
+                        },
+                        {
+                            "phantomId": 6000173,
+                            "mainPropName": "属性伤害加成",
+                            "cost": 3
+                        }
+                    ]
+                },
+                {
+                    "fetterDetailName": "沉日劫明",
+                    "equipPhantomList": [
+                        {
+                            "phantomId": 390070079,
+                            "cost": 1
+                        },
+                        {
+                            "phantomId": 390070077,
+                            "cost": 1
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "charList": [
@@ -980,6 +1018,13 @@
             "name": "仇远",
             "weaponId": 21020066,
             "sonataLibId": 24
+        },
+        {
+            "calcFile": "calc.json",
+            "charId": 1508,
+            "name": "千咲",
+            "weaponId": 21010056,
+            "sonataLibId": 25
         }
     ]
 }
