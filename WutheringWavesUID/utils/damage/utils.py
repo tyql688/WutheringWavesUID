@@ -23,6 +23,7 @@ SONATA_ANCIENT = "失序彼岸之梦"
 SONATA_CROWN_OF_VALOR = "荣斗铸锋之冠"
 SONATA_HARMONY = "息界同调之律"
 SONATA_FIREWALL = "焚羽猎魔之影"
+SONATA_SCISSOR = "命理崩毁之弦"
 
 CHAR_ATTR_FREEZING = "冷凝"
 CHAR_ATTR_CELESTIAL = "衍射"
@@ -87,6 +88,9 @@ SkillTreeMap = {
 
 # 光噪效应
 Spectro_Frazzle_Role_Ids = [1501, 1502, 1506, 1507]
+
+# 虚湮效应
+Havoc_Bane_Role_Ids = [1508]
 
 # 失序彼岸之梦 套装
 Ancient_Role_Ids = [1608]

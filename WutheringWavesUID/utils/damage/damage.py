@@ -242,6 +242,8 @@ class DamageAttribute:
         self.env_aero_erosion = False
         # 风蚀效应伤害加深
         self.env_aero_erosion_deepen = False
+        # 虚湮效应
+        self.env_havoc_bane = False
         # 触发护盾
         self.trigger_shield = False
         # 声骸结果
@@ -561,6 +563,7 @@ class DamageAttribute:
             [
                 self.env_spectro,
                 self.env_aero_erosion,
+                self.env_havoc_bane,
             ]
         )
 
@@ -582,6 +585,11 @@ class DamageAttribute:
     def set_env_aero_erosion_deepen(self):
         """风蚀效应伤害加深"""
         self.env_aero_erosion_deepen = True
+        return self
+
+    def set_env_havoc_bane(self):
+        """虚湮效应"""
+        self.env_havoc_bane = True
         return self
 
     def set_trigger_shield(self):
