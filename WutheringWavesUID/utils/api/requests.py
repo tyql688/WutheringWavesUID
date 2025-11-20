@@ -122,8 +122,8 @@ class WavesApi:
         waves_user.bat = access_token
         await WavesUser.update_data_by_data(
             select_data={
-                "user_id": waves_user.user_id,
-                "bot_id": waves_user.bot_id,
+                # "user_id": waves_user.user_id,
+                # "bot_id": waves_user.bot_id,
                 "uid": waves_user.uid,
             },
             update_data={"bat": access_token},
