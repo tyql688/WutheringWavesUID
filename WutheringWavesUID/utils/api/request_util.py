@@ -18,7 +18,7 @@ from ...utils.util import (
     send_master_info,
 )
 
-KURO_VERSION = "2.6.3"
+KURO_VERSION = "2.8.0"
 PLATFORM_SOURCE = "ios"
 CONTENT_TYPE = "application/x-www-form-urlencoded; charset=utf-8"
 
@@ -27,14 +27,14 @@ async def get_base_header(devCode: Optional[str] = None):
     header = {
         "source": PLATFORM_SOURCE,
         "Content-Type": CONTENT_TYPE,
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.6.3",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.8.0",
     }
     if devCode:
         header["devCode"] = devCode
     else:
         ip = await get_public_ip()
         header["devCode"] = (
-            f"{ip}, Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.6.3"
+            f"{ip}, Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)  KuroGameBox/2.8.0"
         )
     return header
 
