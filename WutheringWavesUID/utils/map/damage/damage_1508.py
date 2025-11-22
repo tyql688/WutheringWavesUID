@@ -2,7 +2,7 @@
 
 from ...api.model import RoleDetailData
 from ...ascension.char import WavesCharResult, get_char_detail
-from ...damage.damage import DamageAttribute
+from ...damage.damage import DamageAttribute, calc_percent_expression
 from ...damage.utils import (
     SkillTreeMap,
     SkillType,
@@ -54,7 +54,7 @@ def calc_damage_1(
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    # 共鸣回路-虚湮之线：对拥有虚无绞痕的目标造成伤害时，可无视其18%防御
+    # 虚湮之线
     title = "共鸣回路-虚湮之线"
     msg = "对拥有虚无绞痕的目标造成伤害时，可无视其18%防御"
     attr.add_defense_reduction(0.18, title, msg)
@@ -78,7 +78,7 @@ def calc_damage_1(
     if chain_num >= 2:
         title = f"{role_name}-二链"
         msg = "造成伤害无视目标10%湮灭伤害抗性"
-        attr.add_resistance_ignore(0.1, title, msg)
+        attr.add_enemy_resistance(-0.1, title, msg)
         if isGroup:
             title = f"{role_name}-二链"
             msg = "队伍中的角色处于虚湮之线状态时，全属性伤害加成提升50%"
@@ -215,12 +215,25 @@ def calc_damage_3(
     # 假设消耗100点【锯环残响】（满值），增加锯环·终结倍率
     echo_consumed = 100
 
-    # 总技能倍率 = 第2段长按 + 第3段长按 + 锯环·终结（含残响加成）
-    total_multi = skill_multi_2 + skill_multi_3 + skill_multi_final + (skill_multi_per_echo * echo_consumed)
+    # 分别添加各部分技能倍率
+    title = "锯环·疾攻第2段长按"
+    msg = f"技能倍率{skill_multi_2}"
+    attr.add_skill_multi(skill_multi_2, title, msg)
 
-    title = "电锯模式长按总伤"
-    msg = f"技能倍率{total_multi}（第2段长按{skill_multi_2}+第3段长按{skill_multi_3}+锯环·终结{skill_multi_final}+残响加成{skill_multi_per_echo}*{echo_consumed}）"
-    attr.add_skill_multi(total_multi, title, msg)
+    title = "锯环·疾攻第3段长按"
+    msg = f"技能倍率{skill_multi_3}"
+    attr.add_skill_multi(skill_multi_3, title, msg)
+
+    title = "锯环·终结基础伤害"
+    msg = f"技能倍率{skill_multi_final}"
+    attr.add_skill_multi(skill_multi_final, title, msg)
+
+    # 残响加成（使用calc_percent_expression计算数值）
+    per_echo_value = calc_percent_expression(skill_multi_per_echo)
+    echo_bonus = per_echo_value * echo_consumed
+    title = "锯环·终结残响加成"
+    msg = f"每点残响{skill_multi_per_echo}×{echo_consumed}点={echo_bonus:.2%}"
+    attr.add_skill_multi(f"{echo_bonus:.2%}", title, msg)
 
     # 设置角色施放技能
     damage_func = [cast_attack, cast_skill, cast_variation, cast_liberation]
@@ -229,7 +242,7 @@ def calc_damage_3(
     # 设置角色等级
     attr.set_character_level(role_level)
 
-    # 共鸣回路-虚湮之线：对拥有虚无绞痕的目标造成伤害时，可无视其18%防御
+    # 虚湮之线
     title = "共鸣回路-虚湮之线"
     msg = "对拥有虚无绞痕的目标造成伤害时，可无视其18%防御"
     attr.add_defense_reduction(0.18, title, msg)
@@ -253,7 +266,7 @@ def calc_damage_3(
     if chain_num >= 2:
         title = f"{role_name}-二链"
         msg = "造成伤害无视目标10%湮灭伤害抗性"
-        attr.add_resistance_ignore(0.1, title, msg)
+        attr.add_enemy_resistance(-0.1, title, msg)
         if isGroup:
             title = f"{role_name}-二链"
             msg = "队伍中的角色处于虚湮之线状态时，全属性伤害加成提升50%"
@@ -265,26 +278,28 @@ def calc_damage_3(
         attr.add_skill_ratio(1.2, title, msg)
 
         # 三链增加锯环·终结残响倍率增加效果
+        per_echo_value = calc_percent_expression(skill_multi_per_echo)
+        extra_bonus = per_echo_value * echo_consumed * 1.2
         title = f"{role_name}-三链"
-        msg = f"消耗【锯环残响】提供的锯环·终结倍率增加效果提升120%（额外+{skill_multi_per_echo * echo_consumed * 1.2}）"
-        attr.add_skill_multi(skill_multi_per_echo * echo_consumed * 1.2, title, msg)
-
-    # 五链：不适用于锯环系列技能
+        msg = f"消耗【锯环残响】提供的锯环·终结倍率增加效果提升120%（额外+{extra_bonus:.2%}）"
+        attr.add_skill_multi(f"{extra_bonus:.2%}", title, msg)
 
     if chain_num >= 6:
         title = f"{role_name}-六链"
         msg = "拥有虚无绞痕·终焉的目标受到千咲伤害提升40%"
         attr.add_dmg_bonus(0.4, title, msg)
 
-    # 万缕·汇终状态（施放共鸣解放后15秒内）
+    # 万缕·汇终状态
     title = "共鸣解放-万缕·汇终"
     msg = "锯环·疾攻、锯环·终结伤害倍率提升120%"
     attr.add_skill_ratio(1.2, title, msg)
 
-    # 万缕·汇终增加锯环·终结残响倍率增加效果
+    # 万缕·汇终残响加成
+    per_echo_value = calc_percent_expression(skill_multi_per_echo)
+    extra_bonus = per_echo_value * echo_consumed * 1.2
     title = "共鸣解放-万缕·汇终"
-    msg = f"消耗【锯环残响】提供的锯环·终结倍率增加效果提升120%（额外+{skill_multi_per_echo * echo_consumed * 1.2}）"
-    attr.add_skill_multi(skill_multi_per_echo * echo_consumed * 1.2, title, msg)
+    msg = f"消耗【锯环残响】提供的锯环·终结倍率增加效果提升120%"
+    attr.add_skill_multi(f"{extra_bonus:.2%}", title, msg)
 
     # 声骸
     echo_damage(attr, isGroup)

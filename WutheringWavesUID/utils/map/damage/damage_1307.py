@@ -62,8 +62,6 @@ def calc_damage_1(
     chain_num = role.get_chain_num()
     # 二链：回复共鸣能量，不影响治疗量
 
-    # 三链：紧急治疗（这里不单独计算，因为是触发型效果）
-
     if chain_num >= 4:
         title = f"{role_name}-四链"
         msg = "卜灵的治疗效果加成提升20%"
@@ -85,7 +83,7 @@ def calc_damage_2(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
 ) -> tuple[str, str]:
     """
-    三链紧急治疗量
+    三链-五雷荡煞阵触发治疗
     """
     attr.set_char_damage(heal_bonus)
     attr.set_char_template("temp_atk")
@@ -98,12 +96,10 @@ def calc_damage_2(
     # 检查是否有三链
     chain_num = role.get_chain_num()
     if chain_num < 3:
-        # 没有三链，返回0
         return None, "0"
 
-    # 三链紧急治疗：350 + 150%卜灵攻击
-    # 使用固定值 + 攻击力百分比的方式
-    title = "三链紧急治疗量"
+    # 三链
+    title = "三链-五雷荡煞阵触发治疗"
     msg = "技能倍率350+150.00%"
     attr.add_healing_skill_multi("350+150.00%", title, msg)
 
@@ -206,7 +202,7 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_1(attr, role),
     },
     {
-        "title": "三链紧急治疗量",
+        "title": "三链-五雷荡煞阵触发治疗",
         "func": lambda attr, role: calc_damage_2(attr, role),
     },
     {
