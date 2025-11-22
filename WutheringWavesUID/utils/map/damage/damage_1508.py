@@ -281,7 +281,7 @@ def calc_damage_3(
         per_echo_value = calc_percent_expression(skill_multi_per_echo)
         extra_bonus = per_echo_value * echo_consumed * 1.2
         title = f"{role_name}-三链"
-        msg = f"消耗【锯环残响】提供的锯环·终结倍率增加效果提升120%（额外+{extra_bonus:.2%}）"
+        msg = f"消耗【锯环残响】提供的锯环·终结倍率增加效果提升120%"
         attr.add_skill_multi(f"{extra_bonus:.2%}", title, msg)
 
     if chain_num >= 6:
