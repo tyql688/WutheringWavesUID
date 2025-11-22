@@ -335,6 +335,7 @@ def phase_damage(
                 return
             # 角色为敌人添加【虚湮效应】时，自身攻击提升20%，共鸣解放伤害加成提升30%，持续5秒。
             title = f"{phase_name}-{ph_detail.ph_name}"
-            msg = "角色为敌人添加【虚湮效应】时，自身攻击提升20%，共鸣解放伤害加成提升30%"
+            msg = "角色为敌人添加【虚湮效应】时，自身攻击提升20%"
             attr.add_atk_percent(0.2, title, msg)
+            msg = "角色为敌人添加【虚湮效应】时，共鸣解放伤害加成提升30%"
             attr.add_dmg_bonus(0.3, title, msg)
