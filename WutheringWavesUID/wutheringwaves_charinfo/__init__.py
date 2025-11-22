@@ -82,7 +82,7 @@ async def send_one_char_detail_msg(bot: Bot, ev: Event):
     if not char:
         return
     char_id = char_name_to_char_id(char)
-    if not char_id:
+    if not char_id or len(char_id) != 4:
         return await bot.send(
             f"[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
         )
