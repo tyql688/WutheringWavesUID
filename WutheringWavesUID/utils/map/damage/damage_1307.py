@@ -60,9 +60,13 @@ def calc_damage_1(
 
     # 设置共鸣链
     chain_num = role.get_chain_num()
-    if chain_num >= 2:
-        title = f"{role_name}-二链"
-        msg = "召劾鬼神治疗效果提升20%"
+    # 二链：回复共鸣能量，不影响治疗量
+
+    # 三链：紧急治疗（这里不单独计算，因为是触发型效果）
+
+    if chain_num >= 4:
+        title = f"{role_name}-四链"
+        msg = "卜灵的治疗效果加成提升20%"
         attr.add_dmg_bonus(0.2, title, msg)
 
     # 声骸
@@ -78,6 +82,65 @@ def calc_damage_1(
 
 
 def calc_damage_2(
+    attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
+) -> tuple[str, str]:
+    """
+    三链紧急治疗量
+    """
+    attr.set_char_damage(heal_bonus)
+    attr.set_char_template("temp_atk")
+
+    role_name = role.role.roleName
+    role_id = role.role.roleId
+    role_level = role.role.level
+    role_breach = role.role.breach
+
+    # 检查是否有三链
+    chain_num = role.get_chain_num()
+    if chain_num < 3:
+        # 没有三链，返回0
+        return None, "0"
+
+    # 三链紧急治疗：350 + 150%卜灵攻击
+    # 使用固定值 + 攻击力百分比的方式
+    title = "三链紧急治疗量"
+    msg = "技能倍率350+150.00%"
+    attr.add_healing_skill_multi("350+150.00%", title, msg)
+
+    # 设置角色施放技能
+    damage_func = [cast_attack, cast_skill]
+
+    # 设置角色等级
+    attr.set_character_level(role_level)
+
+    # 设置角色固有技能
+    if role_breach is not None and role_breach >= 3:
+        title = "固有技能-吉时已至"
+        msg = "治疗生命值低于50%的角色时，治疗效果加成提升25%"
+        attr.add_dmg_bonus(0.25, title, msg)
+
+    # 设置声骸属性
+    attr.set_phantom_dmg_bonus(needShuxing=False)
+
+    # 设置共鸣链
+    if chain_num >= 4:
+        title = f"{role_name}-四链"
+        msg = "卜灵的治疗效果加成提升20%"
+        attr.add_dmg_bonus(0.2, title, msg)
+
+    # 声骸
+    echo_damage(attr, isGroup)
+
+    # 武器
+    weapon_damage(attr, role.weaponData, damage_func, isGroup)
+
+    # 治疗量
+    healing_bonus = attr.calculate_healing(attr.effect_attack)
+    crit_damage = f"{healing_bonus:,.0f}"
+    return None, crit_damage
+
+
+def calc_damage_3(
     attr: DamageAttribute, role: RoleDetailData, isGroup: bool = False
 ) -> tuple[str, str]:
     """
@@ -116,15 +179,13 @@ def calc_damage_2(
 
     # 设置共鸣链
     chain_num = role.get_chain_num()
-    if chain_num >= 4:
-        title = f"{role_name}-四链"
-        msg = "飞雷诀·归一暴击率提升15%"
-        attr.add_crit_rate(0.15, title, msg)
+    if chain_num >= 1:
+        title = f"{role_name}-一链"
+        msg = "共鸣解放·飞雷诀·归一造成伤害时，暴击提升20%"
+        attr.add_crit_rate(0.2, title, msg)
 
-    if chain_num >= 6:
-        title = f"{role_name}-六链"
-        msg = "飞雷诀·归一倍率提升50%"
-        attr.add_skill_ratio(0.5, title, msg)
+    # 四链：治疗效果加成提升，不影响伤害
+    # 六链：队伍中登场角色获得的共鸣技能伤害加成效果提升至50%（这是buff效果，不直接影响飞雷诀伤害计算）
 
     # 声骸
     echo_damage(attr, isGroup)
@@ -145,8 +206,12 @@ damage_detail = [
         "func": lambda attr, role: calc_damage_1(attr, role),
     },
     {
-        "title": "飞雷诀·归一伤害",
+        "title": "三链紧急治疗量",
         "func": lambda attr, role: calc_damage_2(attr, role),
+    },
+    {
+        "title": "飞雷诀·归一伤害",
+        "func": lambda attr, role: calc_damage_3(attr, role),
     },
 ]
 
